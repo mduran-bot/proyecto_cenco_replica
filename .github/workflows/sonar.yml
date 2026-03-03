@@ -23,11 +23,13 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          # Instalamos pytest y los plugins necesarios
+          # Librerías base para los tests y reportes
           pip install pytest pytest-cov 
-          # Instalamos PySpark y cualquier otra librería que use tu código
-          pip install pyspark boto3 
-          # Si tienes un archivo de requerimientos, úsalo también:
+          # TODAS las dependencias que saltaron en tu error:
+          pip install requests pandas jsonschema hypothesis pyspark boto3
+          # Si usas Airflow en los tests (vi errores de airflow_tasks)
+          pip install apache-airflow
+          # Opcional: Si tienes un requirements.txt, úsalo al final
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
       - name: Test with pytest and generate coverage
