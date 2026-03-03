@@ -98,9 +98,12 @@ sonar.python.coverage.reportPaths=coverage.xml
 sonar.python.xunit.reportPath=nosetests.xml
 
 # Organización del análisis
-sonar.sources=.
-sonar.tests=max/polling/
-sonar.exclusions=**/venv/**, **/tests/**
+sonar.sources=max/polling/src
+sonar.tests=max/polling
+sonar.exclusions=**/venv/**
+
+# Codificación
+sonar.sourceEncoding=UTF-8
 ```
 
 ### Parámetros de Configuración
@@ -114,11 +117,11 @@ sonar.exclusions=**/venv/**, **/tests/**
 - **sonar.python.xunit.reportPath**: Ruta al reporte de tests JUnit
 
 #### Análisis de Código
-- **sonar.sources**: Directorio raíz del código fuente (`.` = todo el proyecto)
-- **sonar.tests**: Directorio donde están los tests (`max/polling/`)
+- **sonar.sources**: Directorio del código fuente a analizar (`max/polling/src`)
+- **sonar.tests**: Directorio donde están los tests (`max/polling`)
 - **sonar.exclusions**: Archivos/directorios excluidos del análisis
   - `**/venv/**`: Entornos virtuales de Python
-  - `**/tests/**`: Archivos de test (no se analizan como código fuente)
+- **sonar.sourceEncoding**: Codificación de archivos fuente (UTF-8)
 
 ## Métricas Analizadas
 
