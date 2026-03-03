@@ -31,7 +31,7 @@ jobs:
           # Mantenemos el PYTHONPATH para que encuentre 'src' y 'api_client'
           PYTHONPATH: ${{ github.workspace }}:${{ github.workspace }}/max/polling:${{ github.workspace }}/max/polling/src
         run: |
-          # Ejecutamos SOLO el archivo deseado
+          # Ejecutamos SOLO el archivo deseados
           pytest max/polling/test_localstack_with_real_api.py --cov=max/polling/src --cov-report=xml:coverage.xml --junitxml=nosetests.xml
         continue-on-error: true 
 
