@@ -85,7 +85,7 @@ class JanisAPIClient:
         adapter = HTTPAdapter(max_retries=retry_strategy)
         
         # Montar adapter para HTTP y HTTPS
-        session.mount("http://", adapter)
+  
         session.mount("https://", adapter)
         
         return session
