@@ -10,7 +10,7 @@ Este módulo maneja la escritura de datos al bucket S3 Bronze con:
 import json
 import boto3
 from datetime import datetime
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Any
 import logging
 
 logger = logging.getLogger(__name__)

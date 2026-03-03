@@ -51,6 +51,7 @@ Esta carpeta contiene toda la documentación general del proyecto que no está e
 ### GitLab y CI/CD
 - **GITLAB_PREPARATION.md**: Preparación para GitLab
 - **Preparación para GitLab - Resumen.md**: Resumen de preparación
+- **CI_CD_SONARQUBE.md**: Integración de SonarQube Cloud Analysis con GitHub Actions ⭐ NUEVO
 
 ### Permisos y Seguridad
 - **INVENTARIO_Y_PERMISOS_AWS.md**: Inventario de recursos y permisos AWS

@@ -1,0 +1,40 @@
+name: SonarQube Cloud Analysis
+
+on:
+  push:
+    branches: [ main ]  # Se activa cada vez que subes algo a la rama main
+  pull_request:
+    types: [opened, synchronize, reopened] # Se activa en cada PR para avisarte si hay errores
+
+jobs:
+  sonarcloud:
+    name: Test & Analyze
+    runs-on: ubuntu-latest # Usa una máquina virtual con Linux
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Descarga todo el historial de Git (necesario para que Sonar sepa QUIÉN hizo cada bug)
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest pytest-cov # Instalamos Pytest y el plugin de cobertura
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Test with pytest and generate coverage
+        run: |
+          # --cov=. indica que mida cobertura de toda la carpeta actual
+          # --cov-report=xml genera el archivo que SonarCloud entiende
+          # --junitxml genera el reporte de qué pruebas pasaron/fallaron
+          pytest --cov=. --cov-report=xml:coverage.xml --junitxml=nosetests.xml
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master # Acción oficial de Sonar
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Token automático de GitHub
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}     # El secreto que guardaste manualmente
