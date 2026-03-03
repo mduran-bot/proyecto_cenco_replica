@@ -23,7 +23,11 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pytest pytest-cov # Instalamos Pytest y el plugin de cobertura
+          # Instalamos pytest y los plugins necesarios
+          pip install pytest pytest-cov 
+          # Instalamos PySpark y cualquier otra librería que use tu código
+          pip install pyspark boto3 
+          # Si tienes un archivo de requerimientos, úsalo también:
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
       - name: Test with pytest and generate coverage
