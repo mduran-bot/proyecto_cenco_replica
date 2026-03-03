@@ -94,7 +94,7 @@ class StateManager:
                 },
                 ExpressionAttributeValues={
                     ':true': True,
-                    ':false': LOCK_ACQUIRED_VAL,
+                    'LOCK_ACQUIRED_VAL': False
                     ':now': now,
                     ':exec_id': execution_id,
                     ':running': 'running'
@@ -148,12 +148,12 @@ class StateManager:
         """
         try:
             update_expr = 'SET lock_acquired = :false, #status = :status'
-            expr_values = {':false': LOCK_ACQUIRED_VAL}
+            expr_values = {'LOCK_ACQUIRED_VAL': False}
             expr_names = {'#status': 'status'}
             
             if success:
                 # Update timestamps and metrics on success
-                now = datetime.now(timezone.utc)
+                now = datetime.utcnow().isoformat()
                 update_expr += ', last_successful_execution = :now, records_fetched = :records'
                 expr_values[':now'] = now
                 expr_values[':status'] = 'completed'
@@ -316,7 +316,7 @@ class StateManager:
                 Key={'data_type': data_type},
                 UpdateExpression='SET lock_acquired = :false',
                 ExpressionAttributeValues={
-                    ':false': LOCK_ACQUIRED_VAL
+                    'LOCK_ACQUIRED_VAL': False
                 }
             )
             
