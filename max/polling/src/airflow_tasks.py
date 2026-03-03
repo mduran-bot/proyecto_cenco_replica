@@ -617,7 +617,7 @@ def output_data(data_type: str, client: str, **context) -> Dict[str, Any]:
             'summary': {
                 'total_records': 0,
                 'execution_id': context['run_id'],
-                'poll_timestamp': datetime.utcnow().isoformat(),
+                'poll_timestamp': datetime.now(timezone.utc).isoformat(),
                 'client': client
             }
         }
@@ -631,7 +631,7 @@ def output_data(data_type: str, client: str, **context) -> Dict[str, Any]:
     ) or context['run_id']
     
     # Generate poll timestamp
-    poll_timestamp = datetime.utcnow().isoformat() + 'Z'
+    poll_timestamp = datetime.now(timezone.utc).isoformat() + 'Z'
     
     # Add metadata to each record
     output_records = []
@@ -765,7 +765,7 @@ def write_to_s3_bronze(data_type: str, client: str, **context) -> Dict[str, Any]
     
     # Get S3 configuration from environment or Airflow Variables
     s3_bucket = os.environ.get('S3_BRONZE_BUCKET')
-    aws_region = os.environ.get('AWS_REGION', 'us-east-1')
+  
     
     if not s3_bucket:
         raise ValueError(
@@ -784,7 +784,7 @@ def write_to_s3_bronze(data_type: str, client: str, **context) -> Dict[str, Any]
             data=output_records,
             client=client,
             data_type=data_type,
-            partition_date=datetime.utcnow()
+            partition_date=datetime.now(timezone.utc)
         )
         
         if write_result['success']:
@@ -944,7 +944,7 @@ def release_dynamodb_lock(data_type: str, client: str, **context) -> None:
         # Don't raise - we want to ensure the task completes
         # even if lock release fails
     
-    # TODO: Emit CloudWatch metrics with client dimension
+    
     # This would require boto3 cloudwatch client
     # For now, just log the metrics
     logger.info(

@@ -53,7 +53,7 @@ BUSINESS_RULES = {
             "name": "name_not_empty",
             "description": "El nombre del producto no puede estar vacío",
             "validate": lambda record: bool(record.get("name", "").strip()),
-            "error": "El campo name no puede estar vacío"
+            "error": "El campo name de products no puede estar vacío"
         },
         {
             "name": "reference_id_not_empty",
@@ -102,7 +102,7 @@ BUSINESS_RULES = {
             "name": "name_not_empty",
             "description": "El nombre de la tienda no puede estar vacío",
             "validate": lambda record: bool(record.get("name", "").strip()),
-            "error": "El campo name no puede estar vacío"
+            "error": "El campo name de tienda no puede estar vacío"
         },
         {
             "name": "reference_id_not_empty",
@@ -122,7 +122,7 @@ BUSINESS_RULES = {
             "name": "name_not_empty",
             "description": "El nombre del evento no puede estar vacío",
             "validate": lambda record: bool(record.get("name", "").strip()),
-            "error": "El campo name no puede estar vacío"
+            "error": "El campo name de order-history no puede estar vacío"
         }
     ]
 }
@@ -269,7 +269,7 @@ class DataValidator:
             if record_id is None:
                 # Sin ID: incluir de todas formas, no podemos deduplicar
                 unique_records.append(record)
-                logger.warning(f"Registro sin 'id' encontrado en lote, no se puede deduplicar")
+                logger.warning("Registro sin 'id' encontrado en lote, no se puede deduplicar")
                 continue
 
             if record_id in seen_ids:

@@ -16,7 +16,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
+aws_region = os.getenv('AWS_REGION', 'us-east-1')
 class S3Writer:
     """
     Escritor de datos a S3 Bronze con particionamiento.
@@ -44,13 +44,13 @@ class S3Writer:
             self.s3_client = boto3.client(
                 's3',
                 endpoint_url=endpoint_url,
-                region_name='us-east-1',
+                region_name=aws_region ,
                 aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID', 'test'),
                 aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY', 'test')
             )
         else:
             # AWS real
-            self.s3_client = boto3.client('s3', region_name='us-east-1')
+            self.s3_client = boto3.client('s3', region_name=aws_region)
         
         logger.info(f"S3Writer inicializado para bucket: {bucket_name}")
     
@@ -61,7 +61,7 @@ class S3Writer:
         try:
             self.s3_client.head_bucket(Bucket=self.bucket_name)
             logger.info(f"Bucket '{self.bucket_name}' existe")
-        except:
+        except ClientError:
             logger.info(f"Creando bucket '{self.bucket_name}'...")
             self.s3_client.create_bucket(Bucket=self.bucket_name)
             logger.info(f"Bucket '{self.bucket_name}' creado")

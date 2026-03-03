@@ -208,7 +208,7 @@ class JanisAPIClient:
             # Timeout después de 30 segundos
             raise
         except requests.exceptions.RequestException as e:
-            # Otros errores de red
+            logger.error(f"Error de red detectado: {e}")
             raise
     
     def close(self):

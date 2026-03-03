@@ -24,7 +24,7 @@ from botocore.exceptions import ClientError
 
 logger = logging.getLogger(__name__)
 
-
+LOCK_ACQUIRED_VAL = ':false'
 class StateManager:
     """
     Manages polling state in DynamoDB with distributed locking.
@@ -76,7 +76,7 @@ class StateManager:
             ClientError: For DynamoDB errors other than ConditionalCheckFailed
         """
         try:
-            now = datetime.utcnow().isoformat()
+            now = datetime.now(timezone.utc)
             
             self.table.update_item(
                 Key={'data_type': data_type},
@@ -94,7 +94,7 @@ class StateManager:
                 },
                 ExpressionAttributeValues={
                     ':true': True,
-                    ':false': False,
+                    ':false': LOCK_ACQUIRED_VAL,
                     ':now': now,
                     ':exec_id': execution_id,
                     ':running': 'running'
@@ -148,12 +148,12 @@ class StateManager:
         """
         try:
             update_expr = 'SET lock_acquired = :false, #status = :status'
-            expr_values = {':false': False}
+            expr_values = {':false': LOCK_ACQUIRED_VAL}
             expr_names = {'#status': 'status'}
             
             if success:
                 # Update timestamps and metrics on success
-                now = datetime.utcnow().isoformat()
+                now = datetime.now(timezone.utc)
                 update_expr += ', last_successful_execution = :now, records_fetched = :records'
                 expr_values[':now'] = now
                 expr_values[':status'] = 'completed'
@@ -316,7 +316,7 @@ class StateManager:
                 Key={'data_type': data_type},
                 UpdateExpression='SET lock_acquired = :false',
                 ExpressionAttributeValues={
-                    ':false': False
+                    ':false': LOCK_ACQUIRED_VAL
                 }
             )
             
