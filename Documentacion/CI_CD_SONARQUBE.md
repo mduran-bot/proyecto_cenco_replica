@@ -214,8 +214,8 @@ SonarCloud comenta automáticamente en los PRs con:
 
 ### Módulos No Encontrados en Tests
 - Verificar configuración de `PYTHONPATH` en el workflow
-- Asegurar que las rutas incluyan todos los directorios necesarios
-- Revisar estructura de imports en el código
+- Asegurar que las rutas incluyan `max/polling` y `max/polling/src`
+- Revisar estructura de imports en el código (debe importar desde `src` y `api_client`)
 
 ### Cobertura No Se Reporta
 - Verificar que `coverage.xml` se genere correctamente
