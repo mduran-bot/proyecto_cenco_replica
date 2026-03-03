@@ -1,0 +1,4 @@
+# file: C:\Users\maxim\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\pyspark\sql\profiler.py
+# hypothesis_version: 6.151.9
+
+['(type, renderer)', '0.4', '=', 'ProfileResults', 'VALUE_NOT_ALLOWED', 'allowed_values', 'arg_name', 'cumulative', 'flameprof', 'memory', 'minimum_version', 'package_name', 'perf', 'time', 'type', 'w+']

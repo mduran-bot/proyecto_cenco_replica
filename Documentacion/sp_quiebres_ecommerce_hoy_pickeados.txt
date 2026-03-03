@@ -1,0 +1,337 @@
+CREATE OR REPLACE PROCEDURE dl_sp_dashboards_ecommerce.sp_quiebres_ecommerce_hoy_pickeados()
+	LANGUAGE plpgsql
+AS $$
+	
+	
+	
+	
+
+begin
+
+drop table if exists #pedidos_pickeados_legado;
+select distinct id,vtex_id,cadena,cod_tienda,statusorder,cuenta into #pedidos_pickeados_legado from dl_sp_dashboards_ecommerce.tbl_pedidos_programados_hoy 
+where upper(descestado) 
+in ('PICKEADO POR FACTURAR','PROCESANDO DESCUENTOS','PRE CANCELADO','FACTURADO','PENDIENTE SAC','LISTO PARA ENVIAR',
+'LISTO PARA RETIRAR','DESPACHADO','A REPROGRAMAR ENTREGA','ENTREGADO','LIQUIDADO') and  cuenta='LEGACY';
+
+drop table if exists #pedidos_pickeados_wongio;
+select distinct id,vtex_id,cadena,cod_tienda,statusorder,cuenta into #pedidos_pickeados_wongio from  dl_sp_dashboards_ecommerce.tbl_pedidos_programados_hoy 
+where upper(descestado) 
+in ('PICKEADO POR FACTURAR','PROCESANDO DESCUENTOS','PRE CANCELADO','FACTURADO','PENDIENTE SAC','LISTO PARA ENVIAR',
+'LISTO PARA RETIRAR','DESPACHADO','A REPROGRAMAR ENTREGA','ENTREGADO','LIQUIDADO') and  cuenta='WONG_IO';
+
+drop table if exists #pedidos_pickeados_metroio;
+select distinct id,vtex_id,cadena,cod_tienda,statusorder,cuenta into #pedidos_pickeados_metroio from  dl_sp_dashboards_ecommerce.tbl_pedidos_programados_hoy 
+where upper(descestado) 
+in ('PICKEADO POR FACTURAR','PROCESANDO DESCUENTOS','PRE CANCELADO','FACTURADO','PENDIENTE SAC','LISTO PARA ENVIAR',
+'LISTO PARA RETIRAR','DESPACHADO','A REPROGRAMAR ENTREGA','ENTREGADO','LIQUIDADO') and  cuenta='METRO_IO';
+
+drop table if exists #variables_quiebres;
+WITH tmp_variables_quiebres AS (
+select
+cast((select min(id)id from #pedidos_pickeados_legado where cuenta='LEGACY')  as int) AS min_id_legado,
+cast((select max(id)id from #pedidos_pickeados_legado where cuenta='LEGACY')  as int) AS max_id_legado,
+cast((select min(id)id from #pedidos_pickeados_wongio where cuenta='WONG_IO')  as int) AS min_id_wongio,
+cast((select max(id)id from #pedidos_pickeados_wongio where cuenta='WONG_IO')  as int) AS max_id_wongio,
+cast((select min(id)id from #pedidos_pickeados_metroio where cuenta='METRO_IO')  as int) AS min_id_metroio,
+cast((select max(id)id from #pedidos_pickeados_metroio where cuenta='METRO_IO')  as int) AS max_id_metroio
+)
+
+
+select * into #variables_quiebres  from  tmp_variables_quiebres;
+
+drop table if exists #data_programados_mat_consolidado_seccion_quiebres;--16 seg
+select
+o.vtex_id
+,o.cadena
+,cod_tienda
+,oi.name										as material
+,oi.ref_id
+,oi.substitute_of								as es_sustituto
+,oi.price
+--,oi.selling_price
+,oi.quantity
+,oi.quantity_picked
+,convert(decimal(18,3),main_weight.total)		as unit_pickeadas
+,upper(oi.measurement_unit)						as measurement_unit
+,oi.unit_multiplier
+,o.statusorder
+into #data_programados_mat_consolidado_seccion_quiebres
+from #pedidos_pickeados_legado o
+inner join stg_ecommerce_janis_legacy.wms_order_items oi on (o.id=oi.order_id)-- and oi.substitute_of is null;
+left join	(	
+			select
+			order_item
+			,sum(nvl(weight,0))		as total
+			from stg_ecommerce_janis_legacy.wms_order_item_weighables
+			--where order_id between cast(var_orderid_min_legacy as int) and cast(var_orderid_max_legacy as int) -- parametro de pedidos
+			group by
+			order_item
+			) main_weight on (main_weight.order_item=oi.id)
+where oi.order_id between cast((select min_id_legado from #variables_quiebres) as int) and cast((select max_id_legado from #variables_quiebres) as int)
+union all
+select
+o.vtex_id
+,o.cadena
+,cod_tienda
+,oi.name										as material
+,oi.ref_id
+,oi.substitute_of								as es_sustituto
+,oi.price
+--,oi.selling_price
+,oi.quantity
+,oi.quantity_picked
+,convert(decimal(18,3),main_weight.total)		as unit_pickeadas
+,upper(oi.measurement_unit)						as measurement_unit
+,oi.unit_multiplier
+,o.statusorder
+from #pedidos_pickeados_metroio o
+inner join stg_ecommerce_janis_metroio.wms_order_items oi on (o.id=oi.order_id)-- and oi.substitute_of is null;
+left join	(	
+			select
+			order_item
+			,sum(nvl(weight,0))		as total
+			from stg_ecommerce_janis_metroio.wms_order_item_weighables
+			--where order_id between cast(var_orderid_min_metroio as int) and cast(var_orderid_max_metroio as int) -- parametro de pedidos
+			group by
+			order_item
+			) main_weight on (main_weight.order_item=oi.id)
+where oi.order_id between cast((select min_id_metroio from #variables_quiebres)as int) and cast((select max_id_metroio from #variables_quiebres)as int)
+union all
+select
+o.vtex_id
+,o.cadena
+,cod_tienda
+,oi.name										as material
+,oi.ref_id
+,oi.substitute_of								as es_sustituto
+,oi.price
+--,oi.selling_price
+,oi.quantity
+,oi.quantity_picked
+,convert(decimal(18,3),main_weight.total)		as unit_pickeadas
+,upper(oi.measurement_unit)						as measurement_unit
+,oi.unit_multiplier
+,o.statusorder
+from #pedidos_pickeados_wongio o
+inner join stg_ecommerce_janis_wongio.wms_order_items oi on (o.id=oi.order_id)-- and oi.substitute_of is null;
+left join	(	
+			select
+			order_item
+			,sum(nvl(weight,0))		as total
+			from stg_ecommerce_janis_wongio.wms_order_item_weighables
+			--where order_id between cast(var_orderid_min_wongio as int) and cast(var_orderid_max_wongio as int) -- parametro de pedidos
+			group by
+			order_item
+			) main_weight on (main_weight.order_item=oi.id)
+where oi.order_id between cast((select min_id_wongio from #variables_quiebres)as int) and cast((select max_id_wongio from #variables_quiebres)as int);
+
+
+alter table #data_programados_mat_consolidado_seccion_quiebres add descestado varchar(100);
+alter table #data_programados_mat_consolidado_seccion_quiebres add sustituto varchar(100);
+
+update  #data_programados_mat_consolidado_seccion_quiebres set--9 seg
+sustituto	=case 	when es_sustituto is not null then 'SI'
+					else 'NO' end;
+
+--actualizar estados
+update #data_programados_mat_consolidado_seccion_quiebres set--10 seg
+descestado	=case statusorder	when 5 then 'PENDIENTE DE AUDITORÍA'
+								when 1 then 'NUEVA ORDEN'
+								when 6 then 'AUDITORÍA RECHAZADA'
+								when 9 then 'PENDIENTE DE PICKING EN EL SELLER'
+								when 10 then 'PENDIENTE DE PICKING'
+								when 11 then 'PENDIENTE DE REPICKING'
+								when 20 then 'EN PICKING'
+								when 21 then 'PENDIENTE DE FINALIZAR PICKING'
+								when 22 then 'FINALIZANDO PICKING'
+								when 23 then 'PREPICKING'
+								when 25 then 'PREPICKING'
+								when 30 then 'PICKEADO POR FACTURAR'
+								when 35 then 'PRECANCELADA'
+								when 40 then 'FACTURADO'
+								when 50 then 'A RECUPERAR'
+								when 60 then 'LISTO PARA ENVIAR'
+								when 65 then 'LISTO PARA RETIRAR'
+								when 66 then 'ESPERANDO POR LOGISTICA EXTERNA'
+								when 70 then 'DESPACHADO'
+								when 80 then 'A REPROGRAMAR ENTREGA'
+								when 90 then 'ENTREGADO'
+								when 95 then 'LIQUIDADO'
+								when 100 then 'ANULADO'
+								when 105 then 'ANULACIÓN AUTOMÁTICA PENDIENTE'
+								when 110 then 'ANULACIÓN CONFIRMADA'
+								when 120 then 'CANCELACIÓN PENDIENTE'
+								when 125 then 'CANCELADO'
+								when 130 then 'DEVOLUCIÓN PARCIAL'
+								when 135 then 'DEVOLUCIÓN TOTAL'
+								when 33 then 'PROCESANDO DESCUENTOS'
+								else null end;
+
+--tipo de despacho
+drop table if exists #data_adic_programado_mat_seccion_quiebre;--20 seg
+select distinct
+a.*
+,convert_timezone('GMT','GMT+5',getdate())								 																																									as hora_consulta
+into #data_adic_programado_mat_seccion_quiebre
+from #data_programados_mat_consolidado_seccion_quiebres a;
+
+
+delete--0 seg
+from  #data_adic_programado_mat_seccion_quiebre
+where ref_id in('770406','960780','966142','770407','969575','965489');
+
+update #data_adic_programado_mat_seccion_quiebre set--8 seg
+quantity_picked		=0
+where quantity_picked is null;
+
+update #data_adic_programado_mat_seccion_quiebre set--9 seg
+unit_pickeadas	=0
+where unit_pickeadas is null
+and measurement_unit='KG';
+
+drop table if exists #Materiales_Consolidado_1;
+SELECT ID_MATERIAL,ID_EAN_PRINCIPAL,A.SK_DIA_CREACION_MATERIAL,DESC_MATERIAL,DESC_MARCA,ID_UM_BASE,ID_PROVEEDOR,DESC_PROVEEDOR,
+ID_GRUPO_ARTICULO,DESC_GRUPO_ARTICULO,ID_CATEGORIA,DESC_CATEGORIA,DESC_JEFE_CATEGORIA,DESC_JEFE_CATEGORIA_MP,DESC_JEFE_CATEGORIA_IMP,ID_SUB_CATEGORIA,DESC_SUB_CATEGORIA,ID_SECCION,DESC_SECCION,ID_DEPARTAMENTO,DESC_DEPARTAMENTO,ID_AREA,DESC_AREA,ID_GERENCIA_COMERCIAL,DESC_GERENCIA_COMERCIAL,ID_GERENTE,DESC_GERENTE,
+DESC_UNIDAD_NEGOCIO,E.SK_CATEGORIA,A.SK_MATERIAL,B.SK_MARCA,ID_TIPO_IGV
+INTO #Materiales_Consolidado_1 FROM dl_sp_capa_semantica.dw_cencofcic_dim_material A
+INNER JOIN dl_sp_capa_semantica.dw_cencofcic_dim_marca B ON A.SK_MARCA=B.SK_MARCA
+INNER JOIN dl_sp_capa_semantica.dw_cencofcic_dim_proveedor C ON A.SK_PROVEEDOR=C.SK_PROVEEDOR
+INNER JOIN dl_sp_maestras.dim_grupo_articulo D ON A.SK_GRUPO_ARTICULO=D.SK_GRUPO_ARTICULO
+INNER JOIN dl_sp_maestras.dim_categoria E ON D.SK_CATEGORIA=E.SK_CATEGORIA
+INNER JOIN dl_sp_maestras.dim_jefe_categoria F ON D.SK_JEFE_CATEGORIA=F.SK_JEFE_CATEGORIA
+INNER JOIN dl_sp_maestras.dim_jefe_categoria_mp G ON D.SK_JEFE_CATEGORIA_MP=G.SK_JEFE_CATEGORIA_MP
+INNER JOIN dl_sp_maestras.dim_jefe_categoria_imp H ON D.SK_JEFE_CATEGORIA_IMP=H.SK_JEFE_CATEGORIA_IMP
+INNER JOIN dl_sp_maestras.dim_sub_categoria I ON D.SK_SUB_CATEGORIA=I.SK_SUB_CATEGORIA
+INNER JOIN dl_sp_maestras.dim_seccion J ON D.SK_SECCION=J.SK_SECCION
+INNER join dl_sp_maestras.dim_departamento K ON D.SK_DEPARTAMENTO=K.SK_DEPARTAMENTO
+INNER JOIN dl_sp_maestras.dim_area L ON D.SK_AREA=L.SK_AREA
+INNER JOIN dl_sp_maestras.dim_gerencia_comercial M ON D.SK_GERENCIA_COMERCIAL=M.SK_GERENCIA_COMERCIAL
+INNER JOIN dl_sp_maestras.dim_gerente N ON D.SK_GERENTE=N.SK_GERENTE;
+
+drop table if exists #Material_Final_1;
+SELECT id_material as "COD_MATERIAL",ID_EAN_PRINCIPAL as "EAN",SK_DIA_CREACION_MATERIAL as "FECHA_CREACION",DESC_MATERIAL,DESC_MARCA as "MARCA"
+,ID_UM_BASE as "UMB",ID_PROVEEDOR as "COD_PROVEEDOR",DESC_PROVEEDOR,ID_GRUPO_ARTICULO as "COD_GA",DESC_GRUPO_ARTICULO as"GRUPO_ARTICULO",
+ID_CATEGORIA as "COD_CATEGORIA",DESC_CATEGORIA as "CATEGORIA",DESC_JEFE_CATEGORIA"JEFE_CATEGORIA"
+,DESC_JEFE_CATEGORIA_MP"JEFE_CATEGORIA_MP",DESC_JEFE_CATEGORIA_IMP"JEFE_CATEGORIA_IMP",
+ID_SUB_CATEGORIA"COD_SUB_CATEGORIA",DESC_SUB_CATEGORIA"SUB_CATEGORIA",ID_SECCION"COD_SECCION",DESC_SECCION"SECCION",
+ID_DEPARTAMENTO"COD_DEPARTAMENTO",DESC_DEPARTAMENTO"DEPARTAMENTO",ID_AREA"COD_AREA",DESC_AREA"AREA",ID_GERENCIA_COMERCIAL"COD_GERENCIA",
+DESC_GERENCIA_COMERCIAL"GERENCIA_COMERCIAL",ID_GERENTE"COD_GERENTE", DESC_GERENTE"GERENTE",DESC_UNIDAD_NEGOCIO UNIDAD_NEGOCIO,SK_CATEGORIA,SK_MATERIAL,SK_MARCA,ID_TIPO_IGV
+INTO #Material_Final_1 FROM #Materiales_Consolidado_1;
+
+--regional 10% de tolerancia
+drop table if exists #pedidos_unidades_detalles_10_quiebres;
+select distinct
+vtex_id
+,cadena,
+cod_tienda
+,ref_id
+,material
+,price
+,sustituto
+,measurement_unit 																																																												as un
+,sum(quantity*unit_multiplier) 																																																									as unid_solicitadas
+,sum(case measurement_unit 	when 'KG' then unit_pickeadas/1000
+							when 'UN' then quantity_picked*unit_multiplier end) 																																												as unid_pickeadas_con_susti
+,case 	when sum(case	when measurement_unit='KG' and sustituto='NO' then unit_pickeadas/1000
+						when measurement_unit='UN' and sustituto='NO' then quantity_picked*unit_multiplier end)>sum(quantity*unit_multiplier) then sum(quantity*unit_multiplier)
+		when sum(case 	when measurement_unit='KG' and sustituto='NO' then unit_pickeadas/1000
+						when measurement_unit='UN' then quantity_picked*unit_multiplier end)<=sum(quantity*unit_multiplier)	then sum(case 	when measurement_unit='KG' and sustituto='NO' then unit_pickeadas/1000
+																																			when measurement_unit='UN' then quantity_picked*unit_multiplier end)
+		else sum(case 	when measurement_unit='KG' then unit_pickeadas/1000
+						when measurement_unit='UN' then quantity_picked*unit_multiplier end) end 																																								as unid_pickeadas_con_susti_menor_100
+,case	when sum(case 	when measurement_unit='KG' and sustituto='NO' then unit_pickeadas/1000 
+						when measurement_unit='UN' and sustituto='NO' then quantity_picked*unit_multiplier end)>sum(quantity*unit_multiplier) then sum(quantity*unit_multiplier)
+		when sum(case 	when measurement_unit='KG' and sustituto='NO' then unit_pickeadas/1000 
+						when measurement_unit='UN' and  sustituto='NO' then quantity_picked*unit_multiplier end)<=sum(quantity*unit_multiplier) then sum((case 	when measurement_unit='KG' and sustituto='NO' then unit_pickeadas/1000
+																																								when measurement_unit='UN' and sustituto='NO' then quantity_picked*unit_multiplier end))
+		else 0 end 																																																												as unid_pickeadas_sin_susti_menor_100
+,sum(case	when measurement_unit='KG' and sustituto='SI' then unit_pickeadas/1000
+			when measurement_unit='UN' and sustituto='SI' then quantity_picked*unit_multiplier
+			else 0 end) 																																																										as unid_susti
+,sum(quantity*unit_multiplier)																																																									as unid_pickeadas_con_susti_final
+,sum(quantity*unit_multiplier)																																																									as unid_pickeadas_sin_susti_final 
+into #pedidos_unidades_detalles_10_quiebres
+from #data_adic_programado_mat_seccion_quiebre
+group by
+vtex_id
+,cadena,
+cod_tienda
+,ref_id
+,material
+,price
+,sustituto
+,measurement_unit ;
+
+update #pedidos_unidades_detalles_10_quiebres set
+unid_pickeadas_con_susti_final		=0
+,unid_pickeadas_sin_susti_final		=0;
+
+update #pedidos_unidades_detalles_10_quiebres set
+unid_pickeadas_con_susti_final		=case 	when sustituto='NO' and unid_pickeadas_con_susti_menor_100/nullif(cast(unid_solicitadas as numeric(14,2)),0)>0.9 then unid_solicitadas 
+											else 0 end
+,unid_pickeadas_sin_susti_final		=case 	when sustituto='NO' and unid_pickeadas_sin_susti_menor_100/nullif(cast(unid_solicitadas as numeric(14,2)),0)>0.9 then unid_solicitadas 
+											else 0 end
+where un='KG'
+and sustituto='NO';
+
+update #pedidos_unidades_detalles_10_quiebres set
+unid_pickeadas_con_susti_final		=unid_pickeadas_con_susti_menor_100
+,unid_pickeadas_sin_susti_final		=unid_pickeadas_sin_susti_menor_100
+where un='KG'
+and sustituto='SI';
+
+update #pedidos_unidades_detalles_10_quiebres set
+unid_pickeadas_con_susti_final		=unid_pickeadas_con_susti_menor_100
+,unid_pickeadas_sin_susti_final		=unid_pickeadas_sin_susti_menor_100
+where un='UN';
+
+drop table if exists #pedidos_unidades_detalles_10_quiebres_jerarquia;
+select e.*,M.MARCA,M.GRUPO_ARTICULO,M.CATEGORIA,M.UNIDAD_NEGOCIO,COD_GERENTE,M.SECCION,COD_SECCION,M.DEPARTAMENTO,COD_DEPARTAMENTO,M.GERENCIA_COMERCIAL,COD_GERENCIA,
+unid_solicitadas-unid_pickeadas_sin_susti_final unid_faltantes, (unid_solicitadas-unid_pickeadas_sin_susti_final)*price venta_bruta,
+CASE WHEN ID_TIPO_IGV IN (0,3,4,5) THEN (unid_solicitadas-unid_pickeadas_sin_susti_final)*price ELSE (unid_solicitadas-unid_pickeadas_sin_susti_final)*price/1.18  END as venta_neta 
+into #pedidos_unidades_detalles_10_quiebres_jerarquia
+from #pedidos_unidades_detalles_10_quiebres e
+inner join #Material_Final_1 m on (right('000000000000000000'+e.ref_id,18)=cod_material); 
+
+delete
+from #pedidos_unidades_detalles_10_quiebres_jerarquia
+where gerencia_comercial not in ('FOOD ABARROTES','FOOD PERECIBLES','NON FOOD','MARKETING');
+
+drop table if exists #pre_final_quiebres;
+select distinct vtex_id,ref_id sku,material,unid_solicitadas,unid_pickeadas_sin_susti_final unid_pickeadas,unid_faltantes,cadena,cod_tienda
+,venta_bruta,un un_kg,marca,grupo_articulo,categoria
+,unidad_negocio,seccion,departamento,gerencia_comercial,venta_neta,convert_timezone('GMT','GMT+5',getdate())  
+fecha_act,cod_gerencia,cod_departamento,cod_seccion,cod_gerente,cod_gerencia+cod_gerente+cod_seccion+cod_seccion as llave_seccion 
+into #pre_final_quiebres from #pedidos_unidades_detalles_10_quiebres_jerarquia
+where sustituto='NO' and unid_faltantes>0;
+
+alter table  #pre_final_quiebres add HiperMetro varchar(100);
+alter table  #pre_final_quiebres add SuperMetro varchar(100);
+alter table  #pre_final_quiebres add SuperWong varchar(100);
+
+update #pre_final_quiebres
+set HiperMetro=b.HiperMetro,SuperMetro=b.SuperMetro,SuperWong=b.SuperWong
+from #pre_final_quiebres a inner join dl_sp_dashboards_ecommerce.filtro_jerarquia_seccion b on a.llave_seccion=b.llave_jerarquia;
+
+alter table #pre_final_quiebres add formato varchar(50);
+
+update #pre_final_quiebres
+set formato= case when cod_tienda like 'H%'  then 'Hiper' when cod_tienda like 'S%' or  cod_tienda like 'T%' or cod_tienda like 'W%' then 'Super' end;
+
+delete from dl_sp_dashboards_ecommerce.Pickeados_Hoy_Material;
+
+insert into dl_sp_dashboards_ecommerce.Pickeados_Hoy_Material
+select *   from #pre_final_quiebres;
+
+delete from dl_sp_dashboards_ecommerce.Pickeados_Hoy_Material
+where  cod_tienda  IN ('S038','S014','H010','S043','S085','S010','S029','S089','S044','S055','S053','S046','S051');
+
+end
+
+
+
+
+
+$$
+;

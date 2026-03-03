@@ -1,0 +1,4 @@
+# file: C:\Users\maxim\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\pyspark\sql\merge.py
+# hypothesis_version: 6.151.9
+
+['DataFrame', 'MergeIntoWriter', 'PythonTest', 'SPARK_HOME', '__main__', 'local[4]', 'spark']

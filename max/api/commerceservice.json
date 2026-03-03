@@ -1,0 +1,4595 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Commerce Service",
+    "description": "Manage all the means that the client use to sell their products, like locations, sales channels, stores and accounts\n\n **Last update**: 18 feb 26, 04:54 p. m.",
+    "version": "1.45.0",
+    "x-logo": null,
+    "x-janis-keywords": [
+      "Account",
+      "SalesChannel",
+      "Location",
+      "Store",
+      "Company",
+      "Supplier",
+      "Geofence"
+    ],
+    "lastUpdate": "2026-02-18T19:54:10.734Z"
+  },
+  "tags": [
+    {
+      "name": "Account",
+      "description": "For managing Accounts"
+    },
+    {
+      "name": "Geofence",
+      "description": "For managing Geofences"
+    },
+    {
+      "name": "Location",
+      "description": "For managing Locations"
+    },
+    {
+      "name": "Sales-Channel",
+      "description": "For managing Sales Channels"
+    },
+    {
+      "name": "Store",
+      "description": "For managing Stores"
+    },
+    {
+      "name": "Company",
+      "description": "For managing Company"
+    },
+    {
+      "name": "Supplier",
+      "description": "For managing Suppliers"
+    }
+  ],
+  "servers": [
+    {
+      "url": "https://commerce.janis.in/api",
+      "description": "The Prod API server",
+      "variables": {
+        "environment": {
+          "default": "prod"
+        }
+      }
+    },
+    {
+      "url": "https://commerce.janisqa.in/api",
+      "description": "The QA API server",
+      "variables": {
+        "environment": {
+          "default": "qa"
+        }
+      }
+    },
+    {
+      "url": "https://commerce.janisdev.in/api",
+      "description": "The Beta API server",
+      "variables": {
+        "environment": {
+          "default": "beta"
+        }
+      }
+    },
+    {
+      "url": "http://commerce.janis.localhost:3035/api",
+      "description": "The Local API server",
+      "variables": {
+        "environment": {
+          "default": "local"
+        }
+      }
+    }
+  ],
+  "components": {
+    "schemas": {
+      "id": {
+        "description": "The unique identifier of the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "d555345345345aa67a342a00"
+      },
+      "status": {
+        "description": "The item status",
+        "type": "string",
+        "default": "active",
+        "enum": [
+          "active",
+          "inactive"
+        ],
+        "example": "active"
+      },
+      "dateCreated": {
+        "description": "The date of creation",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-12T19:59:51.801Z"
+      },
+      "dateModified": {
+        "description": "The date of the last modification",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-20T19:59:51.801Z"
+      },
+      "userCreated": {
+        "description": "The ID of the user who created the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "6a1fc1eeb5b68406e0487a10"
+      },
+      "userModified": {
+        "description": "The ID of the user who last modified the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "7e1fc1eeb5b68406e048796"
+      },
+      "dateCreatedDay": {
+        "description": "The day of creating",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-08-07T16:00:00.000Z"
+      },
+      "dateModifiedDay": {
+        "description": "The day of last modification",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-08-07T16:00:00.000Z"
+      },
+      "locationId": {
+        "description": "The Location ID. This refer to the `id` of the **Location** Entity. See [Location](/v2/service/commerce#tag/Location).",
+        "type": "string",
+        "example": "7f1fc1eeb5b68406e0487a91"
+      },
+      "accountId": {
+        "description": "The Account ID. This refer to the `id` of the **Account** Entity. See [Account](/v2/service/commerce#tag/Account).",
+        "type": "string",
+        "example": "4f1fc1eeb5b68406e0487a09",
+        "nullable": true
+      },
+      "Account": {
+        "description": "An Account",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "name": {
+            "description": "The Account name",
+            "type": "string",
+            "example": "Some Account"
+          },
+          "ecommerceName": {
+            "description": "The Account name in the ecommerce platform",
+            "type": "string",
+            "example": "accountname"
+          },
+          "referenceId": {
+            "description": "The Account's reference Id",
+            "type": "string",
+            "example": "account-a01"
+          },
+          "platform": {
+            "description": "The Account's platform",
+            "type": "string",
+            "enum": [
+              "fenicio",
+              "glovo",
+              "ifood",
+              "magento",
+              "mercadolibre",
+              "shopify",
+              "uber-eats",
+              "vtex"
+            ],
+            "example": "vtex"
+          },
+          "features": {
+            "description": "The Account's features",
+            "type": "object"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          },
+          "status": {
+            "$ref": "#/components/schemas/status"
+          }
+        }
+      },
+      "AccountList": {
+        "description": "The list data",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Account"
+        }
+      },
+      "AccountUpdate": {
+        "description": "An Account",
+        "type": "object",
+        "properties": {
+          "features": {
+            "$ref": "#/components/schemas/Account/properties/features"
+          },
+          "status": {
+            "$ref": "#/components/schemas/Account/properties/status"
+          }
+        }
+      },
+      "AccountBatchList": {
+        "description": "The list of Accounts",
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "oneOf": [
+            {
+              "$ref": "#/components/schemas/AccountBatchCreate"
+            },
+            {
+              "$ref": "#/components/schemas/AccountBatchUpdate"
+            }
+          ]
+        }
+      },
+      "AccountBatchCreate": {
+        "description": "Data for creating an Account",
+        "type": "object",
+        "properties": {
+          "referenceId": {
+            "$ref": "#/components/schemas/Account/properties/referenceId"
+          },
+          "name": {
+            "$ref": "#/components/schemas/Account/properties/name"
+          },
+          "platform": {
+            "$ref": "#/components/schemas/Account/properties/platform"
+          },
+          "ecommerceName": {
+            "$ref": "#/components/schemas/Account/properties/ecommerceName"
+          },
+          "status": {
+            "$ref": "#/components/schemas/Account/properties/status"
+          },
+          "platformSettings": {
+            "$ref": "#/components/schemas/AccountBatchPlatformSettings"
+          }
+        },
+        "required": [
+          "referenceId",
+          "name",
+          "platform",
+          "ecommerceName"
+        ]
+      },
+      "AccountBatchUpdate": {
+        "description": "Data for updating an Account",
+        "type": "object",
+        "properties": {
+          "referenceId": {
+            "$ref": "#/components/schemas/Account/properties/referenceId"
+          },
+          "status": {
+            "$ref": "#/components/schemas/Account/properties/status"
+          },
+          "platformSettings": {
+            "$ref": "#/components/schemas/AccountBatchPlatformSettings"
+          }
+        },
+        "required": [
+          "referenceId"
+        ]
+      },
+      "AccountBatchPlatformSettings": {
+        "description": "The settings of the platform",
+        "type": "object",
+        "properties": {
+          "someBooleanSetting": {
+            "type": "boolean",
+            "default": true,
+            "example": false
+          },
+          "someConfig": {
+            "type": "integer",
+            "default": 5,
+            "example": 10
+          }
+        }
+      },
+      "AccountProcess": {
+        "description": "An Account process",
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "The Account Process ID",
+            "type": "string",
+            "readOnly": true,
+            "example": "5d1fc1eeb5b68406e0487a06"
+          },
+          "accountId": {
+            "description": "The Account ID",
+            "type": "string",
+            "readOnly": true,
+            "example": "5d1fc1eeb5b68406e0487a06"
+          },
+          "service": {
+            "description": "Service name",
+            "type": "string",
+            "readOnly": true,
+            "example": "janis-pricing-service"
+          },
+          "process": {
+            "description": "Process name",
+            "type": "string",
+            "example": "price-sheets-batch-import"
+          },
+          "status": {
+            "description": "Status of the process",
+            "type": "string",
+            "enum": [
+              "pending",
+              "processing",
+              "success",
+              "error"
+            ],
+            "example": "pending"
+          },
+          "startDate": {
+            "description": "Start date of the process",
+            "type": "string",
+            "format": "date-time"
+          },
+          "endDate": {
+            "description": "End date of the process",
+            "type": "string",
+            "format": "date-time"
+          },
+          "content": {
+            "description": "For specify extra data of the process",
+            "type": "object"
+          },
+          "userCreated": {
+            "description": "The creator user ID",
+            "type": "string",
+            "readOnly": true,
+            "example": "5d1fc1eeb5b68406e0487a06"
+          },
+          "dateCreated": {
+            "description": "The register creation date",
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true
+          },
+          "dateModified": {
+            "description": "The register modification date",
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true
+          }
+        },
+        "required": [
+          "service",
+          "process",
+          "status"
+        ]
+      },
+      "AccountProcessList": {
+        "type": "array",
+        "description": "A list of Account Processes",
+        "items": {
+          "$ref": "#/components/schemas/AccountProcess"
+        }
+      },
+      "Geofence": {
+        "type": "object",
+        "description": "A Geofence",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "name": {
+            "type": "string",
+            "description": "A human friendly name for the geofence",
+            "example": "Downtown"
+          },
+          "coverage": {
+            "description": "The area covered by the geofence.\nThis is represented by a [GeoJSON](https://geojson.org/) MultiPolygon `coordinates`.\n\nYou can build a MultiPolygon in a graphic interface using https://geojson.io (use an array of Polygon coordinates).\n\nFor more technical information about GeoJSON Polygons and MultiPolygons, see https://www.rfc-editor.org/rfc/rfc7946#section-3.1.6.\n",
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "description": "A GeoJSON Polygon ring. The last point of the Polygon must be the same as the first one.\n\nFor Polygons with more than one of these rings, the first MUST be the exterior ring, and any others MUST be interior rings. The exterior ring bounds the surface, and the interior rings (if present) bound holes within the surface.\n",
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "description": "A GeoJSON Polygon point",
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "description": "The GeoJSON point coordinates. First element is longitude, and second one is latitude.",
+                  "type": "array",
+                  "minItems": 2,
+                  "maxItems": 2
+                }
+              }
+            },
+            "example": [
+              [
+                [
+                  [
+                    -56.865234375,
+                    -29.91685223307016
+                  ],
+                  [
+                    -45.439453125,
+                    -29.152161283318915
+                  ],
+                  [
+                    -50.44921875,
+                    -21.779905342529634
+                  ],
+                  [
+                    -59.23828124999999,
+                    -25.720735134412095
+                  ],
+                  [
+                    -56.865234375,
+                    -29.91685223307016
+                  ]
+                ]
+              ],
+              [
+                [
+                  [
+                    -63.45703124999999,
+                    -37.16031654673676
+                  ],
+                  [
+                    -53.525390625,
+                    -38.13455657705412
+                  ],
+                  [
+                    -58.88671875,
+                    -31.278550858946517
+                  ],
+                  [
+                    -66.005859375,
+                    -32.026706293336126
+                  ],
+                  [
+                    -63.45703124999999,
+                    -37.16031654673676
+                  ]
+                ]
+              ]
+            ]
+          },
+          "status": {
+            "$ref": "#/components/schemas/status"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "coverage",
+          "status",
+          "dateCreated",
+          "userCreated",
+          "dateModified",
+          "userModified"
+        ]
+      },
+      "GeofenceList": {
+        "type": "array",
+        "description": "A list of Geofences",
+        "items": {
+          "$ref": "#/components/schemas/Geofence"
+        }
+      },
+      "Company": {
+        "type": "object",
+        "description": "A Company",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "referenceId": {
+            "type": "string",
+            "description": "The Company referenceId",
+            "example": "some-reference-id-123"
+          },
+          "businessName": {
+            "type": "string",
+            "description": "The Company Business Name",
+            "example": "NewCompany SRL."
+          },
+          "title": {
+            "type": "string",
+            "description": "The Company title",
+            "example": "NewCompanyTitle"
+          },
+          "isDefault": {
+            "type": "boolean",
+            "description": "Determines if the Company is the default one. Only one Company can be the *default* and must be `active`\n",
+            "example": true
+          },
+          "taxRegistrationType": {
+            "type": "string",
+            "description": "The Company tax registration type",
+            "example": "iva"
+          },
+          "documentType": {
+            "type": "string",
+            "description": "The Company document type",
+            "example": "DNI"
+          },
+          "documentNumber": {
+            "type": "string",
+            "description": "The Company document number",
+            "example": 32874298376
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          },
+          "status": {
+            "$ref": "#/components/schemas/status"
+          }
+        },
+        "required": [
+          "referenceId",
+          "businessName",
+          "title",
+          "isDefault"
+        ]
+      },
+      "CompanyList": {
+        "type": "array",
+        "description": "A list of Companies",
+        "items": {
+          "$ref": "#/components/schemas/Company"
+        }
+      },
+      "listenerEvent": {
+        "description": "A JANIS Event object",
+        "type": "object",
+        "properties": {
+          "service": {
+            "description": "The source service name",
+            "type": "string",
+            "example": "id"
+          },
+          "entity": {
+            "description": "The event related entity",
+            "type": "string",
+            "example": "profile"
+          },
+          "event": {
+            "description": "The event name",
+            "type": "string",
+            "example": "created"
+          },
+          "client": {
+            "description": "The source event client",
+            "type": "string",
+            "example": "fizzmod"
+          },
+          "id": {
+            "description": "The event related entity ID",
+            "type": "string",
+            "example": "5d699c1ae8ebb95eaa24aca9"
+          }
+        },
+        "required": [
+          "service",
+          "entity",
+          "event"
+        ]
+      },
+      "FunctionError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "description": "The error message",
+            "type": "string",
+            "readOnly": true,
+            "example": "Database Failed"
+          }
+        }
+      },
+      "FunctionTotals": {
+        "type": "object",
+        "description": "The totals data. It is only available when `calculateTotals` parameter is active",
+        "properties": {
+          "total": {
+            "description": "The total items found in database applied filters",
+            "type": "number",
+            "readOnly": true,
+            "example": 2
+          },
+          "pages": {
+            "description": "The total pages for the filters applied",
+            "type": "number",
+            "readOnly": true,
+            "example": 1
+          },
+          "page": {
+            "description": "The actual page",
+            "type": "number",
+            "readOnly": true,
+            "example": 1
+          }
+        }
+      },
+      "Holiday": {
+        "type": "object",
+        "description": "A Holiday",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "name": {
+            "type": "string",
+            "description": "A name to recognize the holiday",
+            "example": "New year"
+          },
+          "day": {
+            "type": "string",
+            "description": "The day of the holiday. The format must be YYYY-MM-DD",
+            "format": "date",
+            "example": "2023-01-01"
+          },
+          "target": {
+            "type": "object",
+            "description": "This defines the targets this holiday will have. Targets determine how the fulfillment operation is affected.\n\nAt least one target must be set for each holiday so it has some impact in the fulfillment process.\n",
+            "properties": {
+              "delivery": {
+                "type": "boolean",
+                "description": "This target will suspend delivery operation for the store.\nTime slots will be instantly locked so clients are not allowed to schedule their orders for this day.\n\nYou can narrow the scope of the target by setting the `carrierIds` or `carrierReferenceIds` scopes.\n"
+              }
+            }
+          },
+          "scope": {
+            "type": "object",
+            "description": "This defines the scope of the holiday, allowing to apply a holiday to certain carriers for example.\nIf more than one scope is defined, the holiday will apply to the intersection of the scopes.\n\nIf this is not sent or it's empty, the holiday will apply to every carrier.\n",
+            "properties": {
+              "carrierIds": {
+                "type": "array",
+                "description": "The carriers internal IDs to which the holiday applies.",
+                "items": {
+                  "type": "string",
+                  "description": "The unique internal identifier (`id`) of a [Carrier](#tag/Carrier).\n\nThis will only be taken into account if the `delivery` target is set.\n",
+                  "example": "d555345345345aa67a342a00"
+                }
+              },
+              "carrierReferenceIds": {
+                "type": "array",
+                "description": "The carriers reference IDs to which the holiday applies.",
+                "items": {
+                  "type": "string",
+                  "description": "The unique reference identifier (`refId`) of a [Carrier](#tag/Carrier).\n\nThis will only be taken into account if the `delivery` target is set.\n",
+                  "example": "carr-001"
+                }
+              }
+            }
+          },
+          "status": {
+            "$ref": "#/components/schemas/status"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "day",
+          "dateCreated",
+          "dateModified"
+        ]
+      },
+      "HolidayList": {
+        "type": "array",
+        "description": "A list of Holidays",
+        "items": {
+          "$ref": "#/components/schemas/Holiday"
+        }
+      },
+      "Location": {
+        "description": "A location",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "name": {
+            "description": "The location name",
+            "type": "string",
+            "uniqueItems": true,
+            "example": "Some Location"
+          },
+          "referenceId": {
+            "description": "The location Reference ID",
+            "type": "string",
+            "uniqueItems": true,
+            "example": "location-123"
+          },
+          "companyId": {
+            "description": "The location Company's ID\nIf no `company` is set, the *default* Company will be used.\n",
+            "type": "string",
+            "example": "5f611f7ea12359cca2ca0f07",
+            "nullable": true
+          },
+          "latitude": {
+            "description": "Location's latitude",
+            "type": "number",
+            "example": -34.5864066
+          },
+          "longitude": {
+            "description": "Location's longitude",
+            "type": "number",
+            "example": -58.4321807
+          },
+          "countryIso3": {
+            "description": "The country in `iso3` format of the location. This refer to the `iso3` field of the **I18N** Entity. See [I18N](/v2/service/i18n#tag/Country).",
+            "type": "string",
+            "nullable": true,
+            "example": "ARG"
+          },
+          "timezone": {
+            "description": "The timezone's `name` of the location. This refer to the `name` field of the **I18N** Entity. See [I18N](/v2/service/i18n#tag/Timezone).",
+            "nullable": true,
+            "type": "string",
+            "example": "America/Argentina"
+          },
+          "geofences": {
+            "type": "array",
+            "description": "The IDs of the [Geofences](#tag/Geofence) that contain this location",
+            "readOnly": true,
+            "items": {
+              "type": "string",
+              "description": "The ID of a [Geofences](#tag/Geofence)",
+              "example": "78611f7ea12359cca2ca0f07"
+            }
+          },
+          "address": {
+            "$ref": "#/components/schemas/LocationAddress"
+          },
+          "phoneNumber": {
+            "type": "string",
+            "description": "Location's phone number.\n\n> The phone number must be in **E.164** format (they must include country and area code. For toll-free numbers, country code must be included). See [E.164](https://en.wikipedia.org/wiki/E.164).\n\nSome valid phone examples are:\n\n- '+52 (556) 143-5872' # Mexico\n- '+541144556677' # Argentina line-phone\n- '+5491122334455' # Argentina cell-phone\n- '+548001112222' # Argentina toll-free\n",
+            "nullable": true,
+            "example": "+52 (556) 143-5872"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          },
+          "status": {
+            "$ref": "#/components/schemas/status"
+          }
+        },
+        "required": [
+          "name",
+          "referenceId",
+          "timezone",
+          "longitude",
+          "latitude",
+          "status"
+        ]
+      },
+      "Warehouse": {
+        "description": "Warehouses Information for the Location.\nFor each item a WMS Warehouse will be created. See [Janis WMS Service](/v2/service/wms#tag/Warehouse).\n",
+        "type": "object",
+        "properties": {
+          "name": {
+            "description": "Warehouse name",
+            "type": "string",
+            "uniqueItems": true,
+            "example": "Palermo 102"
+          },
+          "referenceId": {
+            "description": "Warehouse Reference ID",
+            "type": "string",
+            "uniqueItems": true,
+            "example": "wh-01"
+          },
+          "salesChannels": {
+            "description": "A list with Warehouse Sales Channels IDs. This refer to the `id` of the **SalesChannel** Entity. See [SalesChannels](/v2/service/commerce#tag/Sales-Channel).",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "5fa2f817bf7350096e71e2c8",
+              "60d5bb1fbc650100142b835e"
+            ]
+          },
+          "group": {
+            "description": "To create a WarehouseGroup you need a name and the id of the Location. The name is this 'group' field, while the id is the id of the newly created location.\n\nFor more information: **WarehouseGroup** Entity. See [WarehouseGroup](/v2/service/wms#tag/WarehouseGroup).\n",
+            "type": "string",
+            "uniqueItems": true,
+            "example": "first floor"
+          },
+          "tasks": {
+            "description": "A list with the tasks that warehouses allow. It could be any of the following:\n  - **pickProducts**: It will create a Picking Point, see [Janis Picking Service](/v2/service/picking#tag/picking_point).\n  - **sellsProducts** it Will create a **Store**, see [Store](/#tag/Store)\n  - **allowsInvoices**: The location will be used in **Janis Economy And Finance Service** aka JEF.\n  - **shipsOrders**\n  - **allowsPickup**\n  - **allowsDriveThrough**\n",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "pickProducts",
+                "sellsProducts",
+                "allowsInvoices",
+                "shipsOrders",
+                "allowsPickup",
+                "allowsDriveThrough"
+              ]
+            },
+            "example": [
+              "pickProducts",
+              "sellsProducts",
+              "allowsInvoices",
+              "shipsOrders",
+              "allowsPickup",
+              "allowsDriveThrough"
+            ]
+          },
+          "limitedToSellers": {
+            "description": "The Sellers to limit the Warehouse usage. This refer to the `id` of the [Sellers](/v2/service/oms#tag/Seller) in OMS Service.",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": "6085bfd1ce5a1a0007a0dd00"
+            }
+          },
+          "status": {
+            "$ref": "#/components/schemas/status"
+          }
+        },
+        "required": [
+          "name",
+          "referenceId"
+        ]
+      },
+      "LocationAddress": {
+        "description": "Address Information of the Location",
+        "type": "object",
+        "properties": {
+          "country": {
+            "type": "string",
+            "description": "The country of the location",
+            "example": "Argentina"
+          },
+          "state": {
+            "type": "string",
+            "description": "The state of the location",
+            "example": "Buenas Aires"
+          },
+          "city": {
+            "type": "string",
+            "description": "The city of the location",
+            "example": "Buenas Aires"
+          },
+          "neighborhood": {
+            "type": "string",
+            "description": "The neighborhood of the location",
+            "example": "Palermo"
+          },
+          "postalCode": {
+            "type": "string",
+            "description": "The postal code of the location",
+            "example": "1414"
+          },
+          "street": {
+            "type": "string",
+            "description": "The street of the location",
+            "example": "Costa Rica"
+          },
+          "number": {
+            "description": "The street's number of the location",
+            "oneOf": [
+              {
+                "type": "number",
+                "example": 4500
+              },
+              {
+                "type": "string",
+                "example": "Km. 23"
+              }
+            ]
+          }
+        },
+        "required": [
+          "country",
+          "state"
+        ]
+      },
+      "LocationSaved": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Location"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "warehousesIds": {
+                "description": "A list of Warehouse IDs. This refer to the `id` of the **Warehouse** Entity. See [Janis WMS Service](/v2/service/wms#tag/Warehouse).",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "example": [
+                  "5fa2f817bf7350096e71e2c8",
+                  "60d5bb1fbc650100142b835e"
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "LocationToCreate": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Location"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "warehouses": {
+                "description": "A list of Warehouses to create. This refer **Warehouse** Entity. See [Janis WMS Service](/v2/service/wms#tag/Warehouse).",
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Warehouse"
+                }
+              }
+            },
+            "required": [
+              "warehouses"
+            ]
+          }
+        ]
+      },
+      "LocationToUpdate": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Location"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "warehouses": {
+                "description": "A list of Warehouses to create. This refer **Warehouse** Entity. See [Janis WMS Service](/v2/service/wms#tag/Warehouse).",
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Warehouse"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "LocationList": {
+        "description": "The list data",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/LocationSaved"
+        }
+      },
+      "LocationBatchList": {
+        "description": "The list of Locations",
+        "type": "array",
+        "maxItems": 1000,
+        "minItems": 1,
+        "items": {
+          "description": "A Location",
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/Location/properties/id"
+            },
+            "name": {
+              "$ref": "#/components/schemas/Location/properties/name"
+            },
+            "referenceId": {
+              "$ref": "#/components/schemas/Location/properties/referenceId"
+            },
+            "companyReferenceId": {
+              "description": "The Location's Company's referenceId",
+              "type": "string",
+              "example": "some-reference-id-123"
+            },
+            "latitude": {
+              "$ref": "#/components/schemas/Location/properties/latitude"
+            },
+            "longitude": {
+              "$ref": "#/components/schemas/Location/properties/longitude"
+            },
+            "countryIso3": {
+              "$ref": "#/components/schemas/Location/properties/countryIso3"
+            },
+            "timezone": {
+              "$ref": "#/components/schemas/Location/properties/timezone"
+            },
+            "address": {
+              "$ref": "#/components/schemas/LocationAddress"
+            },
+            "phoneNumber": {
+              "$ref": "#/components/schemas/Location/properties/phoneNumber"
+            }
+          },
+          "required": [
+            "name",
+            "referenceId",
+            "longitude",
+            "latitude",
+            "status"
+          ]
+        }
+      },
+      "SalesChannel": {
+        "description": "A Sales Channel",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "name": {
+            "description": "The internal system name",
+            "type": "string",
+            "example": "Some Sales Channel"
+          },
+          "referenceId": {
+            "description": "Reference Id",
+            "type": "string",
+            "example": "sales-channel-sc23"
+          },
+          "shortIdentifier": {
+            "description": "Sales Channel Short identifier.\nThis field is useful for creating complex ids for entities such as **Order**, **Price**, etc.\n***e.g.***\n* `OFF-100304`\n* `PRE-504219`\n",
+            "type": "string",
+            "example": "OFF"
+          },
+          "currency": {
+            "description": "The Currency `id`. This field refer to **Janis I18N Service**. See [Janis I18N Service](/v2/service/i18n).\n",
+            "type": "string",
+            "example": "5f761e5c1e268f09239be66f"
+          },
+          "currencySymbol": {
+            "description": "The Currency `code`. This field refer to **Janis I18N Service**. See [Janis I18N Service](/v2/service/i18n).\n",
+            "type": "string",
+            "readOnly": true,
+            "example": "$"
+          },
+          "skipPicking": {
+            "description": "The field is deprecated now \"externalPicking\" must be used instead",
+            "type": "boolean",
+            "example": true,
+            "deprecated": true
+          },
+          "externalPicking": {
+            "description": "Indicates that the sales channel does not require picking because the picking process it is done externally",
+            "type": "boolean",
+            "example": true
+          },
+          "automaticCapturePostPicking": {
+            "description": "Indicates if orders should automatically capture payments after picking",
+            "type": "boolean",
+            "default": false,
+            "example": true
+          },
+          "externalDelivery": {
+            "description": "Indicates that the sales channel does not require delivery because the delivery it is done externally",
+            "type": "boolean",
+            "example": true
+          },
+          "externalPaymentValidation": {
+            "description": "Indicates if the sales channel requires external payment validation",
+            "type": "boolean",
+            "default": false,
+            "example": true
+          },
+          "orderRestrictedActions": {
+            "description": "List of restricted actions for OMS Orders related to this sales channel.\nAvailable actions:\n- `reschedule`: Restricts the action to reschedule orders\n",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "reschedule"
+              ]
+            },
+            "example": [
+              "reschedule"
+            ]
+          },
+          "catalogAccountId": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/accountId"
+              }
+            ],
+            "description": "Catalog Account ID. This refer to the `id` of the **Account** Entity. See [Account](/v2/service/commerce#tag/Account).\n"
+          },
+          "stockAccountId": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/accountId"
+              }
+            ],
+            "description": "Stock Account ID. This refer to the `id` of the **Account** Entity. See [Account](/v2/service/commerce#tag/Account).\n"
+          },
+          "priceAccountId": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/accountId"
+              }
+            ],
+            "description": "Price Account ID. This refer to the `id` of the **Account** Entity. See [Account](/v2/service/commerce#tag/Account).\n"
+          },
+          "ordersAccountId": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/accountId"
+              }
+            ],
+            "description": "Orders Account ID. This refer to the `id` of the **Account** Entity. See [Account](/v2/service/commerce#tag/Account).\n"
+          },
+          "deliveryAccountId": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/accountId"
+              }
+            ],
+            "description": "Delivery Account ID. This refer to the `id` of the **Account** Entity. See [Account](/v2/service/commerce#tag/Account).\n"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          },
+          "status": {
+            "$ref": "#/components/schemas/status"
+          }
+        },
+        "required": [
+          "name",
+          "referenceId"
+        ]
+      },
+      "SalesChannelList": {
+        "description": "The list data",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/SalesChannel"
+        }
+      },
+      "SalesChannelBatchList": {
+        "description": "The list of Sales Channels",
+        "type": "array",
+        "maxItems": 10000,
+        "minItems": 1,
+        "items": {
+          "description": "A Sales Channels",
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/SalesChannel/properties/id"
+            },
+            "name": {
+              "description": "The internal system name",
+              "type": "string",
+              "uniqueItems": true,
+              "example": "Some Sales Channel"
+            },
+            "referenceId": {
+              "description": "The sales channel Reference Id",
+              "type": "string",
+              "uniqueItems": true,
+              "example": "sales-channel-sc23"
+            },
+            "shortIdentifier": {
+              "$ref": "#/components/schemas/SalesChannel/properties/shortIdentifier"
+            },
+            "currency": {
+              "description": "The Currency `code`. This field refer to **Janis I18N Service**. See [Janis I18N Service](/v2/service/i18n).\n",
+              "type": "string",
+              "example": "USD"
+            },
+            "skipPicking": {
+              "$ref": "#/components/schemas/SalesChannel/properties/skipPicking"
+            },
+            "externalPicking": {
+              "$ref": "#/components/schemas/SalesChannel/properties/externalPicking"
+            },
+            "automaticCapturePostPicking": {
+              "$ref": "#/components/schemas/SalesChannel/properties/automaticCapturePostPicking"
+            },
+            "externalDelivery": {
+              "$ref": "#/components/schemas/SalesChannel/properties/externalDelivery"
+            },
+            "externalPaymentValidation": {
+              "$ref": "#/components/schemas/SalesChannel/properties/externalPaymentValidation"
+            },
+            "orderRestrictedActions": {
+              "$ref": "#/components/schemas/SalesChannel/properties/orderRestrictedActions"
+            },
+            "catalogAccountReferenceId": {
+              "description": "Catalog Account ReferenceId. This refer to the `referenceId` of the **Account** Entity. See [Account](/v2/service/commerce#tag/Account).\n",
+              "type": "string",
+              "example": "account-a01"
+            },
+            "stockAccountReferenceId": {
+              "description": "Stock Account ReferenceId. This refer to the `referenceId` of the **Account** Entity. See [Account](/v2/service/commerce#tag/Account).\n",
+              "type": "string",
+              "example": "account-a01"
+            },
+            "priceAccountReferenceId": {
+              "description": "Price Account ReferenceId. This refer to the `referenceId` of the **Account** Entity. See [Account](/v2/service/commerce#tag/Account).\n",
+              "type": "string",
+              "example": "account-a01"
+            },
+            "ordersAccountReferenceId": {
+              "description": "Orders Account ReferenceId. This refer to the `referenceId` of the **Account** Entity. See [Account](/v2/service/commerce#tag/Account).\n",
+              "type": "string",
+              "example": "account-a01"
+            },
+            "deliveryAccountReferenceId": {
+              "description": "Delivery Account ReferenceId. This refer to the `referenceId` of the **Account** Entity. See [Account](/v2/service/commerce#tag/Account).\n",
+              "type": "string",
+              "example": "account-a01"
+            },
+            "dateCreated": {
+              "$ref": "#/components/schemas/dateCreated"
+            },
+            "dateModified": {
+              "$ref": "#/components/schemas/dateModified"
+            },
+            "userCreated": {
+              "$ref": "#/components/schemas/userCreated"
+            },
+            "userModified": {
+              "$ref": "#/components/schemas/userModified"
+            },
+            "status": {
+              "$ref": "#/components/schemas/status"
+            }
+          },
+          "required": [
+            "name",
+            "referenceId"
+          ]
+        }
+      },
+      "Store": {
+        "description": "A store",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "name": {
+            "description": "The internal system name",
+            "type": "string",
+            "example": "Some Store"
+          },
+          "referenceId": {
+            "description": "Client Reference ID",
+            "type": "string",
+            "example": "store-ref-id"
+          },
+          "locationId": {
+            "$ref": "#/components/schemas/locationId"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          },
+          "status": {
+            "$ref": "#/components/schemas/status"
+          }
+        },
+        "required": [
+          "name",
+          "referenceId",
+          "locationId"
+        ]
+      },
+      "StoreList": {
+        "description": "The list data",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Store"
+        }
+      },
+      "Supplier": {
+        "description": "A supplier",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "name": {
+            "description": "The supplier's name",
+            "type": "string",
+            "example": "John Doe"
+          },
+          "referenceId": {
+            "description": "The Supplier `referenceId`",
+            "type": "string",
+            "example": "supplier-123"
+          },
+          "document": {
+            "description": "The supplier's document",
+            "type": "string",
+            "example": "1.234.567"
+          },
+          "address": {
+            "description": "The supplier's address",
+            "type": "string",
+            "example": "Fake Street 123"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          },
+          "status": {
+            "$ref": "#/components/schemas/status"
+          }
+        },
+        "required": [
+          "name",
+          "referenceId",
+          "document"
+        ]
+      },
+      "SupplierPost": {
+        "description": "A supplier to create",
+        "type": "object",
+        "properties": {
+          "name": {
+            "$ref": "#/components/schemas/Supplier/properties/name"
+          },
+          "referenceId": {
+            "$ref": "#/components/schemas/Supplier/properties/referenceId"
+          },
+          "document": {
+            "$ref": "#/components/schemas/Supplier/properties/document"
+          },
+          "address": {
+            "$ref": "#/components/schemas/Supplier/properties/address"
+          }
+        },
+        "required": [
+          "name",
+          "referenceId",
+          "document"
+        ]
+      },
+      "SupplierList": {
+        "description": "The list data",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Supplier"
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-key",
+        "description": "The API Key"
+      },
+      "ApiSecret": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-secret",
+        "description": "The API Secret"
+      },
+      "JanisClient": {
+        "type": "string",
+        "name": "janis-client",
+        "in": "header",
+        "description": "The name of the client"
+      }
+    },
+    "parameters": {
+      "id": {
+        "name": "id",
+        "in": "path",
+        "schema": {
+          "type": "string",
+          "example": "d555345345345as67a342a"
+        },
+        "required": true,
+        "description": "The unique identifier of the item"
+      },
+      "ListSortDirection": {
+        "name": "sortDirection",
+        "in": "query",
+        "description": "The direction to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
+        }
+      },
+      "ListPageNumber": {
+        "name": "x-janis-page",
+        "in": "header",
+        "description": "The page to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "minimum": 1,
+          "default": 1
+        }
+      },
+      "ListPageSize": {
+        "name": "x-janis-page-size",
+        "in": "header",
+        "description": "The page size to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "minimum": 1,
+          "default": 60
+        }
+      },
+      "JanisEntity": {
+        "name": "janis-entity",
+        "in": "header",
+        "description": "The entity name",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "AccountSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "id",
+            "name",
+            "ecommerceName",
+            "platform",
+            "userCreated",
+            "dateCreated",
+            "status"
+          ]
+        }
+      },
+      "AccountFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/Account/properties/id"
+            },
+            "name": {
+              "$ref": "#/components/schemas/Account/properties/name"
+            },
+            "ecommerceName": {
+              "$ref": "#/components/schemas/Account/properties/ecommerceName"
+            },
+            "referenceId": {
+              "$ref": "#/components/schemas/Account/properties/referenceId"
+            },
+            "platform": {
+              "$ref": "#/components/schemas/Account/properties/platform"
+            },
+            "userCreated": {
+              "$ref": "#/components/schemas/Account/properties/userCreated"
+            },
+            "dateCreatedDay": {
+              "$ref": "#/components/schemas/dateCreatedDay"
+            },
+            "status": {
+              "$ref": "#/components/schemas/Account/properties/status"
+            }
+          }
+        }
+      },
+      "AccountProcessSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "accountId",
+            "service",
+            "process",
+            "status",
+            "startDate",
+            "endDate"
+          ]
+        }
+      },
+      "AccountProcessFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/AccountProcess/properties/id"
+            },
+            "accountId": {
+              "$ref": "#/components/schemas/AccountProcess/properties/accountId"
+            },
+            "service": {
+              "$ref": "#/components/schemas/AccountProcess/properties/service"
+            },
+            "process": {
+              "$ref": "#/components/schemas/AccountProcess/properties/process"
+            },
+            "status": {
+              "$ref": "#/components/schemas/AccountProcess/properties/status"
+            },
+            "startDate": {
+              "$ref": "#/components/schemas/AccountProcess/properties/startDate"
+            },
+            "endDate": {
+              "$ref": "#/components/schemas/AccountProcess/properties/endDate"
+            }
+          }
+        }
+      },
+      "GeofenceSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "name",
+            "status",
+            "dateCreated",
+            "dateModified"
+          ]
+        }
+      },
+      "GeofenceFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/Geofence/properties/id"
+            },
+            "name": {
+              "$ref": "#/components/schemas/Geofence/properties/name"
+            },
+            "status": {
+              "$ref": "#/components/schemas/Geofence/properties/status"
+            },
+            "dateCreatedRange": {
+              "type": "object",
+              "description": "A range for creation date.",
+              "properties": {
+                "from": {
+                  "type": "string",
+                  "description": "The beginning of the range",
+                  "format": "date-time",
+                  "example": "2019-11-27T16:08:24.994Z"
+                },
+                "to": {
+                  "type": "string",
+                  "description": "The end of the range",
+                  "format": "date-time",
+                  "example": "2019-11-30T16:08:24.994Z"
+                }
+              }
+            },
+            "userCreated": {
+              "$ref": "#/components/schemas/Geofence/properties/userCreated"
+            },
+            "dateModifiedRange": {
+              "type": "object",
+              "description": "A range for last modification date.",
+              "properties": {
+                "from": {
+                  "type": "string",
+                  "description": "The beginning of the range",
+                  "format": "date-time",
+                  "example": "2019-11-27T16:08:24.994Z"
+                },
+                "to": {
+                  "type": "string",
+                  "description": "The end of the range",
+                  "format": "date-time",
+                  "example": "2019-11-30T16:08:24.994Z"
+                }
+              }
+            },
+            "userModified": {
+              "$ref": "#/components/schemas/Geofence/properties/userModified"
+            }
+          }
+        }
+      },
+      "CompanySortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "referenceId",
+            "name",
+            "title",
+            "isDefault"
+          ]
+        }
+      },
+      "CompanyFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/Company/properties/id"
+            },
+            "referenceId": {
+              "$ref": "#/components/schemas/Company/properties/referenceId"
+            },
+            "businessName": {
+              "$ref": "#/components/schemas/Company/properties/businessName"
+            },
+            "title": {
+              "$ref": "#/components/schemas/Company/properties/title"
+            },
+            "search": {
+              "type": "string",
+              "description": "This filter will apply to the `name`, `referenceId` and `title` fields\n"
+            },
+            "isDefault": {
+              "$ref": "#/components/schemas/Company/properties/isDefault"
+            },
+            "userCreated": {
+              "$ref": "#/components/schemas/Company/properties/userCreated"
+            },
+            "userModified": {
+              "$ref": "#/components/schemas/Company/properties/userModified"
+            },
+            "dateCreatedDay": {
+              "description": "The company's date created",
+              "type": "string",
+              "format": "date-time",
+              "example": "2019-07-12T19:59:51.801Z"
+            },
+            "dateModifiedDay": {
+              "description": "The company's date modified",
+              "type": "string",
+              "format": "date-time",
+              "example": "2019-07-12T19:59:51.801Z"
+            }
+          }
+        }
+      },
+      "FunctionsFields": {
+        "name": "fields",
+        "in": "query",
+        "description": "Reduce the response to fields",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "example": [
+            "id",
+            "name",
+            "referenceId"
+          ]
+        }
+      },
+      "FunctionsFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the model",
+        "schema": {
+          "type": "object",
+          "description": "The filters to apply to the model",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "The id to filter",
+              "example": "d555345345345as67a342b"
+            }
+          }
+        }
+      },
+      "FunctionsCalculateTotals": {
+        "name": "calculateTotals",
+        "in": "query",
+        "description": "Indicates if the response must return the totals data applied filters. **Default** `false`",
+        "schema": {
+          "type": "boolean",
+          "example": true
+        }
+      },
+      "FunctionsAllItems": {
+        "name": "allItems",
+        "in": "query",
+        "description": "Indicates if the response must return all items. **Default** `false`",
+        "schema": {
+          "type": "boolean",
+          "example": true
+        }
+      },
+      "HolidaySortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "name",
+            "day",
+            "status",
+            "dateCreated",
+            "dateModified"
+          ]
+        }
+      },
+      "HolidayFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "$ref": "#/components/schemas/Holiday/properties/name"
+            },
+            "day": {
+              "$ref": "#/components/schemas/Holiday/properties/day"
+            },
+            "status": {
+              "$ref": "#/components/schemas/Holiday/properties/status"
+            },
+            "userCreated": {
+              "$ref": "#/components/schemas/Holiday/properties/userCreated"
+            },
+            "userModified": {
+              "$ref": "#/components/schemas/Holiday/properties/userModified"
+            }
+          }
+        }
+      },
+      "LocationSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "id",
+            "name",
+            "userCreated",
+            "userModified",
+            "dateCreated",
+            "dateModified",
+            "status"
+          ]
+        }
+      },
+      "LocationFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/Location/properties/id"
+            },
+            "name": {
+              "$ref": "#/components/schemas/Location/properties/name"
+            },
+            "referenceId": {
+              "$ref": "#/components/schemas/Location/properties/referenceId"
+            },
+            "companyId": {
+              "$ref": "#/components/schemas/Location/properties/companyId"
+            },
+            "countryIso3": {
+              "$ref": "#/components/schemas/Location/properties/countryIso3"
+            },
+            "timezone": {
+              "$ref": "#/components/schemas/Location/properties/timezone"
+            },
+            "search": {
+              "type": "string",
+              "description": "This filter will apply to the `name` and `referenceId` fields"
+            },
+            "userCreated": {
+              "$ref": "#/components/schemas/Location/properties/userCreated"
+            },
+            "userModified": {
+              "$ref": "#/components/schemas/Location/properties/userModified"
+            },
+            "dateCreatedDay": {
+              "$ref": "#/components/schemas/dateCreatedDay"
+            },
+            "dateModifiedDay": {
+              "$ref": "#/components/schemas/dateModifiedDay"
+            },
+            "status": {
+              "$ref": "#/components/schemas/Location/properties/status"
+            }
+          }
+        }
+      },
+      "SalesChannelSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "id",
+            "name",
+            "shortIdentifier",
+            "referenceId",
+            "skipPicking",
+            "externalPicking",
+            "externalPaymentValidation",
+            "automaticCapturePostPicking",
+            "externalDelivery",
+            "userCreated",
+            "userModified",
+            "dateCreated",
+            "dateModified",
+            "status"
+          ]
+        }
+      },
+      "SalesChannelFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/SalesChannel/properties/id"
+            },
+            "name": {
+              "$ref": "#/components/schemas/SalesChannel/properties/name"
+            },
+            "shortIdentifier": {
+              "$ref": "#/components/schemas/SalesChannel/properties/shortIdentifier"
+            },
+            "referenceId": {
+              "$ref": "#/components/schemas/SalesChannel/properties/referenceId"
+            },
+            "skipPicking": {
+              "$ref": "#/components/schemas/SalesChannel/properties/skipPicking"
+            },
+            "externalPicking": {
+              "$ref": "#/components/schemas/SalesChannel/properties/externalPicking"
+            },
+            "automaticCapturePostPicking": {
+              "$ref": "#/components/schemas/SalesChannel/properties/automaticCapturePostPicking"
+            },
+            "externalDelivery": {
+              "$ref": "#/components/schemas/SalesChannel/properties/externalDelivery"
+            },
+            "externalPaymentValidation": {
+              "$ref": "#/components/schemas/SalesChannel/properties/externalPaymentValidation"
+            },
+            "search": {
+              "type": "string",
+              "description": "This filter will apply to the `name` and `referenceId` fields\n"
+            },
+            "hasOrderAccount": {
+              "type": "boolean",
+              "example": false,
+              "description": "In case of sending `false`, this filter returns the **Sales Channels** that do not have an associated order account.\nIf `true` is sent, it returns the **Sales Channels** that do have an associated account.\n"
+            },
+            "userCreated": {
+              "$ref": "#/components/schemas/SalesChannel/properties/userCreated"
+            },
+            "userModified": {
+              "$ref": "#/components/schemas/SalesChannel/properties/userModified"
+            },
+            "dateCreatedDay": {
+              "$ref": "#/components/schemas/dateCreatedDay"
+            },
+            "dateModifiedDay": {
+              "$ref": "#/components/schemas/dateModifiedDay"
+            },
+            "status": {
+              "$ref": "#/components/schemas/SalesChannel/properties/status"
+            }
+          }
+        }
+      },
+      "StoreSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "id",
+            "name",
+            "locationId",
+            "referenceId",
+            "userCreated",
+            "userModified",
+            "dateCreated",
+            "dateModified",
+            "status"
+          ]
+        }
+      },
+      "StoreFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/Store/properties/id"
+            },
+            "name": {
+              "$ref": "#/components/schemas/Store/properties/name"
+            },
+            "location": {
+              "$ref": "#/components/schemas/Store/properties/locationId"
+            },
+            "referenceId": {
+              "$ref": "#/components/schemas/Store/properties/referenceId"
+            },
+            "userCreated": {
+              "$ref": "#/components/schemas/Store/properties/userCreated"
+            },
+            "userModified": {
+              "$ref": "#/components/schemas/Store/properties/userModified"
+            },
+            "dateCreatedDay": {
+              "$ref": "#/components/schemas/dateCreatedDay"
+            },
+            "dateModifiedDay": {
+              "$ref": "#/components/schemas/dateModifiedDay"
+            },
+            "status": {
+              "$ref": "#/components/schemas/Store/properties/status"
+            }
+          }
+        }
+      },
+      "SupplierSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "name",
+            "referenceId",
+            "document",
+            "address",
+            "dateCreated",
+            "dateModified",
+            "status"
+          ]
+        }
+      },
+      "SupplierFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/Supplier/properties/id"
+            },
+            "name": {
+              "$ref": "#/components/schemas/Supplier/properties/name"
+            },
+            "referenceId": {
+              "$ref": "#/components/schemas/Supplier/properties/referenceId"
+            },
+            "document": {
+              "$ref": "#/components/schemas/Supplier/properties/document"
+            },
+            "search": {
+              "type": "string",
+              "description": "This filter will apply to the `name`, `referenceId` and `document` fields\n"
+            },
+            "address": {
+              "$ref": "#/components/schemas/Supplier/properties/address"
+            },
+            "status": {
+              "$ref": "#/components/schemas/status"
+            },
+            "userCreated": {
+              "$ref": "#/components/schemas/Supplier/properties/userCreated"
+            },
+            "userModified": {
+              "$ref": "#/components/schemas/Supplier/properties/userModified"
+            },
+            "dateCreatedDay": {
+              "$ref": "#/components/schemas/dateCreatedDay"
+            },
+            "dateModifiedDay": {
+              "$ref": "#/components/schemas/dateModifiedDay"
+            }
+          }
+        }
+      }
+    },
+    "headers": {
+      "x-janis-total": {
+        "description": "The total amount of records in the list",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "x-janis-total-created": {
+        "description": "The total amount of items created",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "x-janis-total-updated": {
+        "description": "The total amount of items updated",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "x-janis-total-not-modified": {
+        "description": "The total amount of items not modified",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "x-janis-total-error": {
+        "description": "The total amount of items with error",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "x-janis-total-removed": {
+        "description": "The total amount of removed items",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "responses": {
+      "SuccessCreateResponse": {
+        "description": "The item was created",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "SuccessUpdateResponse": {
+        "description": "The item was updated",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "GenericSuccess": {
+        "description": "Operation succeeded",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "Can not Found Entity.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "BadRequest": {
+        "description": "A client error has ocurred.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Authentication missing or invalid",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Not authorized request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "InternalError": {
+        "description": "A server error has ocurred."
+      },
+      "BatchResponse": {
+        "description": "Batch responses",
+        "headers": {
+          "x-janis-total-created": {
+            "$ref": "#/components/headers/x-janis-total-created"
+          },
+          "x-janis-total-updated": {
+            "$ref": "#/components/headers/x-janis-total-updated"
+          },
+          "x-janis-total-not-modified": {
+            "$ref": "#/components/headers/x-janis-total-not-modified"
+          },
+          "x-janis-total-error": {
+            "$ref": "#/components/headers/x-janis-total-error"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "description": "item Batch response",
+              "type": "object",
+              "properties": {
+                "itemsCreated": {
+                  "description": "Items which were created successfully.\n- The *key* of the *object* is the `referenceId` of the created item.\n- The *value* of the *object* is the `id` of the created item.\n",
+                  "type": "object",
+                  "example": {
+                    "item-ref-id-1": "5ec694b11b252473bad6f170",
+                    "item-ref-id-2": "5ec694b11b252473bad6f171"
+                  }
+                },
+                "itemsUpdated": {
+                  "description": "Items which were updated successfully.\n- The *key* of the *object* is the `referenceId` of the updated item.\n- The *value* of the *object* is the `id` of the updated item.\n",
+                  "type": "object",
+                  "example": {
+                    "item-ref-id-3": "606606782e232624c18f1c18",
+                    "item-ref-id-4": "6066067ff04765697cdd4d9a"
+                  }
+                },
+                "itemsNotModified": {
+                  "description": "Items that did not need to be modified.\nThis occurs when the item in the service **is equal** to the received item.\n- The *key* of the *object* is the `referenceId` of the non modified item.\n- The *value* of the *object* is the `id` of the non modified item.\n",
+                  "type": "object",
+                  "example": {
+                    "item-ref-id-5": "606606827c96a136ead9065e",
+                    "item-ref-id-6": "60660686f42efcf71529e69d"
+                  }
+                },
+                "itemsError": {
+                  "description": "Items with some error.\n- The *key* of the *object* is the `referenceId` of the item.\n- The *value* of the *object* is the validation message error.\n",
+                  "type": "object",
+                  "example": {
+                    "item-ref-id-7": "Some error occur"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/account/{id}": {
+      "get": {
+        "x-janis-namespace": "account",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "commerce:account:read"
+        ],
+        "operationId": "getAccount",
+        "tags": [
+          "Account"
+        ],
+        "summary": "Get an account by ID",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Account"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "x-janis-namespace": "account",
+        "x-janis-method": "update",
+        "x-janis-permissions": [
+          "commerce:account:write"
+        ],
+        "operationId": "updateAccount",
+        "tags": [
+          "Account"
+        ],
+        "summary": "Update an Account by ID",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "requestBody": {
+          "description": "The Account to update",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessUpdateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/account": {
+      "get": {
+        "x-janis-namespace": "account",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "commerce:account:read"
+        ],
+        "operationId": "listAccounts",
+        "tags": [
+          "Account"
+        ],
+        "summary": "Get a list of Accounts",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AccountSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/AccountFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/account/{id}/import-process": {
+      "post": {
+        "x-janis-namespace": "account",
+        "x-janis-method": "importProcess",
+        "x-janis-permissions": [
+          "commerce:account:start-process"
+        ],
+        "operationId": "triggerImportProcess",
+        "tags": [
+          "Account"
+        ],
+        "summary": "Triggers new import process",
+        "description": "Triggers an import process execution for the account if it is possible. Only available for VTEX import processes\n",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "requestBody": {
+          "description": "Name of the import process to trigger",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "importProcess": {
+                    "description": "The [Commerce Account](/v2/service/commerce#tag/Account) import feature to trigger",
+                    "type": "string",
+                    "example": "importBrands"
+                  },
+                  "action": {
+                    "description": "Action to perform. By default will be 'start'",
+                    "type": "string",
+                    "example": "start",
+                    "enum": [
+                      "start"
+                    ]
+                  }
+                },
+                "required": [
+                  "importProcess",
+                  "action"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/BatchResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/account/{id}/settings-schema": {
+      "get": {
+        "x-janis-namespace": "account",
+        "x-janis-method": "settings-schema",
+        "x-janis-permissions": [
+          "commerce:account:read"
+        ],
+        "operationId": "getAccountSettingsSchema",
+        "tags": [
+          "Account"
+        ],
+        "summary": "Get an account settings schema by ID",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "An object with the settings-schemas. You can see the schemas available in documentation of each platform or in [platform]-commerce.",
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/account-batch": {
+      "post": {
+        "x-janis-namespace": "account-batch",
+        "x-janis-method": "post",
+        "x-janis-permissions": [
+          "commerce:account:write"
+        ],
+        "operationId": "saveAccountBatch",
+        "tags": [
+          "Account"
+        ],
+        "summary": "Massive create or update accounts",
+        "description": "Create or update massive accounts.\n",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "The list of accounts to create or update",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountBatchList"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/BatchResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/account-process/{id}": {
+      "get": {
+        "x-janis-namespace": "account-process",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "commerce:account:read"
+        ],
+        "operationId": "getAccountProcess",
+        "tags": [
+          "Account"
+        ],
+        "summary": "Get an Account Process",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "example": "d555345345345as67a342a"
+            },
+            "required": true,
+            "description": "The Account Process ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Account Process found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountProcess"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/account-process": {
+      "get": {
+        "x-janis-namespace": "account-process",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "commerce:account:read"
+        ],
+        "operationId": "listAccountProcesses",
+        "tags": [
+          "Account"
+        ],
+        "summary": "List Account Processes",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AccountProcessSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/AccountProcessFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Account Processes listed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountProcessList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/geofence/{id}": {
+      "get": {
+        "x-janis-namespace": "geofence",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "commerce:geofence:read"
+        ],
+        "operationId": "getGeofence",
+        "tags": [
+          "Geofence"
+        ],
+        "summary": "Get a Geofence",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Geofence found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Geofence"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "x-janis-namespace": "geofence",
+        "x-janis-method": "update",
+        "x-janis-permissions": [
+          "commerce:geofence:write"
+        ],
+        "operationId": "updateGeofence",
+        "tags": [
+          "Geofence"
+        ],
+        "summary": "Update a Geofence",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "requestBody": {
+          "description": "A Geofence",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Geofence"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessUpdateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/geofence": {
+      "get": {
+        "x-janis-namespace": "geofence",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "commerce:geofence:read"
+        ],
+        "operationId": "listGeofences",
+        "tags": [
+          "Geofence"
+        ],
+        "summary": "List Geofences",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/GeofenceSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/GeofenceFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Geofences listed",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeofenceList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "x-janis-namespace": "geofence",
+        "x-janis-method": "create",
+        "x-janis-permissions": [
+          "commerce:geofence:write"
+        ],
+        "operationId": "createGeofence",
+        "tags": [
+          "Geofence"
+        ],
+        "summary": "Create a Geofence",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "A Geofence",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Geofence"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessCreateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/company/{id}": {
+      "get": {
+        "x-janis-namespace": "company",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "commerce:company:read"
+        ],
+        "operationId": "getCompany",
+        "tags": [
+          "Company"
+        ],
+        "summary": "Get a Company",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Company found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Company"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "x-janis-namespace": "company",
+        "x-janis-method": "update",
+        "x-janis-permissions": [
+          "commerce:company:write"
+        ],
+        "operationId": "updateCompany",
+        "tags": [
+          "Company"
+        ],
+        "summary": "Update a Company",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "requestBody": {
+          "description": "A Company",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Company"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessUpdateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/company": {
+      "get": {
+        "x-janis-namespace": "company",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "commerce:company:read"
+        ],
+        "operationId": "listCompany",
+        "tags": [
+          "Company"
+        ],
+        "summary": "List Company",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CompanySortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/CompanyFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Companies listed",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanyList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "x-janis-namespace": "company",
+        "x-janis-method": "create",
+        "x-janis-permissions": [
+          "commerce:company:write"
+        ],
+        "operationId": "createCompany",
+        "tags": [
+          "Company"
+        ],
+        "summary": "Create a Company",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "A Company",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Company"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessCreateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/GetAccount": {
+      "get": {
+        "summary": "Get Accounts using Account Model",
+        "operationId": "FnGetAccount",
+        "tags": [
+          "Functions"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/FunctionsFields"
+          },
+          {
+            "$ref": "#/components/parameters/FunctionsFilters"
+          },
+          {
+            "$ref": "#/components/parameters/FunctionsCalculateTotals"
+          },
+          {
+            "$ref": "#/components/parameters/FunctionsAllItems"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "number",
+                      "example": 200
+                    },
+                    "payload": {
+                      "oneOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "items": {
+                              "$ref": "#/components/schemas/AccountList"
+                            },
+                            "totals": {
+                              "$ref": "#/components/schemas/FunctionTotals"
+                            }
+                          }
+                        },
+                        {
+                          "$ref": "#/components/schemas/FunctionError"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/GetCompany": {
+      "post": {
+        "summary": "Get Companies using CompanyModel",
+        "operationId": "FnGetCompany",
+        "tags": [
+          "Functions"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/FunctionsFields"
+          },
+          {
+            "$ref": "#/components/parameters/FunctionsFilters"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "number",
+                      "example": 200
+                    },
+                    "payload": {
+                      "$ref": "#/components/schemas/CompanyList"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/GetLocation": {
+      "post": {
+        "summary": "Get Locations using LocationModel",
+        "operationId": "FnGetLocation",
+        "tags": [
+          "Functions"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/FunctionsFields"
+          },
+          {
+            "$ref": "#/components/parameters/FunctionsFilters"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "number",
+                      "example": 200
+                    },
+                    "payload": {
+                      "$ref": "#/components/schemas/LocationList"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/GetSalesChannel": {
+      "post": {
+        "summary": "Get Sales Channels using SalesChannelModel",
+        "operationId": "FnGetSalesChannel",
+        "tags": [
+          "Functions"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/FunctionsFields"
+          },
+          {
+            "$ref": "#/components/parameters/FunctionsFilters"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "number",
+                      "example": 200
+                    },
+                    "payload": {
+                      "$ref": "#/components/schemas/SalesChannelList"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/GetSupplier": {
+      "post": {
+        "summary": "Get Suppliers using SupplierModel",
+        "operationId": "FnGetSupplier",
+        "tags": [
+          "Functions"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/FunctionsFields"
+          },
+          {
+            "$ref": "#/components/parameters/FunctionsFilters"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "number",
+                      "example": 200
+                    },
+                    "payload": {
+                      "$ref": "#/components/schemas/SalesChannelList"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/holiday/{id}": {
+      "get": {
+        "x-janis-namespace": "holiday",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "commerce:holiday:read"
+        ],
+        "operationId": "getHoliday",
+        "tags": [
+          "Holidays"
+        ],
+        "summary": "Get a Holiday",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Holiday found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Holiday"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/holiday": {
+      "get": {
+        "x-janis-namespace": "holiday",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "commerce:holiday:read"
+        ],
+        "operationId": "listHolidays",
+        "tags": [
+          "Holidays"
+        ],
+        "summary": "List Holidays",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/HolidaySortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/HolidayFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Holidays listed",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HolidayList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "x-janis-namespace": "holiday",
+        "x-janis-method": "create",
+        "x-janis-permissions": [
+          "commerce:holiday:write"
+        ],
+        "operationId": "createHoliday",
+        "tags": [
+          "Holidays"
+        ],
+        "summary": "Create a Holiday",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "A Holiday",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Holiday"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessUpdateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/location": {
+      "post": {
+        "x-janis-namespace": "location",
+        "x-janis-method": "create",
+        "x-janis-permissions": [
+          "commerce:location:write"
+        ],
+        "operationId": "createLocation",
+        "tags": [
+          "Location"
+        ],
+        "summary": "Create a location",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "The location to create",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LocationToCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessCreateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "get": {
+        "x-janis-namespace": "location",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "commerce:location:read"
+        ],
+        "operationId": "listLocations",
+        "tags": [
+          "Location"
+        ],
+        "summary": "Get a list of locations",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/LocationSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/LocationFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocationList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/location/{id}": {
+      "get": {
+        "x-janis-namespace": "location",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "commerce:location:read"
+        ],
+        "operationId": "getLocation",
+        "tags": [
+          "Location"
+        ],
+        "summary": "Get a location by ID",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocationSaved"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "x-janis-namespace": "location",
+        "x-janis-method": "update",
+        "x-janis-permissions": [
+          "commerce:location:write"
+        ],
+        "operationId": "updateLocation",
+        "tags": [
+          "Location"
+        ],
+        "summary": "Update a location by ID",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "requestBody": {
+          "description": "The location to update",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LocationToUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessUpdateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/location-batch": {
+      "post": {
+        "x-janis-namespace": "location-batch",
+        "x-janis-method": "post",
+        "x-janis-permissions": [
+          "commerce:location:write"
+        ],
+        "operationId": "saveLocationBatch",
+        "tags": [
+          "Location"
+        ],
+        "summary": "Massive save locations",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "The locations to save",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LocationBatchList"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/BatchResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/sales-channel/{id}": {
+      "get": {
+        "x-janis-namespace": "sales-channel",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "commerce:sales-channel:read"
+        ],
+        "operationId": "getSalesChannel",
+        "tags": [
+          "Sales-Channel"
+        ],
+        "summary": "Get a sales channel by ID",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SalesChannel"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "x-janis-namespace": "sales-channel",
+        "x-janis-method": "update",
+        "x-janis-permissions": [
+          "commerce:sales-channel:write"
+        ],
+        "operationId": "updateSalesChannel",
+        "tags": [
+          "Sales-Channel"
+        ],
+        "summary": "Update a sales channel by ID",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "requestBody": {
+          "description": "The sales channel to update",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SalesChannel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessUpdateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/sales-channel": {
+      "get": {
+        "x-janis-namespace": "sales-channel",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "commerce:sales-channel:read"
+        ],
+        "operationId": "listSalesChannels",
+        "tags": [
+          "Sales-Channel"
+        ],
+        "summary": "Get a list of sales channels",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/SalesChannelSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/SalesChannelFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SalesChannelList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "x-janis-namespace": "sales-channel",
+        "x-janis-method": "create",
+        "x-janis-permissions": [
+          "commerce:sales-channel:write"
+        ],
+        "operationId": "createSalesChannel",
+        "tags": [
+          "Sales-Channel"
+        ],
+        "summary": "Create a sales channel",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "The Sales Channel to create",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SalesChannel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessCreateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/sales-channel-batch": {
+      "post": {
+        "x-janis-namespace": "sales-channel-batch",
+        "x-janis-method": "post",
+        "x-janis-permissions": [
+          "commerce:sales-channel:write"
+        ],
+        "operationId": "saveSalesChannelBatch",
+        "tags": [
+          "Sales-Channel"
+        ],
+        "summary": "Massive save sales channels",
+        "description": "Create or update massive sales-channel items. The maximum of sales-channels admitted is `10000`.  \n- The field 'accounts' refer to `referenceId` fields.\n- The field 'currency' refer to `code` fields.\n",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "The sales-channel to save",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SalesChannelBatchList"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/BatchResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/store/{id}": {
+      "get": {
+        "x-janis-namespace": "store",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "commerce:store:read"
+        ],
+        "operationId": "getStore",
+        "tags": [
+          "Store"
+        ],
+        "summary": "Get a store by ID",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Store"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "x-janis-namespace": "store",
+        "x-janis-method": "update",
+        "x-janis-permissions": [
+          "commerce:store:write"
+        ],
+        "operationId": "updateStore",
+        "tags": [
+          "Store"
+        ],
+        "summary": "Update a store by ID",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "requestBody": {
+          "description": "The store to update",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Store"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessUpdateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/store": {
+      "get": {
+        "x-janis-namespace": "store",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "commerce:store:read"
+        ],
+        "operationId": "listStores",
+        "tags": [
+          "Store"
+        ],
+        "summary": "Get a list of stores",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/StoreSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/StoreFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoreList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/supplier/{id}": {
+      "get": {
+        "x-janis-namespace": "supplier",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "commerce:supplier:read"
+        ],
+        "operationId": "getSupplier",
+        "tags": [
+          "Supplier"
+        ],
+        "summary": "Get a supplier by ID",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Supplier"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "x-janis-namespace": "supplier",
+        "x-janis-method": "update",
+        "x-janis-permissions": [
+          "commerce:supplier:write"
+        ],
+        "operationId": "updateSupplier",
+        "tags": [
+          "Supplier"
+        ],
+        "summary": "Update a supplier by ID",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "requestBody": {
+          "description": "The supplier to update",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Supplier"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessUpdateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/supplier": {
+      "get": {
+        "x-janis-namespace": "supplier",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "commerce:supplier:read"
+        ],
+        "operationId": "listSupplier",
+        "tags": [
+          "Supplier"
+        ],
+        "summary": "Get a list of suppliers",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/SupplierSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/SupplierFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupplierList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "x-janis-namespace": "supplier",
+        "x-janis-method": "create",
+        "operationId": "createSupplier",
+        "x-janis-permissions": [
+          "commerce:supplier:write"
+        ],
+        "tags": [
+          "Supplier"
+        ],
+        "summary": "Create a Supplier",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "The supplier to create",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SupplierPost"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessCreateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    }
+  }
+}

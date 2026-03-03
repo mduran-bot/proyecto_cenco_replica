@@ -1,0 +1,3737 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Fenicio Service",
+    "description": "Fenicio Service\n\n **Last update**: 26 dic 25, 01:12 p. m.",
+    "version": "1.8.0",
+    "x-logo": null,
+    "x-janis-keywords": [
+      "fenicio"
+    ],
+    "lastUpdate": "2025-12-26T16:12:32.984Z"
+  },
+  "tags": [
+    {
+      "name": "Account",
+      "description": "For managing Accounts"
+    },
+    {
+      "name": "Attribute",
+      "description": "For managing Attributes"
+    },
+    {
+      "name": "Base Price",
+      "description": "For listing Base Prices information"
+    },
+    {
+      "name": "Fenicio Product",
+      "description": "For managing Fenicio Products"
+    },
+    {
+      "name": "Order",
+      "description": "For managing Orders"
+    },
+    {
+      "name": "Price",
+      "description": "For listing Prices information"
+    },
+    {
+      "name": "Price Sheet",
+      "description": "For listing Price Sheets"
+    },
+    {
+      "name": "Sku",
+      "description": "For listing SKUs information"
+    }
+  ],
+  "servers": [
+    {
+      "url": "https://fenicio.janis.in/api",
+      "description": "The Prod API server",
+      "variables": {
+        "environment": {
+          "default": "prod"
+        }
+      }
+    },
+    {
+      "url": "https://fenicio.janisqa.in/api",
+      "description": "The QA API server",
+      "variables": {
+        "environment": {
+          "default": "qa"
+        }
+      }
+    },
+    {
+      "url": "https://fenicio.janisdev.in/api",
+      "description": "The Beta API server",
+      "variables": {
+        "environment": {
+          "default": "beta"
+        }
+      }
+    },
+    {
+      "url": "http://fenicio.janis.localhost:3132/api",
+      "description": "The Local API server",
+      "variables": {
+        "environment": {
+          "default": "local"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/account/{id}": {
+      "get": {
+        "x-janis-namespace": "account",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "commerce:account:read"
+        ],
+        "operationId": "getAccount",
+        "tags": [
+          "Account"
+        ],
+        "summary": "Get an Account",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Account found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Account"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/account": {
+      "get": {
+        "x-janis-namespace": "account",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "commerce:account:read"
+        ],
+        "operationId": "listAccounts",
+        "tags": [
+          "Account"
+        ],
+        "summary": "List Accounts",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AccountSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/AccountFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Accounts listed",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "x-janis-namespace": "account",
+        "x-janis-method": "save",
+        "x-janis-permissions": [
+          "commerce:account:write"
+        ],
+        "operationId": "saveAccount",
+        "tags": [
+          "Account"
+        ],
+        "summary": "Create or update an Account",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "An Account",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Account"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The Account was saved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "$ref": "#/components/schemas/Account/properties/id"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/attribute": {
+      "get": {
+        "x-janis-namespace": "attribute",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "catalog:attribute:read"
+        ],
+        "operationId": "listAttribute",
+        "tags": [
+          "Attribute"
+        ],
+        "summary": "Get a list of Attribute",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AttributeSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/AttributeFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttributeList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/base-price/{id}": {
+      "get": {
+        "x-janis-namespace": "base-price",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "fenicio:price:read"
+        ],
+        "operationId": "getBasePrice",
+        "tags": [
+          "Base Price"
+        ],
+        "summary": "Get a Base Price",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasePrice"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/base-price": {
+      "get": {
+        "x-janis-namespace": "base-price",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "fenicio:price:read"
+        ],
+        "operationId": "listBasePrice",
+        "tags": [
+          "Base Price"
+        ],
+        "summary": "Get a list of base prices",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PriceSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/PriceFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasePriceList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/fenicio-product/{id}": {
+      "get": {
+        "x-janis-namespace": "fenicio-product",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "fenicio:fenicio-product:read"
+        ],
+        "operationId": "getFenicioProduct",
+        "tags": [
+          "Fenicio Product"
+        ],
+        "summary": "Get a Fenicio Product",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The complete Fenicio Product found in an object with a property completeFenicioProduct",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomResponseFenicioProduct"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/fenicio-product": {
+      "get": {
+        "x-janis-namespace": "fenicio-product",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "fenicio:fenicio-product:read"
+        ],
+        "operationId": "listFenicioProducts",
+        "tags": [
+          "Fenicio Product"
+        ],
+        "summary": "Get a list of Fenicio Products with sort options and filters",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/FenicioProductSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/FenicioProductFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Fenicio products listed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FenicioProductList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/order/{id}": {
+      "get": {
+        "x-janis-namespace": "order",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "fenicio:order:read"
+        ],
+        "operationId": "getOrder",
+        "tags": [
+          "Order"
+        ],
+        "summary": "Get an Order",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/order": {
+      "get": {
+        "x-janis-namespace": "order",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "fenicio:order:read"
+        ],
+        "operationId": "listOrder",
+        "tags": [
+          "Order"
+        ],
+        "summary": "List Orders",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/OrderSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/OrderFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order listed",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "x-janis-namespace": "order",
+        "x-janis-method": "save",
+        "x-janis-permissions": [
+          "fenicio:order:write"
+        ],
+        "operationId": "createOrder",
+        "tags": [
+          "Order"
+        ],
+        "summary": "Create or update an Order",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "An Order",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IntegrationOrder"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The Order was saved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "$ref": "#/components/schemas/IntegrationOrder/properties/id"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/order-status-change/{id}": {
+      "get": {
+        "x-janis-namespace": "order-status-change",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "fenicio:order-status-change:read"
+        ],
+        "operationId": "getOrderStatusChange",
+        "tags": [
+          "Order"
+        ],
+        "summary": "Get an Order Status Change",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order Status Change found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderStatusChange"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/order-status-change": {
+      "get": {
+        "x-janis-namespace": "order-status-change",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "fenicio:order-status-change:read"
+        ],
+        "operationId": "listOrderStatusChanges",
+        "tags": [
+          "Order"
+        ],
+        "summary": "List Order Status Changes",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/OrderStatusChangeSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/OrderStatusChangeFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order Status Changes listed",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderStatusChangeList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/price/{id}": {
+      "get": {
+        "x-janis-namespace": "price",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "fenicio:price:read"
+        ],
+        "operationId": "getPrice",
+        "tags": [
+          "Price"
+        ],
+        "summary": "Get a price",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Price"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/price": {
+      "get": {
+        "x-janis-namespace": "price",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "fenicio:price:read"
+        ],
+        "operationId": "listPrice",
+        "tags": [
+          "Price"
+        ],
+        "summary": "Get a list of prices",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PriceSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/PriceFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PriceList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/price-sheet/{id}": {
+      "get": {
+        "x-janis-namespace": "price-sheet",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "fenicio:price-sheet:read"
+        ],
+        "operationId": "priceSheetGet",
+        "tags": [
+          "Price Sheet"
+        ],
+        "summary": "Get a price sheet by ID",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PriceSheet"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/price-sheet": {
+      "get": {
+        "x-janis-namespace": "price-sheet",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "fenicio:price-sheet:read"
+        ],
+        "operationId": "priceSheetList",
+        "tags": [
+          "Price Sheet"
+        ],
+        "summary": "Get a list of the price sheets",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PriceSheetSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/PriceSheetFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PriceSheetList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/producto": {
+      "post": {
+        "x-janis-namespace": "producto",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "fenicio:fenicio-product:read"
+        ],
+        "operationId": "listFenicioProductsAsProductos",
+        "tags": [
+          "Fenicio Product"
+        ],
+        "summary": "List Fenicio Products with custom response",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "List Parameters",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FenicioProductRequest"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/JanisAccountName"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Fenicio products listed. In case an error occurs, the API will also respond with status code 200 and the details of the error will be in the message.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FenicioProductResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/sku/{id}": {
+      "get": {
+        "x-janis-namespace": "sku",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "fenicio:sku:read"
+        ],
+        "operationId": "getSku",
+        "tags": [
+          "Sku"
+        ],
+        "summary": "Get a Sku",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The complete Sku found in an object with a property completeSku",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomSkuResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/sku": {
+      "get": {
+        "x-janis-namespace": "sku",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "fenicio:sku:read"
+        ],
+        "operationId": "listSkus",
+        "tags": [
+          "Sku"
+        ],
+        "summary": "Get a list of Skus with sort options and filters",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/SkusSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/SkusFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sku listed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SkuList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/stockporsku": {
+      "post": {
+        "x-janis-namespace": "stockporsku",
+        "x-janis-method": "save",
+        "x-janis-permissions": [
+          "fenicio:stock:read"
+        ],
+        "operationId": "stockBySku",
+        "tags": [
+          "Sku"
+        ],
+        "summary": "Retrieve the Stock of a given SKU",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "Stock retrieval request for SKUs",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SkuStockRequest"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/JanisAccountName"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "SKUs Stocks listed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FenicioStockResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-key",
+        "description": "The API Key"
+      },
+      "ApiSecret": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-secret",
+        "description": "The API Secret"
+      },
+      "JanisClient": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-client",
+        "description": "The Client Code"
+      }
+    },
+    "parameters": {
+      "id": {
+        "name": "id",
+        "in": "path",
+        "schema": {
+          "type": "string",
+          "example": "631fb04c8fe08f51a8ee5949"
+        },
+        "required": true,
+        "description": "The unique identifier of the item"
+      },
+      "ListSortDirection": {
+        "name": "sortDirection",
+        "in": "query",
+        "description": "The direction to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
+        }
+      },
+      "ListPageNumber": {
+        "name": "x-janis-page",
+        "in": "header",
+        "description": "The page to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "default": 1
+        }
+      },
+      "ListPageSize": {
+        "name": "x-janis-page-size",
+        "in": "header",
+        "description": "The page size to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "default": 60
+        }
+      },
+      "JanisEntity": {
+        "name": "janis-entity",
+        "in": "header",
+        "description": "The entity name",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "AccountSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "userCreated'",
+            "userModified",
+            "dateCreated",
+            "status"
+          ]
+        }
+      },
+      "AccountFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/Account/properties/id"
+            },
+            "referenceId": {
+              "$ref": "#/components/schemas/Account/properties/referenceId"
+            },
+            "userCreated": {
+              "$ref": "#/components/schemas/Account/properties/userCreated"
+            },
+            "userModified": {
+              "$ref": "#/components/schemas/Account/properties/userModified"
+            },
+            "dateCreated": {
+              "$ref": "#/components/schemas/Account/properties/dateCreated"
+            },
+            "status": {
+              "$ref": "#/components/schemas/Account/properties/status"
+            }
+          }
+        }
+      },
+      "AttributeSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "id",
+            "referenceId",
+            "name",
+            "status"
+          ]
+        }
+      },
+      "AttributeFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/Attribute/properties/id"
+            },
+            "name": {
+              "$ref": "#/components/schemas/Attribute/properties/name"
+            },
+            "referenceId": {
+              "$ref": "#/components/schemas/Attribute/properties/referenceId"
+            },
+            "status": {
+              "$ref": "#/components/schemas/Attribute/properties/status"
+            }
+          }
+        }
+      },
+      "PriceSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "id",
+            "sku",
+            "skuReferenceId",
+            "accountId",
+            "priceSheet",
+            "price",
+            "listPrice",
+            "minQuantity",
+            "dateCreated",
+            "userCreated",
+            "userModified"
+          ]
+        }
+      },
+      "PriceFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/Price/properties/id"
+            },
+            "sku": {
+              "$ref": "#/components/schemas/Price/properties/sku"
+            },
+            "skuReferenceId": {
+              "$ref": "#/components/schemas/Price/properties/skuReferenceId"
+            },
+            "accountId": {
+              "$ref": "#/components/schemas/Price/properties/accountId"
+            },
+            "pricingId": {
+              "$ref": "#/components/schemas/Price/properties/pricingId"
+            },
+            "priceSheet": {
+              "$ref": "#/components/schemas/Price/properties/priceSheet"
+            },
+            "dateCreated": {
+              "$ref": "#/components/schemas/Price/properties/dateCreated"
+            },
+            "dateCreatedDay": {
+              "$ref": "#/components/schemas/dateCreatedDay"
+            },
+            "dateCreatedFrom": {
+              "$ref": "#/components/schemas/dateCreatedFrom"
+            },
+            "dateCreatedTo": {
+              "$ref": "#/components/schemas/dateCreatedTo"
+            }
+          }
+        }
+      },
+      "FenicioProductSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "dateCreated",
+            "dateModified"
+          ]
+        }
+      },
+      "FenicioProductFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/FenicioProduct/properties/id"
+            },
+            "codigo": {
+              "$ref": "#/components/schemas/FenicioProduct/properties/codigo"
+            },
+            "nombre": {
+              "$ref": "#/components/schemas/FenicioProduct/properties/nombre"
+            },
+            "accountId": {
+              "$ref": "#/components/schemas/FenicioProduct/properties/accountId"
+            },
+            "productId": {
+              "$ref": "#/components/schemas/FenicioProduct/properties/productId"
+            },
+            "status": {
+              "$ref": "#/components/schemas/FenicioProduct/properties/status"
+            },
+            "dateCreatedRange": {
+              "$ref": "#/components/schemas/dateCreatedRange"
+            }
+          }
+        }
+      },
+      "OrderSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "dateCreated"
+          ]
+        }
+      },
+      "OrderFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/Order/properties/id"
+            },
+            "fenicioOrderId": {
+              "$ref": "#/components/schemas/Order/properties/fenicioOrderId"
+            },
+            "accountId": {
+              "$ref": "#/components/schemas/Order/properties/accountId"
+            },
+            "status": {
+              "$ref": "#/components/schemas/Order/properties/status"
+            },
+            "dateCreatedRange": {
+              "$ref": "#/components/schemas/dateCreatedRange"
+            }
+          }
+        }
+      },
+      "OrderStatusChangeSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "dateCreated",
+            "dateModified"
+          ]
+        }
+      },
+      "OrderStatusChangeFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/OrderStatusChange/properties/id"
+            },
+            "source": {
+              "$ref": "#/components/schemas/OrderStatusChange/properties/source"
+            },
+            "orderId": {
+              "$ref": "#/components/schemas/OrderStatusChange/properties/orderId"
+            },
+            "eventType": {
+              "$ref": "#/components/schemas/OrderStatusChange/properties/eventType"
+            },
+            "account": {
+              "$ref": "#/components/schemas/OrderStatusChange/properties/account"
+            },
+            "clientCode": {
+              "$ref": "#/components/schemas/OrderStatusChange/properties/clientCode"
+            },
+            "status": {
+              "$ref": "#/components/schemas/OrderStatusChange/properties/status"
+            },
+            "dateCreatedRange": {
+              "$ref": "#/components/schemas/dateCreatedRange"
+            }
+          }
+        }
+      },
+      "PriceSheetSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "name",
+            "dateCreated",
+            "status"
+          ]
+        }
+      },
+      "PriceSheetFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/PriceSheet/properties/id"
+            },
+            "referenceId": {
+              "$ref": "#/components/schemas/PriceSheet/properties/referenceId"
+            },
+            "name": {
+              "$ref": "#/components/schemas/PriceSheet/properties/name"
+            },
+            "incrementThreshold": {
+              "$ref": "#/components/schemas/PriceSheet/properties/incrementThreshold"
+            },
+            "decrementThreshold": {
+              "$ref": "#/components/schemas/PriceSheet/properties/decrementThreshold"
+            },
+            "salesChannels": {
+              "$ref": "#/components/schemas/salesChannelId"
+            },
+            "userCreated": {
+              "$ref": "#/components/schemas/PriceSheet/properties/userCreated"
+            },
+            "dateCreated": {
+              "$ref": "#/components/schemas/PriceSheet/properties/dateCreated"
+            },
+            "dateCreatedDay": {
+              "$ref": "#/components/schemas/dateCreatedDay"
+            },
+            "userModified": {
+              "$ref": "#/components/schemas/PriceSheet/properties/userModified"
+            },
+            "dateModified": {
+              "$ref": "#/components/schemas/PriceSheet/properties/dateModified"
+            },
+            "dateModifiedDay": {
+              "$ref": "#/components/schemas/dateModifiedDay"
+            },
+            "status": {
+              "$ref": "#/components/schemas/PriceSheet/properties/status"
+            }
+          }
+        }
+      },
+      "JanisAccountName": {
+        "name": "janis-account-name",
+        "in": "header",
+        "description": "The Janis account name",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "SkusSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "dateCreated",
+            "dateModified"
+          ]
+        }
+      },
+      "SkusFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/Sku/properties/id"
+            },
+            "referenceId": {
+              "$ref": "#/components/schemas/Sku/properties/referenceId"
+            },
+            "name": {
+              "$ref": "#/components/schemas/Sku/properties/name"
+            },
+            "product": {
+              "$ref": "#/components/schemas/Sku/properties/product"
+            },
+            "status": {
+              "$ref": "#/components/schemas/Sku/properties/status"
+            },
+            "dateCreatedRange": {
+              "$ref": "#/components/schemas/dateCreatedRange"
+            }
+          }
+        }
+      }
+    },
+    "headers": {
+      "x-janis-total": {
+        "description": "The total amount of records in the list",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "responses": {
+      "SuccessCreateResponse": {
+        "description": "The item was created",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "SuccessUpdateResponse": {
+        "description": "The item was updated",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "GenericSuccess": {
+        "description": "Operation succeeded",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "BadRequest": {
+        "description": "A client error has ocurred.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Authentication missing or invalid",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Not authorized request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "InternalError": {
+        "description": "A server error has ocurred."
+      }
+    },
+    "schemas": {
+      "id": {
+        "description": "The unique identifier of the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "631fb04c8fe08f51a8ee5949"
+      },
+      "status": {
+        "description": "The item status",
+        "type": "string",
+        "default": "active",
+        "enum": [
+          "active",
+          "inactive"
+        ],
+        "example": "active"
+      },
+      "dateCreated": {
+        "description": "The date of creation",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-12T19:00:00.000Z"
+      },
+      "dateModified": {
+        "description": "The date of the last modification",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-20T19:00:00.000Z"
+      },
+      "dateCreatedDay": {
+        "description": "The day of creation",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-08-07T16:00:00.000Z"
+      },
+      "dateModifiedDay": {
+        "description": "The day of last modification",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-08-07T16:00:00.000Z"
+      },
+      "userCreated": {
+        "description": "The ID of the user who created the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "6a1fc1eeb5b68406e0487a10"
+      },
+      "userModified": {
+        "description": "The ID of the user who last modified the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "7e1fc1eeb5b68406e048796"
+      },
+      "dateCreatedRange": {
+        "description": "Creation date range",
+        "type": "object",
+        "properties": {
+          "from": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/dateCreated"
+              }
+            ],
+            "description": "Date range from"
+          },
+          "to": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/dateCreated"
+              }
+            ],
+            "description": "Date range to"
+          }
+        }
+      },
+      "accountsIds": {
+        "description": "The Related Account's IDs. This refers to the `id` of the **Account** Entity. See [Account](/v2/service/commerce#tag/Account).",
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "example": [
+          "1a1fc1eeb5b68406e0487a01",
+          "1a1fc1eeb5b68406e0487a00"
+        ]
+      },
+      "skuReferenceId": {
+        "description": "The Janis skus's `referenceId`. See [Sku](catalog#tag/Sku) for further information",
+        "type": "string",
+        "example": "some-sku-refId"
+      },
+      "priceValue": {
+        "description": "The price value",
+        "type": "number",
+        "minimum": 0,
+        "example": 499.99,
+        "exclusiveMinimum": true
+      },
+      "listPriceValue": {
+        "description": "The list price value. This price must be greater than the `price` field.\n",
+        "type": "number",
+        "minimum": 0,
+        "example": 500,
+        "exclusiveMinimum": true
+      },
+      "_idSolicitud": {
+        "description": "The unique identifier of the request",
+        "type": "string",
+        "example": "200325120000-FNSHPUY-3c7621ed5a707177c1421cce79338668"
+      },
+      "accountId": {
+        "description": "The Account `id`.\nThis field refer to **Janis Commerce Service**. See [Account](/v2/service/commerce#tag/Account).\n",
+        "type": "string",
+        "example": "5fe39f06b91fed3cbf9f551f"
+      },
+      "dateCreatedTo": {
+        "description": "Matches with items that were created up to the received date",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-08-07T16:00:00Z"
+      },
+      "dateCreatedFrom": {
+        "description": "Matches with items that were created from the received date",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-08-07T16:00:00Z"
+      },
+      "pricingId": {
+        "description": "The Pricing `id`.\nThis field refer to **Janis Pricing Service**. See [Price](/v2/service/pricing#tag/Price).\n",
+        "type": "string",
+        "readOnly": true,
+        "example": "5fe39f06b91fed3cbf9f551f"
+      },
+      "minQuantity": {
+        "description": "The minimal quantity of an SKU to apply the specified price.\nThis field is used to generate the concept known as \"price by quantity\".\n",
+        "type": "number",
+        "example": 2,
+        "minimum": 1,
+        "default": 1
+      },
+      "priceSheet": {
+        "description": "The ID of the price sheet. Refers to the `id` of the pricing **price-sheet** entity. See [price-sheet](/v2/service/pricing#tag/Price-Sheet)",
+        "type": "string",
+        "example": "507f1f77bcf86cd799439011"
+      },
+      "salesChannelId": {
+        "description": "The Sales Channel ID. This refer to the `id` of the **Sales Channel** Entity of **Janis Commerce Service**. See [Sales Channel](/v2/service/commerce#tag/Sales-Channel).\n",
+        "type": "string",
+        "example": "5e711c7b3d5b9100074b9504"
+      },
+      "salesChannelsIds": {
+        "description": "A list of sales channels IDs. This refer to the `id` of the **Sales Channel** Entity of **Janis Commerce Service**. See [Sales Channel](/v2/service/commerce#tag/Sales-Channel).\n",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/salesChannelId"
+        }
+      },
+      "Account": {
+        "description": "An Account",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "referenceId": {
+            "description": "The Account's reference Id",
+            "type": "string",
+            "example": "r-00001"
+          },
+          "name": {
+            "description": "The Account's name",
+            "type": "string",
+            "example": "Sample Account"
+          },
+          "clientCode": {
+            "description": "The Account's client code",
+            "type": "string",
+            "example": "client-code-01"
+          },
+          "salesChannel": {
+            "description": "The Account's sales channel",
+            "type": "object",
+            "properties": {
+              "id": {
+                "$ref": "#/components/schemas/id"
+              },
+              "name": {
+                "description": "The Janis sales channel's `name`. See [Sales Channel](commerce#tag/Sales-Channel) for further information",
+                "type": "string",
+                "example": "Sample Sales Channel"
+              },
+              "referenceId": {
+                "description": "The Janis sales channel's `referenceId`. See [Sales Channel](commerce#tag/Sales-Channel) for further information",
+                "type": "string",
+                "example": "some-sku-refId"
+              }
+            },
+            "example": {
+              "orders": {
+                "id": "d555345345345as67a342a",
+                "name": "Sample Sale Channel",
+                "referenceId": "r-00001"
+              }
+            }
+          },
+          "availableSalesChannels": {
+            "description": "The Account's available sales channels ids",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "d555345345345as67a342a",
+              "d555345345345as67a342a"
+            ]
+          },
+          "variantCodeAttribute": {
+            "description": "The Account's variant code attribute id",
+            "type": "string",
+            "example": "66ccb71e4d1d285f023c7d2b"
+          },
+          "variantAttribute": {
+            "description": "The Account's variant attribute id",
+            "type": "string",
+            "example": "66ccb722a6fe5bac9b806598"
+          },
+          "presentationAttribute": {
+            "description": "The Account's presentation attribute id",
+            "type": "string",
+            "example": "66ccb72659d0f6e07604d370"
+          },
+          "unifiedStock": {
+            "description": "The Account's stock unification",
+            "type": "boolean",
+            "example": false
+          },
+          "warehouseStockSourceId": {
+            "description": "The Account's warehouse `id` associated. See [Warehouse](wms#tag/Warehouse) for further information",
+            "type": "string",
+            "example": "66ccb7c7a38e9abdb44ae7ac"
+          },
+          "sequentialIdType": {
+            "description": "The Account's sequential identifier type to generate",
+            "type": "string",
+            "example": "numeric"
+          },
+          "status": {
+            "$ref": "#/components/schemas/status"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          }
+        }
+      },
+      "AccountList": {
+        "type": "array",
+        "description": "A list of Accounts",
+        "items": {
+          "$ref": "#/components/schemas/Account"
+        }
+      },
+      "Attribute": {
+        "description": "An Attribute",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "referenceId": {
+            "description": "The Attribute's reference ID",
+            "type": "string",
+            "example": "attribute-attr-9437"
+          },
+          "name": {
+            "description": "The Attribute's name",
+            "type": "string",
+            "example": "Size"
+          },
+          "group": {
+            "description": "The Attribute's group's ID. This refers to the `id` of the **Attribute Group** Entity. See [Attribute Group](/v2/service/catalog#tag/Attribute-Group).",
+            "type": "string",
+            "nullable": true,
+            "example": "7e1fc1eeb5b68406e048796"
+          },
+          "category": {
+            "description": "The Category ID. This refers to the `id` of the **Category** Entity. See [Category](/v2/service/catalog#tag/Category).\nIf `null` or not set it means that the attribute applies to all the products in catalog.\n",
+            "nullable": true,
+            "type": "string",
+            "example": "1234c1eeb5b68406e048796"
+          },
+          "isRequired": {
+            "description": "Determines if the attribute is required",
+            "type": "boolean",
+            "example": true
+          },
+          "appliesToSkus": {
+            "description": "Determines if the attribute applies to skus or products",
+            "type": "boolean",
+            "example": true
+          },
+          "accounts": {
+            "$ref": "#/components/schemas/accountsIds"
+          },
+          "fieldType": {
+            "description": "The Attribute's field type",
+            "type": "string",
+            "enum": [
+              "text",
+              "number"
+            ],
+            "example": "text"
+          },
+          "options": {
+            "description": "The Attribute's possible values.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "XL",
+              "XXL"
+            ]
+          },
+          "defaultValue": {
+            "description": "The default value for the **Product** or **Sku** if no value is defined.\nWhen `options` are defined, `defaultValue` must be one of them.\n",
+            "type": "string",
+            "example": "XL"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          },
+          "status": {
+            "$ref": "#/components/schemas/status"
+          }
+        }
+      },
+      "AttributeList": {
+        "description": "The list data",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Attribute"
+        }
+      },
+      "BasePrice": {
+        "description": "A Base Price object",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "sku": {
+            "$ref": "#/components/schemas/Sku/properties/id"
+          },
+          "skuReferenceId": {
+            "$ref": "#/components/schemas/skuReferenceId"
+          },
+          "priceSheet": {
+            "$ref": "#/components/schemas/priceSheet"
+          },
+          "pricingId": {
+            "$ref": "#/components/schemas/pricingId"
+          },
+          "accountId": {
+            "$ref": "#/components/schemas/accountId"
+          },
+          "price": {
+            "$ref": "#/components/schemas/priceValue"
+          },
+          "listPrice": {
+            "$ref": "#/components/schemas/listPriceValue"
+          },
+          "minQuantity": {
+            "$ref": "#/components/schemas/minQuantity"
+          },
+          "pricePricingId": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/pricingId"
+              }
+            ],
+            "description": "The Pricing `id` of the same sku price.\nThis field refer to **Janis Pricing Service**. See [Price](/v2/service/pricing#tag/Price).\n"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          }
+        }
+      },
+      "BasePriceList": {
+        "description": "A list of prices",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/BasePrice"
+        }
+      },
+      "FenicioProduct": {
+        "type": "object",
+        "description": "A Fenicio Product",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "accountId": {
+            "description": "The Janis account's `id`. See [Account](commerce#tag/Account) for further information",
+            "type": "string",
+            "example": "66eb149feef5439719be83a9"
+          },
+          "productId": {
+            "description": "The Janis product's `id`. See [Product](catalog#tag/Product) for further information",
+            "type": "string",
+            "example": "66eb13f2d415990500884829"
+          },
+          "brandId": {
+            "description": "The Janis product's `brand`. See [Product](catalog#tag/Product) for further information",
+            "type": "string",
+            "example": "66eb14507ac7eb9c0e221d8e"
+          },
+          "categoryId": {
+            "description": "The Janis product's `category`. See [Product](catalog#tag/Product) for further information",
+            "type": "string",
+            "example": "66eb1455eaeffba0f9bb0bcd"
+          },
+          "status": {
+            "$ref": "#/components/schemas/status"
+          },
+          "codigo": {
+            "description": "The Janis product's `referenceId`. See [Product](catalog#tag/Product) for further information",
+            "type": "string",
+            "example": "some-product-code"
+          },
+          "nombre": {
+            "description": "The Janis product's `name`. See [Product](catalog#tag/Product) for further information",
+            "type": "string",
+            "example": "A product name"
+          },
+          "monedaPredeterminada": {
+            "description": "The product's currency in code ISO 4217",
+            "type": "string",
+            "example": "UYU"
+          },
+          "atributos": {
+            "description": "The product's attributes. It can contain the Janis product's `brand`, `category`, `description`, and others. See [Product](catalog#tag/Product) for further information",
+            "type": "object",
+            "additionalProperties": true,
+            "example": {
+              "brand": "some-brand",
+              "category": "some-category",
+              "description": "some-description"
+            }
+          },
+          "variantes": {
+            "description": "The product's variants, grouped by the value of the attribute defined as `variantCode` in the client's account settings. See [Account](fenicio#tag/Account) for further information",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "codigo": {
+                  "description": "The variant's code id defined in the client's account settings. See [Account](fenicio#tag/Account) for further information",
+                  "type": "string",
+                  "example": "0zE48qQzULeUy0B3RpyvU6XkZ1m79L1G"
+                },
+                "nombre": {
+                  "description": "The value of the variant's code defined in the client's account settings. See [Account](fenicio#tag/Account) for further information",
+                  "type": "string",
+                  "example": "A variant name"
+                },
+                "atributos": {
+                  "description": "The Janis product's sku `attributes`. See [Sku](catalog#tag/Sku) for further information",
+                  "type": "object"
+                },
+                "presentaciones": {
+                  "description": "The product's variant presentations, grouped by the value of the attribute defined as `presentationAttribute` in the client's account settings. See [Account](fenicio#tag/Account) for further information",
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "codigo": {
+                        "description": "The Janis product's sku attribute value",
+                        "type": "string",
+                        "example": "L"
+                      },
+                      "sku": {
+                        "description": "The Janis product's sku `referenceId`. See [Sku](catalog#tag/Sku) for further information",
+                        "type": "string",
+                        "example": "some-sku-ref-id"
+                      },
+                      "nombre": {
+                        "description": "The Janis product's sku attribute value",
+                        "type": "string",
+                        "example": "L"
+                      },
+                      "stock": {
+                        "description": "The product's available stock for the warehouse defined in the client's account settings, or aggregated across all warehouses if the setting unified stock is enabled. See [Account](fenicio#tag/Account) for further information",
+                        "type": "integer",
+                        "example": 100
+                      },
+                      "precioLista": {
+                        "description": "The product's original price mapped by currency in code ISO 4217",
+                        "type": "object",
+                        "example": {
+                          "UYU": 150.5
+                        }
+                      },
+                      "previoVenta": {
+                        "description": "The product's selling price mapped by currency in code ISO 4217",
+                        "type": "object",
+                        "example": {
+                          "UYU": 250.5
+                        }
+                      },
+                      "identificadores": {
+                        "description": "The product's sku `eans` codes. See [Sku](catalog#tag/Sku) for further information",
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "codigo": {
+                              "description": "The product's sku `eans` code",
+                              "type": "string",
+                              "enum": [
+                                "GTIN"
+                              ],
+                              "example": "GTIN"
+                            },
+                            "valor": {
+                              "description": "The product's sku `eans` value",
+                              "type": "string",
+                              "example": "some-identifier-value"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "CustomResponseFenicioProduct": {
+        "type": "object",
+        "description": "An object with the complete Fenicio Product",
+        "properties": {
+          "rawFenicioProduct": {
+            "$ref": "#/components/schemas/FenicioProduct"
+          }
+        }
+      },
+      "FenicioProductList": {
+        "type": "array",
+        "description": "A list of Fenicio Products",
+        "items": {
+          "$ref": "#/components/schemas/FenicioProduct"
+        }
+      },
+      "IntegrationOrder": {
+        "description": "An integration order",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "_idSolicitud": {
+            "$ref": "#/components/schemas/_idSolicitud"
+          },
+          "idOrden": {
+            "description": "The unique identifier of the order in Fenicio",
+            "type": "string",
+            "example": "1235"
+          },
+          "idOrdenOrigen": {
+            "description": "The unique identifier of the order in the external origin",
+            "type": "string",
+            "example": "6789"
+          },
+          "referencia": {
+            "description": "The unique identifier of the reference",
+            "type": "string"
+          },
+          "estado": {
+            "description": "The status of the order",
+            "type": "string",
+            "enum": [
+              "PAGO_PENDIENTE",
+              "APROBADA",
+              "CANCELADA"
+            ],
+            "example": "APROBADA"
+          },
+          "motivoCancelacion": {
+            "description": "The cancelation motive",
+            "type": "string"
+          },
+          "origen": {
+            "description": "The origin of the order",
+            "type": "string",
+            "enum": [
+              "MERCADOLIBRE",
+              "CALLCENTER",
+              "WEB"
+            ],
+            "example": "MERCADOLIBRE"
+          },
+          "fechaInicio": {
+            "description": "The start date of the order",
+            "type": "string",
+            "format": "date-time",
+            "example": "2019-11-12T02:59:59-0300"
+          },
+          "fechaAbandono": {
+            "description": "The abandon date of the order",
+            "type": "string",
+            "format": "date-time",
+            "example": "2019-11-12T02:59:59-0300"
+          },
+          "fechaRecuperada": {
+            "description": "The recovery date of the order",
+            "type": "string",
+            "format": "date-time",
+            "example": "2019-11-12T02:59:59-0300"
+          },
+          "fechaFin": {
+            "description": "The end date of the order",
+            "type": "string",
+            "format": "date-time",
+            "example": "2019-11-12T02:59:59-0300"
+          },
+          "fechaCancelada": {
+            "description": "The cancel date of the order",
+            "type": "string",
+            "format": "date-time",
+            "example": "2019-11-12T02:59:59-0300"
+          },
+          "comprador": {
+            "$ref": "#/components/schemas/User"
+          },
+          "direccionFacturacion": {
+            "$ref": "#/components/schemas/Address"
+          },
+          "codigoTributario": {
+            "description": "The company's tax registration number",
+            "type": "string"
+          },
+          "razonSocial": {
+            "description": "The company's name",
+            "type": "string"
+          },
+          "moneda": {
+            "description": "The code ISO 4217 of the currency",
+            "type": "string",
+            "example": "UYU"
+          },
+          "pago": {
+            "$ref": "#/components/schemas/Payment"
+          },
+          "entrega": {
+            "$ref": "#/components/schemas/OrderShipping"
+          },
+          "lineas": {
+            "description": "The details of all the lines of the order",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderLine"
+            }
+          },
+          "impuestos": {
+            "description": "The taxes amount of the order",
+            "type": "number",
+            "example": 135.22
+          },
+          "importeTotal": {
+            "description": "The total amount of the order",
+            "type": "number",
+            "example": 750
+          },
+          "observaciones": {
+            "description": "The general observations of the order",
+            "type": "string"
+          },
+          "historialCallCenter": {
+            "description": "The call center events list",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EventCallCenter"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "_idSolicitud",
+          "idOrden",
+          "estado",
+          "origen",
+          "comprador",
+          "pago",
+          "entrega",
+          "impuestos",
+          "importeTotal"
+        ]
+      },
+      "Order": {
+        "type": "object",
+        "description": "An order",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "fenicioOrderId": {
+            "type": "string",
+            "description": "The integration order id",
+            "example": "V1StGXR8Z5jdHi6B"
+          },
+          "accountId": {
+            "type": "string",
+            "description": "The id of the account associated with the order",
+            "example": "672cdadd1849404bde3d0c70"
+          },
+          "status": {
+            "description": "The order status",
+            "type": "string",
+            "enum": [
+              "accepted",
+              "cancelled"
+            ],
+            "example": "accepted"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          }
+        },
+        "required": [
+          "id",
+          "fenicioOrderId",
+          "accountId",
+          "status"
+        ]
+      },
+      "User": {
+        "description": "The user details",
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "The unique identifier of the user",
+            "type": "number",
+            "example": 123
+          },
+          "codigo": {
+            "description": "The code of the user",
+            "type": "string",
+            "example": "doc1234567"
+          },
+          "email": {
+            "description": "The email of the user",
+            "type": "string",
+            "example": "mail@dominio.com"
+          },
+          "nombre": {
+            "description": "The name of the user",
+            "type": "string",
+            "example": "Juan"
+          },
+          "apellido": {
+            "description": "The last name of the user",
+            "type": "string",
+            "example": "Perez"
+          },
+          "telefono": {
+            "description": "The phone of the user",
+            "type": "string",
+            "example": "+59899123456"
+          },
+          "genero": {
+            "description": "The gender of the user",
+            "type": "string",
+            "enum": [
+              "M",
+              "F"
+            ],
+            "example": "M"
+          },
+          "documento": {
+            "description": "The document of the user",
+            "type": "object",
+            "properties": {
+              "numero": {
+                "description": "The number of the document",
+                "type": "string",
+                "example": "41234568"
+              },
+              "pais": {
+                "description": "The country ISO 3166-1 code of the document",
+                "type": "string",
+                "example": "UY"
+              },
+              "tipo": {
+                "description": "The type of the document",
+                "type": "string",
+                "enum": [
+                  "PASAPORTE",
+                  "DOCUMENTO_IDENTIDAD"
+                ],
+                "example": "DOCUMENTO_IDENTIDAD"
+              }
+            },
+            "required": [
+              "numero",
+              "pais",
+              "tipo"
+            ]
+          },
+          "extras": {
+            "description": "The extras of the user",
+            "type": "object",
+            "properties": {
+              "programaMillas": {
+                "description": "The miles program of the user",
+                "type": "string",
+                "example": "LATAM"
+              }
+            }
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "nombre",
+          "telefono"
+        ]
+      },
+      "Address": {
+        "description": "The address details",
+        "type": "object",
+        "properties": {
+          "latitud": {
+            "description": "The latitude of the address",
+            "type": "number",
+            "example": 14.22545121542
+          },
+          "longitud": {
+            "description": "The longitude of the address",
+            "type": "number",
+            "example": -50.32655885488
+          },
+          "pais": {
+            "description": "The country of the address",
+            "type": "string",
+            "example": "Uruguay"
+          },
+          "estado": {
+            "description": "The state of the address",
+            "type": "string",
+            "example": "Montevideo"
+          },
+          "localidad": {
+            "description": "The location of the address",
+            "type": "string",
+            "example": "Montevideo"
+          },
+          "calle": {
+            "description": "The street name of the address",
+            "type": "string",
+            "example": "Obligado"
+          },
+          "numeroPuerta": {
+            "description": "The street number of the address",
+            "type": "string",
+            "example": "1316"
+          },
+          "numeroApto": {
+            "description": "The apartment number of the address",
+            "type": "string"
+          },
+          "codigoPostal": {
+            "description": "The postal code of the address",
+            "type": "string",
+            "example": "11300"
+          },
+          "observaciones": {
+            "description": "The observations of the address",
+            "type": "string"
+          }
+        },
+        "required": [
+          "pais",
+          "estado",
+          "localidad",
+          "calle"
+        ]
+      },
+      "Payment": {
+        "description": "The payment details",
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "The unique identifier of the payment",
+            "type": "number",
+            "example": 2000
+          },
+          "idExterno": {
+            "description": "The external unique identifier of the payment",
+            "type": "string",
+            "example": "52bf5321eadb4603b3f01502db7c7f62"
+          },
+          "codigo": {
+            "$ref": "#/components/schemas/PaymentCode"
+          },
+          "conector": {
+            "$ref": "#/components/schemas/PaymentConnector"
+          },
+          "estado": {
+            "description": "The status of the payment",
+            "type": "string",
+            "enum": [
+              "PAGO_PENDIENTE",
+              "APROBADA",
+              "CANCELADA"
+            ],
+            "example": "APROBADA"
+          },
+          "fechaVencimiento": {
+            "description": "The expiration date of the payment",
+            "type": "string",
+            "format": "date-time",
+            "example": "2019-12-01T12:01:00-0300"
+          },
+          "fechaPago": {
+            "description": "The confirmation date of the payment",
+            "type": "string",
+            "format": "date-time",
+            "example": "2019-12-01T12:01:00-0300"
+          },
+          "fechaCancelacion": {
+            "description": "The cancelation date of the payment",
+            "type": "string",
+            "format": "date-time",
+            "example": "2019-12-01T12:01:00-0300"
+          },
+          "cuotas": {
+            "description": "The number of quotas of the payment",
+            "type": "number",
+            "example": 1
+          },
+          "importe": {
+            "description": "The amount total of the payment",
+            "type": "number",
+            "example": 750
+          },
+          "moneda": {
+            "description": "The code ISO 4217 of the currency of the payment",
+            "type": "string",
+            "example": "UYU"
+          },
+          "bin": {
+            "description": "The first 6 digits of the card of the payment",
+            "type": "string",
+            "example": "5469015"
+          },
+          "autorizacion": {
+            "description": "The authorization code of the payment",
+            "type": "string",
+            "example": "00054890564XC"
+          },
+          "numeroTarjeta": {
+            "description": "The hashed card number",
+            "type": "string",
+            "example": "411111******1111"
+          },
+          "terminacionTarjeta": {
+            "description": "The last 4 digits of the card of the payment",
+            "type": "string",
+            "example": "1234"
+          }
+        },
+        "required": [
+          "id",
+          "cuotas",
+          "importe"
+        ]
+      },
+      "PaymentCode": {
+        "description": "The code of the payment",
+        "type": "string",
+        "enum": [
+          "ABITAB",
+          "AMEX",
+          "ANDA",
+          "ARGENCARD",
+          "AZUL",
+          "BALOTO",
+          "BANCARDCHECK",
+          "BANDES",
+          "BANRED",
+          "BBVA",
+          "BBVANET",
+          "CABAL",
+          "CARGAVIRTUAL",
+          "CASH",
+          "CENCOSUD",
+          "CITIBANAMEX",
+          "CLUBDELESTE",
+          "CMR",
+          "CODENSA",
+          "CORDIAL",
+          "CORDOBESA",
+          "CREDIFIELCO",
+          "CREDITEL",
+          "CREDITODELACASA",
+          "CREDITOSDIRECTOS",
+          "DAVIVIENDA",
+          "DINERS",
+          "EBROU",
+          "EDENRED",
+          "EFECTY",
+          "FUCAC",
+          "HERITAGE",
+          "HSBC",
+          "INFONET",
+          "INTERBANK",
+          "ITALCRED",
+          "ITAU",
+          "KHIPU",
+          "LIDER",
+          "MAESTRO",
+          "MAGNA",
+          "MASTER",
+          "MERCADOPAGO",
+          "MIDINERO",
+          "NARANJA",
+          "NATIVA",
+          "OCA",
+          "OXXO",
+          "PAGOCONTRAENTREGA",
+          "PAGODESPUES",
+          "PAGOEXPRESS",
+          "PAGOFACIL",
+          "PAGOMANUAL",
+          "PASSCARD",
+          "PAYPAL",
+          "PEFECTIVO",
+          "PRESTO",
+          "PROVINCIANET",
+          "PSE",
+          "RAPIPAGO",
+          "REDPAGOS",
+          "SANTANDER",
+          "SANTANDERSUPERNET",
+          "SERVIPAG",
+          "SIMULADOR",
+          "SPEI",
+          "TARJETAD",
+          "TARJETASHOPPING",
+          "VISA",
+          "WEBPAY"
+        ],
+        "example": "VISA"
+      },
+      "PaymentConnector": {
+        "description": "The type of connector used for the payment",
+        "type": "string",
+        "enum": [
+          "ALIGNET",
+          "AMEX",
+          "AZUL",
+          "BANRED",
+          "COBROSYA",
+          "FENICIO",
+          "FIRSTDATA",
+          "GEOPAY",
+          "MERCADOPAGO",
+          "MERCADOPAGO_API",
+          "MIPRESTAMO",
+          "NEWAGEDATA",
+          "OCA",
+          "PAYPAL",
+          "PLEXO",
+          "SIEMPREPAGO",
+          "SISTARBANC"
+        ],
+        "example": "ALIGNET"
+      },
+      "OrderShipping": {
+        "description": "The shipping details",
+        "type": "object",
+        "properties": {
+          "tipo": {
+            "description": "The type of the shipping",
+            "type": "string",
+            "enum": [
+              "RETIRO",
+              "ENVIO"
+            ],
+            "example": "RETIRO"
+          },
+          "estado": {
+            "description": "The status of the shipping",
+            "type": "string",
+            "enum": [
+              "RECIBIDO",
+              "PREPARANDO",
+              "AGUARDANDO_DESPACHO",
+              "EN_TRANSITO",
+              "LISTO_PARA_RETIRAR",
+              "ENTREGADO"
+            ],
+            "example": "PREPARANDO"
+          },
+          "horario": {
+            "description": "The time range of the shipping",
+            "type": "object",
+            "properties": {
+              "desde": {
+                "description": "The start date of the shipping",
+                "type": "string",
+                "format": "date-time",
+                "example": "2019-11-12T02:59:59-0300"
+              },
+              "hasta": {
+                "description": "The end date of the shipping",
+                "type": "string",
+                "format": "date-time",
+                "example": "2019-11-12T02:59:59-0300"
+              }
+            },
+            "required": [
+              "desde",
+              "hasta"
+            ]
+          },
+          "destinatario": {
+            "description": "The person who receives the order",
+            "type": "string",
+            "example": "Juan Lopez"
+          },
+          "direccionEnvio": {
+            "$ref": "#/components/schemas/Address"
+          },
+          "local": {
+            "description": "The local shipping code",
+            "type": "string",
+            "example": "ABCD"
+          },
+          "servicioEntrega": {
+            "description": "The order shipping service details",
+            "type": "object",
+            "properties": {
+              "id": {
+                "description": "The unique identifier of the shipping service",
+                "type": "number"
+              },
+              "codigo": {
+                "description": "The code of the shipping service",
+                "type": "string"
+              },
+              "nombre": {
+                "description": "The name of the shipping service",
+                "type": "string"
+              }
+            }
+          },
+          "codigoTracking": {
+            "description": "The tracking code assigned by the shipping service",
+            "type": "string"
+          },
+          "etiqueta": {
+            "description": "The file URL of the shipping label generated by the shipping service",
+            "type": "string"
+          }
+        },
+        "required": [
+          "tipo"
+        ]
+      },
+      "OrderLine": {
+        "description": "An order line",
+        "type": "object",
+        "properties": {
+          "nombre": {
+            "description": "The name of the article",
+            "type": "string",
+            "example": "Remera Slim Fit"
+          },
+          "sku": {
+            "description": "The unique identifier of the article",
+            "type": "string",
+            "example": "0000123"
+          },
+          "codigoPrecio": {
+            "description": "The code of the type of the price of the article",
+            "type": "string",
+            "example": "1"
+          },
+          "cantidad": {
+            "description": "The number of purchased units",
+            "type": "number",
+            "example": 2
+          },
+          "cantidadRegalo": {
+            "description": "The number of gift units",
+            "type": "number",
+            "example": 0
+          },
+          "precio": {
+            "description": "The unit price of the line",
+            "type": "number",
+            "example": 500
+          },
+          "descuentos": {
+            "description": "The list of discounts applied to the line",
+            "type": "object",
+            "properties": {
+              "nombre": {
+                "description": "The name of the discount",
+                "type": "string",
+                "example": "Cupon Fin de año"
+              },
+              "codigo": {
+                "description": "The code of the discount",
+                "type": "string",
+                "example": "123"
+              },
+              "origen": {
+                "description": "The origin of the discount",
+                "type": "string",
+                "enum": [
+                  "CUPON",
+                  "PRODUCTO",
+                  "MEDIO_DE_PAGO",
+                  "PROMOCION"
+                ],
+                "example": "CUPON"
+              },
+              "monto": {
+                "description": "The amount of the discount",
+                "type": "number",
+                "example": 250
+              }
+            }
+          },
+          "attributos": {
+            "description": "The attributes values of the article",
+            "type": "object"
+          }
+        },
+        "required": [
+          "nombre",
+          "sku",
+          "codigoPrecio",
+          "cantidad",
+          "cantidadRegalo",
+          "precio"
+        ]
+      },
+      "EventCallCenter": {
+        "description": "A call center event",
+        "type": "object",
+        "properties": {
+          "evento": {
+            "description": "The call center event type",
+            "type": "string",
+            "enum": [
+              "CREAR",
+              "ENVIAR",
+              "FINALIZAR"
+            ],
+            "example": "CREAR"
+          },
+          "fecha": {
+            "description": "The date of the event",
+            "type": "string",
+            "format": "date-time",
+            "example": "2019-11-12T02:59:59-0300"
+          },
+          "operador": {
+            "description": "The details of the operator of the event",
+            "type": "object",
+            "properties": {
+              "nombre": {
+                "description": "The name of the operator",
+                "type": "string",
+                "example": "Lorena"
+              },
+              "apellido": {
+                "description": "The last name of the operator",
+                "type": "string",
+                "example": "Gómez"
+              },
+              "email": {
+                "description": "The email of the operator",
+                "type": "string",
+                "example": "lgomez@dominio.com"
+              }
+            },
+            "required": [
+              "nombre",
+              "apellido",
+              "email"
+            ]
+          }
+        },
+        "required": [
+          "evento",
+          "fecha",
+          "operador"
+        ]
+      },
+      "OrderList": {
+        "type": "array",
+        "description": "A list of orders",
+        "items": {
+          "$ref": "#/components/schemas/Order"
+        }
+      },
+      "OrderStatusChange": {
+        "type": "object",
+        "description": "An Order Status Change",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "source": {
+            "type": "string",
+            "description": "The source of the status change",
+            "enum": [
+              "fenicio",
+              "oms"
+            ],
+            "example": "fenicio"
+          },
+          "orderId": {
+            "type": "string",
+            "description": "The Fenicio id of the order",
+            "example": "V1StGXR8Z5jdHi6B"
+          },
+          "clientCode": {
+            "type": "string",
+            "description": "The client code of the order",
+            "example": "defaultClient"
+          },
+          "account": {
+            "type": "string",
+            "description": "The name of the account that originated the status change",
+            "example": "fizzmod"
+          },
+          "eventType": {
+            "type": "string",
+            "description": "The event type of the status order",
+            "enum": [
+              "PAGO_PENDIENTE",
+              "APROBADA",
+              "CANCELADA"
+            ],
+            "example": "APROBADA"
+          },
+          "loggingData": {
+            "type": "array",
+            "description": "A list of logging information of the status change process",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "Saved status change in DB"
+            ]
+          },
+          "status": {
+            "description": "The order status change processing status",
+            "type": "string",
+            "default": "pending",
+            "enum": [
+              "pending",
+              "processing",
+              "processed",
+              "skipped",
+              "error"
+            ],
+            "example": "pending"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          }
+        },
+        "required": [
+          "id",
+          "source",
+          "orderId",
+          "clientCode",
+          "account",
+          "loggingData",
+          "status",
+          "dateCreated"
+        ]
+      },
+      "OrderStatusChangeList": {
+        "type": "array",
+        "description": "A list of Order Status Changes",
+        "items": {
+          "$ref": "#/components/schemas/OrderStatusChange"
+        }
+      },
+      "Price": {
+        "description": "A price object",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "sku": {
+            "$ref": "#/components/schemas/Sku/properties/id"
+          },
+          "skuReferenceId": {
+            "$ref": "#/components/schemas/skuReferenceId"
+          },
+          "priceSheet": {
+            "$ref": "#/components/schemas/priceSheet"
+          },
+          "pricingId": {
+            "$ref": "#/components/schemas/pricingId"
+          },
+          "accountId": {
+            "$ref": "#/components/schemas/accountId"
+          },
+          "price": {
+            "$ref": "#/components/schemas/priceValue"
+          },
+          "listPrice": {
+            "$ref": "#/components/schemas/listPriceValue"
+          },
+          "minQuantity": {
+            "$ref": "#/components/schemas/minQuantity"
+          },
+          "dateFrom": {
+            "description": "The date from where the price will apply.\n\n**Important**: This value must be a ISOString. See more information in [ISO_8601](https://en.wikipedia.org/wiki/ISO_8601).\n\nThis field should be lesser than `dateTo`\n",
+            "type": "string",
+            "format": "date-time",
+            "example": "2019-01-01T00:00:00Z"
+          },
+          "dateTo": {
+            "description": "The date until the price will apply.\n\n**Important**: This value must be a ISOString. See more information in [ISO_8601](https://en.wikipedia.org/wiki/ISO_8601).\n\nThis field must be greater than `dateFrom`\n",
+            "type": "string",
+            "format": "date-time",
+            "example": "2019-12-31T29:59:59Z"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          }
+        }
+      },
+      "PriceList": {
+        "description": "A list of prices",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Price"
+        }
+      },
+      "PriceSheet": {
+        "description": "A Price Sheet object",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "name": {
+            "description": "The Price Sheet Name",
+            "type": "string",
+            "example": "some-price-sheet"
+          },
+          "referenceId": {
+            "description": "The Price Sheet Reference ID `referenceId`",
+            "type": "string",
+            "example": "price-sheet-ref-555"
+          },
+          "salesChannels": {
+            "$ref": "#/components/schemas/salesChannelsIds"
+          },
+          "incrementThreshold": {
+            "description": "The increment threshold of the Price Sheet, this field is a number, but represents a percentage.\nThis is used for determinate if price changes requires an audit process.\n",
+            "type": "number",
+            "minimum": 1,
+            "example": 10
+          },
+          "decrementThreshold": {
+            "description": "The decrement threshold of the Price Sheet, this field is a number, but represents a percentage.\nThis is used for determinate if price changes requires an audit process.\n",
+            "type": "number",
+            "minimum": 1,
+            "example": 5
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          },
+          "status": {
+            "$ref": "#/components/schemas/status"
+          }
+        }
+      },
+      "PriceSheetList": {
+        "description": "A list of Price Sheets",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/PriceSheet"
+        }
+      },
+      "FenicioProductRequest": {
+        "description": "Fenicio Product List Request",
+        "type": "object",
+        "properties": {
+          "_idSolicitud": {
+            "$ref": "#/components/schemas/_idSolicitud"
+          },
+          "desde": {
+            "description": "The position of the first Fenicio Product to return from DB",
+            "type": "number",
+            "example": 1,
+            "minimum": 0,
+            "default": 0
+          },
+          "total": {
+            "description": "The total Fenicio Products to return from DB",
+            "type": "number",
+            "example": 10,
+            "minimum": 0,
+            "maximum": 100,
+            "default": 60
+          }
+        }
+      },
+      "FenicioProductResponse": {
+        "description": "The response to the Producto API Request. This is the response provided to Fenicio",
+        "type": "object",
+        "properties": {
+          "status": {
+            "description": "The status of the response",
+            "type": "string",
+            "enum": [
+              "OK",
+              "ERROR"
+            ],
+            "example": "OK"
+          },
+          "mensaje": {
+            "description": "The message of the response. If success, the value is `null`. If error, the value is the error details",
+            "type": "string",
+            "nullable": true
+          },
+          "_idSolicitud": {
+            "$ref": "#/components/schemas/_idSolicitud"
+          },
+          "data": {
+            "type": "object",
+            "description": "The data of the response. If error, the value is `null`",
+            "nullable": true,
+            "properties": {
+              "desde": {
+                "description": "The position of the first Fenicio Product to return from DB",
+                "type": "number",
+                "example": 0,
+                "minimum": 0,
+                "default": 0
+              },
+              "total": {
+                "description": "The total Fenicio Products to return from DB",
+                "type": "number",
+                "example": 1,
+                "minimum": 0,
+                "maximum": 100,
+                "default": 60
+              },
+              "productos": {
+                "type": "array",
+                "description": "A list of Fenicio Products",
+                "items": {
+                  "$ref": "#/components/schemas/FenicioProduct"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Sku": {
+        "type": "object",
+        "description": "An Sku",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "accounts": {
+            "type": "array",
+            "description": "List of [Commerce Accounts](/v2/service/commerce#tag/Account) ID",
+            "items": {
+              "description": "The Janis account's `id`. See [Account](commerce#tag/Account) for further information",
+              "type": "string",
+              "example": "66eb149feef5439719be83a9"
+            }
+          },
+          "ean": {
+            "description": "The Janis sku's main `ean`. See [Sku](catalog#tag/Sku) for further information",
+            "type": "string",
+            "example": "2300008052550"
+          },
+          "mainImage": {
+            "type": "string",
+            "description": "The sku's main image url",
+            "example": "https://cdn.catalog.janisqa.in/bas/sku-images/123456/main-thumb.webp"
+          },
+          "measurementUnit": {
+            "type": "string",
+            "description": "The sku's measurement unit",
+            "example": "meters"
+          },
+          "name": {
+            "description": "The Janis sku's `name`. See [Product](catalog#tag/Sku) for further information",
+            "type": "string",
+            "example": "A product name"
+          },
+          "referenceId": {
+            "$ref": "#/components/schemas/skuReferenceId"
+          },
+          "product": {
+            "description": "The Janis product's `id`. See [Product](catalog#tag/Product) for further information",
+            "type": "string",
+            "example": "66eb13f2d415990500884829"
+          },
+          "productReferenceId": {
+            "description": "The Janis product's `referenceId`. See [Product](catalog#tag/Product) for further information",
+            "type": "string",
+            "example": "some-product-refId"
+          },
+          "sellingMeasurementUnit": {
+            "type": "string",
+            "description": "The sku's measurement unit",
+            "example": "meters"
+          },
+          "sellingUnitMultiplier": {
+            "type": "number",
+            "description": "The product's unit multiplier",
+            "example": 1
+          },
+          "status": {
+            "$ref": "#/components/schemas/status"
+          },
+          "attributes": {
+            "description": "The skus's attributes values mapped by its attribute id. See [Sku-Attributes](catalog#tag/Sku-Attribute) for further information",
+            "type": "object",
+            "additionalProperties": true,
+            "example": {
+              "66eb13f2d415990500884829": "red"
+            }
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          }
+        }
+      },
+      "CustomSkuResponse": {
+        "type": "object",
+        "description": "An object with the complete Sku content",
+        "properties": {
+          "rawSku": {
+            "$ref": "#/components/schemas/Sku"
+          }
+        }
+      },
+      "SkuList": {
+        "type": "array",
+        "description": "A list of Skus",
+        "items": {
+          "$ref": "#/components/schemas/Sku"
+        }
+      },
+      "SkuStockRequest": {
+        "description": "SKU Stock Request",
+        "type": "object",
+        "properties": {
+          "_idSolicitud": {
+            "$ref": "#/components/schemas/_idSolicitud"
+          },
+          "skus": {
+            "description": "The IDs of the SKUs to retrieve their stock",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "548972-002-01",
+              "548972-002-03"
+            ]
+          }
+        }
+      },
+      "FenicioStockResponse": {
+        "type": "object",
+        "description": "SKU Stock response",
+        "properties": {
+          "status": {
+            "description": "The response status",
+            "type": "string",
+            "example": "OK",
+            "enum": [
+              "ERROR",
+              "OK"
+            ]
+          },
+          "mensaje": {
+            "description": "Response message with the error message in case of an error. If the response is successful message will be null",
+            "type": "string",
+            "nullable": true,
+            "example": "An account name needs to be passed in the request headers"
+          },
+          "_idSolicitud": {
+            "$ref": "#/components/schemas/_idSolicitud"
+          },
+          "data": {
+            "type": "object",
+            "description": "The response data",
+            "properties": {
+              "stockPorSku": {
+                "type": "array",
+                "description": "A list of SKUs with their stock",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "sku": {
+                      "description": "The SKU used by Fenicio. This represents de Sku referenceId in Janis",
+                      "type": "string",
+                      "example": "548972-002-01"
+                    },
+                    "stock": {
+                      "description": "The stock for the required SKU.\nThe result can be either the aggregated stock considering all warehouses or the stock of the warehouse defined in the Account settings.\n",
+                      "type": "integer",
+                      "example": 5
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "listenerEvent": {
+        "description": "A JANIS Event object",
+        "type": "object",
+        "properties": {
+          "service": {
+            "description": "The source service name",
+            "type": "string",
+            "example": "id"
+          },
+          "entity": {
+            "description": "The event related entity",
+            "type": "string",
+            "example": "profile"
+          },
+          "event": {
+            "description": "The event name",
+            "type": "string",
+            "example": "created"
+          },
+          "client": {
+            "description": "The source event client",
+            "type": "string",
+            "example": "fizzmod"
+          },
+          "id": {
+            "description": "The event related entity ID",
+            "type": "string",
+            "example": "5d699c1ae8ebb95eaa24aca9"
+          }
+        },
+        "required": [
+          "service",
+          "entity",
+          "event"
+        ]
+      }
+    }
+  }
+}

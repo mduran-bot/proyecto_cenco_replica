@@ -1,0 +1,1556 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "i18n Service",
+    "description": "i18n Service\n\n **Last update**: 09 sept 25, 04:33 p. m.",
+    "version": "1.10.1",
+    "x-logo": null,
+    "x-janis-keywords": [
+      "i18n",
+      "country",
+      "countries",
+      "currency",
+      "currencies",
+      "timezones",
+      "timezone",
+      "languages"
+    ],
+    "lastUpdate": "2025-09-09T19:33:04.650Z"
+  },
+  "tags": [
+    {
+      "name": "Country",
+      "description": "For managing Countries"
+    },
+    {
+      "name": "Currency",
+      "description": "For managing Currencies"
+    },
+    {
+      "name": "Languages",
+      "description": "To manage languages"
+    },
+    {
+      "name": "Timezone",
+      "description": "For managing Timezones"
+    }
+  ],
+  "servers": [
+    {
+      "url": "https://i18n.janis.in/api",
+      "description": "The Prod API server",
+      "variables": {
+        "environment": {
+          "default": "prod"
+        }
+      }
+    },
+    {
+      "url": "https://i18n.janisqa.in/api",
+      "description": "The QA API server",
+      "variables": {
+        "environment": {
+          "default": "qa"
+        }
+      }
+    },
+    {
+      "url": "https://i18n.janisdev.in/api",
+      "description": "The Beta API server",
+      "variables": {
+        "environment": {
+          "default": "beta"
+        }
+      }
+    },
+    {
+      "url": "http://i18n.janis.localhost:3068/api",
+      "description": "The Local API server",
+      "variables": {
+        "environment": {
+          "default": "local"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/country/{id}": {
+      "get": {
+        "x-janis-namespace": "country",
+        "x-janis-method": "get",
+        "operationId": "countryGet",
+        "tags": [
+          "Country"
+        ],
+        "summary": "Get a Country",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Country found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Country"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/country": {
+      "get": {
+        "x-janis-namespace": "country",
+        "x-janis-method": "list",
+        "operationId": "countriesList",
+        "tags": [
+          "Country"
+        ],
+        "summary": "List of Countries",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CountrySortBy"
+          },
+          {
+            "$ref": "#/components/parameters/CountryFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Countries listed",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CountryList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/currency/{id}": {
+      "get": {
+        "x-janis-namespace": "currency",
+        "x-janis-method": "get",
+        "operationId": "currencyGet",
+        "tags": [
+          "Currency"
+        ],
+        "summary": "Get a Currency",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Currency"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/currency": {
+      "get": {
+        "x-janis-namespace": "currency",
+        "x-janis-method": "list",
+        "operationId": "currencyList",
+        "tags": [
+          "Currency"
+        ],
+        "summary": "List of Currencies",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CurrencySortBy"
+          },
+          {
+            "$ref": "#/components/parameters/CurrencyFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrencyList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/language": {
+      "get": {
+        "x-janis-namespace": "language",
+        "x-janis-method": "list",
+        "operationId": "listLanguages",
+        "tags": [
+          "Languages"
+        ],
+        "summary": "List the languages",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/LanguagesSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/LanguagesFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/listLanguagesSuccess"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/timezone/{id}": {
+      "get": {
+        "x-janis-namespace": "timezone",
+        "x-janis-method": "get",
+        "operationId": "timezoneGet",
+        "tags": [
+          "Timezone"
+        ],
+        "summary": "Get a timezone",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Timezone"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/timezone": {
+      "get": {
+        "x-janis-namespace": "timezone",
+        "x-janis-method": "list",
+        "operationId": "timezoneList",
+        "tags": [
+          "Timezone"
+        ],
+        "summary": "List of Timezones",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TimezoneSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/TimezoneFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TimezoneList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-key",
+        "description": "The API Key"
+      },
+      "ApiSecret": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-secret",
+        "description": "The API Secret"
+      }
+    },
+    "parameters": {
+      "id": {
+        "name": "id",
+        "in": "path",
+        "schema": {
+          "type": "string",
+          "example": "d555345345345as67a342a"
+        },
+        "required": true,
+        "description": "The unique identifier of the item"
+      },
+      "ListSortDirection": {
+        "name": "sortDirection",
+        "in": "query",
+        "description": "The direction to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
+        }
+      },
+      "ListPageNumber": {
+        "name": "x-janis-page",
+        "in": "header",
+        "description": "The page to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "default": 1
+        }
+      },
+      "ListPageSize": {
+        "name": "x-janis-page-size",
+        "in": "header",
+        "description": "The page size to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "default": 60
+        }
+      },
+      "JanisEntity": {
+        "name": "janis-entity",
+        "in": "header",
+        "description": "The entity name",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "CountrySortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "name",
+            "iso2",
+            "iso3",
+            "currencies",
+            "defaultCurrency",
+            "languages",
+            "timezones",
+            "borders"
+          ]
+        }
+      },
+      "CountryFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/id"
+            },
+            "name": {
+              "$ref": "#/components/schemas/Country/properties/name"
+            },
+            "iso2": {
+              "$ref": "#/components/schemas/Country/properties/iso2"
+            },
+            "iso3": {
+              "$ref": "#/components/schemas/Country/properties/iso3"
+            },
+            "search": {
+              "type": "string",
+              "description": "This filter will apply to the `name`, `iso2` and `iso3` fields\n"
+            },
+            "currencies": {
+              "$ref": "#/components/schemas/Country/properties/currencies"
+            },
+            "defaultCurrency": {
+              "$ref": "#/components/schemas/Country/properties/defaultCurrency"
+            },
+            "languages": {
+              "$ref": "#/components/schemas/Country/properties/languages"
+            },
+            "timezones": {
+              "$ref": "#/components/schemas/Country/properties/timezones"
+            },
+            "borders": {
+              "$ref": "#/components/schemas/Country/properties/borders"
+            }
+          }
+        }
+      },
+      "CurrencySortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "code",
+            "name",
+            "symbol"
+          ]
+        }
+      },
+      "CurrencyFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/id"
+            },
+            "code": {
+              "$ref": "#/components/schemas/Currency/properties/code"
+            },
+            "name": {
+              "$ref": "#/components/schemas/Currency/properties/name"
+            },
+            "search": {
+              "type": "string",
+              "description": "This filter will apply to the `name`, `code` and `countryNames` fields\n"
+            },
+            "symbol": {
+              "$ref": "#/components/schemas/Currency/properties/symbol"
+            }
+          }
+        }
+      },
+      "LanguagesSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "id",
+            "name",
+            "code",
+            "variant"
+          ]
+        }
+      },
+      "LanguagesFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "$ref": "#/components/schemas/Language/properties/name"
+            },
+            "code": {
+              "$ref": "#/components/schemas/Language/properties/code"
+            },
+            "variant": {
+              "$ref": "#/components/schemas/Language/properties/variant"
+            },
+            "fallback": {
+              "$ref": "#/components/schemas/Language/properties/fallback"
+            },
+            "fullCode": {
+              "$ref": "#/components/schemas/Language/properties/fullCode"
+            },
+            "status": {
+              "$ref": "#/components/schemas/Language/properties/status"
+            }
+          }
+        }
+      },
+      "ReleasesSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "id",
+            "namespace",
+            "language"
+          ]
+        }
+      },
+      "ReleasesFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "namespace": {
+              "description": "The namespace",
+              "type": "string"
+            },
+            "language": {
+              "description": "The language",
+              "type": "string"
+            },
+            "status": {
+              "description": "The status name",
+              "type": "string"
+            }
+          }
+        }
+      },
+      "TimezoneSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "name",
+            "countryIso2",
+            "gmtOffset",
+            "gmtOffsetRaw"
+          ]
+        }
+      },
+      "TimezoneFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/id"
+            },
+            "name": {
+              "$ref": "#/components/schemas/Timezone/properties/name"
+            },
+            "country": {
+              "$ref": "#/components/schemas/Timezone/properties/country"
+            },
+            "countryIso2": {
+              "$ref": "#/components/schemas/Timezone/properties/countryIso2"
+            },
+            "search": {
+              "type": "string",
+              "description": "This filter will apply to the `name` and `countryName` fields\n"
+            },
+            "gmtOffset": {
+              "$ref": "#/components/schemas/Timezone/properties/gmtOffset"
+            },
+            "gmtOffsetRaw": {
+              "$ref": "#/components/schemas/Timezone/properties/gmtOffsetRaw"
+            }
+          }
+        }
+      },
+      "TranslatesSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "id",
+            "dateCreated",
+            "namespace",
+            "key",
+            "lastUsed"
+          ]
+        }
+      },
+      "TranslatesFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "namespace": {
+              "$ref": "#/components/schemas/Translate/properties/namespace"
+            },
+            "key": {
+              "$ref": "#/components/schemas/Translate/properties/key"
+            },
+            "language": {
+              "description": "Language for filter for a already translated values.\nThis field refer to the `fullCode` of the [Languages](/v2/service/translate#tag/Languages). entity.\nYou **must** combine this filter with `value` filter to work properly.\n",
+              "type": "string"
+            },
+            "value": {
+              "description": "The translated value in the `language` selected.\nYou **must** combine this filter with `language` filter to work properly.\n"
+            },
+            "fullKey": {
+              "description": "Full Key combining namespace and key",
+              "type": "string",
+              "example": "common.status.active"
+            },
+            "lastUsedRange": {
+              "type": "object",
+              "description": "A range for last used day. It will filter from 00:00Hs to 23:59:59Hs of the given range",
+              "properties": {
+                "from": {
+                  "type": "string",
+                  "description": "The beginning of the range",
+                  "format": "date-time",
+                  "example": "2019-11-27T16:08:24.994Z"
+                },
+                "to": {
+                  "type": "string",
+                  "description": "The end of the range",
+                  "format": "date-time",
+                  "example": "2019-11-30T16:08:24.994Z"
+                }
+              }
+            },
+            "status": {
+              "$ref": "#/components/schemas/Translate/properties/status"
+            }
+          }
+        }
+      }
+    },
+    "headers": {
+      "x-janis-total": {
+        "description": "The total amount of records in the list",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "x-janis-total-created": {
+        "description": "The total amount of records created",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "x-janis-total-updated": {
+        "description": "The total amount of records updated",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "x-janis-total-not-modified": {
+        "description": "The total amount of records not modified",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "x-janis-total-error": {
+        "description": "The total amount of records that were invalid",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "responses": {
+      "SuccessCreateResponse": {
+        "description": "The item was created",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "SuccessUpdateResponse": {
+        "description": "The item was updated",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "GenericSuccess": {
+        "description": "Operation succeeded",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "BadRequest": {
+        "description": "A client error has ocurred.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Authentication missing or invalid",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Not authorized request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "InternalError": {
+        "description": "A server error has ocurred."
+      },
+      "getLanguageSuccess": {
+        "description": "OK",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Language"
+            }
+          }
+        }
+      },
+      "listLanguagesSuccess": {
+        "description": "OK",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Language"
+              }
+            }
+          }
+        }
+      },
+      "getReleaseSuccess": {
+        "description": "OK",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Release"
+            }
+          }
+        }
+      },
+      "listReleasesSuccess": {
+        "description": "OK",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Release"
+              }
+            }
+          }
+        }
+      },
+      "getTranslateSuccess": {
+        "description": "OK",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Translate"
+            }
+          }
+        }
+      },
+      "listTranslatesSuccess": {
+        "description": "OK",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Translate"
+              }
+            }
+          }
+        }
+      },
+      "TranslateBatchResponse": {
+        "description": "Batch responses",
+        "content": {
+          "application/json": {
+            "schema": {
+              "description": "Item Batch response",
+              "type": "object",
+              "properties": {
+                "itemsCreated": {
+                  "description": "Items which were created successfully. Each item is identified by its namespace and key.\n",
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TranslateBatchResponseCorrectItem"
+                  }
+                },
+                "itemsUpdated": {
+                  "description": "Items which were updated successfully. Each item is identified by its namespace and key.\n",
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TranslateBatchResponseCorrectItem"
+                  }
+                },
+                "itemsNotModified": {
+                  "description": "Items that did not need to be modified. Each item is identified by its namespace and key.\n",
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TranslateBatchResponseCorrectItem"
+                  }
+                },
+                "itemsError": {
+                  "description": "Items that were not valid. To be valid, a translate must have **only** valid languages. Each item is identified by its namespace and key.\n",
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "namespace": {
+                        "$ref": "#/components/schemas/Translate/properties/namespace"
+                      },
+                      "key": {
+                        "$ref": "#/components/schemas/Translate/properties/key"
+                      },
+                      "errorMessage": {
+                        "description": "Failure message showing an error description",
+                        "type": "string",
+                        "example": "Language/s Pg and Es are invalid"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "headers": {
+          "x-janis-total-created": {
+            "$ref": "#/components/headers/x-janis-total-created"
+          },
+          "x-janis-total-updated": {
+            "$ref": "#/components/headers/x-janis-total-updated"
+          },
+          "x-janis-total-not-modified": {
+            "$ref": "#/components/headers/x-janis-total-not-modified"
+          },
+          "x-janis-total-error": {
+            "$ref": "#/components/headers/x-janis-total-error"
+          }
+        }
+      }
+    },
+    "schemas": {
+      "id": {
+        "description": "The unique identifier of the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "d555345345345as67a342a"
+      },
+      "status": {
+        "description": "The item status",
+        "type": "string",
+        "default": "active",
+        "enum": [
+          "active",
+          "inactive"
+        ],
+        "example": "active"
+      },
+      "dateCreated": {
+        "description": "The date of creation",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-12T19:00:00.000Z"
+      },
+      "dateModified": {
+        "description": "The date of the last modification",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-20T19:00:00.000Z"
+      },
+      "userCreated": {
+        "description": "The ID of the user who created the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "6a1fc1eeb5b68406e0487a10"
+      },
+      "userModified": {
+        "description": "The ID of the user who last modified the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "7e1fc1eeb5b68406e048796"
+      },
+      "lastUsed": {
+        "description": "The date of the last used of the translate",
+        "type": "string",
+        "format": "date-time",
+        "example": "2019-07-20T19:00:00.000Z"
+      },
+      "Country": {
+        "type": "object",
+        "description": "A Country",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the country",
+            "example": "Argentina",
+            "readOnly": true
+          },
+          "iso2": {
+            "type": "string",
+            "description": "The iso code in two letters",
+            "example": "AR",
+            "readOnly": true
+          },
+          "iso3": {
+            "type": "string",
+            "description": "The iso code in three letters",
+            "example": "ARG",
+            "readOnly": true
+          },
+          "currencies": {
+            "type": "array",
+            "description": "List of currencies. This refer to the `code` of the **Currency** Entity. See [Location](/v2/service/i18n#tag/Currency).",
+            "readOnly": true,
+            "items": {
+              "type": "string",
+              "description": "The currencies codes of the country",
+              "example": "ARS"
+            }
+          },
+          "defaultCurrency": {
+            "type": "string",
+            "description": "The common currency of the country",
+            "example": "ARS",
+            "readOnly": true
+          },
+          "languages": {
+            "type": "array",
+            "description": "The languages of the country",
+            "readOnly": true,
+            "items": {
+              "type": "string",
+              "description": "The language in iso639-1",
+              "example": "es"
+            }
+          },
+          "timezones": {
+            "type": "array",
+            "description": "A list of timezones of the country",
+            "readOnly": true,
+            "items": {
+              "type": "string",
+              "description": "The timezone UTC",
+              "example": "UTC-03:00"
+            }
+          },
+          "borders": {
+            "type": "array",
+            "description": "The iso2 codes of the border country of the country",
+            "readOnly": true,
+            "items": {
+              "type": "string",
+              "description": "A list of borders countries in iso3 code",
+              "example": "URY"
+            }
+          }
+        }
+      },
+      "CountryList": {
+        "type": "array",
+        "description": "A list of countries",
+        "items": {
+          "$ref": "#/components/schemas/Country"
+        }
+      },
+      "Currency": {
+        "type": "object",
+        "description": "A currency",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "code": {
+            "type": "string",
+            "description": "The currency code",
+            "example": "ARS",
+            "readOnly": true
+          },
+          "name": {
+            "type": "string",
+            "description": "The currency name",
+            "example": "Argentine peso",
+            "readOnly": true
+          },
+          "symbol": {
+            "type": "string",
+            "description": "The currency symbol",
+            "example": "$",
+            "readOnly": true
+          },
+          "countryNames": {
+            "type": "array",
+            "description": "A list of country names were the currency is used",
+            "example": [
+              "Argentina",
+              "United States"
+            ],
+            "readOnly": true,
+            "items": {
+              "type": "string",
+              "description": "The Country name"
+            }
+          }
+        }
+      },
+      "CurrencyList": {
+        "type": "array",
+        "description": "A list of currencies",
+        "items": {
+          "$ref": "#/components/schemas/Currency"
+        }
+      },
+      "Language": {
+        "description": "Represents a language variant",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "name": {
+            "description": "The name",
+            "type": "string",
+            "example": "English (UK)"
+          },
+          "code": {
+            "description": "The language 2-digit code",
+            "type": "string",
+            "example": "en"
+          },
+          "variant": {
+            "description": "The language 2-digit variant",
+            "type": "string",
+            "example": "UK"
+          },
+          "fullCode": {
+            "description": "The full code (concatenating code and variant with a hyphen, or just the code if variant is empty)",
+            "type": "string",
+            "readOnly": true,
+            "example": "en-UK"
+          },
+          "fallback": {
+            "description": "The fallback language full code (code or code-variant)",
+            "type": "string",
+            "example": "en"
+          },
+          "status": {
+            "$ref": "#/components/schemas/status"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "code",
+          "status"
+        ]
+      },
+      "Release": {
+        "description": "Represents a bundle of translates for an especific service and language",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "namespace": {
+            "description": "The namespace",
+            "type": "string",
+            "example": "common"
+          },
+          "language": {
+            "description": "The full language",
+            "type": "string",
+            "example": "en-US"
+          },
+          "status": {
+            "description": "The status name\n- `pending`: The translate is pending to be translated\n- `ready`: The translate is ready to be released\n- `needsReview`: The translate needs to be reviewed by a human\n",
+            "type": "string",
+            "enum": [
+              "pending",
+              "ready",
+              "needsReview"
+            ],
+            "example": "pending"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "dateReleased": {
+            "description": "The latest date it was released",
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true,
+            "example": "2019-07-20T19:00:00.000Z"
+          }
+        },
+        "required": [
+          "id",
+          "namespace",
+          "language",
+          "status"
+        ]
+      },
+      "Timezone": {
+        "type": "object",
+        "description": "A Timezone",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "name": {
+            "type": "string",
+            "description": "The location name of the timezone",
+            "example": "America/Argentina/Buenos_Aires",
+            "readOnly": true
+          },
+          "country": {
+            "type": "string",
+            "description": "The country ID, This refer to the `id` of the **Country** Entity. See [Country](/v2/service/i18n#tag/Country).\n",
+            "example": "d555345345345as67a342a",
+            "readOnly": true
+          },
+          "countryIso2": {
+            "type": "string",
+            "description": "The iso code in two letters of the country time zone",
+            "example": "AR",
+            "readOnly": true
+          },
+          "countryName": {
+            "type": "string",
+            "description": "The name of the country time zone",
+            "example": "Argentina",
+            "readOnly": true
+          },
+          "gmtOffset": {
+            "type": "string",
+            "description": "The GMT offset of the timezone",
+            "example": "-03:00",
+            "readOnly": true
+          },
+          "gmtOffsetRaw": {
+            "type": "number",
+            "description": "The GMT offset of the timezone",
+            "example": -10800,
+            "readOnly": true
+          }
+        }
+      },
+      "TimezoneList": {
+        "type": "array",
+        "description": "A list of timezones",
+        "items": {
+          "$ref": "#/components/schemas/Timezone"
+        }
+      },
+      "Translate": {
+        "description": "Represents a key of translate without translation values",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "namespace": {
+            "description": "The namespace",
+            "type": "string",
+            "example": "common"
+          },
+          "key": {
+            "description": "The key",
+            "type": "string",
+            "example": "message.success"
+          },
+          "status": {
+            "description": "The item status",
+            "type": "string",
+            "default": "pending",
+            "enum": [
+              "pending",
+              "ready"
+            ],
+            "example": "pending"
+          },
+          "translatedLanguages": {
+            "description": "A list of translated languages, comma separated",
+            "type": "string",
+            "readOnly": true,
+            "example": "es, en"
+          },
+          "values": {
+            "description": "The translate values for each language. It's a mapping of language to value.",
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "example": {
+              "es": "¡Éxito!",
+              "en": "Success!"
+            }
+          },
+          "autoTranslated": {
+            "description": "Whether the translation was automatically generated",
+            "type": "boolean",
+            "readOnly": true,
+            "default": false,
+            "example": false
+          },
+          "lastUsed": {
+            "$ref": "#/components/schemas/lastUsed"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          }
+        },
+        "required": [
+          "id",
+          "namespace",
+          "key"
+        ]
+      },
+      "TranslateBatch": {
+        "description": "A Translate Batch",
+        "type": "array",
+        "minItems": 1,
+        "maxItems": 10000,
+        "uniqueItems": true,
+        "items": {
+          "$ref": "#/components/schemas/TranslateBatchItem"
+        }
+      },
+      "TranslateBatchItem": {
+        "description": "A translate added",
+        "type": "object",
+        "properties": {
+          "namespace": {
+            "$ref": "#/components/schemas/Translate/properties/namespace"
+          },
+          "key": {
+            "$ref": "#/components/schemas/Translate/properties/key"
+          },
+          "values": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Translate/properties/values"
+              }
+            ],
+            "description": "The translate values for each language. It's a mapping of language to value. If the translation for any of the languages is not defined, it will be set as an empty string."
+          },
+          "lastUsed": {
+            "$ref": "#/components/schemas/lastUsed"
+          }
+        },
+        "required": [
+          "namespace",
+          "key"
+        ]
+      },
+      "TranslateBatchResponseCorrectItem": {
+        "description": "An item from the translate batch response.",
+        "type": "object",
+        "properties": {
+          "namespace": {
+            "$ref": "#/components/schemas/Translate/properties/namespace"
+          },
+          "key": {
+            "$ref": "#/components/schemas/Translate/properties/key"
+          },
+          "values": {
+            "$ref": "#/components/schemas/Translate/properties/values"
+          },
+          "id": {
+            "$ref": "#/components/schemas/id"
+          }
+        }
+      }
+    }
+  }
+}

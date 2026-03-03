@@ -1,0 +1,1566 @@
+-- DROP PROCEDURE dl_sp_temporal.sp_genera_fact_publicaciones_ecommerce();
+
+CREATE OR REPLACE PROCEDURE dl_sp_temporal.sp_genera_fact_publicaciones_ecommerce()
+	LANGUAGE plpgsql
+AS $$
+
+
+declare
+
+var_fecha_hoy int;
+var_fecha_ayer int;
+var_fechaini_venta_90_dias int;
+var_fechaini_ingreso_90_dias int;
+var_fechaini_ingreso_365_dias int;
+var_fecha_scraping int;
+
+begin
+
+var_fecha_hoy 						:=cast(to_char(dateadd(day,0,convert_timezone('GMT','GMT+5',getdate())),'yyyymmdd') as int);	
+var_fecha_ayer 						:=cast(to_char(dateadd(day,-1,to_date(var_fecha_hoy,'yyyymmdd',false)),'yyyymmdd') as int);	
+var_fechaini_venta_90_dias 			:=cast(to_char(dateadd(day,-31,to_date(var_fecha_hoy,'yyyymmdd',false)),'yyyymmdd') as int);
+var_fechaini_ingreso_90_dias 		:=cast(to_char(dateadd(day,-91,to_date(var_fecha_hoy,'yyyymmdd',false)),'yyyymmdd') as int);
+var_fechaini_ingreso_365_dias 		:=cast(to_char(dateadd(day,-366,to_date(var_fecha_hoy,'yyyymmdd',false)),'yyyymmdd') as int);
+var_fecha_scraping					:=(select max(to_char(to_date(fecha_scraping_wong ,'dd-mm-yyyy'),'yyyymmdd')) from dl_sp_temporal.datascience_scrapping_wong);
+
+
+drop table if exists #sku;		
+select distinct *,'wongio' cuenta into #sku from datalabs.stg_ecommerce_janis_wongio.skus
+union all
+select distinct *,'metroio' cuenta from datalabs.stg_ecommerce_janis_metroio.skus;
+
+drop table if exists #wms_stores;		
+select distinct *,'wongio' cuenta into #wms_stores from datalabs.stg_ecommerce_janis_wongio.wms_stores
+union all
+select distinct *,'metroio' cuenta from datalabs.stg_ecommerce_janis_metroio.wms_stores;
+
+drop table if exists #stock;		
+select distinct *,'wongio' cuenta into #stock from datalabs.stg_ecommerce_janis_wongio.stock
+union all
+select distinct *,'metroio' cuenta from datalabs.stg_ecommerce_janis_metroio.stock  ;	
+
+drop table if exists #stock_io;	
+select distinct
+item_id
+,store_id
+,min_stock
+,stock
+,infinite_stock --nuevo
+,cuenta
+into #stock_io
+from #stock;
+
+alter table #stock_io add cod_tienda varchar(50);
+
+alter table #stock_io add ref_id varchar(50);
+
+update #stock_io set
+ref_id	=null;
+
+update #stock_io set
+ref_id	=b.ref_id
+from #stock_io a
+inner join #sku b on (a.item_id=b.id) and (a.cuenta=b.cuenta);
+
+update #stock_io set
+cod_tienda	=b.ref_id
+from #stock_io a
+inner join #wms_stores b on (a.store_id=b.id) and (a.cuenta=b.cuenta);
+
+delete
+from #stock_io
+where (item_id is null or item_id=0 or Store_id is null);
+
+--drop table if exists dl_sp_temporal.stock_seguridad_janis;	
+--select * into dl_sp_temporal.stock_seguridad_janis from #stock_io;
+
+delete
+from dl_sp_temporal.stock_seguridad_janis;
+
+insert into dl_sp_temporal.stock_seguridad_janis
+select  item_id,store_id,min_stock,stock,cod_tienda,ref_id,infinite_stock,cuenta--nuevo
+from #stock_io;--nuevo
+
+drop table if exists #sku_cod_tienda_stock_infinito; --nuevo
+select distinct ref_id,cod_tienda into #sku_cod_tienda_stock_infinito from dl_sp_temporal.stock_seguridad_janis  --nuevo
+where stock_infinito  is true;  --nuevo
+
+update dl_sp_temporal.stock_seguridad_janis --nuevo
+set stock_infinito=true --nuevo
+from dl_sp_temporal.stock_seguridad_janis a inner join #sku_cod_tienda_stock_infinito b on a.ref_id =b.ref_id and a.cod_tienda=b.cod_tienda; --nuevo
+
+drop table if exists #materiales_consolidado;
+select
+convert(varchar(18),id_material)			as id_material
+,id_ean_principal
+,a.sk_dia_creacion_material
+,desc_material
+,desc_marca
+,id_um_base
+,id_proveedor
+,desc_proveedor
+,id_grupo_articulo
+,desc_grupo_articulo
+,id_categoria
+,desc_categoria
+,desc_jefe_categoria
+,desc_jefe_categoria_mp
+,desc_jefe_categoria_imp
+,id_sub_categoria
+,desc_sub_categoria
+,id_seccion
+,desc_seccion
+,id_departamento
+,desc_departamento
+,id_area
+,desc_area
+,id_gerencia_comercial
+,desc_gerencia_comercial
+,id_gerente
+,desc_gerente
+,desc_unidad_negocio
+,a.sk_tipo_material
+,id_tipo_material
+,desc_tipo_material							as tipo_material
+,sk_tipo_set_venta
+,sk_tipo_surtido_incluido
+,id_tipo_igv
+,id_bloqueo_ecommerce
+,a.id_bloqueo_corporativo_venta --nuevo
+into #materiales_consolidado
+from dl_sp_capa_semantica.dw_cencofcic_dim_material a
+left join dl_sp_capa_semantica.dw_cencofcic_dim_marca b on (a.sk_marca=b.sk_marca)
+left join dl_sp_capa_semantica.dw_cencofcic_dim_proveedor c on (a.sk_proveedor=c.sk_proveedor)
+inner join dl_sp_maestras.dim_grupo_articulo d on (a.sk_grupo_articulo=d.sk_grupo_articulo)
+left join dl_sp_maestras.dim_categoria e on (d.sk_categoria=e.sk_categoria)
+left join dl_sp_maestras.dim_jefe_categoria f on (d.sk_jefe_categoria=f.sk_jefe_categoria)
+left join dl_sp_maestras.dim_jefe_categoria_mp g on (d.sk_jefe_categoria_mp=g.sk_jefe_categoria_mp)
+left join dl_sp_maestras.dim_jefe_categoria_imp h on (d.sk_jefe_categoria_imp=h.sk_jefe_categoria_imp)
+left join dl_sp_maestras.dim_sub_categoria i on (d.sk_sub_categoria=i.sk_sub_categoria)
+left join dl_sp_maestras.dim_seccion j on (d.sk_seccion=j.sk_seccion)
+left join dl_sp_maestras.dim_departamento k on (d.sk_departamento=k.sk_departamento)
+left join dl_sp_maestras.dim_area l on (d.sk_area=l.sk_area)
+left join dl_sp_maestras.dim_gerencia_comercial m on (d.sk_gerencia_comercial=m.sk_gerencia_comercial)
+left join dl_sp_maestras.dim_gerente n on (d.sk_gerente=n.sk_gerente)
+left join dl_sp_maestras.dim_tipo_material t on (a.sk_tipo_material=t.sk_tipo_material);
+
+-----------------------------------------------------------------disponibles para la venta----------------------------------------------------------------------------------
+
+--estado del material
+drop table if exists #materiales_status;
+select distinct
+convert(int,cod_dia)								as cod_dia
+,convert(varchar(18),cod_material)					as cod_material
+,convert(varchar(4),cod_tienda)						as cod_tienda
+,convert(varchar(2),cod_bloqueo_corporativo)		as cod_bloqueo_corporativo
+,convert(varchar(2),cod_estado_final)				as cod_estado_final
+,convert(varchar(2),cod_tipo_canasta)				as cod_tipo_canasta
+,convert(varchar(20),cod_tipo_pareto)				as cod_tipo_pareto--bloqueo_ecommerce(cloud)
+,estadon1
+,estadon2
+into #materiales_status
+--select top 10 *
+from per_super_pd_stg.trx_status_mat a
+where cod_dia=var_fecha_ayer
+and cod_tienda in ('H001','H002','H003','H005','H006','H007','H008','H009','H011','H013','H014','H016','S001','S002','S003','S005','S008','S009'
+,'S011','S028','S032','S034','S037','S047','S049','S058','S062','S064','S067','S081','S082','S087','S093','S097','S098','T101','T102','T103','T104','T106'
+,'T107','T108','T109','T111','T114','T115','T116','T117','T118','T120','T121','T130','W101','T132');
+
+drop table if exists #materiales_status1;
+select * into #materiales_status1 from #materiales_status;
+							   
+alter table #materiales_status1 add material varchar(200);
+alter table #materiales_status1 add cod_gerencia varchar(2);
+alter table #materiales_status1 add sk_tipo_set_venta int;
+alter table #materiales_status1 add sk_tipo_surtido_incluido int;
+alter table #materiales_status1 add sk_tipo_material int;
+alter table #materiales_status1 add fecha_creacion int;
+alter table #materiales_status1 add nuevo_ult_90_dias int;
+alter table #materiales_status1 add sk_gerente varchar(2);
+alter table #materiales_status1 add tiene_venta int;
+alter table #materiales_status1 add tiene_ingreso int;
+alter table #materiales_status1 add stock_total numeric(14,2);
+alter table #materiales_status1 add tiene_stock int;
+alter table #materiales_status1 add bloqueo_ecommerce int;
+alter table #materiales_status1 add universo_ecommerce int;
+alter table #materiales_status1 add universo_category int;
+alter table #materiales_status1 add categoria_estado_activo_janis int;
+alter table #materiales_status1 add estado_final_activo int;
+alter table #materiales_status1 add cantidad_stock_sap numeric(18,2);
+alter table #materiales_status1 add stock_seguridad numeric(18,2);
+alter table #materiales_status1 add vista_publicaciones varchar(50);
+alter table #materiales_status1 add stock_infinito int;--nuevo infinito MS
+alter table #materiales_status1 add estado_final_activo_2 int;--nuevo bloqueo compra MS
+alter table #materiales_status1 add bloqueo_05 varchar(50);--nuevo bloqueo corporativo 05
+alter table #materiales_status1 add bloqueo_venta int;--nuevo bloqueo venta
+alter table #materiales_status1 add operacion_tienda int;--nuevo tienda MS
+alter table #materiales_status1 add sk_categoria varchar(10); --nuevo categoria
+             
+update #materiales_status1 set
+nuevo_ult_90_dias					=0
+,tiene_venta						=0
+,tiene_ingreso						=0
+,tiene_stock						=0
+,stock_total						=0
+,universo_ecommerce					=0
+,universo_category					=0
+,categoria_estado_activo_janis		=1
+,estado_final_activo				=0
+,cantidad_stock_sap					=0
+,vista_publicaciones				='SIN STOCK'
+,estado_final_activo_2              =0--nuevo
+,stock_infinito                     =0--nuevo
+,bloqueo_venta                      =0--nuevo
+,operacion_tienda                   =1;--nuevo
+
+update #materiales_status1 set
+material						=b.desc_material
+,cod_gerencia					=b.id_gerencia_comercial
+,sk_tipo_set_venta				=b.sk_tipo_set_venta
+,sk_tipo_surtido_incluido		=b.sk_tipo_surtido_incluido
+,sk_tipo_material				=b.sk_tipo_material
+,fecha_creacion					=b.sk_dia_creacion_material
+,sk_gerente						=b.id_gerente
+,bloqueo_ecommerce				=b.id_bloqueo_ecommerce
+,bloqueo_05                     =b.id_bloqueo_corporativo_venta--nuevo
+,sk_categoria                   =b.id_categoria--nuevo
+from #materiales_status1 a
+inner join #materiales_consolidado b on (a.cod_material=b.id_material);
+
+update #materiales_status1 set
+estado_final_activo	=1
+where estadon1='ACTIVO';
+
+update #materiales_status1 set
+estado_final_activo_2	=1
+where estadon2='ACTIVO';
+
+update #materiales_status1 set--nuevo
+bloqueo_venta	=1--nuevo
+where cod_bloqueo_corporativo='XS' and bloqueo_05='05'; --nuevo
+
+update #materiales_status1 set--nuevo
+stock_infinito=1 --nuevo
+from #materiales_status1 a inner join dl_sp_temporal.stock_seguridad_janis b on a.cod_material=right('000000000000000000'+b.ref_id ,18)  and a.cod_tienda=b.cod_tienda--nuevo
+where b.stock_infinito=true;--nuevo
+
+--solo food y non food
+delete
+from #materiales_status1 --511414
+where cod_gerencia not in ('02','03','06');
+
+--no incluir hawa (abarrotes), fert(terminados), frip(perecederos) y nof1 (non food)
+delete
+from #materiales_status1 --506305
+where sk_tipo_material not in (13,8,11,16);
+
+--no incluir sku generico
+delete
+from #materiales_status1
+where sk_tipo_set_venta in (2);
+
+--no incluir sku exclusivos del ecommerce
+delete
+from #materiales_status1
+where sk_tipo_surtido_incluido in (10);
+
+--create nonclustered index idx_cod_dia on #materiales_status(cod_dia)
+--create nonclustered index idx_cod_tienda on #materiales_status(cod_tienda)
+--create nonclustered index idx_cod_material on #materiales_status(cod_material)
+
+--boqueo venta - falta bloqueo coporativo 05 (cloud)
+--delete
+--from #materiales_status1
+--where cod_bloqueo_corporativo='XS'; --and bloqueo coporativo=05 cloud
+
+-----------------------------------------------------------------definir universos----------------------------------------------------------------------------------
+
+-- stock
+drop table if exists #materiales_stock;
+select distinct
+convert(int,cod_dia)								as cod_dia
+,convert(varchar(18),a.cod_material)				as cod_material
+,convert(varchar(4),cod_tienda)						as cod_tienda
+,convert(decimal(18,2),convert(varchar,cnt_stock_tda))	as cnt_stock
+into #materiales_stock
+from per_super_pd_stg.trx_stock_mat a
+where cod_dia=var_fecha_ayer
+and cod_tienda in ('H001','H002','H003','H005','H006','H007','H008','H009','H011','H013','H014','H016','S001','S002','S003','S005','S008','S009'
+,'S011','S028','S032','S034','S037','S047','S049','S058','S062','S064','S067','S081','S082','S087','S093','S097','S098','T101','T102','T103','T104','T106'
+,'T107','T108','T109','T111','T114','T115','T116','T117','T118','T120','T121','T130','W101','T132');
+
+
+--tiene stock
+update #materiales_status1 set
+tiene_stock	=1
+from #materiales_status1 a
+inner join #materiales_stock b on (a.cod_material=b.cod_material and a.cod_tienda=b.cod_tienda)
+where cnt_stock>0; --and a.cod_dia=b.cod_dia
+
+--tiene stock SAP
+update #materiales_status1 set
+cantidad_stock_sap	=b.cnt_stock
+from #materiales_status1 a
+inner join #materiales_stock b on (a.cod_material=b.cod_material and a.cod_tienda=b.cod_tienda); --and a.cod_dia=b.cod_dia
+
+update #materiales_status1 set  --nuevo
+cantidad_stock_sap=100000    --nuevo
+where stock_infinito=1;         --nuevo
+
+delete
+from #materiales_status1
+where tiene_stock=0
+and estado_final_activo=0;
+
+delete                     --nuevo
+from #materiales_status1   --nuevo
+where bloqueo_venta=1;     --nuevo
+
+--bloqueo ecommerce en onpremise considerar el listado - en cloud considerar el campo bloqueo_ecommerce de dim_material
+update #materiales_status1 set
+bloqueo_ecommerce	=1
+from #materiales_consolidado m
+inner join #materiales_status1 s on (m.id_material=s.cod_material)
+where m.id_bloqueo_ecommerce=1;
+		
+--materiales creados hace 90 días 
+update #materiales_status1 set
+nuevo_ult_90_dias	=1
+where fecha_creacion>=var_fechaini_ingreso_90_dias
+and fecha_creacion<=var_fecha_ayer
+;
+
+--materiales creados hace más de 90 días
+drop table if exists #materiales_antiguos;
+select distinct
+cod_material
+into #materiales_antiguos
+from #materiales_status1
+where nuevo_ult_90_dias=0;
+
+-- materiales nuevo -> si tienen venta
+update #materiales_status1 set
+tiene_venta	=1
+where nuevo_ult_90_dias=1;
+
+--ult. 90 dias con venta 
+drop table if exists #venta_90_dias;
+select distinct
+convert(int,cod_dia)						as cod_dia
+,convert(varchar(4),cod_tienda)				as cod_tienda
+,convert(varchar(18),a.cod_material) 		as cod_material
+into #venta_90_dias
+from per_super_pd_stg.trx_venta_mat a
+inner join #materiales_antiguos b on (a.cod_material=b.cod_material)
+where (cod_dia>=var_fechaini_venta_90_dias 
+and cod_dia<=var_fecha_ayer
+)
+and cnt_venta>0;
+
+--materiales con venta en los ult. 90 dias
+update #materiales_status1 set
+tiene_venta		=1
+from #materiales_status1 a
+inner join #venta_90_dias b on (a.cod_material=b.cod_material)
+where a.nuevo_ult_90_dias=0;
+
+--materiales unicos
+drop table if exists #materiales_status_unico;
+select distinct
+cod_material
+into #materiales_status_unico
+from #materiales_status1;
+
+--tiene ingreso de mercaderia ultimos 90 dias food 
+drop table if exists #materiales_entregado_90;
+select distinct
+convert(varchar(18),a.cod_material)	as cod_material
+into #materiales_entregado_90
+from per_super_pd_stg.trx_pedido_mat_new a inner join #materiales_status_unico b on a.cod_material=b.cod_material
+where cod_tipo_proceso='A'
+and mto_pedido>0 
+and (cod_dia>=var_fechaini_ingreso_90_dias 
+and cod_dia<=var_fecha_ayer
+);
+
+update #materiales_status1 set
+tiene_ingreso	=1
+from #materiales_status1 a
+inner join #materiales_entregado_90 b on (a.cod_material=b.cod_material)
+where a.sk_gerente not in ('01','03','16','17');
+
+--tiene ingreso de mercaderia ultimos 365 dias non food      --mejorar tiempo
+drop table if exists #materiales_entregado_365;
+select distinct
+convert(varchar(18),a.cod_material)		as cod_material
+into #materiales_entregado_365
+from per_super_pd_stg.trx_pedido_mat_new a inner join #materiales_status_unico b on a.cod_material=b.cod_material
+where cod_tipo_proceso='A'
+and mto_pedido>0 
+and (cod_dia>=var_fechaini_ingreso_365_dias
+and cod_dia<=var_fecha_ayer
+);
+
+update #materiales_status1 set
+tiene_ingreso	=1
+from #materiales_status1 a
+inner join #materiales_entregado_365 b on (a.cod_material=b.cod_material)
+where a.sk_gerente in ('01','03','16','17');
+
+--select distinct tiene_venta,tiene_ingreso,tiene_stock,bloqueo_ecommerce,universo_ecommerce,count(1) from #materiales_status1
+--group by tiene_venta,tiene_ingreso,tiene_stock,bloqueo_ecommerce,universo_ecommerce;
+
+--universo para ecommerce 
+--update #materiales_status1
+--set universo_ecommerce=1
+--where tiene_venta=1  and tiene_stock=1 and bloqueo_ecommerce=0;
+
+--universo para category 
+--update #materiales_status1
+--set universo_category=1
+--where tiene_stock=1;
+
+--sku unicos 
+drop table if exists #sku_universo;
+select distinct
+cod_material
+into #sku_universo
+from #materiales_status1;
+	
+------------------------------------------------------reglas publicacion--------------------------------------------------------------
+--surtido de vtex
+set enable_case_sensitive_identifier=true;
+--select * from stg_ecommerce_vtex.surtido_materiales_productos limit 10;
+
+drop table if exists #surtido;
+select
+"SkuId"									as skuid
+,"SkuName" 								as skuname
+,"ActivateSkuIfPossible" 				as activateskuifpossible
+,"SkuIsActive" 							as skuisactive
+,"SkuEan"								as skuean
+,"Height" 								as height
+,"ActualHeight"							as actualheight
+,"Width" 								as width
+,"ActualWidth" 							as actualwidth
+,"Length" 								as length
+,"ActualLength" 						as actuallength
+,"Weight" 								as weight
+,"ActualWeight" 						as actualweight
+,"SKUReferenceCode" 					as skureferencecode
+,"ProductId" 							as productid
+,"ProductName" 							as productname
+,"ProductIsActive" 						as productisactive
+,"ShowOnSite" 							as showonsite
+,"CategoryId" 							as categoryid
+,"CategoryName" 						as categoryname
+,"BrandId" 								as brandid
+,"Brand" 								as brand
+,"Stores" 								as stores
+,"f_registro" 							as f_registro 
+,'wongio'                               as cuenta             into #surtido from stg_ecommerce_vtex.surtido_materiales_productos
+union all 
+select 
+"SkuId"									as skuid
+,"SkuName" 								as skuname
+,"ActivateSkuIfPossible" 				as activateskuifpossible
+,"SkuIsActive" 							as skuisactive
+,"SkuEan"								as skuean
+,"Height" 								as height
+,"ActualHeight"							as actualheight
+,"Width" 								as width
+,"ActualWidth" 							as actualwidth
+,"Length" 								as length
+,"ActualLength" 						as actuallength
+,"Weight" 								as weight
+,"ActualWeight" 						as actualweight
+,"SKUReferenceCode" 					as skureferencecode
+,"ProductId" 							as productid
+,"ProductName" 							as productname
+,"ProductIsActive" 						as productisactive
+,"ShowOnSite" 							as showonsite
+,"CategoryId" 							as categoryid
+,"CategoryName" 						as categoryname
+,"BrandId" 								as brandid
+,"Brand" 								as brand
+,"Stores" 								as stores
+,"f_registro" 							as f_registro
+,'metroio'                              as cuenta 
+from stg_ecommerce_vtex.surtido_materiales_productos_metroio ;
+	
+alter table #surtido add cod_material varchar(50); --collate modern_spanish_ci_as -- se considera modern_spanish_ci_as solo en onpremise en redshift no se necesita
+
+update #surtido set--175606
+cod_material	=right('000000000000000000'+skureferencecode,18);
+
+--se coloca cast a todos los campo solo en onpremise  en redshift no 
+drop table if exists #surtido_cruce;
+select distinct
+skuid
+,skuname
+,activateskuifpossible
+,skuisactive
+,skuean
+,height
+,actualheight
+,width
+,actualwidth
+,length
+,actuallength
+,weight
+,actualweight
+,skureferencecode
+,productid
+,productname
+,productisactive
+,showonsite
+,categoryid
+,categoryname
+,brandid
+,brand
+,stores
+,f_registro
+,a.cod_material
+,cuenta
+into #surtido_cruce from #surtido a 
+inner join #sku_universo b on (a.cod_material=b.cod_material);
+
+
+--limpiar surtido de vtex
+drop table if exists #contar;
+select distinct
+skureferencecode
+,count(skureferencecode)	as veces
+,cuenta
+into #contar
+from #surtido
+group by
+skureferencecode,cuenta;
+
+drop table if exists #duplicados;
+select distinct
+skureferencecode,cuenta
+into #duplicados
+from #contar
+where veces>1;
+
+delete
+from #surtido_cruce 
+where skureferencecode in 	(
+							select distinct
+							skureferencecode
+							from #duplicados where cuenta='wongio'
+							)
+and skuean is null and cuenta='wongio' ;
+
+delete
+from #surtido_cruce 
+where skureferencecode in 	(
+							select distinct
+							skureferencecode
+							from #duplicados where cuenta='metroio'
+							)
+and skuean is null and cuenta='metroio' ;
+
+
+drop table if exists #contar_2;
+select distinct
+skureferencecode
+,count(skureferencecode)	as veces
+,cuenta
+into #contar_2
+from #surtido_cruce
+group by skureferencecode,cuenta;
+
+drop table if exists #duplicados_2;
+select distinct
+skureferencecode,cuenta
+into #duplicados_2
+from #contar_2
+where veces>1;
+
+delete
+from #surtido_cruce
+where skureferencecode in	(
+							select distinct
+							skureferencecode
+							from #duplicados_2 where cuenta='wongio'
+							) 
+and skuid=productid and cuenta='wongio';
+
+delete
+from #surtido_cruce
+where skureferencecode in	(
+							select distinct
+							skureferencecode
+							from #duplicados_2 where cuenta='metroio'
+							) 
+and skuid=productid and cuenta='metroio';
+
+drop table if exists #contar_3;
+select distinct
+skureferencecode
+,count(skureferencecode)	as veces
+,cuenta
+into #contar_3
+from #surtido_cruce
+group by
+skureferencecode,cuenta;
+
+drop table if exists #duplicados_3;
+select distinct
+skureferencecode,cuenta
+into #duplicados_3
+from #contar_3
+where veces>1;
+
+delete
+from #surtido_cruce
+where skureferencecode in	(
+							select distinct
+							skureferencecode
+							from #duplicados_3 where cuenta='wongio'
+							) 
+and actualheight is null and  cuenta='wongio';
+
+delete
+from #surtido_cruce
+where skureferencecode in	(
+							select distinct
+							skureferencecode
+							from #duplicados_3 where cuenta='metroio'
+							) 
+and actualheight is null and  cuenta='metroio';
+
+drop table if exists #contar_4;
+select distinct
+skureferencecode
+,count(skureferencecode)		as veces
+,cuenta
+into #contar_4
+from #surtido_cruce
+group by
+skureferencecode,cuenta;
+
+drop table if exists #duplicados_4;
+select distinct
+skureferencecode,cuenta
+into #duplicados_4
+from #contar_4
+where veces>1;
+
+delete
+from #surtido_cruce
+where skureferencecode in	(
+							select distinct
+							skureferencecode
+							from #duplicados_4 where cuenta='wongio'
+							) 
+and skuisactive='no' and  cuenta='wongio'; 
+
+delete
+from #surtido_cruce
+where skureferencecode in	(
+							select distinct
+							skureferencecode
+							from #duplicados_4 where cuenta='metroio'
+							) 
+and skuisactive='no' and  cuenta='metroio'; 
+
+--productos catalogados wong io stores=70
+
+drop table if exists #catalogado_en_wong_io;
+select
+skureferencecode
+,cod_material
+,productisactive
+,showonsite
+,skuisactive
+,skuid
+,productid
+,categoryid
+,brandid
+,cuenta
+into #catalogado_en_wong_io from #surtido_cruce 
+where stores like '%70%' and cuenta='wongio'
+union all 
+select
+skureferencecode
+,cod_material
+,productisactive
+,showonsite
+,skuisactive
+,skuid
+,productid
+,categoryid
+,brandid
+,cuenta from #surtido_cruce 
+where (stores like '1,%' or stores like '1') and cuenta='metroio'
+;
+
+alter table #materiales_status1 add sku_id varchar(50);
+alter table #materiales_status1 add product_id varchar(50);
+alter table #materiales_status1 add marca_id  varchar(50);
+alter table #materiales_status1 add cate_id varchar(50);
+alter table #materiales_status1 add surtido_vtex int;
+alter table #materiales_status1 add producto_activo int;
+alter table #materiales_status1 add sku_activo int;
+alter table #materiales_status1 add visible_vtex int;
+alter table #materiales_status1 add tiene_marca int;
+alter table #materiales_status1 add tiene_categoria int;
+
+update #materiales_status1 set
+producto_activo		=0
+,sku_activo			=0
+,visible_vtex		=0
+,tiene_marca		=0
+,tiene_categoria	=0
+,surtido_vtex		=0;
+
+
+--cruce de universo con el catalogado io
+update #materiales_status1 set
+producto_activo			=case 	when productisactive='YES' then 1
+								else 0 end
+,sku_activo				=case 	when skuisactive='YES' then 1
+								else 0 end
+,visible_vtex			=case 	when showonsite='YES' then 1
+								else 0 end
+,sku_id					=b.skuid
+,product_id				=b.productid
+,cate_id				=categoryid
+,marca_id				=brandid
+from #materiales_status1 a
+inner join  #catalogado_en_wong_io b on (a.cod_material=b.cod_material) and cuenta='wongio'
+where a.cod_tienda like 'T%' or a.cod_tienda like 'W%'  ;
+
+update #materiales_status1 set
+producto_activo			=case 	when productisactive='YES' then 1
+								else 0 end
+,sku_activo				=case 	when skuisactive='YES' then 1
+								else 0 end
+,visible_vtex			=case 	when showonsite='YES' then 1
+								else 0 end
+,sku_id					=b.skuid
+,product_id				=b.productid
+,cate_id				=categoryid
+,marca_id				=brandid
+from #materiales_status1 a
+inner join  #catalogado_en_wong_io b on (a.cod_material=b.cod_material) and cuenta='metroio'
+where a.cod_tienda like 'H%' or a.cod_tienda like 'S%'  ;
+
+update #materiales_status1 set 
+tiene_marca				=case 	when marca_id is not null then 1
+								else 0 end
+,tiene_categoria		=case 	when cate_id is not null then 1
+								else 0 end
+,surtido_vtex			=case 	when sku_id is not null then 1
+								else 0 end;
+
+--cruce con categorias activas de janis
+--categorias hijos
+drop table if exists #categorias_io;		
+select distinct
+a.id
+,a.ref_id
+,a.vtex_id
+,a.product
+,a."name"
+,p.ref_id			as ref_id_product
+,p.category
+,p.brand
+,c.ref_id			as ref_id_category
+,c."name"			as categoria
+,c.status			as estado_categoria
+,ref_parent
+,'wongio'           as cuenta
+into #categorias_io 
+from datalabs.stg_ecommerce_janis_wongio.skus a
+inner join datalabs.stg_ecommerce_janis_wongio.products p on (p.id=a.product)
+inner join datalabs.stg_ecommerce_janis_wongio.categories c on (p.category=c.id)
+union all 
+select distinct
+a.id
+,a.ref_id
+,a.vtex_id
+,a.product
+,a."name"
+,p.ref_id			as ref_id_product
+,p.category
+,p.brand
+,c.ref_id			as ref_id_category
+,c."name"			as categoria
+,c.status			as estado_categoria
+,ref_parent
+,'metroio'          as cuenta
+from datalabs.stg_ecommerce_janis_metroio.skus a
+inner join datalabs.stg_ecommerce_janis_metroio.products p on (p.id=a.product)
+inner join datalabs.stg_ecommerce_janis_metroio.categories c on (p.category=c.id)
+;	
+
+--categorias padres
+drop table if exists #categorias_padre_io;		
+select distinct
+b.ref_id
+,b."name"	as nombre_padre
+,b.status
+,'wongio'           as cuenta
+into #categorias_padre_io
+from datalabs.stg_ecommerce_janis_wongio.categories a
+inner join datalabs.stg_ecommerce_janis_wongio.categories b on (a.ref_parent=b.ref_id)
+where a.ref_parent is not null
+union all 
+select distinct
+b.ref_id
+,b."name"	as nombre_padre
+,b.status
+,'metroio'           as cuenta
+from datalabs.stg_ecommerce_janis_metroio.categories a
+inner join datalabs.stg_ecommerce_janis_metroio.categories b on (a.ref_parent=b.ref_id)
+where a.ref_parent is not null;
+
+alter table #categorias_io add estado_ref_parent int;
+alter table #categorias_io add jerarquia_padre varchar(50);
+
+update #categorias_io set
+estado_ref_parent	=b.status
+,jerarquia_padre	=nombre_padre
+from #categorias_io a
+inner join #categorias_padre_io b on (a.ref_parent=b.ref_id) and a.cuenta=b.cuenta;
+
+drop table if exists #categorias_janis_padres;
+select distinct
+ref_id_category
+,estado_categoria
+,categoria
+,ref_parent
+,estado_ref_parent
+,jerarquia_padre 
+,cuenta
+into #categorias_janis_padres
+from #categorias_io;
+
+update #categorias_janis_padres set
+estado_categoria		=estado_ref_parent
+where estado_categoria not in (0,2,8,10,26,42,106)
+and estado_ref_parent in (0,2,8,10,26,42,106);
+
+  
+drop table if exists #categorias_janis_no_activas;
+select distinct
+ref_id_category
+,estado_categoria
+,categoria
+,ref_parent
+,estado_ref_parent
+,jerarquia_padre 
+,cuenta
+into #categorias_janis_no_activas
+from #categorias_janis_padres --415,322
+where estado_categoria in (0,2,8,10,26,42,106);
+
+alter table #materiales_status1 add cuenta varchar(7);
+
+update  #materiales_status1 set cuenta='wongio'
+where cod_tienda like 'T%' or cod_tienda like 'W%' ;
+
+update  #materiales_status1 set cuenta='metroio'
+where cod_tienda like 'S%' or cod_tienda like 'H%' ;
+
+--completar categorias nulas
+update #materiales_status1 set
+cate_id		=ref_id_category
+from #materiales_status1 a 
+inner join #categorias_io b on (a.cod_material=right('000000000000000000'+ref_id,18)) and a.cuenta=b.cuenta
+where a.cate_id is null;
+
+
+--categorias janis no activas
+update #materiales_status1 set
+categoria_estado_activo_janis	=0
+from #materiales_status1 a
+inner join #categorias_janis_no_activas b on (a.cate_id=rtrim(ltrim(b.ref_id_category))) and a.cuenta=b.cuenta ;
+
+--cruzar con precio
+alter table #materiales_status1 add tiene_precio int;
+
+update #materiales_status1 set
+tiene_precio=0;
+
+drop table if exists #trx_precio_mat_0;
+select
+cod_dia
+,convert(varchar(4),cod_tienda)		as cod_tienda
+,convert(varchar(18),cod_material)	as cod_material 
+into #trx_precio_mat_0
+from per_super_pd_stg.trx_precio_mat
+where cod_dia in (var_fecha_ayer,var_fecha_hoy)
+and mto_precio_vigente>0
+group by
+cod_dia
+,convert(varchar(4),cod_tienda)
+,convert(varchar(18),cod_material);
+
+drop table if exists #trx_precio_mat;
+select *
+into #trx_precio_mat
+from	(
+		select
+		row_number()over(partition by cod_tienda,cod_material order by cod_dia desc)	as cont
+		,*
+		from #trx_precio_mat_0
+		)
+where cont=1;
+
+update #materiales_status1 set
+tiene_precio	=1
+from #materiales_status1 a
+inner join #trx_precio_mat b on (a.cod_material=b.cod_material and a.cod_tienda=b.cod_tienda);-- and a.cod_dia=b.cod_dia);
+
+--cruzar con imagen cloud 
+set enable_case_sensitive_identifier=true;
+
+drop table if exists #imagenes;
+select
+"ProductId"			as productid
+,"ProductName" 		as productname
+,"SkuId" 			as skuid
+,"SkuName" 			as skuname
+,"Image" 			as image
+,"Label" 			as label
+,"SKUReferenceCode" as skureferencecode
+,f_registro
+,'wongio'           as cuenta
+into #imagenes
+from stg_ecommerce_vtex.surtido_materiales_imagenes 
+union all
+select
+"ProductId"			as productid
+,"ProductName" 		as productname
+,"SkuId" 			as skuid
+,"SkuName" 			as skuname
+,"Image" 			as image
+,"Label" 			as label
+,"SKUReferenceCode" as skureferencecode
+,f_registro
+,'metroio'           as cuenta
+from stg_ecommerce_vtex.surtido_materiales_imagenes_metroio  ;
+
+
+alter table #imagenes add cod_material varchar(50); --collate modern_spanish_ci_as
+
+update #imagenes set
+cod_material	=right('000000000000000000'+skureferencecode,18);
+
+alter table #materiales_status1 add tiene_imagen int;
+
+update #materiales_status1 set
+tiene_imagen	=0;
+
+update #materiales_status1 set
+tiene_imagen	=1
+from #materiales_status1 a
+inner join #imagenes b on (a.cod_material=b.cod_material) and a.cuenta=b.cuenta;
+
+--stock de vtex cloud -- cast solo onpremise - no cloud
+drop table if exists #stock_vtex;
+select
+convert(varchar(18),item_id)				as item_id
+,convert(varchar(18),sku_reference_code)	as sku_reference_code
+,convert(varchar(18),sc)					as sc
+,convert(varchar(18),seller_id)				as seller_id
+,convert(varchar(18),seller_name)			as seller_name
+,convert(varchar(18),store)					as store
+,convert(varchar(18),available_quantity)	as available_quantity
+,cod_dia
+,'wongio'                                   as cuenta
+into #stock_vtex--select *
+from per_super_pd_int.vtex_stock_balance --limit 10
+where cod_dia=var_fecha_hoy
+and convert(varchar(18),store) is not null
+union all
+select
+convert(varchar(18),item_id)				as item_id
+,convert(varchar(18),sku_reference_code)	as sku_reference_code
+,convert(varchar(18),sc)					as sc
+,convert(varchar(18),seller_id)				as seller_id
+,convert(varchar(18),seller_name)			as seller_name
+,convert(varchar(18),store)					as store
+,convert(varchar(18),available_quantity)	as available_quantity
+,cod_dia
+,'metroio'                                   as cuenta
+from per_super_pd_int.vtex_stock_balance_metroio where cod_dia=var_fecha_hoy and convert(varchar(18),store) is not null   ;
+
+alter table #materiales_status1 add stock_vtex numeric(18,2);
+   
+update #materiales_status1 set
+stock_vtex=0;
+  
+alter table #materiales_status1	add tiene_stock_vtex int;
+	
+update #materiales_status1 set
+tiene_stock_vtex=0;
+	
+update #materiales_status1 
+set 
+tiene_stock_vtex = 1 ,
+stock_vtex = available_quantity
+from #materiales_status1 a
+inner join #stock_vtex b on (a.cod_material=right('000000000000000000'+sku_reference_code,18) and a.cod_tienda=b.store)
+where available_quantity>0;
+
+update #materiales_status1 set --nuevo
+tiene_stock_vtex	=1         --nuevo
+where stock_infinito=1;        --nuevo
+
+update #materiales_status1 set --nuevo
+tiene_stock	=1                --nuevo
+where stock_infinito=1;        --nuevo
+
+drop table if exists #stock_master; --modificado 21.01.24
+select * into #stock_master from stg_ecommerce_pass_vtex.stock_master ;
+
+drop table if exists #stock_pass; --modificado 21.01.24
+select distinct  cast(code_material as varchar(500))ref_id,cast(store  as varchar(500))cod_tienda,stock,stock_security  --modificado 10.01.24
+into #stock_pass from #stock_master where stock>0 and  modification_date is not null;
+--cast(to_char(modification_date,'yyyymmdd') as int)=cast(to_char(dateadd(day,0,convert_timezone('GMT','GMT+5',getdate())),'yyyymmdd') as int) ; --modificado 10.01.24
+
+--modificado 10.01.24
+update #materiales_status1 set 
+tiene_stock_vtex	=1,
+stock_vtex			=b.stock
+from #materiales_status1 a
+inner join #stock_pass b on (a.cod_material=right('000000000000000000'+ref_id,18) and a.cod_tienda=b.cod_tienda)
+where a.stock_vtex=0;
+
+alter table #materiales_status1 add catalogado_vtex int;
+
+update #materiales_status1 set
+catalogado_vtex=0;
+
+update #materiales_status1 set
+catalogado_vtex	=case 	when surtido_vtex+producto_activo+sku_activo+visible_vtex+tiene_marca+tiene_categoria=6
+							then 1 else 0 end;
+
+update #materiales_status1 set 
+stock_seguridad	=b.stock_security 
+from #materiales_status1 a
+inner join #stock_master b on (a.cod_material=right('000000000000000000'+(cast(code_material as varchar(500))),18) and a.cod_tienda=cast(b.store  as varchar(500)))
+where a.stock_seguridad is null;
+
+update #materiales_status1 set
+stock_seguridad	=b.min_stock 
+from #materiales_status1 a
+inner join dl_sp_temporal.stock_seguridad_janis b on (a.cod_material=(right('000000000000000000'+b.ref_id,18)) and a.cod_tienda=b.cod_tienda)
+where a.stock_seguridad is null;
+
+update #materiales_status1 set
+stock_seguridad=0
+where stock_seguridad is null;
+
+update #materiales_status1 set  --nuevo
+stock_seguridad=10000       --nuevo
+where stock_infinito=1;         --nuevo
+
+update #materiales_status1 set
+stock_seguridad	=0
+where stock_seguridad is null;
+
+update #materiales_status1 set
+universo_category	=0;
+
+update #materiales_status1 set
+universo_ecommerce	=0;
+
+update #materiales_status1 set
+universo_category	=1
+where tiene_stock=1;
+
+update #materiales_status1 set
+universo_ecommerce	=1
+where tiene_stock_vtex=1
+and bloqueo_ecommerce=0;
+
+update #materiales_status1 set
+cod_tipo_pareto='00'
+where cod_tipo_pareto='0';
+
+--publicado
+alter table #materiales_status1 add publicado int;
+alter table #materiales_status1 add universo int;
+
+update #materiales_status1 set
+publicado	=0
+,universo	=1;
+
+update #materiales_status1 set
+publicado	=case 	when surtido_vtex+producto_activo+sku_activo+visible_vtex+tiene_marca+tiene_categoria+categoria_estado_activo_janis+tiene_precio+tiene_imagen+universo_ecommerce=10	then 1
+					else 0 end;
+
+update #materiales_status1 set --nuevo
+operacion_tienda=0--nuevo
+where sk_gerente in ('03') or sk_categoria in ('5001','3203','3301','3302','5002');--nuevo
+
+update #materiales_status1 set --nuevo1
+publicado=0 --nuevo1
+where operacion_tienda=0; --nuevo1
+
+--delete
+--from #materiales_status1
+--where universo_category<>1;
+				
+update #materiales_status1
+set cantidad_stock_sap=0
+where cantidad_stock_sap<0;
+
+alter table #materiales_status1 add unit_multiplier numeric(14,2);
+alter table #materiales_status1 add stock_sap_uni numeric(14,2);
+
+--delete
+--from dl_sp_dashboards_ecommerce.sku_io;
+
+
+update #materiales_status1
+set unit_multiplier=b.unit_multiplier
+from #materiales_status1 a
+inner join #sku b on a.cod_material=right('000000000000000000'+ref_id,18)  and a.cuenta=b.cuenta;
+
+update #materiales_status1
+set unit_multiplier=1
+where unit_multiplier is null;
+
+update #materiales_status1
+set stock_sap_uni=floor(cantidad_stock_sap/nullif(unit_multiplier,0));
+
+update #materiales_status1 set--nuevo
+stock_vtex	=stock_sap_uni-stock_seguridad--nuevo
+where stock_infinito=1;       --nuevo
+
+--cambiar stock_sap_uni-> cantidad_stock_sap				
+
+--alter table #materiales_status1 add estado_final_activo_motivo int;
+alter table #materiales_status1 add no_tiene_bloqueo_eco_sin_venta_motivo int;
+alter table #materiales_status1 add no_tiene_bloqueo_eco_con_venta_motivo int;
+alter table #materiales_status1 add catalogado_vtex_motivo int;
+alter table #materiales_status1 add tiene_imagen_motivo int;
+alter table #materiales_status1 add cat_activo_janis_motivo int;
+alter table #materiales_status1 add tiene_precio_motivo int;
+alter table #materiales_status1 add tiene_stock_sap_motivo int;
+alter table #materiales_status1 add integracion_stock_vtex_motivo int;
+alter table #materiales_status1 add stock_sap_mayor_seg_motivo int;
+
+update #materiales_status1 set
+--estado_final_activo_motivo					=1
+no_tiene_bloqueo_eco_sin_venta_motivo		=1
+,no_tiene_bloqueo_eco_con_venta_motivo		=1
+,catalogado_vtex_motivo						=1
+,tiene_imagen_motivo						=1
+,cat_activo_janis_motivo					=1
+,tiene_precio_motivo						=1
+,tiene_stock_sap_motivo						=1
+,integracion_stock_vtex_motivo				=1
+,stock_sap_mayor_seg_motivo					=1;
+
+--update #materiales_status1 set
+--estado_final_activo_motivo					=0
+--,no_tiene_bloqueo_eco_sin_venta_motivo		=1
+--,no_tiene_bloqueo_eco_con_venta_motivo		=1
+--,catalogado_vtex_motivo						=1
+--,tiene_imagen_motivo						=1
+--,cat_activo_janis_motivo					=1
+--,tiene_precio_motivo						=1
+--,tiene_stock_sap_motivo						=1
+--,integracion_stock_vtex_motivo				=1
+--,stock_sap_mayor_seg_motivo					=1
+--where estado_final_activo=0
+--and tiene_stock=0
+--and publicado=0;
+
+update #materiales_status1 set
+no_tiene_bloqueo_eco_sin_venta_motivo		=0
+,no_tiene_bloqueo_eco_con_venta_motivo		=1
+,catalogado_vtex_motivo						=1
+,tiene_imagen_motivo						=1
+,cat_activo_janis_motivo					=1
+,tiene_precio_motivo						=1
+,tiene_stock_sap_motivo						=1
+,integracion_stock_vtex_motivo				=1
+,stock_sap_mayor_seg_motivo					=1
+where bloqueo_ecommerce=1
+and tiene_venta=0
+--and estado_final_activo_motivo=1
+and publicado=0;
+
+update #materiales_status1 set 
+no_tiene_bloqueo_eco_con_venta_motivo		=0
+,catalogado_vtex_motivo						=1
+,tiene_imagen_motivo						=1
+,cat_activo_janis_motivo					=1
+,tiene_precio_motivo						=1
+,tiene_stock_sap_motivo						=1
+,integracion_stock_vtex_motivo				=1
+,stock_sap_mayor_seg_motivo					=1
+where bloqueo_ecommerce=1
+and tiene_venta=1
+and no_tiene_bloqueo_eco_sin_venta_motivo=1
+--and estado_final_activo_motivo=1
+and publicado=0 ;
+
+update #materiales_status1 set 
+catalogado_vtex_motivo				=0
+,tiene_imagen_motivo				=1
+,cat_activo_janis_motivo			=1
+,tiene_precio_motivo				=1
+,tiene_stock_sap_motivo				=1
+,integracion_stock_vtex_motivo		=1
+,stock_sap_mayor_seg_motivo			=1
+where catalogado_vtex=0
+and no_tiene_bloqueo_eco_con_venta_motivo=1
+and no_tiene_bloqueo_eco_sin_venta_motivo=1
+--and estado_final_activo_motivo=1
+and publicado=0;
+
+update #materiales_status1 set 
+tiene_imagen_motivo					=0
+,cat_activo_janis_motivo			=1
+,tiene_precio_motivo				=1
+,tiene_stock_sap_motivo				=1
+,integracion_stock_vtex_motivo		=1
+,stock_sap_mayor_seg_motivo			=1
+where tiene_imagen					=0
+and catalogado_vtex_motivo=1
+and no_tiene_bloqueo_eco_con_venta_motivo=1
+and no_tiene_bloqueo_eco_sin_venta_motivo=1
+--and estado_final_activo_motivo=1
+and publicado=0;
+
+update #materiales_status1 set 
+cat_activo_janis_motivo				=0
+,tiene_precio_motivo				=1
+,tiene_stock_sap_motivo				=1
+,integracion_stock_vtex_motivo		=1
+,stock_sap_mayor_seg_motivo			=1
+where categoria_estado_activo_janis=0
+and tiene_imagen_motivo=1
+and catalogado_vtex_motivo=1
+and no_tiene_bloqueo_eco_con_venta_motivo=1
+and no_tiene_bloqueo_eco_sin_venta_motivo=1 
+--and estado_final_activo_motivo=1
+and publicado=0;
+
+update #materiales_status1 set 
+tiene_precio_motivo					=0
+,tiene_stock_sap_motivo				=1
+,integracion_stock_vtex_motivo		=1
+,stock_sap_mayor_seg_motivo			=1
+where tiene_precio=0
+and cat_activo_janis_motivo=1
+and tiene_imagen_motivo=1
+and catalogado_vtex_motivo=1
+and no_tiene_bloqueo_eco_con_venta_motivo=1 
+and no_tiene_bloqueo_eco_sin_venta_motivo=1
+--and estado_final_activo_motivo=1
+and publicado=0;
+
+update #materiales_status1 set 
+tiene_stock_sap_motivo				=0
+,integracion_stock_vtex_motivo		=1
+,stock_sap_mayor_seg_motivo			=1
+where (tiene_stock=0 or stock_sap_uni=0)--nuevo 26.09
+and tiene_precio_motivo=1
+and cat_activo_janis_motivo=1
+and tiene_imagen_motivo=1
+and catalogado_vtex_motivo=1 
+and no_tiene_bloqueo_eco_con_venta_motivo=1
+and no_tiene_bloqueo_eco_sin_venta_motivo=1
+--and estado_final_activo_motivo=1
+and publicado=0;
+
+update #materiales_status1 set 
+integracion_stock_vtex_motivo		=0
+,stock_sap_mayor_seg_motivo			=1
+where stock_sap_uni>stock_seguridad
+and tiene_stock_sap_motivo=1
+and tiene_precio_motivo=1
+and cat_activo_janis_motivo=1
+and tiene_imagen_motivo=1
+and catalogado_vtex_motivo=1
+and no_tiene_bloqueo_eco_con_venta_motivo=1
+and no_tiene_bloqueo_eco_sin_venta_motivo=1
+--and estado_final_activo_motivo=1
+and publicado=0;
+
+update #materiales_status1 set 
+stock_sap_mayor_seg_motivo		=0
+where stock_sap_uni<=stock_seguridad
+and integracion_stock_vtex_motivo=1
+and tiene_stock_sap_motivo=1
+and tiene_precio_motivo=1
+and cat_activo_janis_motivo=1
+and tiene_imagen_motivo=1
+and catalogado_vtex_motivo=1
+and no_tiene_bloqueo_eco_con_venta_motivo=1
+and no_tiene_bloqueo_eco_sin_venta_motivo=1
+--and estado_final_activo_motivo=1
+and publicado=0;
+
+alter table #materiales_status1 add casuistica_1 varchar(200);
+alter table #materiales_status1 add casuistica_2 varchar(200);
+
+update #materiales_status1 set
+casuistica_1	='10.PUBLICADO';
+
+update #materiales_status1 set
+casuistica_2	='6.PUBLICADO';
+
+--update #materiales_status1 set
+--casuistica_1	='1.NO GESTIONABLE'
+--where estado_final_activo_motivo=0;
+
+update #materiales_status1 set
+casuistica_1	='1.BLOQUEO ECOMMERCE CON VENTA'
+where no_tiene_bloqueo_eco_con_venta_motivo=0;
+
+update #materiales_status1 set
+casuistica_1	='2.BLOQUEO ECOMMERCE SIN VENTA'
+where no_tiene_bloqueo_eco_sin_venta_motivo=0;
+
+update #materiales_status1 set
+casuistica_1	='3.NO CATALOGADO VTEX'
+where catalogado_vtex_motivo=0;
+
+update #materiales_status1 set
+casuistica_1	='4.NO IMAGEN'
+where tiene_imagen_motivo=0;
+
+update #materiales_status1 set
+casuistica_1	='5.CAT. NO ACTIVA JANIS'
+where cat_activo_janis_motivo=0;
+
+update #materiales_status1 set
+casuistica_1	='6.NO PRECIO'
+where tiene_precio_motivo=0;
+
+update #materiales_status1 set
+casuistica_1	='7.NO STOCK SAP'
+where tiene_stock_sap_motivo=0;
+
+update #materiales_status1 set
+casuistica_1	='8.NO INTEGRA. STOCK VTEX'
+where integracion_stock_vtex_motivo=0;
+
+update #materiales_status1 set
+casuistica_1	='9.STOCK SAP <= STOCK SEG.'
+where stock_sap_mayor_seg_motivo=0;
+
+--update #materiales_status1 set
+--casuistica_2	='1.NO GESTIONABLE'
+--where estado_final_activo_motivo=0;
+
+update #materiales_status1 set
+casuistica_2	='1.BLOQUEO ECOMMERCE'
+where (no_tiene_bloqueo_eco_con_venta_motivo=0 or no_tiene_bloqueo_eco_sin_venta_motivo=0);
+
+update #materiales_status1 set
+casuistica_2	='2.NO CONFIGURACIÓN ECOMMERCE'
+where (catalogado_vtex_motivo=0 or tiene_imagen_motivo=0 or cat_activo_janis_motivo=0 or tiene_precio_motivo=0);
+
+update #materiales_status1 set
+casuistica_2	='3.NO STOCK SAP'
+where tiene_stock_sap_motivo=0;
+
+update #materiales_status1 set
+casuistica_2	='4.NO INTEGRA. STOCK VTEX'
+where integracion_stock_vtex_motivo=0;
+
+update #materiales_status1 set
+casuistica_2	='5.STOCK SAP <= STOCK SEG.'
+where stock_sap_mayor_seg_motivo=0;
+
+update #materiales_status1 set
+vista_publicaciones	='SIN STOCK';
+
+update #materiales_status1 set --nuevo
+casuistica_2	='7.OPE.ALMACEN' --nuevo
+where operacion_tienda=0; --nuevo
+
+update #materiales_status1 set --nuevo
+casuistica_1	='11.OPE.ALMACEN' --nuevo
+where operacion_tienda=0; --nuevo
+
+update #materiales_status1 set
+vista_publicaciones	=case 	when tiene_stock=1 and bloqueo_ecommerce=0 and operacion_tienda=1  then 'ECOMMERCE' --nuevo
+							when tiene_stock=1  then 'CATEGORY' --nuevo
+							else 'SIN STOCK' end;	--nuevo
+
+update #materiales_status1 set
+vista_publicaciones='SIN STOCK',casuistica_1='7.NO STOCK SAP'
+where casuistica_2='3.NO STOCK SAP' and vista_publicaciones='ECOMMERCE';
+
+update #materiales_status1
+set casuistica_2=case when  stock_sap_uni=1 then '5.1 STOCK(1)SAP<= STOCK SEG.' else casuistica_2 end 
+where vista_publicaciones='ECOMMERCE'and casuistica_2='5.STOCK SAP <= STOCK SEG.';
+				
+--atributo Scraping
+alter table  #materiales_status1 add scraping int;
+
+update #materiales_status1 set scraping=0;
+
+--max fecha hoy
+drop table if exists #scraping;
+select
+right('000000000000000000'+sku_wong,18)		as cod_material
+,tienda cod_tienda
+into #scraping 
+from dl_sp_temporal.datascience_scrapping_wong
+where cast(to_char(to_date(fecha_scraping_wong ,'dd-mm-yyyy'),'yyyymmdd') as int)=var_fecha_scraping
+union all
+select
+right('000000000000000000'+sku_metro,18)		as cod_material
+,tienda cod_tienda
+from dl_sp_temporal.datascience_scrapping_metro
+where cast(to_char(to_date(fecha_scraping_metro,'dd-mm-yyyy'),'yyyymmdd') as int)=var_fecha_scraping; --max por no carga
+
+update #materiales_status1 set
+scraping	=1
+from #materiales_status1 a
+inner join #scraping b on (a.cod_material=b.cod_material and a.cod_tienda=b.cod_tienda);
+
+--drop table if exists  dl_sp_temporal.prueba_fact_publicaciones_ecommerce_nueva_1;
+--select *,getdate() into dl_sp_temporal.prueba_fact_publicaciones_ecommerce_nueva_1 from #materiales_status1;
+delete
+from dl_sp_temporal.fact_publicaciones_ecommerce
+where sk_dia=var_fecha_ayer;
+
+--tabla final--select count(1) from dl_sp_temporal.fact_publicaciones_ecommerce where sk_dia=20231023
+insert into dl_sp_temporal.fact_publicaciones_ecommerce--select top 1 * from dl_sp_temporal.fact_publicaciones_ecommerce
+(
+sk_dia
+,sk_tienda
+,sk_material
+,sk_tipo_canasta
+,sk_tipo_pareto
+,tiene_venta
+,tiene_ingreso
+,tiene_stock
+,bloqueo_ecommerce
+,universo_ecommerce
+,universo_category
+,categoria_estado_activo_janis
+,sku_id
+,product_id
+,marca_id
+,cate_id
+,surtido_vtex
+,producto_activo
+,sku_activo
+,visible_vtex
+,tiene_marca
+,tiene_categoria
+,tiene_precio
+,tiene_imagen
+,tiene_stock_vtex
+,publicado
+,universo
+,catalogado_vtex
+,stock_vtex
+,estado_final_activo
+,cantidad_stock_sap
+,stock_seguridad
+,vista_publicaciones
+--,estado_final_activo_motivo
+,no_tiene_bloqueo_eco_sin_venta_motivo
+,no_tiene_bloqueo_eco_con_venta_motivo
+,catalogado_vtex_motivo
+,tiene_imagen_motivo
+,cat_activo_janis_motivo
+,tiene_precio_motivo
+,tiene_stock_sap_motivo
+,integracion_stock_vtex_motivo
+,stock_sap_mayor_seg_motivo
+,scraping
+,casuistica_1
+,casuistica_2
+,stock_sap_uni
+,unit_multiplier
+,stock_infinito
+,estado_final_activo_2
+,bloqueo_05
+,bloqueo_venta
+,operacion_tienda
+)
+select
+a.cod_dia
+,c.sk_tienda
+,b.sk_material
+,d.sk_tipo_canasta
+,e.sk_tipo_pareto
+,a.tiene_venta
+,a.tiene_ingreso
+,a.tiene_stock
+,a.bloqueo_ecommerce
+,a.universo_ecommerce
+,a.universo_category
+,a.categoria_estado_activo_janis
+,a.sku_id
+,a.product_id
+,a.marca_id
+,a.cate_id
+,a.surtido_vtex
+,a.producto_activo
+,a.sku_activo
+,a.visible_vtex
+,a.tiene_marca
+,a.tiene_categoria
+,a.tiene_precio
+,a.tiene_imagen
+,a.tiene_stock_vtex
+,a.publicado
+,a.universo
+,a.catalogado_vtex
+,a.stock_vtex
+,a.estado_final_activo
+,a.cantidad_stock_sap
+,a.stock_seguridad
+,a.vista_publicaciones
+--,a.estado_final_activo_motivo
+,a.no_tiene_bloqueo_eco_sin_venta_motivo
+,a.no_tiene_bloqueo_eco_con_venta_motivo
+,a.catalogado_vtex_motivo
+,a.tiene_imagen_motivo
+,a.cat_activo_janis_motivo
+,a.tiene_precio_motivo
+,a.tiene_stock_sap_motivo
+,a.integracion_stock_vtex_motivo
+,a.stock_sap_mayor_seg_motivo
+,a.scraping
+,a.casuistica_1
+,a.casuistica_2
+,a.stock_sap_uni
+,a.unit_multiplier
+,a.stock_infinito
+,a.estado_final_activo_2
+,a.bloqueo_05
+,a.bloqueo_venta
+,a.operacion_tienda
+from #materiales_status1 a
+inner join dl_sp_capa_semantica.dw_cencofcic_dim_material b on (a.cod_material=convert(varchar(18),b.id_material))
+left join dl_sp_maestras.dim_tienda c on (a.cod_tienda=convert(varchar(18),c.id_tienda))
+left join dl_sp_maestras.dim_tipo_canasta d on (a.cod_tipo_canasta=convert(varchar(18),d.cod_tipo_canasta))
+left join dl_sp_maestras.dim_tipo_pareto e on (a.cod_tipo_pareto=convert(varchar(18),e.id_tipo_pareto))
+where  a.cod_tienda  in ('H001','H002','H003','H005','H006','H007','H008','H009','H011','H013','H014','H016','S001','S002','S003','S005','S008','S009'
+,'S011','T101','T102','T103','T104','T106','T107','T108','T109','T111','T114','T115','T116','T117','T118','T120','T121','T130','W101','T132');
+
+end
+		  
+
+
+
+
+
+
+
+
+$$
+;
+

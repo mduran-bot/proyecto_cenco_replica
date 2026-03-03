@@ -1,0 +1,438 @@
+{
+  "orders": {
+    "bronze_prefix": "orders",
+    "silver_table": "orders_clean",
+    "description": "Órdenes de WMS Janis",
+    "parent_child_relations": {
+      "items": {
+        "child_entity": "order-items",
+        "child_table": "order_items_clean",
+        "foreign_key": "order_id",
+        "relationship_type": "one_to_many"
+      },
+      "payments": {
+        "child_entity": "order-payments",
+        "child_table": "order_payments_clean",
+        "foreign_key": "order_id",
+        "relationship_type": "one_to_many"
+      },
+      "shipping": {
+        "child_entity": "order-shipping",
+        "child_table": "order_shipping_clean",
+        "foreign_key": "order_id",
+        "relationship_type": "one_to_one"
+      },
+      "statusChanges": {
+        "child_entity": "order-status-changes",
+        "child_table": "order_status_changes_clean",
+        "foreign_key": "order_id",
+        "relationship_type": "one_to_many"
+      },
+      "customData": {
+        "child_entity": "order-custom-data-fields",
+        "child_table": "order_custom_data_fields_clean",
+        "foreign_key": "order_id",
+        "relationship_type": "key_value",
+        "note": "Dynamic object converted to key-value pairs"
+      }
+    }
+  },
+  "products": {
+    "bronze_prefix": "products",
+    "silver_table": "products_clean",
+    "description": "Productos del catálogo",
+    "parent_child_relations": {
+      "skus": {
+        "child_entity": "skus",
+        "child_table": "skus_clean",
+        "foreign_key": "product_id",
+        "relationship_type": "one_to_many"
+      }
+    }
+  },
+  "stock": {
+    "bronze_prefix": "stock",
+    "silver_table": "stock_clean",
+    "description": "Inventario de productos",
+    "parent_child_relations": {}
+  },
+  "order-items": {
+    "bronze_prefix": "order-items",
+    "silver_table": "order_items_clean",
+    "description": "Items de órdenes",
+    "parent_entity": "orders",
+    "foreign_key": "order_id",
+    "parent_child_relations": {
+      "weighables": {
+        "child_entity": "order-item-weighables",
+        "child_table": "order_item_weighables_clean",
+        "foreign_key": "item_id",
+        "relationship_type": "one_to_many"
+      }
+    }
+  },
+  "order-payments": {
+    "bronze_prefix": "order-payments",
+    "silver_table": "order_payments_clean",
+    "description": "Pagos de órdenes",
+    "parent_entity": "orders",
+    "foreign_key": "order_id",
+    "parent_child_relations": {
+      "connectorResponse": {
+        "child_entity": "order-payments-connector-responses",
+        "child_table": "order_payments_connector_responses_clean",
+        "foreign_key": "payment_id",
+        "relationship_type": "key_value",
+        "note": "Dynamic connector response converted to key-value pairs"
+      }
+    }
+  },
+  "picking-sessions": {
+    "bronze_prefix": "picking-sessions",
+    "silver_table": "picking_sessions_clean",
+    "description": "Sesiones de picking",
+    "parent_child_relations": {
+      "orders": {
+        "child_entity": "picking-round-orders",
+        "child_table": "picking_round_orders_clean",
+        "foreign_key": "session_id",
+        "relationship_type": "one_to_many"
+      }
+    }
+  },
+  "skus": {
+    "bronze_prefix": "skus",
+    "silver_table": "skus_clean",
+    "description": "SKUs de productos",
+    "parent_entity": "products",
+    "foreign_key": "product_id",
+    "parent_child_relations": {}
+  },
+  "categories": {
+    "bronze_prefix": "categories",
+    "silver_table": "categories_clean",
+    "description": "Categorías de productos",
+    "parent_child_relations": {}
+  },
+  "brands": {
+    "bronze_prefix": "brands",
+    "silver_table": "brands_clean",
+    "description": "Marcas de productos",
+    "parent_child_relations": {}
+  },
+  "stores": {
+    "bronze_prefix": "stores",
+    "silver_table": "stores_clean",
+    "description": "Tiendas",
+    "parent_child_relations": {}
+  },
+  "customers": {
+    "bronze_prefix": "customers",
+    "silver_table": "customers_clean",
+    "description": "Clientes",
+    "parent_child_relations": {}
+  },
+  "carriers": {
+    "bronze_prefix": "carriers",
+    "silver_table": "carriers_clean",
+    "description": "Transportistas logísticos",
+    "parent_child_relations": {}
+  },
+  "delivery-planning": {
+    "bronze_prefix": "delivery-planning",
+    "silver_table": "delivery_planning_clean",
+    "description": "Planificación de entregas",
+    "parent_child_relations": {
+      "ranges": {
+        "child_entity": "delivery-ranges",
+        "child_table": "delivery_ranges_clean",
+        "foreign_key": "planning_id",
+        "relationship_type": "one_to_many"
+      }
+    }
+  },
+  "prices": {
+    "bronze_prefix": "prices",
+    "silver_table": "prices_clean",
+    "description": "Precios de productos",
+    "parent_child_relations": {}
+  },
+  "promotional-prices": {
+    "bronze_prefix": "promotional-prices",
+    "silver_table": "promotional_prices_clean",
+    "description": "Precios promocionales",
+    "parent_child_relations": {}
+  },
+  "promotions": {
+    "bronze_prefix": "promotions",
+    "silver_table": "promotions_clean",
+    "description": "Promociones",
+    "parent_child_relations": {}
+  },
+  "invoices": {
+    "bronze_prefix": "invoices",
+    "silver_table": "invoices_clean",
+    "description": "Facturas",
+    "parent_entity": "orders",
+    "foreign_key": "order_id",
+    "parent_child_relations": {}
+  },
+  "admins": {
+    "bronze_prefix": "admins",
+    "silver_table": "admins_clean",
+    "description": "Administradores del sistema",
+    "parent_child_relations": {}
+  },
+  "comments": {
+    "bronze_prefix": "comments",
+    "silver_table": "comments_clean",
+    "description": "Comentarios de fulfillment",
+    "parent_child_relations": {}
+  },
+  "order-shipping": {
+    "bronze_prefix": "order-shipping",
+    "silver_table": "order_shipping_clean",
+    "description": "Información de envío de órdenes",
+    "parent_entity": "orders",
+    "foreign_key": "order_id",
+    "parent_child_relations": {}
+  },
+  "order-status-changes": {
+    "bronze_prefix": "order-status-changes",
+    "silver_table": "order_status_changes_clean",
+    "description": "Cambios de estado de órdenes",
+    "parent_entity": "orders",
+    "foreign_key": "order_id",
+    "parent_child_relations": {}
+  },
+  "order-custom-data-fields": {
+    "bronze_prefix": "order-custom-data-fields",
+    "silver_table": "order_custom_data_fields_clean",
+    "description": "Campos personalizados de órdenes (key-value)",
+    "parent_entity": "orders",
+    "foreign_key": "order_id",
+    "parent_child_relations": {}
+  },
+  "order-item-weighables": {
+    "bronze_prefix": "order-item-weighables",
+    "silver_table": "order_item_weighables_clean",
+    "description": "Productos pesables en items de órdenes",
+    "parent_entity": "order-items",
+    "foreign_key": "item_id",
+    "parent_child_relations": {}
+  },
+  "order-payments-connector-responses": {
+    "bronze_prefix": "order-payments-connector-responses",
+    "silver_table": "order_payments_connector_responses_clean",
+    "description": "Respuestas de conectores de pago (key-value)",
+    "parent_entity": "order-payments",
+    "foreign_key": "payment_id",
+    "parent_child_relations": {}
+  },
+  "picking-round-orders": {
+    "bronze_prefix": "picking-round-orders",
+    "silver_table": "picking_round_orders_clean",
+    "description": "Órdenes en rondas de picking",
+    "parent_entity": "picking-sessions",
+    "foreign_key": "session_id",
+    "parent_child_relations": {}
+  },
+  "delivery-ranges": {
+    "bronze_prefix": "delivery-ranges",
+    "silver_table": "delivery_ranges_clean",
+    "description": "Rangos de entrega",
+    "parent_entity": "delivery-planning",
+    "foreign_key": "planning_id",
+    "parent_child_relations": {}
+  },
+  "warehouses": {
+    "bronze_prefix": "warehouses",
+    "silver_table": "warehouses_clean",
+    "description": "Almacenes y centros de distribución",
+    "parent_child_relations": {}
+  },
+  "locations": {
+    "bronze_prefix": "locations",
+    "silver_table": "locations_clean",
+    "description": "Ubicaciones dentro de almacenes",
+    "parent_entity": "warehouses",
+    "foreign_key": "warehouse_id",
+    "parent_child_relations": {}
+  },
+  "suppliers": {
+    "bronze_prefix": "suppliers",
+    "silver_table": "suppliers_clean",
+    "description": "Proveedores de productos",
+    "parent_child_relations": {}
+  },
+  "purchase-orders": {
+    "bronze_prefix": "purchase-orders",
+    "silver_table": "purchase_orders_clean",
+    "description": "Órdenes de compra a proveedores",
+    "parent_child_relations": {
+      "items": {
+        "child_entity": "purchase-order-items",
+        "child_table": "purchase_order_items_clean",
+        "foreign_key": "purchase_order_id",
+        "relationship_type": "one_to_many"
+      }
+    }
+  },
+  "purchase-order-items": {
+    "bronze_prefix": "purchase-order-items",
+    "silver_table": "purchase_order_items_clean",
+    "description": "Items de órdenes de compra",
+    "parent_entity": "purchase-orders",
+    "foreign_key": "purchase_order_id",
+    "parent_child_relations": {}
+  },
+  "inventory-movements": {
+    "bronze_prefix": "inventory-movements",
+    "silver_table": "inventory_movements_clean",
+    "description": "Movimientos de inventario",
+    "parent_child_relations": {}
+  },
+  "returns": {
+    "bronze_prefix": "returns",
+    "silver_table": "returns_clean",
+    "description": "Devoluciones de órdenes",
+    "parent_entity": "orders",
+    "foreign_key": "order_id",
+    "parent_child_relations": {
+      "items": {
+        "child_entity": "return-items",
+        "child_table": "return_items_clean",
+        "foreign_key": "return_id",
+        "relationship_type": "one_to_many"
+      }
+    }
+  },
+  "return-items": {
+    "bronze_prefix": "return-items",
+    "silver_table": "return_items_clean",
+    "description": "Items de devoluciones",
+    "parent_entity": "returns",
+    "foreign_key": "return_id",
+    "parent_child_relations": {}
+  },
+  "shipments": {
+    "bronze_prefix": "shipments",
+    "silver_table": "shipments_clean",
+    "description": "Envíos de órdenes",
+    "parent_entity": "orders",
+    "foreign_key": "order_id",
+    "parent_child_relations": {}
+  },
+  "routes": {
+    "bronze_prefix": "routes",
+    "silver_table": "routes_clean",
+    "description": "Rutas de entrega",
+    "parent_child_relations": {}
+  },
+  "route-stops": {
+    "bronze_prefix": "route-stops",
+    "silver_table": "route_stops_clean",
+    "description": "Paradas en rutas de entrega",
+    "parent_entity": "routes",
+    "foreign_key": "route_id",
+    "parent_child_relations": {}
+  },
+  "drivers": {
+    "bronze_prefix": "drivers",
+    "silver_table": "drivers_clean",
+    "description": "Conductores de entregas",
+    "parent_child_relations": {}
+  },
+  "vehicles": {
+    "bronze_prefix": "vehicles",
+    "silver_table": "vehicles_clean",
+    "description": "Vehículos de entrega",
+    "parent_child_relations": {}
+  },
+  "zones": {
+    "bronze_prefix": "zones",
+    "silver_table": "zones_clean",
+    "description": "Zonas de cobertura de entrega",
+    "parent_child_relations": {}
+  },
+  "sales-channels": {
+    "bronze_prefix": "sales-channels",
+    "silver_table": "sales_channels_clean",
+    "description": "Canales de venta",
+    "parent_child_relations": {}
+  },
+  "accounts": {
+    "bronze_prefix": "accounts",
+    "silver_table": "accounts_clean",
+    "description": "Cuentas de comercio electrónico",
+    "parent_child_relations": {}
+  },
+  "sellers": {
+    "bronze_prefix": "sellers",
+    "silver_table": "sellers_clean",
+    "description": "Vendedores",
+    "parent_child_relations": {}
+  },
+  "order-groups": {
+    "bronze_prefix": "order-groups",
+    "silver_table": "order_groups_clean",
+    "description": "Grupos de órdenes",
+    "parent_child_relations": {}
+  },
+  "audit-instances": {
+    "bronze_prefix": "audit-instances",
+    "silver_table": "audit_instances_clean",
+    "description": "Instancias de auditoría",
+    "parent_child_relations": {}
+  },
+  "audit-rules": {
+    "bronze_prefix": "audit-rules",
+    "silver_table": "audit_rules_clean",
+    "description": "Reglas de auditoría",
+    "parent_child_relations": {}
+  },
+  "price-sheets": {
+    "bronze_prefix": "price-sheets",
+    "silver_table": "price_sheets_clean",
+    "description": "Hojas de precios",
+    "parent_child_relations": {}
+  },
+  "currencies": {
+    "bronze_prefix": "currencies",
+    "silver_table": "currencies_clean",
+    "description": "Monedas",
+    "parent_child_relations": {}
+  },
+  "payment-methods": {
+    "bronze_prefix": "payment-methods",
+    "silver_table": "payment_methods_clean",
+    "description": "Métodos de pago",
+    "parent_child_relations": {}
+  },
+  "shipping-methods": {
+    "bronze_prefix": "shipping-methods",
+    "silver_table": "shipping_methods_clean",
+    "description": "Métodos de envío",
+    "parent_child_relations": {}
+  },
+  "order-attachments": {
+    "bronze_prefix": "order-attachments",
+    "silver_table": "order_attachments_clean",
+    "description": "Archivos adjuntos de órdenes",
+    "parent_entity": "orders",
+    "foreign_key": "order_id",
+    "parent_child_relations": {}
+  },
+  "packing-sessions": {
+    "bronze_prefix": "packing-sessions",
+    "silver_table": "packing_sessions_clean",
+    "description": "Sesiones de empaque",
+    "parent_child_relations": {}
+  },
+  "distribution-centers": {
+    "bronze_prefix": "distribution-centers",
+    "silver_table": "distribution_centers_clean",
+    "description": "Centros de distribución",
+    "parent_child_relations": {}
+  }
+}

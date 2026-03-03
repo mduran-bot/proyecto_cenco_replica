@@ -1,0 +1,2058 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Notification Service",
+    "description": "Notification Service\n\n **Last update**: 21 ene 26, 04:11 p. m.",
+    "version": "1.7.0",
+    "x-logo": null,
+    "x-janis-keywords": [
+      "notification"
+    ],
+    "lastUpdate": "2026-01-21T19:11:25.509Z"
+  },
+  "tags": [
+    {
+      "name": "AccessToken",
+      "description": "For managing access tokens"
+    },
+    {
+      "name": "Connection",
+      "description": "For managing connections"
+    },
+    {
+      "name": "Default Event",
+      "description": "For managing default events"
+    },
+    {
+      "name": "Event",
+      "description": "For managing events"
+    },
+    {
+      "name": "Event Listeners",
+      "description": "For handling event listeners"
+    },
+    {
+      "name": "Subscription",
+      "description": "For managing Subscriptions"
+    },
+    {
+      "name": "User",
+      "description": "For managing connected users"
+    }
+  ],
+  "servers": [
+    {
+      "url": "https://notification.janis.in/api",
+      "description": "The Prod API server",
+      "variables": {
+        "environment": {
+          "default": "prod"
+        }
+      }
+    },
+    {
+      "url": "https://notification.janisqa.in/api",
+      "description": "The QA API server",
+      "variables": {
+        "environment": {
+          "default": "qa"
+        }
+      }
+    },
+    {
+      "url": "https://notification.janisdev.in/api",
+      "description": "The Beta API server",
+      "variables": {
+        "environment": {
+          "default": "beta"
+        }
+      }
+    },
+    {
+      "url": "http://notification.janis.localhost:3121/api",
+      "description": "The Local API server",
+      "variables": {
+        "environment": {
+          "default": "local"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/access-token": {
+      "get": {
+        "x-janis-namespace": "access-token",
+        "x-janis-method": "list",
+        "x-janis-permissions": [],
+        "operationId": "accessToken",
+        "tags": [
+          "AccessToken"
+        ],
+        "summary": "Get an access token for new websocket connection",
+        "description": "Retrieves a new access token if user has valid credentials.",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string",
+                      "description": "The access token",
+                      "example": "SVD6XDQZO9"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/connection": {
+      "get": {
+        "x-janis-namespace": "connection",
+        "x-janis-method": "list",
+        "x-janis-permissions": [],
+        "operationId": "getConnection",
+        "tags": [
+          "Connection"
+        ],
+        "summary": "Get a list of Connections with their subscriptions",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ConnectionFilters"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Connections listed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectionList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/default-event/{id}": {
+      "get": {
+        "x-janis-namespace": "default-event",
+        "x-janis-method": "get",
+        "x-janis-permissions": [],
+        "operationId": "defaultEventGet",
+        "tags": [
+          "Default Event"
+        ],
+        "summary": "API to get a default event by id",
+        "description": "**IMPORTANT**: Although `janis-client` header is requested, the data is not retrieved by client\n",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultEvent"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "x-janis-namespace": "default-event",
+        "x-janis-method": "update",
+        "x-janis-permissions": [],
+        "operationId": "defaultEventUpdate",
+        "tags": [
+          "Default Event"
+        ],
+        "summary": "API to update a default event",
+        "description": "**IMPORTANT**: Although `janis-client` header is requested, the data is not retrieved by client\n",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The default event id"
+          }
+        ],
+        "requestBody": {
+          "description": "The default event to update",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DefaultEvent"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Default event updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "The default event id",
+                      "example": "5d1fc1eeb5b68406e0487a06"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/default-event": {
+      "get": {
+        "x-janis-namespace": "default-event",
+        "x-janis-method": "list",
+        "x-janis-permissions": [],
+        "operationId": "defaultEventList",
+        "tags": [
+          "Default Event"
+        ],
+        "summary": "API to get a list of default events",
+        "description": "**IMPORTANT**: Although `janis-client` header is requested, the data is not retrieved by client\n",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/DefaultEventsFilters"
+          },
+          {
+            "$ref": "#/components/parameters/DefaultEventsSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultEventList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "x-janis-namespace": "default-event",
+        "x-janis-method": "create",
+        "x-janis-permissions": [],
+        "operationId": "defaultEventCreate",
+        "tags": [
+          "Default Event"
+        ],
+        "summary": "API to create a new default event",
+        "description": "**IMPORTANT**: Although `janis-client` header is requested, the data is not retrieved by client\n",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "The default event to create",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DefaultEvent"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The default event created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "The default event id",
+                      "example": "5d1fc1eeb5b68406e0487a06"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/event/{id}": {
+      "get": {
+        "x-janis-namespace": "event",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "notification:event:read"
+        ],
+        "operationId": "eventGet",
+        "tags": [
+          "Event"
+        ],
+        "summary": "API to get a event by id",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Event"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "x-janis-namespace": "event",
+        "x-janis-method": "update",
+        "x-janis-permissions": [
+          "notification:event:write"
+        ],
+        "operationId": "eventUpdate",
+        "tags": [
+          "Event"
+        ],
+        "summary": "API to update a event",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The event id"
+          }
+        ],
+        "requestBody": {
+          "description": "The event to update",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Event"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Event updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "The event id",
+                      "example": "5d1fc1eeb5b68406e0487a06"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/event": {
+      "get": {
+        "x-janis-namespace": "event",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "notification:event:read"
+        ],
+        "operationId": "eventList",
+        "tags": [
+          "Event"
+        ],
+        "summary": "API to get a list of events",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/EventsFilters"
+          },
+          {
+            "$ref": "#/components/parameters/EventsSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/subscribe/{subscriptionType}": {
+      "post": {
+        "x-janis-namespace": "subscription",
+        "x-janis-method": "subscribe",
+        "x-janis-permissions": [],
+        "operationId": "subscribe",
+        "tags": [
+          "Subscription"
+        ],
+        "summary": "Subscribe to notifications",
+        "description": "Subscribes to receive notifications for the specified events.",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "subscriptionType",
+            "description": "The subscription type",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "push"
+              ]
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/PushSubscribeRequest"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GenericSuccess"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/subscription": {
+      "get": {
+        "x-janis-namespace": "subscription",
+        "x-janis-method": "list",
+        "x-janis-permissions": [],
+        "operationId": "getSubscription",
+        "tags": [
+          "Subscription"
+        ],
+        "summary": "Get a list of Subscriptions by event",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/SubscriptionFilters"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Subscriptions listed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/unsubscribe/{subscriptionType}": {
+      "post": {
+        "x-janis-namespace": "subscription",
+        "x-janis-method": "unsubscribe",
+        "x-janis-permissions": [],
+        "operationId": "unsubscribe",
+        "tags": [
+          "Subscription"
+        ],
+        "summary": "Unsubscribe from notifications",
+        "description": "Unsubscribes to stop receiving notifications from the specified events.",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "subscriptionType",
+            "description": "The subscription type",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "push"
+              ]
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/PushUnsubscribeRequest"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GenericSuccess"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/user/{id}": {
+      "get": {
+        "x-janis-namespace": "user",
+        "x-janis-method": "get",
+        "x-janis-permissions": [],
+        "operationId": "userGet",
+        "tags": [
+          "User"
+        ],
+        "summary": "Get detailed information about a specific user",
+        "description": "Retrieve comprehensive connection details for a specific user",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User details retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "description": "User not found or does not belong to this client",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/user": {
+      "get": {
+        "x-janis-namespace": "user",
+        "x-janis-method": "list",
+        "x-janis-permissions": [],
+        "operationId": "userList",
+        "tags": [
+          "User"
+        ],
+        "summary": "Get a list of connected users",
+        "description": "Retrieve a list of users connected to the current client with their connection details",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/UserFilters"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Users listed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserSummary"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/listener/id/user/updated": {
+      "post": {
+        "x-janis-namespace": "id-user",
+        "x-janis-method": "updated-listener",
+        "x-janis-permissions": [],
+        "operationId": "idUserUpdatedListener",
+        "tags": [
+          "Event Listeners"
+        ],
+        "summary": "Id User Updated Event Listener",
+        "description": "Listener for events related to the updating of a user's ID",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "The event",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/listenerEvent"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GenericSuccess"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-key",
+        "description": "The API Key"
+      },
+      "ApiSecret": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-secret",
+        "description": "The API Secret"
+      },
+      "JanisClient": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-client",
+        "description": "The Client Code"
+      }
+    },
+    "parameters": {
+      "id": {
+        "name": "id",
+        "in": "path",
+        "schema": {
+          "type": "string",
+          "example": "631fb04c8fe08f51a8ee5949"
+        },
+        "required": true,
+        "description": "The unique identifier of the item"
+      },
+      "ListSortDirection": {
+        "name": "sortDirection",
+        "in": "query",
+        "description": "The direction to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
+        }
+      },
+      "ListPageNumber": {
+        "name": "x-janis-page",
+        "in": "header",
+        "description": "The page to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "default": 1
+        }
+      },
+      "ListPageSize": {
+        "name": "x-janis-page-size",
+        "in": "header",
+        "description": "The page size to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "default": 60
+        }
+      },
+      "JanisEntity": {
+        "name": "janis-entity",
+        "in": "header",
+        "description": "The entity name",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "ConnectionFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "notificationTypes": {
+              "type": "array",
+              "description": "The type of connections to filter by.",
+              "items": {
+                "type": "string",
+                "description": "A connectionType",
+                "example": "websocket",
+                "enum": [
+                  "websocket",
+                  "push"
+                ]
+              }
+            },
+            "connectionIds": {
+              "type": "array",
+              "description": "The connectionIds to filter by. A comma separated string  will also be accepted. `REQUIRED`",
+              "items": {
+                "type": "string",
+                "description": "A connectionId",
+                "example": "NAkC2cOnIAMCJ7A="
+              }
+            }
+          }
+        }
+      },
+      "DefaultEventsSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "dateCreated",
+            "dateModified"
+          ]
+        }
+      },
+      "DefaultEventsFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "eventKey": {
+              "$ref": "#/components/schemas/DefaultEvent/properties/eventKey"
+            },
+            "platforms": {
+              "$ref": "#/components/schemas/DefaultEvent/properties/platforms"
+            },
+            "status": {
+              "$ref": "#/components/schemas/DefaultEvent/properties/status"
+            }
+          }
+        }
+      },
+      "EventsSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "dateCreated",
+            "dateModified"
+          ]
+        }
+      },
+      "EventsFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "eventKey": {
+              "$ref": "#/components/schemas/Event/properties/eventKey"
+            },
+            "platforms": {
+              "$ref": "#/components/schemas/Event/properties/platforms"
+            },
+            "status": {
+              "$ref": "#/components/schemas/Event/properties/status"
+            }
+          }
+        }
+      },
+      "SubscriptionFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "notificationTypes": {
+              "type": "array",
+              "description": "The type of connections to filter by",
+              "items": {
+                "type": "string",
+                "description": "A connection type",
+                "example": "websocket",
+                "enum": [
+                  "websocket",
+                  "push"
+                ]
+              }
+            },
+            "event": {
+              "type": "string",
+              "description": "The raw event name with the following structure: `service:entity:event`",
+              "example": "picking:session:picked"
+            }
+          }
+        }
+      },
+      "UserFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the user list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "Filter users by ID (partial match)",
+              "example": "65c391139dc4b6d4e24ba8a9"
+            },
+            "platform": {
+              "type": "array",
+              "description": "Filter users by notification platforms",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "websocket",
+                  "push"
+                ]
+              },
+              "example": [
+                "websocket"
+              ]
+            },
+            "event": {
+              "type": "string",
+              "description": "Filter users subscribed to specific event",
+              "example": "delivery:shipping:shipped"
+            }
+          }
+        }
+      }
+    },
+    "headers": {
+      "x-janis-total": {
+        "description": "The total amount of records in the list",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "responses": {
+      "SuccessCreateResponse": {
+        "description": "The item was created",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "SuccessUpdateResponse": {
+        "description": "The item was updated",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "GenericSuccess": {
+        "description": "Operation succeeded",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "BadRequest": {
+        "description": "A client error has ocurred.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Authentication missing or invalid",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Not authorized request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "InternalError": {
+        "description": "A server error has ocurred."
+      }
+    },
+    "schemas": {
+      "id": {
+        "description": "The unique identifier of the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "631fb04c8fe08f51a8ee5949"
+      },
+      "status": {
+        "description": "The item status",
+        "type": "string",
+        "default": "active",
+        "enum": [
+          "active",
+          "inactive"
+        ],
+        "example": "active"
+      },
+      "dateCreated": {
+        "description": "The date of creation",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-12T19:00:00.000Z"
+      },
+      "dateModified": {
+        "description": "The date of the last modification",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-20T19:00:00.000Z"
+      },
+      "dateCreatedDay": {
+        "description": "The day of creation",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-08-07T16:00:00.000Z"
+      },
+      "dateModifiedDay": {
+        "description": "The day of last modification",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-08-07T16:00:00.000Z"
+      },
+      "userCreated": {
+        "description": "The ID of the user who created the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "6a1fc1eeb5b68406e0487a10"
+      },
+      "userModified": {
+        "description": "The ID of the user who last modified the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "7e1fc1eeb5b68406e048796"
+      },
+      "BaseEvent": {
+        "description": "Base event configuration",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "eventKey": {
+            "description": "The key that identifies the event",
+            "type": "string",
+            "example": "picking:session:picker-assigned"
+          },
+          "platforms": {
+            "description": "The platforms where the notification can be delivered",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "apps",
+                "websocket"
+              ]
+            }
+          },
+          "appOperatingSystems": {
+            "description": "The operating systems supported by the mobile app notifications",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "android",
+                "ios"
+              ]
+            }
+          },
+          "notificationChannelId": {
+            "description": "The notification channel identifier used by the platform",
+            "type": "string",
+            "example": "channel_example_id"
+          },
+          "filters": {
+            "description": "Dynamic filters used to target notifications",
+            "type": "object",
+            "properties": {
+              "warehouseId": {
+                "description": "The field name to resolve the warehouse identifier",
+                "type": "string",
+                "example": "warehouseField"
+              },
+              "userId": {
+                "description": "The field name to resolve the user identifier",
+                "type": "string",
+                "example": "userIdField"
+              }
+            }
+          },
+          "useActiveWarehouseInFilter": {
+            "description": "Whether to use the user's active warehouse automatically for filtering",
+            "type": "boolean",
+            "example": true
+          },
+          "defaultNotificationTranslations": {
+            "description": "Default translation texts used when no language-specific translation is provided",
+            "type": "object",
+            "properties": {
+              "title": {
+                "description": "Default notification title",
+                "type": "string",
+                "example": "Example title"
+              },
+              "description": {
+                "description": "Default notification body",
+                "type": "string",
+                "example": "Example body"
+              }
+            }
+          },
+          "notificationTranslations": {
+            "description": "Language-specific notification translations",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "language": {
+                  "description": "ISO language code of the translation",
+                  "type": "string",
+                  "example": "en"
+                },
+                "title": {
+                  "description": "Notification title for the language",
+                  "type": "string",
+                  "example": "Example title"
+                },
+                "description": {
+                  "description": "Notification body for the language",
+                  "type": "string",
+                  "example": "Example body"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ErrorResponse": {
+        "description": "Error response",
+        "type": "object",
+        "properties": {
+          "message": {
+            "description": "A message explaining the error",
+            "type": "string"
+          }
+        }
+      },
+      "ConnectionList": {
+        "type": "array",
+        "description": "A list of connections",
+        "items": {
+          "type": "object",
+          "description": "An connection with its subscriptions",
+          "properties": {
+            "connectionId": {
+              "type": "string",
+              "description": "Active connection Id",
+              "example": "NAkC2cOnIAMCJ7A="
+            },
+            "subscriptions": {
+              "type": "array",
+              "description": "Active subscriptions for this event",
+              "items": {
+                "type": "string",
+                "description": "A formatted event name",
+                "example": "websocket:defaultClient:picking:session:picked"
+              }
+            }
+          }
+        }
+      },
+      "DefaultEvent": {
+        "description": "A default event",
+        "properties": {
+          "id": {
+            "allOf": [
+              {
+                "description": "The id of the default event"
+              },
+              {
+                "$ref": "#/components/schemas/BaseEvent/properties/id"
+              }
+            ]
+          },
+          "eventKey": {
+            "allOf": [
+              {
+                "description": "The event key of the default event"
+              },
+              {
+                "$ref": "#/components/schemas/BaseEvent/properties/eventKey"
+              }
+            ]
+          },
+          "platforms": {
+            "allOf": [
+              {
+                "description": "The available platforms of the default event"
+              },
+              {
+                "$ref": "#/components/schemas/BaseEvent/properties/platforms"
+              }
+            ]
+          },
+          "appOperatingSystems": {
+            "allOf": [
+              {
+                "description": "The notification app operating systems of the default event"
+              },
+              {
+                "$ref": "#/components/schemas/BaseEvent/properties/appOperatingSystems"
+              }
+            ]
+          },
+          "notificationChannelId": {
+            "allOf": [
+              {
+                "description": "The notification channel id of the default event"
+              },
+              {
+                "$ref": "#/components/schemas/BaseEvent/properties/notificationChannelId"
+              }
+            ]
+          },
+          "filters": {
+            "allOf": [
+              {
+                "description": "The filters of the default event"
+              },
+              {
+                "$ref": "#/components/schemas/BaseEvent/properties/filters"
+              }
+            ]
+          },
+          "useActiveWarehouseInFilter": {
+            "allOf": [
+              {
+                "description": "The useActiveWarehouseInFilter prop indicates whether to use the user's active warehouse for warehouse filter"
+              },
+              {
+                "$ref": "#/components/schemas/BaseEvent/properties/useActiveWarehouseInFilter"
+              }
+            ]
+          },
+          "defaultNotificationTranslations": {
+            "allOf": [
+              {
+                "description": "The default notification translations of the default event"
+              },
+              {
+                "$ref": "#/components/schemas/BaseEvent/properties/defaultNotificationTranslations"
+              }
+            ]
+          },
+          "notificationTranslations": {
+            "allOf": [
+              {
+                "description": "The notification translations of the default event"
+              },
+              {
+                "$ref": "#/components/schemas/BaseEvent/properties/notificationTranslations"
+              }
+            ]
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "status": {
+            "$ref": "#/components/schemas/status"
+          }
+        }
+      },
+      "DefaultEventList": {
+        "description": "The list of the default event",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/DefaultEvent"
+        }
+      },
+      "Event": {
+        "description": "A event",
+        "properties": {
+          "id": {
+            "allOf": [
+              {
+                "description": "The id of the event"
+              },
+              {
+                "$ref": "#/components/schemas/BaseEvent/properties/id"
+              }
+            ]
+          },
+          "eventKey": {
+            "allOf": [
+              {
+                "readOnly": true,
+                "description": "The event key of the event"
+              },
+              {
+                "$ref": "#/components/schemas/BaseEvent/properties/eventKey"
+              }
+            ]
+          },
+          "platforms": {
+            "allOf": [
+              {
+                "description": "The available platforms of the event"
+              },
+              {
+                "$ref": "#/components/schemas/BaseEvent/properties/platforms"
+              }
+            ]
+          },
+          "appOperatingSystems": {
+            "allOf": [
+              {
+                "readOnly": true,
+                "description": "The notification app operating systems of the event"
+              },
+              {
+                "$ref": "#/components/schemas/BaseEvent/properties/appOperatingSystems"
+              }
+            ]
+          },
+          "notificationChannelId": {
+            "allOf": [
+              {
+                "readOnly": true,
+                "description": "The notification channel id of the event"
+              },
+              {
+                "$ref": "#/components/schemas/BaseEvent/properties/notificationChannelId"
+              }
+            ]
+          },
+          "filters": {
+            "allOf": [
+              {
+                "readOnly": true,
+                "description": "The filters of the event"
+              },
+              {
+                "$ref": "#/components/schemas/BaseEvent/properties/filters"
+              }
+            ]
+          },
+          "useActiveWarehouseInFilter": {
+            "allOf": [
+              {
+                "readOnly": true,
+                "description": "The useActiveWarehouseInFilter prop indicates whether to use the user's active warehouse for warehouse filter"
+              },
+              {
+                "$ref": "#/components/schemas/BaseEvent/properties/useActiveWarehouseInFilter"
+              }
+            ]
+          },
+          "defaultNotificationTranslations": {
+            "allOf": [
+              {
+                "readOnly": true,
+                "description": "The default notification translations of the event"
+              },
+              {
+                "$ref": "#/components/schemas/BaseEvent/properties/defaultNotificationTranslations"
+              }
+            ]
+          },
+          "notificationTranslations": {
+            "allOf": [
+              {
+                "readOnly": true,
+                "description": "The notification translations of the event"
+              },
+              {
+                "$ref": "#/components/schemas/BaseEvent/properties/notificationTranslations"
+              }
+            ]
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "status": {
+            "$ref": "#/components/schemas/status"
+          }
+        }
+      },
+      "EventList": {
+        "description": "The list of the event",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Event"
+        }
+      },
+      "PushSubscribeRequest": {
+        "title": "Push Subscription",
+        "description": "Subscribe to Push Notifications",
+        "type": "object",
+        "properties": {
+          "platformApplicationName": {
+            "type": "string",
+            "description": "The SNS Platform Application Name\n",
+            "enum": [
+              "PickingApp",
+              "DeliveryApp"
+            ]
+          },
+          "token": {
+            "type": "string",
+            "description": "The Firebase Cloud Messaging Device Token (this must be generated by client/application)",
+            "example": "JDF6GJS364uhaGGe384gJHIQs23nbRNFG2859gJSD9gBivajeSJD-GJ39b8SAfwp39gW1589avje93A-PengG"
+          },
+          "events": {
+            "type": "array",
+            "description": "The Notification Events to Subscribe to",
+            "items": {
+              "type": "string",
+              "description": "The Notification Event",
+              "example": "delivery:shipping:shipped"
+            }
+          },
+          "additionalInfo": {
+            "type": "object",
+            "description": "Additional information about the subscribing user.",
+            "properties": {
+              "language": {
+                "type": "string",
+                "description": "User language to use in the notification.",
+                "example": "es"
+              },
+              "activeWarehouse": {
+                "type": "string",
+                "description": "User active warehouse to use in the notification filters.",
+                "example": "5d1fc1eeb5b68406e0487a01"
+              }
+            }
+          }
+        }
+      },
+      "SubscriptionList": {
+        "type": "array",
+        "description": "A list of subscriptions",
+        "items": {
+          "type": "object",
+          "description": "An event subscription data",
+          "properties": {
+            "eventName": {
+              "type": "string",
+              "description": "The event saved as a key in database",
+              "example": "websocket:{userId}:picking:session:picked"
+            },
+            "activeConnection": {
+              "type": "string",
+              "description": "Connection ID for this event and userId",
+              "example": "NAkC2cOnIAMCJ7A="
+            }
+          }
+        }
+      },
+      "TriggerEventRequest": {
+        "description": "An event to trigger",
+        "type": "object",
+        "properties": {
+          "eventKey": {
+            "type": "string",
+            "description": "The event key to trigger in the format of service:entity:event",
+            "example": "delivery:shipping:shipped"
+          },
+          "userId": {
+            "type": "string",
+            "description": "The user ID to trigger the event for",
+            "example": "5d699c1ae8ebb95eaa24aca9"
+          },
+          "eventData": {
+            "type": "object",
+            "description": "The data to trigger the event with",
+            "example": {
+              "orderId": "6d699c1ae8ebb95eaa24aca9"
+            }
+          }
+        },
+        "required": [
+          "eventKey",
+          "eventData"
+        ]
+      },
+      "PushUnsubscribeRequest": {
+        "title": "Push Unsubscribe",
+        "description": "Unsubscribe from Push Notifications",
+        "type": "object",
+        "properties": {
+          "events": {
+            "type": "array",
+            "description": "The Notification Events to unsubscribe from",
+            "items": {
+              "type": "string",
+              "description": "The notification event",
+              "example": "delivery:shipping:shipped"
+            }
+          }
+        }
+      },
+      "UserDetail": {
+        "type": "object",
+        "description": "Detailed information about a connected user",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "User identifier",
+            "example": "65c391139dc4b6d4e24ba8a9"
+          },
+          "platforms": {
+            "type": "array",
+            "description": "Notification platforms used by the user",
+            "items": {
+              "type": "string",
+              "enum": [
+                "websocket",
+                "push"
+              ]
+            },
+            "example": [
+              "websocket",
+              "push"
+            ]
+          },
+          "events": {
+            "type": "array",
+            "description": "Events the user is subscribed to",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "delivery:shipping:shipped",
+              "picking:session:created"
+            ]
+          },
+          "connections": {
+            "type": "array",
+            "description": "Active connection IDs (deduplicated)",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "NAkC2cOnIAMCJ7A=",
+              "arn:aws:sns:us-east-1:123:endpoint/GCM/app/device"
+            ]
+          },
+          "devices": {
+            "type": "array",
+            "description": "Device IDs for push notifications",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "b04096b4f7813fg4",
+              "a15207c5g8924hg5"
+            ]
+          },
+          "languages": {
+            "type": "object",
+            "description": "Language preferences by notification type and device",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "example": {
+              "websocket": "es",
+              "push-b04096b4f7813fg4": "en",
+              "push-a15207c5g8924hg5": "es"
+            }
+          },
+          "warehouses": {
+            "type": "object",
+            "description": "Warehouse access information for current client",
+            "properties": {
+              "warehousesIds": {
+                "description": "IDs of warehouses the user can access",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "example": [
+                  "5d1fc1eeb5b68406e0487a01",
+                  "5d1fc1eeb5b68406e0487a02"
+                ]
+              },
+              "hasTotalAccess": {
+                "description": "Whether the user has total access to all warehouses",
+                "type": "boolean",
+                "example": false
+              },
+              "activeWarehouse": {
+                "description": "The user's active warehouse to use in filters",
+                "type": "string",
+                "example": "5d1fc1eeb5b68406e0487a01"
+              }
+            }
+          },
+          "websocketConnections": {
+            "type": "object",
+            "description": "Detailed WebSocket connections by key",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "example": {
+              "websocket-65c391139dc4b6d4e24ba8a9": "NAkC2cOnIAMCJ7A=",
+              "websocket-65c391139dc4b6d4e24ba8a9-delivery:shipping:shipped": "NAkC2cOnIAMCJ7A="
+            }
+          },
+          "pushConnections": {
+            "type": "object",
+            "description": "Detailed Push connections by key",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "example": {
+              "push-65c391139dc4b6d4e24ba8a9-b04096b4f7813fg4": "arn:aws:sns:us-east-1:123:endpoint/GCM/app/device",
+              "push-65c391139dc4b6d4e24ba8a9-b04096b4f7813fg4-delivery:shipping:shipped": "arn:aws:sns:us-east-1:123:endpoint/GCM/app/device"
+            }
+          },
+          "connectionEvents": {
+            "type": "array",
+            "description": "All events associated with user's connections",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "websocket:defaultClient:delivery:shipping:shipped",
+              "push:defaultClient:picking:session:created"
+            ]
+          },
+          "totalConnections": {
+            "type": "integer",
+            "description": "Total number of active connections",
+            "example": 3
+          },
+          "totalEvents": {
+            "type": "integer",
+            "description": "Total number of unique events subscribed",
+            "example": 5
+          },
+          "totalDevices": {
+            "type": "integer",
+            "description": "Total number of push notification devices",
+            "example": 2
+          }
+        }
+      },
+      "UserSummary": {
+        "type": "object",
+        "description": "Summary of a connected user",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "User identifier",
+            "example": "65c391139dc4b6d4e24ba8a9"
+          },
+          "platforms": {
+            "type": "array",
+            "description": "Notification platforms used by the user",
+            "items": {
+              "type": "string",
+              "enum": [
+                "websocket",
+                "push"
+              ]
+            },
+            "example": [
+              "websocket",
+              "push"
+            ]
+          },
+          "events": {
+            "type": "array",
+            "description": "Events the user is subscribed to",
+            "items": {
+              "type": "string",
+              "example": "delivery:shipping:shipped"
+            },
+            "example": [
+              "delivery:shipping:shipped",
+              "picking:session:created"
+            ]
+          },
+          "devices": {
+            "type": "array",
+            "description": "Device IDs for push notifications",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "b04096b4f7813fg4",
+              "a15207c5g8924hg5"
+            ]
+          },
+          "totalConnections": {
+            "type": "integer",
+            "description": "Total number of active connections",
+            "example": 2
+          },
+          "totalDevices": {
+            "type": "integer",
+            "description": "Total number of push notification devices",
+            "example": 2
+          },
+          "totalEvents": {
+            "type": "integer",
+            "description": "Total number of unique events subscribed",
+            "example": 5
+          }
+        }
+      },
+      "listenerEvent": {
+        "description": "A JANIS Event object",
+        "type": "object",
+        "properties": {
+          "service": {
+            "description": "The source service name",
+            "type": "string",
+            "example": "id"
+          },
+          "entity": {
+            "description": "The event related entity",
+            "type": "string",
+            "example": "profile"
+          },
+          "event": {
+            "description": "The event name",
+            "type": "string",
+            "example": "created"
+          },
+          "client": {
+            "description": "The source event client",
+            "type": "string",
+            "example": "fizzmod"
+          },
+          "id": {
+            "description": "The event related entity ID",
+            "type": "string",
+            "example": "5d699c1ae8ebb95eaa24aca9"
+          }
+        },
+        "required": [
+          "service",
+          "entity",
+          "event"
+        ]
+      }
+    }
+  }
+}

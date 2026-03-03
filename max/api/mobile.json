@@ -1,0 +1,1342 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Mobile Service",
+    "description": "Mobile Service\n\n **Last update**: 17 jun 25, 04:45 a. m.",
+    "version": "1.1.0",
+    "x-logo": null,
+    "x-janis-keywords": [
+      "mobile"
+    ],
+    "lastUpdate": "2025-06-17T08:45:18.014Z"
+  },
+  "tags": [
+    {
+      "name": "App",
+      "description": "For managing Apps"
+    },
+    {
+      "name": "App Attachments",
+      "description": "For managing Apps Attachments"
+    },
+    {
+      "name": "Download",
+      "description": "For managing Downloads"
+    }
+  ],
+  "servers": [
+    {
+      "url": "https://mobile.janis.in/api",
+      "description": "The Prod API server",
+      "variables": {
+        "environment": {
+          "default": "prod"
+        }
+      }
+    },
+    {
+      "url": "https://mobile.janisqa.in/api",
+      "description": "The QA API server",
+      "variables": {
+        "environment": {
+          "default": "qa"
+        }
+      }
+    },
+    {
+      "url": "https://mobile.janisdev.in/api",
+      "description": "The Beta API server",
+      "variables": {
+        "environment": {
+          "default": "beta"
+        }
+      }
+    },
+    {
+      "url": "http://mobile.janis.localhost:3118/api",
+      "description": "The Local API server",
+      "variables": {
+        "environment": {
+          "default": "local"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/app/{id}": {
+      "get": {
+        "x-janis-namespace": "app",
+        "x-janis-method": "get",
+        "x-janis-permissions": [],
+        "operationId": "getApp",
+        "tags": [
+          "App"
+        ],
+        "summary": "Get a App",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "App found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/App"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "x-janis-namespace": "app",
+        "x-janis-method": "update",
+        "x-janis-permissions": [],
+        "operationId": "updateApp",
+        "tags": [
+          "App"
+        ],
+        "summary": "Update a App",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "requestBody": {
+          "description": "A App",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/App"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessUpdateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/app": {
+      "get": {
+        "x-janis-namespace": "app",
+        "x-janis-method": "list",
+        "x-janis-permissions": [],
+        "operationId": "listApps",
+        "tags": [
+          "App"
+        ],
+        "summary": "List Apps",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AppSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/AppFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Apps listed",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "x-janis-namespace": "app",
+        "x-janis-method": "create",
+        "x-janis-permissions": [],
+        "operationId": "createApp",
+        "tags": [
+          "App"
+        ],
+        "summary": "Create a App",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": []
+          }
+        ],
+        "requestBody": {
+          "description": "A App",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/App"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessCreateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/app/{id}/file/{fileId}": {
+      "delete": {
+        "x-janis-namespace": "app-file",
+        "x-janis-method": "delete",
+        "x-janis-permissions": [
+          "mobile:app:remove-file"
+        ],
+        "operationId": "removeOrderFile",
+        "tags": [
+          "App Attachments"
+        ],
+        "summary": "Remove a related file from an app",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          },
+          {
+            "$ref": "#/components/parameters/FileId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The file was deleted"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "get": {
+        "x-janis-namespace": "app-file",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "mobile:app:download-file"
+        ],
+        "operationId": "getOrderFile",
+        "tags": [
+          "App Attachments"
+        ],
+        "summary": "Get an app related file",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          },
+          {
+            "$ref": "#/components/parameters/FileId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The file",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/File"
+                    },
+                    {
+                      "$ref": "#/components/schemas/FileSignedGetUrl"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/app/{id}/file": {
+      "get": {
+        "x-janis-namespace": "app-file",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "mobile:app:list-files"
+        ],
+        "operationId": "listOrderFiles",
+        "tags": [
+          "App Attachments"
+        ],
+        "summary": "List app related files",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          },
+          {
+            "$ref": "#/components/parameters/FilesFilters"
+          },
+          {
+            "$ref": "#/components/parameters/FilesSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The app list files",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "x-janis-namespace": "app-file",
+        "x-janis-method": "post",
+        "x-janis-permissions": [
+          "mobile:app:upload-file"
+        ],
+        "operationId": "postOrderFile",
+        "tags": [
+          "App Attachments"
+        ],
+        "summary": "Relate a file to an app",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "requestBody": {
+          "description": "The file to be related",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "fileName": {
+                    "type": "string",
+                    "description": "The original file name that the user will recognize",
+                    "example": "file.png"
+                  },
+                  "fileSource": {
+                    "type": "string",
+                    "description": "The location of the file uploaded to AWS S3",
+                    "example": "files/clientCode/c97b76ab-488e-4d74-9198-9a805562f3d7.png"
+                  }
+                },
+                "required": [
+                  "fileName",
+                  "fileSource"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The file was related",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "$ref": "#/components/schemas/File/properties/id"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/app/{id}/file-get-credentials": {
+      "get": {
+        "x-janis-namespace": "app-file-get-credentials",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "mobile:app:upload-file"
+        ],
+        "operationId": "listFileGetCredentials",
+        "tags": [
+          "App Attachments"
+        ],
+        "summary": "Get credentials to upload files",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          },
+          {
+            "name": "fileNames",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "example": [
+                "image.png"
+              ]
+            },
+            "description": "The filenames to generate de credentials. **It is required if `fileName` is not passed.**"
+          },
+          {
+            "name": "fileName",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "image.png",
+            "description": "The filename to generate de credentials. **It is required if `fileNames` is not passed.**"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The response when the request is successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/SingleCredential"
+                    },
+                    {
+                      "$ref": "#/components/schemas/MultiplesCredentials"
+                    }
+                  ]
+                }
+              }
+            },
+            "headers": {
+              "x-amz-apigw-id": {
+                "description": "The amz-apigw's Id",
+                "schema": {
+                  "type": "string",
+                  "example": "XprvfGzWIAMFq5g="
+                }
+              },
+              "x-amzn-requestid": {
+                "description": "The amzn request's id",
+                "schema": {
+                  "type": "string",
+                  "example": "e795b572-1d9a-408b-90ad-696f3b5ce783"
+                }
+              },
+              "x-amzn-trace-id": {
+                "description": "The amzn trace's id",
+                "schema": {
+                  "type": "string",
+                  "example": "Root=1-5fda2663-57e62e67672e2d5c4ac08ee9;Sampled=0"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/download/{appName}/android/{version}": {
+      "get": {
+        "x-janis-namespace": "download",
+        "x-janis-method": "getAndroidApp",
+        "x-janis-permissions": [],
+        "operationId": "getDownloadAndroidApp",
+        "tags": [
+          "Download"
+        ],
+        "summary": "Returns the application installation file",
+        "parameters": [
+          {
+            "name": "appName",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "example": "picking",
+              "enum": [
+                "picking",
+                "delivery",
+                "wms"
+              ]
+            },
+            "required": true,
+            "description": "The app name"
+          },
+          {
+            "name": "version",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "example": "1.30.2"
+            },
+            "required": true,
+            "description": "The version of the app. The possible values are:\n\n  - `latest`\n  - A valid [Semantic Versioning](http://semver.org/spec/v2.0.0.html).\n"
+          }
+        ],
+        "responses": {
+          "302": {
+            "$ref": "#/components/responses/getDownload"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/download/{appName}/ios/{version}": {
+      "get": {
+        "x-janis-namespace": "download",
+        "x-janis-method": "getIosApp",
+        "x-janis-permissions": [],
+        "operationId": "getDownloadIosApp",
+        "tags": [
+          "Download"
+        ],
+        "summary": "Returns the application installation file",
+        "parameters": [
+          {
+            "name": "appName",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "example": "picking",
+              "enum": [
+                "picking",
+                "delivery",
+                "wms"
+              ]
+            },
+            "required": true,
+            "description": "The app name"
+          },
+          {
+            "name": "version",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "example": "1.30.2"
+            },
+            "required": true,
+            "description": "The version of the app. The possible values are:\n\n  - `latest`\n  - A valid [Semantic Versioning](http://semver.org/spec/v2.0.0.html).\n"
+          }
+        ],
+        "responses": {
+          "302": {
+            "$ref": "#/components/responses/getDownload"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-key",
+        "description": "The API Key"
+      },
+      "ApiSecret": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-secret",
+        "description": "The API Secret"
+      },
+      "JanisClient": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-client",
+        "description": "The Client Code"
+      }
+    },
+    "parameters": {
+      "id": {
+        "name": "id",
+        "in": "path",
+        "schema": {
+          "type": "string",
+          "example": "631fb04c8fe08f51a8ee5949"
+        },
+        "required": true,
+        "description": "The unique identifier of the item"
+      },
+      "ListSortDirection": {
+        "name": "sortDirection",
+        "in": "query",
+        "description": "The direction to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
+        }
+      },
+      "ListPageNumber": {
+        "name": "x-janis-page",
+        "in": "header",
+        "description": "The page to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "default": 1
+        }
+      },
+      "ListPageSize": {
+        "name": "x-janis-page-size",
+        "in": "header",
+        "description": "The page size to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "default": 60
+        }
+      },
+      "JanisEntity": {
+        "name": "janis-entity",
+        "in": "header",
+        "description": "The entity name",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "AppSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "name",
+            "packageName",
+            "version",
+            "build",
+            "os",
+            "status"
+          ]
+        }
+      },
+      "AppFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "$ref": "#/components/schemas/App/properties/name"
+            },
+            "packageName": {
+              "$ref": "#/components/schemas/App/properties/packageName"
+            },
+            "version": {
+              "$ref": "#/components/schemas/App/properties/version"
+            },
+            "build": {
+              "$ref": "#/components/schemas/App/properties/build"
+            },
+            "os": {
+              "$ref": "#/components/schemas/App/properties/os"
+            },
+            "status": {
+              "$ref": "#/components/schemas/App/properties/status"
+            }
+          }
+        }
+      },
+      "FileId": {
+        "name": "fileId",
+        "in": "path",
+        "schema": {
+          "type": "string",
+          "example": "d555345345345as67a3428"
+        },
+        "required": true,
+        "description": "The File ID"
+      },
+      "FilesSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "id",
+            "name",
+            "dateCreated"
+          ]
+        }
+      },
+      "FilesFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/File/properties/id"
+            },
+            "name": {
+              "$ref": "#/components/schemas/File/properties/name"
+            },
+            "dateCreated": {
+              "$ref": "#/components/schemas/File/properties/dateCreated"
+            }
+          }
+        }
+      }
+    },
+    "headers": {
+      "x-janis-total": {
+        "description": "The total amount of records in the list",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "responses": {
+      "SuccessCreateResponse": {
+        "description": "The item was created",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "SuccessUpdateResponse": {
+        "description": "The item was updated",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "GenericSuccess": {
+        "description": "Operation succeeded",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "BadRequest": {
+        "description": "A client error has ocurred.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Authentication missing or invalid",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Not authorized request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "InternalError": {
+        "description": "A server error has ocurred."
+      },
+      "getDownload": {
+        "description": "The file was successfully found. User should be redirected to download the file."
+      }
+    },
+    "schemas": {
+      "id": {
+        "description": "The unique identifier of the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "631fb04c8fe08f51a8ee5949"
+      },
+      "status": {
+        "description": "The item status",
+        "type": "string",
+        "default": "active",
+        "enum": [
+          "active",
+          "inactive"
+        ],
+        "example": "active"
+      },
+      "dateCreated": {
+        "description": "The date of creation",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-12T19:00:00.000Z"
+      },
+      "dateModified": {
+        "description": "The date of the last modification",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-20T19:00:00.000Z"
+      },
+      "dateCreatedDay": {
+        "description": "The day of creation",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-08-07T16:00:00.000Z"
+      },
+      "dateModifiedDay": {
+        "description": "The day of last modification",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-08-07T16:00:00.000Z"
+      },
+      "userCreated": {
+        "description": "The ID of the user who created the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "6a1fc1eeb5b68406e0487a10"
+      },
+      "userModified": {
+        "description": "The ID of the user who last modified the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "7e1fc1eeb5b68406e048796"
+      },
+      "App": {
+        "type": "object",
+        "description": "A App",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the app",
+            "example": "Janis Picking App",
+            "readOnly": true,
+            "enum": [
+              "Janis Picking App",
+              "Janis Delivery App",
+              "Janis WMS App"
+            ]
+          },
+          "packageName": {
+            "type": "string",
+            "description": "The Package name of the app",
+            "example": "in.janis.picking",
+            "enum": [
+              "in.janis.picking",
+              "in.janis.picking.qa",
+              "in.janis.picking.beta",
+              "in.janis.delivery",
+              "in.janis.delivery.qa",
+              "in.janis.delivery.beta",
+              "in.janis.wms",
+              "in.janis.wms.qa",
+              "in.janis.wms.beta"
+            ]
+          },
+          "version": {
+            "type": "string",
+            "description": "The version of the app",
+            "example": "1.2.0.qa"
+          },
+          "build": {
+            "type": "number",
+            "description": "The build number of the app",
+            "example": 132
+          },
+          "os": {
+            "type": "string",
+            "description": "The operative system of the app",
+            "example": "android",
+            "enum": [
+              "android",
+              "ios"
+            ]
+          },
+          "isMinorVersion": {
+            "type": "boolean",
+            "description": "This property determinate if is a minor version of the app",
+            "example": true
+          },
+          "status": {
+            "$ref": "#/components/schemas/status"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "packageName",
+          "version",
+          "build",
+          "os",
+          "status",
+          "userCreated",
+          "dateCreated",
+          "userModified",
+          "dateModified"
+        ]
+      },
+      "AppList": {
+        "type": "array",
+        "description": "A list of Apps",
+        "items": {
+          "$ref": "#/components/schemas/App"
+        }
+      },
+      "FileList": {
+        "type": "array",
+        "description": "A list of orders",
+        "items": {
+          "$ref": "#/components/schemas/File"
+        }
+      },
+      "File": {
+        "type": "object",
+        "description": "A file uploaded by a user",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "type": {
+            "type": "string",
+            "description": "The file type",
+            "readOnly": true,
+            "enum": [
+              "video",
+              "image",
+              "doc",
+              "sheet",
+              "other"
+            ],
+            "example": "image"
+          },
+          "name": {
+            "type": "string",
+            "description": "The file name",
+            "example": "image.png"
+          },
+          "size": {
+            "type": "integer",
+            "description": "The file size in bytes",
+            "readOnly": true,
+            "example": 2048
+          },
+          "expireAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The expiration date of the file. Upon reaching that date, the file will be removed from the DB.",
+            "readOnly": true,
+            "example": "2023-03-13T19:00:00.816Z"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "FileSignedGetUrl": {
+        "type": "object",
+        "description": "The URL of the file with a temporal signature to be downloaded",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "The URL of the file with a temporal signature to be downloaded",
+            "readOnly": true,
+            "example": "https://cdn.storage.janis.in/some-bucket-name/image.png"
+          }
+        }
+      },
+      "SingleCredential": {
+        "type": "object",
+        "title": "SingleCredential (if send parameter fileName)",
+        "description": "The name of the file.",
+        "properties": {
+          "url": {
+            "description": "The Bucket url",
+            "type": "string",
+            "example": "https://s3.amazonaws.com/janis-storage-service-beta"
+          },
+          "fields": {
+            "description": "The fields to request Amazon",
+            "type": "object",
+            "properties": {
+              "Content-Type": {
+                "description": "The content type to request Amazon",
+                "type": "string",
+                "example": "image/png"
+              },
+              "key": {
+                "description": "The request's key to put the data.\nThe key is generated by the server and is unique for each file.\n",
+                "type": "string",
+                "example": "entities: cdn/files/clientCode/2023/01/10/c97b76ab-488e-4d74-9198-9a805562f3d7.png\n"
+              },
+              "bucket": {
+                "description": "The bucket's name.\nThis must not contain uppercase characters.\n",
+                "type": "string",
+                "example": "janis-oms-service-beta"
+              },
+              "X-Amz-Algorithm": {
+                "description": "The Amz algorithm's name",
+                "type": "string",
+                "example": "AWS4-HMAC-SHA256"
+              },
+              "X-Amz-Credential": {
+                "description": "The Amz's Credential",
+                "type": "string",
+                "example": "ASIASU7VKOIIHH6UPMSE/20201216/us-east-1/s3/aws4_request"
+              },
+              "X-Amz-Date": {
+                "description": "The Amz's date",
+                "type": "string",
+                "example": "20201216T152315Z"
+              },
+              "X-Amz-Security-Token": {
+                "description": "The Amz's security Token",
+                "type": "string",
+                "example": "IQoJb3JpZ2luX2VjEHAaCXVzLWVhc3QtMSJHMEUCIC6i+ZYYprT0xz2cVLfF7+fyPGr6aoVXgBiASmdaa51nAiEA5OQNvgC2IVhuoUWiyq2XOjVtGxbJNWND+1YIyVREDdUq6AEIGBAAGgwxODI1MTM3MjU5NjgiDBY8cTcsd6kgpiBb6SrFAcgCwMhMgEq9OQ/yHXn6E782eOs8wV8/iwCD4A9sH/TbMoqnHLD+P8SB42rhizQe0H/d3y3jbLlH0Q/7AgzJfNRKN/E/NegZF+7jJvFHoNyqbhlxu7grHIzxeW0mcQdUug4celmsYznwh6RtZhrvs+Dfolo/ibpGWwMk9xFSj/bxFGYpPNHvuCAamY/68QbI+khoG8ovXp+fnVa9VWiIFFsfgrIXMhnHNOCeYZ3pXNCJMzcNST6fweelDm7Aqk++TcDKT2eoMIzL6P4FOuAB6XVcEcknqXSxOE0xdDhfmirGyJc29zRulfP8CoJfMDE0ziumeuDIkBU2JapAq6Z1nzaJTKG/d6pj9so0Un6j8QDadwKib2l9JBvPPs88saJ1LMM2YGM2DAQs60OZVtTg80tce3F0CrbNvkj3IlbMT2Xg0U+SlFwlFe5I9OvoWWhK1psKqCZtxQ/uPavp+kfNRuBAb5BbBJLt8L+0mMnhsfT85GpnrSia7WdV2JGEuHnVTyQwoabGiFyYLOyKOS5jn1CmzOAhiVXwHYk4RVnKxwwaAukwBhUmgrEf6ZTWcUM="
+              },
+              "Policy": {
+                "description": "The request's policy",
+                "type": "string",
+                "example": "eyJleHBpcmF0aW9uIjoiMjAyMC0xMi0xNlQxNToyNDoxNVoiLCJjb25kaXRpb25zIjpbWyJjb250ZW50LWxlbmd0aC1yYW5nZSIsMSwxMDQ4NTc2MF0seyJDb250ZW50LVR5cGUiOiJpbWFnZS9wbmcifSx7ImtleSI6InNpZ25pbmcta2V5cy9wdWJsaWMvY2xpZW50LWltYWdlcy81ZTdkMDc4ZmNmMjdhMTAwMDhmZTRkMTkvYzk3Yjc2YWItNDg4ZS00ZDc0LTkxOTgtOWE4MDU1NjJmM2Q3LnBuZyJ9LHsiYnVja2V0IjoiamFuaXMtaWQtc2VydmljZS1iZXRhLWNkbiJ9LHsiWC1BbXotQWxnb3JpdGhtIjoiQVdTNC1ITUFDLVNIQTI1NiJ9LHsiWC1BbXotQ3JlZGVudGlhbCI6IkFTSUFTVTdWS09JSUhINlVQTVNFLzIwMjAxMjE2L3VzLWVhc3QtMS9zMy9hd3M0X3JlcXVlc3QifSx7IlgtQW16LURhdGUiOiIyMDIwMTIxNlQxNTIzMTVaIn0seyJYLUFtei1TZWN1cml0eS1Ub2tlbiI6IklRb0piM0pwWjJsdVgyVmpFSEFhQ1hWekxXVmhjM1F0TVNKSE1FVUNJQzZpK1pZWXByVDB4ejJjVkxmRjcrZnlQR3I2YW9WWGdCaUFTbWRhYTUxbkFpRUE1T1FOdmdDMklWaHVvVVdpeXEyWE9qVnRHeGJKTldORCsxWUl5VlJFRGRVcTZBRUlHQkFBR2d3eE9ESTFNVE0zTWpVNU5qZ2lEQlk4Y1Rjc2Q2a2dwaUJiNlNyRkFjZ0N3TWhNZ0VxOU9RL3lIWG42RTc4MmVPczh3VjgvaXdDRDRBOXNIL1RiTW9xbkhMRCtQOFNCNDJyaGl6UWUwSC9kM3kzamJMbEgwUS83QWd6SmZOUktOL0UvTmVnWkYrN2pKdkZIb055cWJobHh1N2dySEl6eGVXMG1jUWRVdWc0Y2VsbXNZem53aDZSdFpocnZzK0Rmb2xvL2licEdXd01rOXhGU2ovYnhGR1lwUE5IdnVDQWFtWS82OFFiSStraG9HOG92WHArZm5WYTlWV2lJRkZzZmdySVhNaG5ITk9DZVlaM3BYTkNKTXpjTlNUNmZ3ZWVsRG03QXFrKytUY0RLVDJlb01Jekw2UDRGT3VBQjZYVmNFY2tucVhTeE9FMHhkRGhmbWlyR3lKYzI5elJ1bGZQOENvSmZNREUweml1bWV1RElrQlUySmFwQXE2WjFuemFKVEtHL2Q2cGo5c28wVW42ajhRRGFkd0tpYjJsOUpCdlBQczg4c2FKMUxNTTJZR00yREFRczYwT1pWdFRnODB0Y2UzRjBDcmJOdmtqM0lsYk1UMlhnMFUrU2xGd2xGZTVJOU92b1dXaEsxcHNLcUNadHhRL3VQYXZwK2tmTlJ1QkFiNUJiQkpMdDhMKzBtTW5oc2ZUODVHcG5yU2lhN1dkVjJKR0V1SG5WVHlRd29hYkdpRnlZTE95S09TNWpuMUNtek9BaGlWWHdIWWs0UlZuS3h3d2FBdWt3QmhVbWdyRWY2WlRXY1VNPSJ9XX0="
+              },
+              "X-Amz-Signature": {
+                "description": "The Amz's signature",
+                "type": "string",
+                "example": "fb0855d2b4fa5271b7e1ffa9712c9a37dd9ab37475ff8cce25c4650beafcc4ac"
+              }
+            }
+          }
+        }
+      },
+      "MultiplesCredentials": {
+        "description": "The data required to upload data to Amazon Bucket.",
+        "type": "object",
+        "title": "MultiplesCredentials (if send the parameter fileNames)",
+        "properties": {
+          "image.png": {
+            "$ref": "#/components/schemas/SingleCredential"
+          }
+        }
+      },
+      "listenerEvent": {
+        "description": "A JANIS Event object",
+        "type": "object",
+        "properties": {
+          "service": {
+            "description": "The source service name",
+            "type": "string",
+            "example": "id"
+          },
+          "entity": {
+            "description": "The event related entity",
+            "type": "string",
+            "example": "profile"
+          },
+          "event": {
+            "description": "The event name",
+            "type": "string",
+            "example": "created"
+          },
+          "client": {
+            "description": "The source event client",
+            "type": "string",
+            "example": "fizzmod"
+          },
+          "id": {
+            "description": "The event related entity ID",
+            "type": "string",
+            "example": "5d699c1ae8ebb95eaa24aca9"
+          }
+        },
+        "required": [
+          "service",
+          "entity",
+          "event"
+        ]
+      }
+    }
+  }
+}

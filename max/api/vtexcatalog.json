@@ -1,0 +1,5285 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "description": "Manage communication between Catalog and VTEX\n\n **Last update**: 11 feb 26, 07:03 a. m.",
+    "title": "VtexCatalog Service",
+    "version": "1.53.0",
+    "x-logo": null,
+    "x-janis-keywords": [
+      "Category",
+      "Brand",
+      "Attribute",
+      "Product",
+      "Sku",
+      "Import",
+      "Publish"
+    ],
+    "lastUpdate": "2026-02-11T10:03:36.901Z"
+  },
+  "tags": [
+    {
+      "name": "Account",
+      "description": "For managing Account"
+    },
+    {
+      "name": "Category",
+      "description": "For managing Categories"
+    },
+    {
+      "name": "Brand",
+      "description": "For managing Brands"
+    },
+    {
+      "name": "Attribute Group",
+      "description": "For managing Attributes Group"
+    },
+    {
+      "name": "Attribute",
+      "description": "For managing Attributes"
+    },
+    {
+      "name": "Product",
+      "description": "For managing Products"
+    },
+    {
+      "name": "Sku",
+      "description": "For managing Skus"
+    },
+    {
+      "name": "SalesChannel",
+      "description": "For managing Sales Channels"
+    },
+    {
+      "name": "Webhook",
+      "description": "History of Webhooks received from VTEX"
+    },
+    {
+      "name": "Webhooks",
+      "description": "This section documents the webhook events triggered by products and skus.\n\nTo learn more about Webhooks configuration, see the [Webhooks Documentation](https://docs.janis.im/docs/webhook)\n"
+    }
+  ],
+  "servers": [
+    {
+      "url": "https://vtex.catalog.janis.in/api",
+      "description": "The Prod API server",
+      "variables": {
+        "environment": {
+          "default": "prod"
+        }
+      }
+    },
+    {
+      "url": "https://vtex.catalog.janisqa.in/api",
+      "description": "The QA API server",
+      "variables": {
+        "environment": {
+          "default": "qa"
+        }
+      }
+    },
+    {
+      "url": "https://vtex.catalog.janisdev.in/api",
+      "description": "The Beta API server",
+      "variables": {
+        "environment": {
+          "default": "beta"
+        }
+      }
+    },
+    {
+      "url": "http://vtex.catalog.janis.localhost:3037/api",
+      "description": "The Local API server",
+      "variables": {
+        "environment": {
+          "default": "local"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/attribute/{id}": {
+      "get": {
+        "x-janis-namespace": "attribute",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "vtex-catalog:attribute:read"
+        ],
+        "operationId": "getAttribute",
+        "tags": [
+          "Attribute"
+        ],
+        "summary": "Get a attribute by ID",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/paramId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Attribute"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "x-janis-namespace": "attribute",
+        "x-janis-method": "update",
+        "x-janis-permissions": [
+          "catalog:attribute:write"
+        ],
+        "operationId": "updateAttribute",
+        "tags": [
+          "Attribute"
+        ],
+        "summary": "Update Attributes. Restricted to particular properties.",
+        "description": "\nUpdates particular Attribute's properties and triggers the process to publish it in **VTEX**. Also, It tries to publish **Attribute Field Values** for the **Attribute**.\n\n**Disclaimer**:\n  - Only the properties **isFilter**, **isOnProductDetails**, **isTopMenuLinkActive**, **isSideMenuLinkActive** can be modified.\n  - Only valid for already published **Attribute**.\n",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/paramId"
+          }
+        ],
+        "requestBody": {
+          "description": "The attributes to be published",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AttributeToUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The Attributes begins the process to be published"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/attribute": {
+      "get": {
+        "x-janis-namespace": "attribute",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "vtex-catalog:attribute:read"
+        ],
+        "operationId": "listAttribute",
+        "tags": [
+          "Attribute"
+        ],
+        "summary": "Get a list of Attributes",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AttributeSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/AttributeFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "x-janis-total": {
+                "description": "The total amount of records in the list",
+                "schema": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttributeList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "x-janis-namespace": "attribute",
+        "x-janis-method": "publish",
+        "x-janis-permissions": [
+          "catalog:attribute:write"
+        ],
+        "operationId": "publishAttributes",
+        "tags": [
+          "Attribute"
+        ],
+        "summary": "Publish Attributes",
+        "description": "\nBegins the process to publish **Attributes** in **VTEX**. Also, It tries to publish **Attribute Field Values** for the **Attribute**.\n\n**Disclaimer**:\n  - **Attributes Groups** must be published.\n  - If **Attribute** has `category`, **Category** must be published.\n",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "The attributes to be published",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AttributesPublishList"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The Attributes begins the process to be published"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/attribute-batch": {
+      "post": {
+        "x-janis-namespace": "attribute-batch",
+        "x-janis-method": "post",
+        "x-janis-permissions": [
+          "catalog:attribute:write"
+        ],
+        "operationId": "updateAttributeBatch",
+        "tags": [
+          "Attribute"
+        ],
+        "summary": "Massive Update Attributes",
+        "description": "\nCreate or update massive attribute items. The maximum of attributes admitted is `10000`.\n\nUpdates particular Attribute's properties and, if the account setting is enabled, it triggers the process to publish them in **VTEX**.\n\n**Disclaimer**:\n  - Only the properties **isFilter**, **isOnProductDetails**, **isTopMenuLinkActive**, **isSideMenuLinkActive** can be modified.\n  - Only valid for already published **Attributes**.\n",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "The attributes to update",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AttributeBatchList"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/BatchResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/attribute-group/{id}": {
+      "get": {
+        "x-janis-namespace": "attribute-group",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "vtex-catalog:attribute-group:read"
+        ],
+        "operationId": "getAttributeGroup",
+        "tags": [
+          "Attribute Group"
+        ],
+        "summary": "Get an Attribute Group by ID",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/paramId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttributeGroup"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/attribute-group": {
+      "get": {
+        "x-janis-namespace": "attribute-group",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "vtex-catalog:attribute-group:read"
+        ],
+        "operationId": "listAttributeGroup",
+        "tags": [
+          "Attribute Group"
+        ],
+        "summary": "Get a list of Attribute Groups",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AttributeGroupSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/AttributeGroupFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "x-janis-total": {
+                "description": "The total amount of records in the list",
+                "schema": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttributeGroupList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "x-janis-namespace": "attribute-group",
+        "x-janis-method": "publish",
+        "operationId": "publishAttributeGroups",
+        "tags": [
+          "Attribute Group"
+        ],
+        "summary": "Publish Attribute Groups",
+        "description": "\nBegins the process to publish **Attribute Groups** in **VTEX**.\n\n**Disclaimer**: Every Group will be publish with `categoryId: null`\n",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "The attribute-groups to be published",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AttributeGroupsPublishList"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The Attribute Groups begins the process to be published"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/brand/{id}": {
+      "get": {
+        "x-janis-namespace": "brand",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "vtex-catalog:brand:read"
+        ],
+        "operationId": "getBrand",
+        "tags": [
+          "Brand"
+        ],
+        "summary": "Get a brand by ID",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/paramId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Brand"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/brand": {
+      "get": {
+        "x-janis-namespace": "brand",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "vtex-catalog:brand:read"
+        ],
+        "operationId": "listBrand",
+        "tags": [
+          "Brand"
+        ],
+        "summary": "Get a list of Brands",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/BrandSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/BrandFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "x-janis-total": {
+                "description": "The total amount of records in the list",
+                "schema": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BrandList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "x-janis-namespace": "brand",
+        "x-janis-method": "publish",
+        "operationId": "publishBrands",
+        "tags": [
+          "Brand"
+        ],
+        "summary": "Publish Brands",
+        "description": "Begins the process to publish **Brands** in **VTEX**.",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "The brands to be published",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BrandsPublishList"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The Brands begins the process to be published"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/brand-pending-publish": {
+      "get": {
+        "x-janis-namespace": "brand-pending-publish",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "vtex-catalog:brand:read"
+        ],
+        "operationId": "listBrandsPendingPublish",
+        "tags": [
+          "Brand"
+        ],
+        "summary": "List Brands pending to publish",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PendingPublishItemsFilters"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Brands waiting to be published",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BrandPendingPublishList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/category/{id}": {
+      "get": {
+        "x-janis-namespace": "category",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "vtex-catalog:category:read"
+        ],
+        "operationId": "getCategory",
+        "tags": [
+          "Category"
+        ],
+        "summary": "Get a category by ID",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/paramId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Category"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/category": {
+      "get": {
+        "x-janis-namespace": "category",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "vtex-catalog:category:read"
+        ],
+        "operationId": "listCategory",
+        "tags": [
+          "Category"
+        ],
+        "summary": "Get a list of Category",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CategorySortBy"
+          },
+          {
+            "$ref": "#/components/parameters/CategoryFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "x-janis-total": {
+                "description": "The total amount of records in the list",
+                "schema": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "x-janis-namespace": "category",
+        "x-janis-method": "publish",
+        "operationId": "publishCategories",
+        "tags": [
+          "Category"
+        ],
+        "summary": "Publish Categories",
+        "description": "Begins the process to publish **Categories** in **VTEX**.",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "The categories to be published",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CategoriesPublishList"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The Categories begins the process to be published"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/category-pending-publish": {
+      "get": {
+        "x-janis-namespace": "category-pending-publish",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "vtex-catalog:category:read"
+        ],
+        "operationId": "listCategoriesPendingPublish",
+        "tags": [
+          "Category"
+        ],
+        "summary": "List Categories pending to publish",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PendingPublishItemsFilters"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Categories waiting to be published",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryPendingPublishList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/listener/vtex-commerce/account/saved": {
+      "post": {
+        "x-janis-namespace": "vtex-commerce-account",
+        "x-janis-method": "saved-listener",
+        "tags": [
+          "Account"
+        ],
+        "summary": "Vtex Commerce Account saved event listener",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "description": "Vtex Commerce Account saved event listener",
+        "operationId": "vtexAccountSavedListener",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/listenerEvent"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GenericSuccess"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/listener/vtex-commerce/sales-channel/saved": {
+      "post": {
+        "x-janis-namespace": "vtex-commerce-sales-channel",
+        "x-janis-method": "saved-listener",
+        "tags": [
+          "SalesChannel"
+        ],
+        "summary": "VTEX Commerce Sales Channel saved event listener",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "description": "VTEX Commerce Sales Channel saved event listener",
+        "operationId": "vtexCommerceSalesChannelSavedEventListener",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/listenerEvent"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GenericSuccess"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/product/{id}": {
+      "get": {
+        "x-janis-namespace": "product",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "vtex-catalog:product:read"
+        ],
+        "operationId": "getProduct",
+        "tags": [
+          "Product"
+        ],
+        "summary": "Get a Product",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/paramId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Product found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Product"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "x-janis-namespace": "product",
+        "x-janis-method": "update",
+        "x-janis-permissions": [
+          "catalog:product:write"
+        ],
+        "operationId": "updateSkus",
+        "tags": [
+          "Product"
+        ],
+        "summary": "Update Product by ID",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/paramId"
+          }
+        ],
+        "description": "Update a Product",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "The products to be updated",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "description": "A Product from VTEX",
+                "properties": {
+                  "referenceId": {
+                    "type": "string",
+                    "description": "The product's referenceId",
+                    "example": "A-product-ref-id123"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The Products begins the process to be published"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/product": {
+      "get": {
+        "x-janis-namespace": "product",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "vtex-catalog:product:read"
+        ],
+        "operationId": "listProducts",
+        "tags": [
+          "Product"
+        ],
+        "summary": "List Products",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ProductSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ProductFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Products listed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "x-janis-namespace": "product",
+        "x-janis-method": "publish",
+        "operationId": "publishProducts",
+        "tags": [
+          "Product"
+        ],
+        "summary": "Publish Products",
+        "description": "\nBegins the process to publish **Products** in **VTEX**.\n\nAlso it try to add the **Sales-Channels** for each **Product**.\n\n**Disclaimer**: Needs **Brands** and **Categories** to be published first.\n",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "The products to be published",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductsPublishList"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The Products begins the process to be published"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/product-attribute": {
+      "post": {
+        "x-janis-namespace": "product-attribute",
+        "x-janis-method": "publish",
+        "operationId": "publishProductsAttributes",
+        "tags": [
+          "Product"
+        ],
+        "summary": "Publish Products Attributes",
+        "description": "\nBegins the process to publish **Products Attributes** in **VTEX**.\n\n**Disclaimer**:\n  - **Products** must be published.\n  - **Attributes** must be published.\n",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "The product-attributes to be published",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductsAttributesPublishList"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The Products Attributes begins the process to be published"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/product-pending-publish": {
+      "get": {
+        "x-janis-namespace": "product-pending-publish",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "vtex-catalog:product:read"
+        ],
+        "operationId": "listProductsPendingPublish",
+        "tags": [
+          "Product"
+        ],
+        "summary": "List Products pending to publish",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PendingPublishItemsFilters"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Products waiting to be published",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductPendingPublishList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/sku/{id}": {
+      "get": {
+        "x-janis-namespace": "sku",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "vtex-catalog:attribute:read"
+        ],
+        "operationId": "getSku",
+        "tags": [
+          "Sku"
+        ],
+        "summary": "Get a Sku",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/paramId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sku found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Sku"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "x-janis-namespace": "sku",
+        "x-janis-method": "update",
+        "x-janis-permissions": [
+          "catalog:sku:write"
+        ],
+        "operationId": "updateProducts",
+        "tags": [
+          "Sku"
+        ],
+        "summary": "Update Sku by ID",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/paramId"
+          }
+        ],
+        "description": "Update a Sku",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "The skus to be updated",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "description": "A SKU from VTEX",
+                "properties": {
+                  "referenceId": {
+                    "type": "string",
+                    "description": "The sku's referenceId",
+                    "example": "A-sku-ref-id123"
+                  },
+                  "eans": {
+                    "type": "array",
+                    "description": "The sku's eans",
+                    "items": {
+                      "type": "string",
+                      "description": "An ean value",
+                      "example": "some-ean"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The Products begins the process to be published"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/sku": {
+      "get": {
+        "x-janis-namespace": "sku",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "vtex-catalog:sku:read"
+        ],
+        "operationId": "listSkus",
+        "tags": [
+          "Sku"
+        ],
+        "summary": "List Skus",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/SkuSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/SkuFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Skus listed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SkuList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "x-janis-namespace": "sku",
+        "x-janis-method": "publish",
+        "operationId": "publishSkus",
+        "tags": [
+          "Sku"
+        ],
+        "summary": "Publish SKUs",
+        "description": "\nBegins the process to publish **SKUs** in **VTEX**.\n\nAlso it try to publish the **EANs** for each **SKU**.\n\n**Disclaimer**:\n  - Needs **Products** to be published first.\n  - **SKUs** new or without **Images** with *Status Active* will be published with `IsActive: false` until **Images** are added.\n",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "The SKUs to be published",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SkusPublishList"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The SKUs begins the process to be published"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/sku-image": {
+      "post": {
+        "x-janis-namespace": "sku-image",
+        "x-janis-method": "publish",
+        "operationId": "publishSkuImages",
+        "tags": [
+          "Sku"
+        ],
+        "summary": "Publish SKUs Images",
+        "description": "\nBegins the process to publish **Images** for the given **SKUs** in **VTEX**.\n\nAlso, It updates the current **SKU** `images` field data.\n\n**Disclaimer**: Needs **SKUs** to be published first.\n",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "The new, modified or deleted **Images** for **SKUs** to be published",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SkusImagesPublishList"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The SKUs Images begins the process to be published"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/sku-pending-publish": {
+      "get": {
+        "x-janis-namespace": "sku-pending-publish",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "vtex-catalog:sku:read"
+        ],
+        "operationId": "listSkusPendingPublish",
+        "tags": [
+          "Sku"
+        ],
+        "summary": "List Skus pending to publish",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PendingPublishItemsFilters"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Skus waiting to be published",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SkuPendingPublishList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/vtex-attribute": {
+      "get": {
+        "x-janis-namespace": "vtex-attribute",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "vtex-catalog:attribute:read"
+        ],
+        "operationId": "getVtexAttribute",
+        "tags": [
+          "Attribute"
+        ],
+        "summary": "Get VTEX attribute for the Attribute",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/vtexId"
+          },
+          {
+            "$ref": "#/components/parameters/accountId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The VTEX Attribute"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/vtex-attribute-group": {
+      "get": {
+        "x-janis-namespace": "vtex-attribute-group",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "vtex-catalog:attribute-group:read"
+        ],
+        "operationId": "getVtexAttributeGroup",
+        "tags": [
+          "Attribute Group"
+        ],
+        "summary": "Get VTEX attribute group for the current Attribute Group",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/vtexId"
+          },
+          {
+            "$ref": "#/components/parameters/accountId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The VTEX Attribute Group"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/vtex-brand": {
+      "get": {
+        "x-janis-namespace": "vtex-brand",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "vtex-catalog:brand:read"
+        ],
+        "operationId": "getVtexBrand",
+        "tags": [
+          "Brand"
+        ],
+        "summary": "Get VTEX brand for the Brand",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/vtexId"
+          },
+          {
+            "$ref": "#/components/parameters/accountId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The VTEX Brand"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/vtex-category": {
+      "get": {
+        "x-janis-namespace": "vtex-category",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "vtex-catalog:category:read"
+        ],
+        "operationId": "getVtexCategory",
+        "tags": [
+          "Category"
+        ],
+        "summary": "Get VTEX category for the Category",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/vtexId"
+          },
+          {
+            "$ref": "#/components/parameters/accountId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The VTEX Category"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/vtex-product": {
+      "get": {
+        "x-janis-namespace": "vtex-product",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "vtex-catalog:product:read"
+        ],
+        "operationId": "getVtexProduct",
+        "tags": [
+          "Product"
+        ],
+        "summary": "Get VTEX product for the Product",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/vtexId"
+          },
+          {
+            "$ref": "#/components/parameters/accountId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The VTEX Product"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/vtex-sku": {
+      "get": {
+        "x-janis-namespace": "vtex-sku",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "vtex-catalog:sku:read"
+        ],
+        "operationId": "getVtexSku",
+        "tags": [
+          "Sku"
+        ],
+        "summary": "Get VTEX sku for the Sku",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/vtexId"
+          },
+          {
+            "$ref": "#/components/parameters/accountId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The VTEX Sku"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/webhook-history": {
+      "get": {
+        "x-janis-namespace": "webhook-history",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "vtex-catalog:webhook-history:read"
+        ],
+        "operationId": "listWebhookHistories",
+        "tags": [
+          "Webhook"
+        ],
+        "summary": "List Webhook Histories",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/WebhookHistorySortBy"
+          },
+          {
+            "$ref": "#/components/parameters/WebhookHistoryFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Webhook Histories listed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WebhookHistoryList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "id": {
+        "description": "The unique identifier of the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "d555345345345as67a342a"
+      },
+      "commerceId": {
+        "type": "string",
+        "example": "1234",
+        "description": "\nThe ID used by the external platform related to this record (e.g, VTEX, Magento).\n"
+      },
+      "catalogId": {
+        "description": "The unique identifier of the item in [Catalog](/v2/service/catalog) Service",
+        "type": "string",
+        "example": "f555345345345as67a3400"
+      },
+      "status": {
+        "description": "The item status",
+        "type": "string",
+        "enum": [
+          "active",
+          "inactive"
+        ],
+        "example": "active"
+      },
+      "pendingPublishStatus": {
+        "type": "string",
+        "description": "The Sku Pending status. It will be `pendingPublish` if there is a publish process running, otherwise it will be `stoppedPublish`",
+        "enum": [
+          "pendingPublish",
+          "stoppedPublish"
+        ],
+        "example": "pendingPublish"
+      },
+      "dateCreated": {
+        "description": "The date of creation",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-12T19:59:51.801Z"
+      },
+      "dateModified": {
+        "description": "The date of the last modification",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-20T19:59:51.801Z"
+      },
+      "userCreated": {
+        "description": "The ID of the user who created the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "6a1fc1eeb5b68406e0487a10"
+      },
+      "userModified": {
+        "description": "The ID of the user who last modified the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "7e1fc1eeb5b68406e048796"
+      },
+      "dateCreatedDay": {
+        "description": "The Schema's date created day",
+        "type": "string",
+        "format": "date-time",
+        "example": "2019-07-12T19:59:51.801Z"
+      },
+      "dateModifiedDay": {
+        "description": "The Schema's date modified day",
+        "type": "string",
+        "format": "date-time",
+        "example": "2019-07-12T19:59:51.801Z"
+      },
+      "notifiedDateRange": {
+        "type": "object",
+        "description": "The day of notification to S3 by date range",
+        "properties": {
+          "from": {
+            "$ref": "#/components/schemas/dateFrom"
+          },
+          "to": {
+            "$ref": "#/components/schemas/dateTo"
+          }
+        }
+      },
+      "dateFrom": {
+        "type": "string",
+        "description": "Date from",
+        "format": "date-time",
+        "example": "2019-08-07T16:00:00.000Z"
+      },
+      "dateTo": {
+        "type": "string",
+        "description": "Date to",
+        "format": "date-time",
+        "example": "2019-08-07T16:00:00.000Z"
+      },
+      "vtexId": {
+        "description": "The Item Vtex ID",
+        "type": "number",
+        "readOnly": true,
+        "example": 20
+      },
+      "accountId": {
+        "description": "The Item's [Vtex-Commerce Account](/v2/service/vtex-commerce#tag/Account) ID",
+        "type": "string",
+        "readOnly": true,
+        "example": "1d1fc1eeb5b68406e0487a11"
+      },
+      "accountName": {
+        "description": "The Item's [Vtex-Commerce Account](/v2/service/vtex-commerce#tag/Account) Name",
+        "type": "string",
+        "example": "defaultAccount"
+      },
+      "accounts": {
+        "type": "array",
+        "description": "List of [Vtex-Commerce Accounts](/v2/service/vtex-commerce#tag/Account) ID",
+        "items": {
+          "$ref": "#/components/schemas/accountId"
+        }
+      },
+      "import": {
+        "type": "object",
+        "description": "The Item's import properties",
+        "properties": {
+          "status": {
+            "description": "The Item's import status",
+            "readOnly": true,
+            "type": "string",
+            "enum": [
+              "pending",
+              "publishError",
+              "publishing",
+              "processing",
+              "imported",
+              "notModified",
+              "published"
+            ],
+            "example": "pending"
+          },
+          "startDate": {
+            "description": "The Item's import start date",
+            "readOnly": true,
+            "type": "string",
+            "format": "date-time",
+            "example": "2019-12-09T18:44:50.637Z"
+          },
+          "endDate": {
+            "description": "The Item's import end date",
+            "readOnly": true,
+            "type": "string",
+            "format": "date-time",
+            "example": "2019-12-09T18:44:50.637Z"
+          },
+          "message": {
+            "description": "A message about the importation",
+            "type": "string",
+            "readOnly": true,
+            "example": "Importation ok but some changes are required"
+          },
+          "errorMessage": {
+            "description": "A message about the importation",
+            "type": "string",
+            "readOnly": true,
+            "example": "Importation fails because .."
+          }
+        }
+      },
+      "publish": {
+        "type": "object",
+        "description": "The Item's publish properties",
+        "properties": {
+          "status": {
+            "description": "The Item's publish status",
+            "readOnly": true,
+            "type": "string",
+            "enum": [
+              "readyForPublish",
+              "notModified",
+              "publishError",
+              "published"
+            ],
+            "example": "published"
+          },
+          "startDate": {
+            "description": "The Item's publish start date",
+            "readOnly": true,
+            "type": "string",
+            "format": "date-time",
+            "example": "2020-12-09T17:44:50.637Z"
+          },
+          "endDate": {
+            "description": "The Item's publish end date",
+            "readOnly": true,
+            "type": "string",
+            "format": "date-time",
+            "example": "2020-12-09T18:44:50.637Z"
+          },
+          "message": {
+            "description": "A message about the publish",
+            "type": "string",
+            "readOnly": true,
+            "example": "Ok but some changes are required"
+          },
+          "errorMessage": {
+            "description": "A message about the publish",
+            "type": "string",
+            "readOnly": true,
+            "example": "Fails because ..."
+          }
+        }
+      },
+      "Attribute": {
+        "description": "An Attribute",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "vtexId": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/vtexId"
+              }
+            ],
+            "example": 400
+          },
+          "accountId": {
+            "$ref": "#/components/schemas/accountId"
+          },
+          "catalogId": {
+            "$ref": "#/components/schemas/catalogId"
+          },
+          "name": {
+            "description": "The Attribute name",
+            "type": "string",
+            "example": "Dimension"
+          },
+          "referenceId": {
+            "description": "The Attribute referenceId",
+            "type": "string",
+            "example": "400"
+          },
+          "description": {
+            "description": "The Attribute's description",
+            "type": "number",
+            "readOnly": true,
+            "example": "Dimension"
+          },
+          "fieldGroupID": {
+            "description": "The Attribute's Group ID in VTEX",
+            "type": "number",
+            "readOnly": true,
+            "example": 20
+          },
+          "fieldGroupName": {
+            "description": "The Attribute's Group Name",
+            "type": "string",
+            "readOnly": true,
+            "example": "Features"
+          },
+          "fieldTypeId": {
+            "description": "\nThe Attribute's Type ID in VTEX\n\n- text: 1\n- bigger-text or multi-line-text: 2\n- number: 4\n- combo: 5\n- radio: 6\n- checkbox: 7\n- indexed-text: 8\n- indexed-bigger-text or indexed-multi-line-text: 9\n",
+            "type": "number",
+            "readOnly": true,
+            "enum": [
+              1,
+              2,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9
+            ],
+            "example": 9
+          },
+          "categoryId": {
+            "description": "Attribute's Group's Category VTEX ID. Can be `null`",
+            "type": "number",
+            "example": 0,
+            "readOnly": true,
+            "nullable": true
+          },
+          "isFilter": {
+            "description": "True to allow the attribute to be used as a facet (filter) on the VTEX search navigation bar.",
+            "type": "boolean",
+            "readOnly": true,
+            "example": true
+          },
+          "isRequired": {
+            "description": "If Attribute is a Required",
+            "type": "boolean",
+            "example": true
+          },
+          "isSideMenuLinkActive": {
+            "description": "True to make the attribute field clickable in the VTEX search navigation bar.",
+            "type": "boolean",
+            "readOnly": true,
+            "example": false
+          },
+          "isTopMenuLinkActive": {
+            "description": "True to make the attribute visible in the VTEX store's upper menu.",
+            "type": "boolean",
+            "readOnly": true,
+            "example": false
+          },
+          "isOnProductDetails": {
+            "description": "True to set the attribute as visible on the VTEX product page.",
+            "readOnly": true,
+            "type": "boolean",
+            "example": true
+          },
+          "isStockKeepingUnit": {
+            "description": "If Attribute is applies to SKU",
+            "type": "boolean",
+            "example": true,
+            "default": false
+          },
+          "isWizard": {
+            "description": "If Attribute is a Wizard",
+            "type": "boolean",
+            "readOnly": true,
+            "example": false
+          },
+          "position": {
+            "description": "The Attribute's position",
+            "type": "number",
+            "readOnly": true,
+            "example": 1
+          },
+          "defaultValue": {
+            "description": "The Attribute's default value. Admits `string` and `number`",
+            "type": "string",
+            "readOnly": true,
+            "example": 1
+          },
+          "values": {
+            "description": "The list of Attribute Value",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AttributeValue"
+            }
+          },
+          "publish": {
+            "$ref": "#/components/schemas/publish"
+          },
+          "import": {
+            "$ref": "#/components/schemas/import"
+          },
+          "status": {
+            "$ref": "#/components/schemas/status"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          }
+        }
+      },
+      "AttributeValue": {
+        "description": "An Attribute's Value",
+        "type": "object",
+        "properties": {
+          "fieldValueID": {
+            "description": "The Attribute's Value ID",
+            "type": "number",
+            "readOnly": true,
+            "example": 100
+          },
+          "value": {
+            "description": "The Attribute Value",
+            "type": "string",
+            "readOnly": true,
+            "example": "pixel"
+          },
+          "isActive": {
+            "description": "If Attribute Value is Active. If it is `false`, this Attribute Value does not exist in Janis",
+            "type": "boolean",
+            "readOnly": true,
+            "example": true,
+            "default": true
+          },
+          "position": {
+            "description": "The Attribute Value's position",
+            "type": "number",
+            "readOnly": true,
+            "example": 1
+          },
+          "publishStatus": {
+            "description": "The Attribute Value's publish status",
+            "readOnly": true,
+            "type": "string",
+            "enum": [
+              "readyForPublish",
+              "notModified",
+              "publishError",
+              "published"
+            ],
+            "example": "published"
+          },
+          "publishMessage": {
+            "description": "A message about the publish",
+            "type": "string",
+            "readOnly": true,
+            "nullable": true,
+            "example": "Item has no changes."
+          }
+        }
+      },
+      "AttributePublish": {
+        "description": "A Attribute to be published in VTEX",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/catalogId"
+          },
+          "name": {
+            "$ref": "#/components/schemas/Attribute/properties/name"
+          },
+          "referenceId": {
+            "$ref": "#/components/schemas/Attribute/properties/referenceId"
+          },
+          "accounts": {
+            "$ref": "#/components/schemas/accounts"
+          },
+          "fieldType": {
+            "description": "The Attribute's Field Type",
+            "type": "string",
+            "enum": [
+              "text",
+              "bigger-text",
+              "number",
+              "combo",
+              "radio",
+              "checkbox",
+              "indexed-text",
+              "indexed-bigger-text"
+            ],
+            "example": "text"
+          },
+          "group": {
+            "description": "The [Attribute Group ID](v2/service/catalog#tag/Attribute-Group) in Catalog Service",
+            "type": "string",
+            "example": "6ab5345345345as67a3400"
+          },
+          "category": {
+            "description": "The [Category ID](v2/service/catalog#tag/Category) in Catalog Service",
+            "type": "string",
+            "example": "7ab5345345345as67a3400"
+          },
+          "isRequired": {
+            "$ref": "#/components/schemas/Attribute/properties/isRequired"
+          },
+          "appliesToSkus": {
+            "$ref": "#/components/schemas/Attribute/properties/isStockKeepingUnit"
+          },
+          "options": {
+            "description": "The list of Attributes options, the Attribute Value in VTEX",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": "pixel"
+            }
+          },
+          "status": {
+            "$ref": "#/components/schemas/status"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "referenceId",
+          "accounts",
+          "fieldType",
+          "status"
+        ]
+      },
+      "AttributesPublishList": {
+        "description": "A list of Attributes to be published",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/AttributePublish"
+        }
+      },
+      "AttributeList": {
+        "description": "The list data",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Attribute"
+        }
+      },
+      "AttributeToUpdate": {
+        "description": "An Attribute to update",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "vtexId": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/vtexId"
+              }
+            ],
+            "example": 400
+          },
+          "accountId": {
+            "$ref": "#/components/schemas/accountId"
+          },
+          "isFilter": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Attribute/properties/isFilter"
+              }
+            ],
+            "readOnly": false
+          },
+          "isOnProductDetails": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Attribute/properties/isOnProductDetails"
+              }
+            ],
+            "readOnly": false
+          },
+          "isTopMenuLinkActive": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Attribute/properties/isTopMenuLinkActive"
+              }
+            ],
+            "readOnly": false
+          },
+          "isSideMenuLinkActive": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Attribute/properties/isSideMenuLinkActive"
+              }
+            ],
+            "readOnly": false
+          }
+        },
+        "required": [
+          "vtexId",
+          "accountId"
+        ]
+      },
+      "AttributeBatchList": {
+        "description": "The list of Attributes",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/AttributeBatch"
+        },
+        "maxItems": 10000
+      },
+      "AttributeBatch": {
+        "description": "A Attribute for Massive Saved",
+        "type": "object",
+        "properties": {
+          "vtexId": {
+            "$ref": "#/components/schemas/Attribute/properties/vtexId"
+          },
+          "referenceId": {
+            "$ref": "#/components/schemas/Attribute/properties/referenceId"
+          },
+          "accountReferenceId": {
+            "description": "The Item's [Vtex-Commerce Account](/v2/service/vtex-commerce#tag/Account) referenceId",
+            "type": "string",
+            "example": "defaultAccount"
+          },
+          "isFilter": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Attribute/properties/isFilter"
+              }
+            ],
+            "readOnly": false
+          },
+          "isOnProductDetails": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Attribute/properties/isOnProductDetails"
+              }
+            ],
+            "readOnly": false
+          },
+          "isTopMenuLinkActive": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Attribute/properties/isTopMenuLinkActive"
+              }
+            ],
+            "readOnly": false
+          },
+          "isSideMenuLinkActive": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Attribute/properties/isSideMenuLinkActive"
+              }
+            ],
+            "readOnly": false
+          }
+        },
+        "required": [
+          "referenceId",
+          "accountReferenceId"
+        ]
+      },
+      "AttributeGroup": {
+        "description": "An Attribute's Group from VTEX",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "vtexId": {
+            "$ref": "#/components/schemas/vtexId"
+          },
+          "accountId": {
+            "$ref": "#/components/schemas/accountId"
+          },
+          "name": {
+            "description": "The Attribute's Group name",
+            "type": "string",
+            "example": "Special Features"
+          },
+          "referenceId": {
+            "description": "Attribute's Group's reference ID",
+            "type": "string",
+            "example": "special-features-ref"
+          },
+          "categoryId": {
+            "description": "Attribute's Group's Category VTEX ID. Can be `null`",
+            "type": "number",
+            "example": 0,
+            "readOnly": true,
+            "nullable": true
+          },
+          "position": {
+            "description": "Attribute's Group's position respect the other groups. Can be `null`.",
+            "type": "number",
+            "example": 4,
+            "readOnly": true,
+            "nullable": true
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "import": {
+            "$ref": "#/components/schemas/publish"
+          },
+          "publish": {
+            "$ref": "#/components/schemas/publish"
+          }
+        }
+      },
+      "AttributeGroupPublish": {
+        "description": "A Brand to be published in VTEX",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/catalogId"
+          },
+          "name": {
+            "$ref": "#/components/schemas/AttributeGroup/properties/name"
+          },
+          "referenceId": {
+            "$ref": "#/components/schemas/AttributeGroup/properties/referenceId"
+          },
+          "accounts": {
+            "$ref": "#/components/schemas/accounts"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "referenceId",
+          "accounts"
+        ]
+      },
+      "AttributeGroupsPublishList": {
+        "description": "A list of Attribute's Group to be published",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/AttributeGroupPublish"
+        }
+      },
+      "AttributeGroupList": {
+        "description": "The list data",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/AttributeGroup"
+        }
+      },
+      "Brand": {
+        "description": "A Brand from VTEX",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "catalogId": {
+            "$ref": "#/components/schemas/catalogId"
+          },
+          "vtexId": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/vtexId"
+              }
+            ],
+            "example": 10
+          },
+          "accountId": {
+            "$ref": "#/components/schemas/accountId"
+          },
+          "name": {
+            "description": "The Brand name",
+            "type": "string",
+            "readOnly": true,
+            "example": "some brand"
+          },
+          "title": {
+            "description": "The Brand's title",
+            "type": "number",
+            "readOnly": true,
+            "example": "Some Brand"
+          },
+          "referenceId": {
+            "description": "Brand's referenceId",
+            "type": "string",
+            "example": "coffee-purple-ref"
+          },
+          "description": {
+            "description": "The Description",
+            "type": "string",
+            "readOnly": true,
+            "example": "Some Brand for branding"
+          },
+          "keywords": {
+            "type": "string",
+            "description": "Brand's keywords",
+            "example": "coffee, purple, beans, drink"
+          },
+          "slug": {
+            "type": "string",
+            "description": "Brand's slug",
+            "example": "purple-coffee"
+          },
+          "status": {
+            "$ref": "#/components/schemas/status"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "import": {
+            "$ref": "#/components/schemas/import"
+          },
+          "publish": {
+            "type": "object",
+            "description": "The Brand's publish properties",
+            "properties": {
+              "startDate": {
+                "$ref": "#/components/schemas/publish/properties/startDate"
+              },
+              "endDate": {
+                "$ref": "#/components/schemas/publish/properties/endDate"
+              },
+              "message": {
+                "$ref": "#/components/schemas/publish/properties/message"
+              },
+              "errorMessage": {
+                "$ref": "#/components/schemas/publish/properties/errorMessage"
+              },
+              "status": {
+                "description": "The Brand's publish status",
+                "readOnly": true,
+                "type": "string",
+                "enum": [
+                  "readyForPublish",
+                  "pendingToCreate",
+                  "pendingToUpdate",
+                  "pendingToVerify",
+                  "published",
+                  "notModified",
+                  "error"
+                ],
+                "example": "published"
+              }
+            }
+          }
+        }
+      },
+      "BrandPublish": {
+        "description": "A Brand to be published in VTEX",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/catalogId"
+          },
+          "name": {
+            "$ref": "#/components/schemas/Brand/properties/name"
+          },
+          "referenceId": {
+            "$ref": "#/components/schemas/Brand/properties/referenceId"
+          },
+          "accounts": {
+            "$ref": "#/components/schemas/accounts"
+          },
+          "slug": {
+            "$ref": "#/components/schemas/Brand/properties/slug"
+          },
+          "description": {
+            "$ref": "#/components/schemas/Brand/properties/description"
+          },
+          "keywords": {
+            "$ref": "#/components/schemas/Brand/properties/keywords"
+          },
+          "title": {
+            "$ref": "#/components/schemas/Brand/properties/title"
+          },
+          "status": {
+            "$ref": "#/components/schemas/Brand/properties/status"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "referenceId",
+          "accounts",
+          "status"
+        ]
+      },
+      "BrandsPublishList": {
+        "description": "A list of Brands to be published",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/BrandPublish"
+        }
+      },
+      "BrandList": {
+        "description": "The list data",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Brand"
+        }
+      },
+      "BrandPendingPublishList": {
+        "type": "array",
+        "description": "A list of Brands Pending to be published",
+        "items": {
+          "$ref": "#/components/schemas/PendingPublishItem"
+        }
+      },
+      "Category": {
+        "description": "A Category from VTEX",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "catalogId": {
+            "$ref": "#/components/schemas/catalogId"
+          },
+          "vtexId": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/vtexId"
+              }
+            ],
+            "example": 20
+          },
+          "accountId": {
+            "$ref": "#/components/schemas/accountId"
+          },
+          "name": {
+            "description": "The Category name",
+            "type": "string",
+            "example": "Coffee"
+          },
+          "title": {
+            "description": "The Category's title",
+            "type": "string",
+            "example": "Coffee"
+          },
+          "referenceId": {
+            "description": "The Category's reference Id",
+            "type": "string",
+            "example": "coffee-ref-id"
+          },
+          "parentId": {
+            "description": "The Parent Category Vtex Id",
+            "type": "number",
+            "readOnly": true,
+            "example": 49
+          },
+          "description": {
+            "description": "The Category Description",
+            "type": "string",
+            "example": "Every Coffee grain or product related"
+          },
+          "slug": {
+            "description": "Category's slug",
+            "type": "string",
+            "example": "coffee"
+          },
+          "keywords": {
+            "description": "Category's keywords",
+            "type": "string",
+            "example": "cofffee, grain, drink, breakfast"
+          },
+          "globalCategoryId": {
+            "description": "Google Global Category Id",
+            "type": "number",
+            "readOnly": true,
+            "example": 11
+          },
+          "globalCategoryName": {
+            "description": "Google Global Category Name",
+            "type": "string",
+            "readOnly": true,
+            "example": "coffee"
+          },
+          "activeStoreFrontLink": {
+            "description": "Is active store front link",
+            "type": "boolean",
+            "readOnly": true,
+            "example": true
+          },
+          "showBrandFilter": {
+            "description": "If show brand filter",
+            "type": "boolean",
+            "readOnly": true,
+            "example": true
+          },
+          "showInStoreFront": {
+            "description": "If show in store front",
+            "type": "boolean",
+            "readOnly": true,
+            "example": true
+          },
+          "stockKeepingUnitSelectionMode": {
+            "description": "Stock Keeping Unit Selection Mode",
+            "type": "string",
+            "readOnly": true,
+            "example": "SPECIFICATION"
+          },
+          "hasChildren": {
+            "description": "If Category has Children",
+            "type": "boolean",
+            "readOnly": true,
+            "example": false
+          },
+          "parentCatalogId": {
+            "description": "The Parent Category's Id in Catalog Service",
+            "type": "string",
+            "example": "5d1fc1eeb5b68406e0487a06"
+          },
+          "importError": {
+            "description": "If Category has an error in last import",
+            "type": "boolean",
+            "readOnly": true,
+            "example": false
+          },
+          "status": {
+            "$ref": "#/components/schemas/status"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "import": {
+            "$ref": "#/components/schemas/import"
+          },
+          "publish": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/publish"
+              }
+            ],
+            "properties": {
+              "status": {
+                "description": "The Category's publish status",
+                "readOnly": true,
+                "type": "string",
+                "enum": [
+                  "pending",
+                  "readyForPublish",
+                  "notModified",
+                  "waitingForFiles",
+                  "publishError",
+                  "published"
+                ],
+                "example": "published"
+              }
+            }
+          }
+        }
+      },
+      "CategoryPublish": {
+        "description": "A Category to be published in VTEX",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/catalogId"
+          },
+          "name": {
+            "$ref": "#/components/schemas/Category/properties/name"
+          },
+          "referenceId": {
+            "$ref": "#/components/schemas/Category/properties/referenceId"
+          },
+          "accounts": {
+            "$ref": "#/components/schemas/accounts"
+          },
+          "parentId": {
+            "$ref": "#/components/schemas/Category/properties/parentCatalogId"
+          },
+          "slug": {
+            "$ref": "#/components/schemas/Category/properties/slug"
+          },
+          "description": {
+            "$ref": "#/components/schemas/Category/properties/description"
+          },
+          "keywords": {
+            "$ref": "#/components/schemas/Category/properties/keywords"
+          },
+          "title": {
+            "$ref": "#/components/schemas/Category/properties/title"
+          },
+          "status": {
+            "$ref": "#/components/schemas/Category/properties/status"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "referenceId",
+          "accounts",
+          "status"
+        ]
+      },
+      "CategoriesPublishList": {
+        "description": "A list of Categories to be published",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/CategoryPublish"
+        }
+      },
+      "CategoryList": {
+        "description": "The list data",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Category"
+        }
+      },
+      "CategoryPendingPublishList": {
+        "type": "array",
+        "description": "A list of Categories Pending to be published",
+        "items": {
+          "$ref": "#/components/schemas/PendingPublishItem"
+        }
+      },
+      "listenerEvent": {
+        "description": "A JANIS Event object",
+        "type": "object",
+        "properties": {
+          "service": {
+            "description": "The source service name",
+            "type": "string",
+            "example": "id"
+          },
+          "entity": {
+            "description": "The event related entity",
+            "type": "string",
+            "example": "profile"
+          },
+          "event": {
+            "description": "The event name",
+            "type": "string",
+            "example": "created"
+          },
+          "client": {
+            "description": "The source event client",
+            "type": "string",
+            "example": "fizzmod"
+          },
+          "id": {
+            "description": "The event related entity ID",
+            "type": "string",
+            "example": "5d699c1ae8ebb95eaa24aca9"
+          }
+        },
+        "required": [
+          "service",
+          "entity",
+          "event"
+        ]
+      },
+      "PendingPublishItem": {
+        "type": "object",
+        "description": "An Item from VTEX",
+        "properties": {
+          "catalogId": {
+            "$ref": "#/components/schemas/catalogId"
+          },
+          "referenceId": {
+            "type": "string",
+            "description": "The item reference id",
+            "example": "item-ref-id-123"
+          },
+          "accountId": {
+            "$ref": "#/components/schemas/accountId"
+          },
+          "accountName": {
+            "$ref": "#/components/schemas/accountName"
+          },
+          "dateNotified": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "status": {
+            "$ref": "#/components/schemas/pendingPublishStatus"
+          }
+        }
+      },
+      "Product": {
+        "type": "object",
+        "description": "A Product from VTEX",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "catalogId": {
+            "$ref": "#/components/schemas/catalogId"
+          },
+          "vtexId": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/vtexId"
+              }
+            ],
+            "example": 100
+          },
+          "accountId": {
+            "$ref": "#/components/schemas/accountId"
+          },
+          "referenceId": {
+            "type": "string",
+            "description": "The product's referenceId",
+            "example": "A-product-ref-id123"
+          },
+          "name": {
+            "type": "string",
+            "description": "The product's name",
+            "example": "A product name"
+          },
+          "title": {
+            "type": "string",
+            "description": "The product's title",
+            "example": "A title for a product"
+          },
+          "brandId": {
+            "type": "number",
+            "description": "The product's brand's id",
+            "readOnly": true,
+            "example": 10
+          },
+          "categoryId": {
+            "type": "number",
+            "description": "The product's category's id",
+            "readOnly": true,
+            "example": 20
+          },
+          "description": {
+            "type": "string",
+            "description": "The product's description",
+            "example": "A full description of the product"
+          },
+          "descriptionShort": {
+            "type": "string",
+            "description": "The product's short description",
+            "readOnly": true,
+            "example": "A short description of the product"
+          },
+          "metaTagDescription": {
+            "type": "string",
+            "description": "The product's meta tag description",
+            "readOnly": true,
+            "example": "A meta tag description"
+          },
+          "keywords": {
+            "type": "string",
+            "description": "The product's keywords",
+            "example": "nice, easyUseProduct, cheap"
+          },
+          "departmentId": {
+            "type": "number",
+            "description": "The product's department's id",
+            "readOnly": true,
+            "example": 321
+          },
+          "linkId": {
+            "type": "string",
+            "description": "The product's link's id",
+            "example": "product-slug"
+          },
+          "listStoreId": {
+            "type": "array",
+            "description": "The product's stores ids",
+            "readOnly": true,
+            "items": {
+              "type": "number",
+              "description": "A store id",
+              "example": 321
+            }
+          },
+          "showWithoutStock": {
+            "type": "boolean",
+            "description": "Indicates if product is shown without stock",
+            "readOnly": true,
+            "example": false
+          },
+          "isVisible": {
+            "type": "boolean",
+            "description": "Indicates if product is visible",
+            "readOnly": true,
+            "example": true
+          },
+          "taxCode": {
+            "type": "string",
+            "description": "The product's taxCode",
+            "readOnly": true,
+            "example": "a-tax-code"
+          },
+          "attributes": {
+            "type": "array",
+            "description": "The Attribute's option values assigned to the Product",
+            "items": {
+              "$ref": "#/components/schemas/ProductAttributes"
+            }
+          },
+          "status": {
+            "$ref": "#/components/schemas/status"
+          },
+          "import": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/import"
+              }
+            ],
+            "properties": {
+              "attributeStatus": {
+                "description": "The Product Attributes Value's import status.",
+                "type": "string",
+                "enum": [
+                  "pending",
+                  "imported",
+                  "notModified",
+                  "publishError",
+                  "published"
+                ],
+                "example": "published"
+              }
+            }
+          },
+          "publish": {
+            "$ref": "#/components/schemas/publish"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          }
+        }
+      },
+      "ProductPublish": {
+        "description": "A Product to be published in VTEX",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/catalogId"
+          },
+          "name": {
+            "$ref": "#/components/schemas/Product/properties/name"
+          },
+          "referenceId": {
+            "$ref": "#/components/schemas/Product/properties/referenceId"
+          },
+          "commerceId": {
+            "$ref": "#/components/schemas/commerceId"
+          },
+          "accounts": {
+            "$ref": "#/components/schemas/accounts"
+          },
+          "brand": {
+            "type": "string",
+            "description": "The [Catalog Brand](/v2/service/catalog#tag/Brand)'s ID",
+            "example": "5d1fc1eeb5b68406e0487b00"
+          },
+          "category": {
+            "type": "string",
+            "description": "The [Catalog Category](/v2/service/catalog#tag/Category)'s ID",
+            "example": "5d1fc1eeb5b68406e0487c000"
+          },
+          "salesChannels": {
+            "type": "array",
+            "description": "List of [Commerce Sales-Channels](/v2/service/commerce#tag/Sales-Channels)'s ID",
+            "items": {
+              "type": "string",
+              "description": "Commerce Sales-Channel's ID",
+              "example": "5d1fc1eeb5b68406e0480000"
+            }
+          },
+          "salesChannelsToAdd": {
+            "type": "array",
+            "description": "List of [Commerce Sales-Channels](/v2/service/commerce#tag/Sales-Channels)'s ID to be added.",
+            "items": {
+              "type": "string",
+              "description": "Commerce Sales-Channel's ID",
+              "example": "5d1fc1eeb5b68406e0480000"
+            }
+          },
+          "salesChannelsToRemove": {
+            "type": "array",
+            "description": "List of [Commerce Sales-Channels](/v2/service/commerce#tag/Sales-Channels)'s ID to be removed",
+            "items": {
+              "type": "string",
+              "description": "Commerce Sales-Channel's ID",
+              "example": "5d1fc1eeb5b68406e0480000"
+            }
+          },
+          "slug": {
+            "$ref": "#/components/schemas/Product/properties/linkId"
+          },
+          "description": {
+            "$ref": "#/components/schemas/Product/properties/description"
+          },
+          "keywords": {
+            "$ref": "#/components/schemas/Product/properties/keywords"
+          },
+          "title": {
+            "$ref": "#/components/schemas/Product/properties/title"
+          },
+          "status": {
+            "$ref": "#/components/schemas/Product/properties/status"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "referenceId",
+          "accounts",
+          "status"
+        ]
+      },
+      "ProductsPublishList": {
+        "description": "A list of Products to be published",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/ProductPublish"
+        }
+      },
+      "ProductAttributes": {
+        "description": "A Product Attributes",
+        "type": "object",
+        "readOnly": true,
+        "properties": {
+          "value": {
+            "description": "The Attribute Option values",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "Min",
+              "Max"
+            ]
+          },
+          "id": {
+            "description": "The Attribute VTEX ID.",
+            "type": "number",
+            "example": 10
+          },
+          "name": {
+            "description": "The Attribute Name.",
+            "type": "string",
+            "example": "Power"
+          },
+          "publishStatus": {
+            "description": "The Product Attribute Value's publish status",
+            "type": "string",
+            "enum": [
+              "readyForPublish",
+              "notModified",
+              "publishError",
+              "published"
+            ],
+            "example": "published"
+          },
+          "publishMessage": {
+            "description": "A message about the publish",
+            "type": "string",
+            "nullable": true,
+            "example": "Item has no changes."
+          },
+          "importStatus": {
+            "description": "The Product Attribute Value's import status",
+            "type": "string",
+            "enum": [
+              "imported",
+              "notModified",
+              "publishError",
+              "published"
+            ],
+            "example": "published"
+          },
+          "importMessage": {
+            "description": "A message about the import",
+            "type": "string",
+            "nullable": true,
+            "example": "Item has no changes."
+          }
+        }
+      },
+      "ProductList": {
+        "type": "array",
+        "description": "A list of Products",
+        "items": {
+          "$ref": "#/components/schemas/Product"
+        }
+      },
+      "ProductAttributesPublish": {
+        "description": "A Product Attributes to be published in VTEX",
+        "type": "object",
+        "properties": {
+          "productId": {
+            "description": "The [Product ID](/v2/service/catalog#tag/Product) in Catalog Service",
+            "type": "string",
+            "example": "6ab5345345345as67a3400"
+          },
+          "accounts": {
+            "$ref": "#/components/schemas/accounts"
+          },
+          "attributes": {
+            "description": "\nThe **Attributes** assigned to a **Product**.\n\n- `Property name *` : The [Attribute ID](/v2/service/catalog#tag/Attribute) in Catalog Service\n- values: the possible options for an **Attribute**. Must respect the `fieldType`.\n",
+            "type": "object",
+            "additionalProperties": {
+              "type": "string, number or array"
+            },
+            "example": {
+              "609987d246cb3f0012aae0c0": "red",
+              "609988379c21b2c0b2635dc1": 5,
+              "5d1fc1eeb5b68406e0487a06": [
+                "cm"
+              ]
+            }
+          }
+        },
+        "required": [
+          "productId",
+          "accounts",
+          "attributes"
+        ]
+      },
+      "ProductsAttributesPublishList": {
+        "description": "A list of Products Attributes to be published",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/ProductAttributesPublish"
+        }
+      },
+      "ProductPendingPublishList": {
+        "type": "array",
+        "description": "A list of Products Pending to be published",
+        "items": {
+          "$ref": "#/components/schemas/PendingPublishItem"
+        }
+      },
+      "RetryPublishErrorsPayload": {
+        "description": "Payload to retry to publish all error records",
+        "type": "object",
+        "properties": {
+          "account": {
+            "description": "The [Vtex-Commerce Account](/v2/service/vtex-commerce#tag/Account) ID for which to retry publishing items",
+            "type": "string",
+            "example": "1d1fc1eeb5b68406e0487a11"
+          }
+        },
+        "required": [
+          "account"
+        ]
+      },
+      "Sku": {
+        "type": "object",
+        "description": "A Sku from VTEX",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "catalogId": {
+            "$ref": "#/components/schemas/catalogId"
+          },
+          "vtexId": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/vtexId"
+              }
+            ],
+            "example": 500
+          },
+          "accountId": {
+            "$ref": "#/components/schemas/accountId"
+          },
+          "skuName": {
+            "type": "string",
+            "description": "The sku's name",
+            "example": "sku-123"
+          },
+          "nameComplete": {
+            "type": "string",
+            "description": "The complete sku's name",
+            "example": "complete-sku-123"
+          },
+          "referenceId": {
+            "type": "string",
+            "description": "The sku's reference id",
+            "example": "ref-id-123"
+          },
+          "measurementUnit": {
+            "type": "string",
+            "description": "The sku's measurment units",
+            "example": "meters"
+          },
+          "unitMultiplier": {
+            "type": "number",
+            "description": "The product's unit multiplier",
+            "example": 1
+          },
+          "productId": {
+            "type": "number",
+            "description": "The sku's product id",
+            "example": 100
+          },
+          "productName": {
+            "type": "string",
+            "description": "The sku's product name",
+            "example": "a-product-name-123"
+          },
+          "productRefId": {
+            "type": "string",
+            "description": "The sku's product reference id",
+            "example": "product-ref-id-123"
+          },
+          "productDescription": {
+            "type": "string",
+            "description": "The sku's product description",
+            "example": "A description of the product"
+          },
+          "productGlobalCategoryId": {
+            "type": "number",
+            "description": "The sku's global product id",
+            "example": 20
+          },
+          "productClusterIds": {
+            "type": "string",
+            "description": "The sku's products cluster ids concatenated with commas",
+            "example": "20, 49, 123"
+          },
+          "productCategoryIds": {
+            "type": "string",
+            "description": "The product's categories ids",
+            "example": "20/49/123"
+          },
+          "productCategories": {
+            "type": "array",
+            "description": "The product's productCategories",
+            "items": {
+              "type": "object",
+              "description": "A product's category",
+              "properties": {
+                "productCategoryId": {
+                  "type": "string",
+                  "description": "A product's category Id",
+                  "example": 100
+                },
+                "productCategoryName": {
+                  "type": "string",
+                  "description": "A product's category name",
+                  "example": "some-name"
+                }
+              }
+            }
+          },
+          "productIsVisible": {
+            "type": "boolean",
+            "description": "Is true if the sku's product is visible",
+            "example": false
+          },
+          "productSpecifications": {
+            "type": "array",
+            "description": "The sku's product specifications",
+            "items": {
+              "type": "object",
+              "description": "A product's specifications",
+              "properties": {
+                "fieldId": {
+                  "type": "number",
+                  "description": "The specification's id",
+                  "example": 123
+                },
+                "fieldName": {
+                  "type": "string",
+                  "description": "The specification's name",
+                  "example": "some-name"
+                },
+                "fieldValuesIds": {
+                  "type": "array",
+                  "description": "The specification's value's id",
+                  "items": {
+                    "type": "number",
+                    "description": "The value's id",
+                    "example": 123
+                  }
+                },
+                "fieldValues": {
+                  "type": "array",
+                  "description": "The specification's values",
+                  "items": {
+                    "type": "string",
+                    "description": "The values",
+                    "example": "some-value"
+                  }
+                }
+              }
+            }
+          },
+          "salesChannels": {
+            "type": "array",
+            "description": "The sku's sales channels",
+            "items": {
+              "type": "string",
+              "description": "A sales channel's id",
+              "example": "some-id-123"
+            }
+          },
+          "brandName": {
+            "type": "string",
+            "description": "The sku's brand name",
+            "example": "a-brand-name-123"
+          },
+          "brandId": {
+            "type": "number",
+            "description": "The sku's brand id",
+            "example": 10
+          },
+          "categories": {
+            "type": "array",
+            "description": "The sku's categories",
+            "items": {
+              "type": "string",
+              "description": "A category",
+              "example": "some-category-name"
+            }
+          },
+          "eans": {
+            "type": "array",
+            "description": "The sku's eans",
+            "items": {
+              "type": "string",
+              "description": "An ean value",
+              "example": "some-ean"
+            }
+          },
+          "eansToPublish": {
+            "type": "array",
+            "description": "The sku's eans after publish, it is a temporary field",
+            "items": {
+              "type": "string",
+              "description": "An ean value",
+              "example": "some-ean"
+            }
+          },
+          "skuSellers": {
+            "type": "array",
+            "description": "The sku's sellers",
+            "items": {
+              "type": "object",
+              "description": "Some seller information",
+              "properties": {
+                "sellerId": {
+                  "type": "number",
+                  "description": "Some seller's id",
+                  "example": 123
+                },
+                "stockKeepingUnitId": {
+                  "type": "number",
+                  "description": "The seller's stock keepint unit's id",
+                  "example": 321
+                },
+                "sellerStockKeepingUnitId": {
+                  "type": "number",
+                  "description": "The seller's seller stock keeping unit's id",
+                  "example": 876
+                },
+                "isActive": {
+                  "type": "boolean",
+                  "description": "Is true if the seller is active",
+                  "example": true
+                },
+                "freigthCommissionPercentage": {
+                  "type": "number",
+                  "description": "The seller's freigth commission percentage",
+                  "example": 90
+                },
+                "productCommissionPercentage": {
+                  "type": "number",
+                  "description": "The seller's product commission percentage",
+                  "example": 20
+                }
+              }
+            }
+          },
+          "commercialConditionId": {
+            "type": "number",
+            "description": "The sku's commercial condition id",
+            "example": 963
+          },
+          "manufacturerCode": {
+            "type": "string",
+            "description": "The sku's manufacturer code",
+            "example": "code-manufaturer-123"
+          },
+          "dimension": {
+            "type": "object",
+            "description": "The sku's dimension",
+            "properties": {
+              "cubicweight": {
+                "type": "number",
+                "description": "The dimension's cubic weight",
+                "example": 1
+              },
+              "height": {
+                "type": "number",
+                "description": "The dimension's height",
+                "example": 1
+              },
+              "length": {
+                "type": "number",
+                "description": "The dimension's length",
+                "example": 1
+              },
+              "weight": {
+                "type": "number",
+                "description": "The dimension's weight",
+                "example": 1
+              },
+              "width": {
+                "type": "number",
+                "description": "The dimension's width",
+                "example": 1
+              }
+            }
+          },
+          "realDimension": {
+            "type": "object",
+            "description": "The sku's dimension",
+            "properties": {
+              "realCubicweight": {
+                "type": "number",
+                "description": "The real dimension's cubic weight",
+                "example": 1
+              },
+              "realHeight": {
+                "type": "number",
+                "description": "The real dimension's height",
+                "example": 1
+              },
+              "realLength": {
+                "type": "number",
+                "description": "The real dimension's length",
+                "example": 1
+              },
+              "realWeight": {
+                "type": "number",
+                "description": "The real dimension's weight",
+                "example": 1
+              },
+              "realWidth": {
+                "type": "number",
+                "description": "The real dimension's width",
+                "example": 1
+              }
+            }
+          },
+          "mainImageUrl": {
+            "type": "object",
+            "description": "The sku's image url",
+            "properties": {
+              "url": {
+                "type": "string",
+                "description": "The sku's image url",
+                "example": "https://some.vtex.com.br/images/arquivos/id/1/front.png?v=100"
+              }
+            }
+          },
+          "images": {
+            "type": "array",
+            "description": "The sku's images",
+            "items": {
+              "description": "An image",
+              "type": "object",
+              "properties": {
+                "imageUrl": {
+                  "type": "string",
+                  "description": "Image's url",
+                  "example": "https://some.vtex.com.br/images/arquivos/id/1234/front.png?v=101",
+                  "readOnly": true
+                },
+                "imageName": {
+                  "type": "string",
+                  "description": "Image's name",
+                  "example": "Front Picture",
+                  "readOnly": true
+                },
+                "fileId": {
+                  "type": "string",
+                  "description": "Image's file id",
+                  "example": 1234,
+                  "readOnly": true
+                },
+                "catalogId": {
+                  "description": "The sku-image Catalog Id",
+                  "type": "string",
+                  "example": "5d1fc1eeb5b68406e0487fff",
+                  "readOnly": true
+                },
+                "importStatus": {
+                  "description": "The sku-image import status",
+                  "type": "string",
+                  "enum": [
+                    "pendingToPublish",
+                    "notModified",
+                    "published",
+                    "publishError"
+                  ],
+                  "example": "published",
+                  "readOnly": true
+                },
+                "importMessage": {
+                  "description": "A message about the importation",
+                  "type": "string",
+                  "example": "Image updated in Catalog",
+                  "readOnly": true
+                },
+                "publishStatus": {
+                  "description": "The sku-image publish status",
+                  "type": "string",
+                  "enum": [
+                    "pendingToCreate",
+                    "pendingToUpdate",
+                    "pendingToDelete",
+                    "notModified",
+                    "published",
+                    "publishError"
+                  ],
+                  "example": "published",
+                  "readOnly": true
+                },
+                "publishErrorMessage": {
+                  "description": "A message if an error when the image is being published",
+                  "type": "string",
+                  "example": "Cannot delete Image because ...",
+                  "readOnly": true
+                }
+              }
+            }
+          },
+          "videos": {
+            "type": "string",
+            "description": "The sku's video url",
+            "example": "some-url/1234"
+          },
+          "keyWords": {
+            "type": "string",
+            "description": "The sku's keywords",
+            "example": "keyword1, keyword2"
+          },
+          "skuSpecifications": {
+            "type": "array",
+            "description": "The sku's specifications",
+            "items": {
+              "type": "object",
+              "description": "The sku Specifications",
+              "properties": {
+                "fieldId": {
+                  "type": "number",
+                  "description": "The specification's id",
+                  "example": 123
+                },
+                "fieldName": {
+                  "type": "string",
+                  "description": "The specification's name",
+                  "example": "some-name"
+                },
+                "fieldValuesIds": {
+                  "type": "array",
+                  "description": "The specification's value's id",
+                  "items": {
+                    "type": "number",
+                    "description": "The value's id",
+                    "example": 123
+                  }
+                },
+                "fieldValues": {
+                  "type": "array",
+                  "description": "The specification's values",
+                  "items": {
+                    "type": "string",
+                    "description": "The values",
+                    "example": "some-value"
+                  }
+                }
+              }
+            }
+          },
+          "modalType": {
+            "type": "string",
+            "description": "The sku's modal type",
+            "example": "some-modal-type-123"
+          },
+          "taxCode": {
+            "type": "string",
+            "description": "The sku's tax code",
+            "example": "some-sku-tax-code"
+          },
+          "kitItems": {
+            "type": "array",
+            "description": "The sku's kitItems",
+            "items": {
+              "type": "string",
+              "description": "A kit items",
+              "example": "some-item"
+            }
+          },
+          "collections": {
+            "type": "array",
+            "description": "The sku's collections",
+            "items": {
+              "type": "string",
+              "description": "A collection",
+              "example": "some-collection"
+            }
+          },
+          "detailUrl": {
+            "type": "string",
+            "description": "The sku's detail url",
+            "example": "some-url/123"
+          },
+          "informationSource": {
+            "type": "string",
+            "description": "The sku's information source",
+            "example": "some-information-source"
+          },
+          "isGiftCardRecharge": {
+            "type": "boolean",
+            "description": "Is true if the sku is a gift card recharge",
+            "example": true
+          },
+          "isInventoried": {
+            "type": "boolean",
+            "description": "Is true if the sku is inventoried",
+            "example": true
+          },
+          "isTransported": {
+            "type": "boolean",
+            "description": "Is true if the sku is transported",
+            "example": true
+          },
+          "rewardValue": {
+            "type": "string",
+            "description": "The sku's reward value",
+            "example": "Some reward value"
+          },
+          "showIfNotAvailable": {
+            "type": "boolean",
+            "description": "Is true if sku is shown if available",
+            "example": true
+          },
+          "services": {
+            "type": "array",
+            "description": "The sku's services",
+            "items": {
+              "type": "string",
+              "description": "A service",
+              "example": "some-service"
+            }
+          },
+          "attachments": {
+            "type": "array",
+            "description": "The sku's attachments",
+            "items": {
+              "type": "object",
+              "description": "An attachments",
+              "properties": {
+                "id": {
+                  "type": "number",
+                  "description": "Some attachments's id",
+                  "example": 123
+                },
+                "name": {
+                  "type": "string",
+                  "description": "Some attachments's name",
+                  "example": "some-name"
+                },
+                "keys": {
+                  "type": "array",
+                  "description": "Some attachments's keys",
+                  "items": {
+                    "type": "string",
+                    "description": "a key",
+                    "example": "some-key"
+                  }
+                },
+                "fields": {
+                  "type": "array",
+                  "description": "Some attachments's fields",
+                  "items": {
+                    "type": "object",
+                    "description": "Some attachments's field",
+                    "properties": {
+                      "fieldName": {
+                        "type": "string",
+                        "description": "Some field's name",
+                        "example": "some-name"
+                      },
+                      "maxCharacters": {
+                        "type": "string",
+                        "description": "Some field's max MaxCharacters",
+                        "example": "123-field-max"
+                      },
+                      "domainValues": {
+                        "type": "string",
+                        "description": "Some field's domain value",
+                        "example": "some-domain-value-123"
+                      }
+                    }
+                  }
+                },
+                "isActive": {
+                  "type": "boolean",
+                  "description": "Is true if the attachments is active",
+                  "example": false
+                },
+                "isRequired": {
+                  "type": "boolean",
+                  "description": "Is true if the attachments is required",
+                  "example": false
+                }
+              }
+            }
+          },
+          "attributes": {
+            "type": "array",
+            "description": "The sku's attributes",
+            "items": {
+              "type": "object",
+              "description": "A sku's attribute",
+              "properties": {
+                "id": {
+                  "type": "number",
+                  "description": "The attribute's Vtex id. This refer to the `vtexId` of the **Attribute** Entity. See [Product](/v2/service/vtex-catalog#tag/Attribute).",
+                  "example": 20
+                },
+                "name": {
+                  "type": "string",
+                  "description": "The attribute's name. This refer to the `name` of the **Attribute** Entity. See [Product](/v2/service/vtex-catalog#tag/Attribute).",
+                  "example": "Resolution"
+                },
+                "values": {
+                  "type": "string",
+                  "description": "The SKU Attribute's value value. This refer to the `values` of the **Sku-Attribute** Entity. See [Product](/v2/service/catalog#tag/SkuAttribute).",
+                  "example": "4K"
+                },
+                "valueFieldId": {
+                  "type": "number",
+                  "description": "The SKU attribute's value field Vtex Id. This refer to the `valueFieldId` of the **Attribute** Entity. See [Product](/v2/service/vtex-catalog#tag/Attribute).",
+                  "example": 100
+                },
+                "publishStatus": {
+                  "type": "string",
+                  "description": "The status of publish SKU Attribute in Vtex",
+                  "enum": [
+                    "readyForPublish",
+                    "publishError",
+                    "published"
+                  ],
+                  "example": "published"
+                },
+                "publishMessage": {
+                  "type": "string",
+                  "description": "A message of the result of publish SKU Attribute in VTEX, if it's empty no message is sent as response. Errors messages are the main use."
+                }
+              }
+            },
+            "readOnly": true
+          },
+          "import": {
+            "$ref": "#/components/schemas/import"
+          },
+          "publish": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/publish"
+              }
+            ],
+            "properties": {
+              "status": {
+                "description": "The SKU's publish status",
+                "readOnly": true,
+                "type": "string",
+                "enum": [
+                  "readyForPublish",
+                  "notModified",
+                  "waitingForFiles",
+                  "publishError",
+                  "published"
+                ],
+                "example": "published"
+              }
+            }
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "status": {
+            "$ref": "#/components/schemas/status"
+          }
+        }
+      },
+      "SkuPublish": {
+        "description": "A Sku to be published in VTEX",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/catalogId"
+          },
+          "name": {
+            "$ref": "#/components/schemas/Sku/properties/skuName"
+          },
+          "referenceId": {
+            "$ref": "#/components/schemas/Sku/properties/referenceId"
+          },
+          "commerceId": {
+            "$ref": "#/components/schemas/commerceId"
+          },
+          "accounts": {
+            "$ref": "#/components/schemas/accounts"
+          },
+          "product": {
+            "$ref": "#/components/schemas/Product/properties/catalogId"
+          },
+          "eans": {
+            "$ref": "#/components/schemas/Sku/properties/eans"
+          },
+          "sellingMeasurementUnit": {
+            "$ref": "#/components/schemas/Sku/properties/measurementUnit"
+          },
+          "sellingUnitMultiplier": {
+            "$ref": "#/components/schemas/Sku/properties/unitMultiplier"
+          },
+          "measures": {
+            "$ref": "#/components/schemas/SkuMeasures"
+          },
+          "packageMeasures": {
+            "$ref": "#/components/schemas/SkuPackageMeasures"
+          },
+          "status": {
+            "$ref": "#/components/schemas/Sku/properties/status"
+          },
+          "manufacturerCode": {
+            "$ref": "#/components/schemas/Sku/properties/manufacturerCode"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "referenceId",
+          "accounts",
+          "status"
+        ]
+      },
+      "SkusPublishList": {
+        "description": "A list of SKUs to be published",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/SkuPublish"
+        }
+      },
+      "SkuMeasures": {
+        "description": "Sku measures",
+        "type": "object",
+        "properties": {
+          "height": {
+            "description": "Sku's height",
+            "type": "number",
+            "example": 1
+          },
+          "width": {
+            "description": "Sku's width",
+            "type": "number",
+            "example": 1
+          },
+          "depth": {
+            "description": "Sku's depth",
+            "type": "number",
+            "example": 1
+          },
+          "weight": {
+            "description": "Sku's weight",
+            "type": "number",
+            "example": 1
+          }
+        }
+      },
+      "SkuPackageMeasures": {
+        "description": "Sku package measures",
+        "type": "object",
+        "properties": {
+          "height": {
+            "description": "Sku's package height",
+            "type": "number",
+            "example": 1
+          },
+          "width": {
+            "description": "Sku's package width",
+            "type": "number",
+            "example": 1
+          },
+          "depth": {
+            "description": "Sku's package depth",
+            "type": "number",
+            "example": 1
+          },
+          "weight": {
+            "description": "Sku's package weight",
+            "type": "number",
+            "example": 1
+          }
+        }
+      },
+      "SkuList": {
+        "type": "array",
+        "description": "A list of Skus",
+        "items": {
+          "$ref": "#/components/schemas/Sku"
+        }
+      },
+      "SkuImageBase": {
+        "description": "A Sku to be published in **VTEX**",
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "This refers to the `id` of a **SKU-Image** in **Janis Catalog** Service. See [SKU-Image](/v2/service/catalog#tag/Sku-Image)",
+            "type": "string",
+            "example": "6d1fc1eeb5b68406e0487a00"
+          },
+          "title": {
+            "description": "This refers to the `title` of a **SKU-Image** in **Janis Catalog** Service. See [SKU-Image](/v2/service/catalog#tag/Sku-Image)",
+            "type": "string",
+            "example": "Some Good Image"
+          },
+          "sku": {
+            "description": "This refers to the `id` of a **SKU** in **Janis Catalog** Service. See [SKU](/v2/service/catalog#tag/Sku)",
+            "type": "string",
+            "example": "5d1fc1eeb5b68406e0487a00"
+          },
+          "accounts": {
+            "type": "array",
+            "description": "A list of `id` of a **Account** in **Janis Vtex-Commerce** Service. See [Account](/v2/service/vtex-commerce#tag/Account)",
+            "items": {
+              "type": "string",
+              "description": "An Account's `id`",
+              "example": "5d1fc1eeb5b68406e0487a00"
+            }
+          },
+          "url": {
+            "description": "This refers to the *public URL* of a **SKU-Image** in **Janis Catalog** Service. See [SKU](/v2/service/catalog#tag/Sku-Image)",
+            "type": "string",
+            "example": "https://cdn.catalog.janis.in/defaultClient/sku-images/5d1fc1eeb5b68406e0487a00/image.png"
+          }
+        },
+        "required": [
+          "id",
+          "sku",
+          "accounts",
+          "url"
+        ]
+      },
+      "SkuImageNew": {
+        "type": "object",
+        "description": "When an image is New",
+        "properties": {
+          "isNew": {
+            "description": "Indicates if the Image must be created in **VTEX**",
+            "type": "boolean",
+            "example": true
+          }
+        },
+        "required": [
+          "isNew"
+        ]
+      },
+      "SkuImageModified": {
+        "type": "object",
+        "description": "When an image is Modified",
+        "properties": {
+          "isModified": {
+            "description": "Indicates if the Image must be updated in **VTEX**",
+            "type": "boolean",
+            "example": true
+          }
+        },
+        "required": [
+          "isModified"
+        ]
+      },
+      "SkuImageDeleted": {
+        "type": "object",
+        "description": "When an image is Deleted",
+        "properties": {
+          "isDeleted": {
+            "description": "Indicates if the Image must be deleted in **VTEX**",
+            "type": "boolean",
+            "example": true
+          }
+        },
+        "required": [
+          "isDeleted"
+        ]
+      },
+      "SkuImagePublish": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/SkuImageBase"
+          },
+          {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SkuImageNew"
+              },
+              {
+                "$ref": "#/components/schemas/SkuImageModified"
+              },
+              {
+                "$ref": "#/components/schemas/SkuImageDeleted"
+              }
+            ]
+          }
+        ]
+      },
+      "SkusImagesPublishList": {
+        "description": "A list of Skus Images to be published",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/SkuImagePublish"
+        }
+      },
+      "SkuPendingPublishList": {
+        "type": "array",
+        "description": "A list of Skus Pending to be published",
+        "items": {
+          "$ref": "#/components/schemas/PendingPublishItem"
+        }
+      },
+      "WebhookHistory": {
+        "description": "A Webhook History",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "accountId": {
+            "$ref": "#/components/schemas/accountId"
+          },
+          "accountVtexName": {
+            "type": "string",
+            "description": "The VTEX account name",
+            "readOnly": true,
+            "example": "fizzmodarg"
+          },
+          "skusVtexIds": {
+            "type": "array",
+            "description": "The SKUs ids in VTEX",
+            "items": {
+              "$ref": "#/components/schemas/vtexId"
+            },
+            "minItems": 1
+          },
+          "skusQuantity": {
+            "type": "number",
+            "description": "The SKUs quantity the listener received from VTEX",
+            "readOnly": true,
+            "example": 1,
+            "minimum": 1
+          },
+          "status": {
+            "description": "The status of the Webhook History record.\n- `dispatched` is when the Import process could be started successfully\n- `error` is when the Import process could not be started. On this cases the field `errorType` is completed with to explain the error origin.\n",
+            "readOnly": true,
+            "type": "string",
+            "enum": [
+              "dispatched",
+              "error"
+            ],
+            "example": "dispatched"
+          },
+          "errorType": {
+            "description": "The error type explains the origin of the error.\n- `AccountNotFound` is when the Account could not be matched by the account vtexName\n- `AccountIsInactive` is when the Account was matched but is no active\n- `AccountSettingIsOff` is when the Account was matched but the setting importPricesSync is not true\n",
+            "readOnly": true,
+            "type": "string",
+            "enum": [
+              "accountNotFound",
+              "accountIsInactive",
+              "accountSettingIsOff"
+            ],
+            "example": "AccountSettingIsOff"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          }
+        },
+        "required": [
+          "id",
+          "accountId",
+          "accountVtexName",
+          "skusVtexIds",
+          "status"
+        ]
+      },
+      "WebhookHistoryList": {
+        "type": "array",
+        "description": "A list of Webhook Histories",
+        "items": {
+          "$ref": "#/components/schemas/WebhookHistory"
+        }
+      },
+      "VtexCatalogWebhookService": {
+        "description": "The service that sends the message",
+        "type": "string",
+        "example": "vtex-catalog",
+        "enum": [
+          "vtex-catalog"
+        ]
+      },
+      "ImportReferenceIdError": {
+        "type": "object",
+        "properties": {
+          "referenceId": {
+            "type": "string",
+            "description": "The referenceId that is trying to be changed in the entity and cause conflict",
+            "example": "GTIN-0400007101271"
+          }
+        }
+      },
+      "ProductWebhookEntity": {
+        "description": "The entity related to the event",
+        "type": "string",
+        "example": "product",
+        "enum": [
+          "product"
+        ]
+      },
+      "ProductImportErrorWebhook": {
+        "description": "The product metadata",
+        "type": "array",
+        "items": {
+          "oneOf": [
+            {
+              "$ref": "#/components/schemas/ProductImportReferenceIdError"
+            }
+          ]
+        }
+      },
+      "ProductImportReferenceIdError": {
+        "type": "object",
+        "properties": {
+          "referenceId": {
+            "type": "string",
+            "description": "The referenceId that is trying to be changed in the entity and cause conflict",
+            "example": "GTIN-0400007101271"
+          },
+          "productId": {
+            "type": "string",
+            "description": "The vtex-catalog internal ID from the Product that wanted to change its referenceId",
+            "example": "8f490cf07dd0e44144ed08a0"
+          },
+          "conflictProductId": {
+            "type": "string",
+            "description": "The vtex-catalog internal ID from the Product that has the referenceId",
+            "example": "7f490cf07dd0e44144ed08a0"
+          }
+        }
+      },
+      "SkuWebhookEntity": {
+        "description": "The entity related to the event",
+        "type": "string",
+        "example": "sku",
+        "enum": [
+          "sku"
+        ]
+      },
+      "SkuImportErrorWebhook": {
+        "description": "The sku metadata",
+        "type": "array",
+        "items": {
+          "oneOf": [
+            {
+              "$ref": "#/components/schemas/SkuImportReferenceIdError"
+            },
+            {
+              "$ref": "#/components/schemas/SkuImportEanError"
+            }
+          ]
+        }
+      },
+      "SkuImportReferenceIdError": {
+        "type": "object",
+        "properties": {
+          "referenceId": {
+            "type": "string",
+            "description": "The referenceId that is trying to be changed in the entity and cause conflict",
+            "example": "GTIN-0400007101271"
+          },
+          "skuId": {
+            "type": "string",
+            "description": "The vtex-catalog internal ID from the Sku that wanted to change its referenceId",
+            "example": "8f490cf07dd0e44144ed08a0"
+          },
+          "conflictSkuId": {
+            "type": "string",
+            "description": "The vtex-catalog internal ID from the Sku that has the referenceId",
+            "example": "7f490cf07dd0e44144ed08a0"
+          }
+        }
+      },
+      "SkuImportEanError": {
+        "type": "object",
+        "properties": {
+          "ean": {
+            "type": "string",
+            "description": "The ean that is trying to be changed in the entity and cause conflict",
+            "example": "400007000000"
+          },
+          "skuId": {
+            "type": "string",
+            "description": "The vtex-catalog internal ID from the Sku that wanted to change its ean",
+            "example": "8f490cf07dd0e44144ed08a0"
+          },
+          "conflictSkuId": {
+            "type": "string",
+            "description": "The vtex-catalog internal ID from the Sku that has the ean",
+            "example": "7f490cf07dd0e44144ed08a0"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-key",
+        "description": "The API Key"
+      },
+      "ApiSecret": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-secret",
+        "description": "The API Secret"
+      },
+      "JanisClient": {
+        "type": "apiKey",
+        "name": "janis-client",
+        "in": "header",
+        "description": "The name of the client"
+      }
+    },
+    "parameters": {
+      "ListSortDirection": {
+        "name": "sortDirection",
+        "in": "query",
+        "description": "The direction to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
+        }
+      },
+      "ListPageNumber": {
+        "name": "x-janis-page",
+        "in": "header",
+        "description": "The page to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "default": 1
+        }
+      },
+      "ListPageSize": {
+        "name": "x-janis-page-size",
+        "in": "header",
+        "description": "The page size to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "default": 60
+        }
+      },
+      "paramId": {
+        "name": "id",
+        "in": "path",
+        "schema": {
+          "type": "string",
+          "example": "d555345345345as67a342a"
+        },
+        "required": true,
+        "description": "The entity item identification"
+      },
+      "vtexId": {
+        "in": "query",
+        "name": "vtexId",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "description": "The VTEX Item ID"
+      },
+      "accountId": {
+        "in": "query",
+        "name": "accountId",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "description": "The Janis Account ID"
+      },
+      "AttributeSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "id",
+            "accountId",
+            "vtexId",
+            "name",
+            "fieldGroupName",
+            "dateCreated",
+            "publish.status",
+            "publish.endDate"
+          ]
+        }
+      },
+      "AttributeFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/Attribute/properties/id"
+            },
+            "vtexId": {
+              "$ref": "#/components/schemas/Attribute/properties/vtexId"
+            },
+            "accountId": {
+              "$ref": "#/components/schemas/Attribute/properties/accountId"
+            },
+            "catalogId": {
+              "$ref": "#/components/schemas/catalogId"
+            },
+            "name": {
+              "$ref": "#/components/schemas/Attribute/properties/name"
+            },
+            "referenceId": {
+              "$ref": "#/components/schemas/AttributeGroup/properties/referenceId"
+            },
+            "fieldGroupName": {
+              "$ref": "#/components/schemas/Attribute/properties/fieldGroupName"
+            },
+            "dateCreatedDay": {
+              "$ref": "#/components/schemas/dateCreatedDay"
+            },
+            "publish.status": {
+              "$ref": "#/components/schemas/publish/properties/status"
+            }
+          }
+        }
+      },
+      "AttributeGroupSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "accountId",
+            "vtexId",
+            "name",
+            "position",
+            "dateCreated",
+            "import.status",
+            "publish.status",
+            "publish.endDate"
+          ]
+        }
+      },
+      "AttributeGroupFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/AttributeGroup/properties/id"
+            },
+            "vtexId": {
+              "$ref": "#/components/schemas/AttributeGroup/properties/vtexId"
+            },
+            "accountId": {
+              "$ref": "#/components/schemas/AttributeGroup/properties/accountId"
+            },
+            "name": {
+              "$ref": "#/components/schemas/AttributeGroup/properties/name"
+            },
+            "referenceId": {
+              "$ref": "#/components/schemas/AttributeGroup/properties/referenceId"
+            },
+            "position": {
+              "$ref": "#/components/schemas/AttributeGroup/properties/position"
+            },
+            "dateCreatedDay": {
+              "$ref": "#/components/schemas/dateCreatedDay"
+            },
+            "publish.status": {
+              "$ref": "#/components/schemas/publish/properties/status"
+            }
+          }
+        }
+      },
+      "BrandSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "id",
+            "accountId",
+            "vtexId",
+            "name",
+            "title",
+            "dateCreated",
+            "import.status",
+            "publish.status"
+          ]
+        }
+      },
+      "BrandFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/Brand/properties/id"
+            },
+            "vtexId": {
+              "$ref": "#/components/schemas/Brand/properties/vtexId"
+            },
+            "accountId": {
+              "$ref": "#/components/schemas/Brand/properties/accountId"
+            },
+            "catalogId": {
+              "$ref": "#/components/schemas/catalogId"
+            },
+            "name": {
+              "$ref": "#/components/schemas/Brand/properties/name"
+            },
+            "referenceId": {
+              "$ref": "#/components/schemas/Brand/properties/referenceId"
+            },
+            "title": {
+              "$ref": "#/components/schemas/Brand/properties/title"
+            },
+            "dateCreatedDay": {
+              "$ref": "#/components/schemas/dateCreatedDay"
+            },
+            "publish.status": {
+              "$ref": "#/components/schemas/publish/properties/status"
+            },
+            "import.status": {
+              "$ref": "#/components/schemas/import/properties/status"
+            }
+          }
+        }
+      },
+      "CategorySortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "name",
+            "title",
+            "dateCreated",
+            "import.status",
+            "import.endDate",
+            "publish.status",
+            "publish.endDate"
+          ]
+        }
+      },
+      "CategoryFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/Category/properties/id"
+            },
+            "vtexId": {
+              "$ref": "#/components/schemas/Category/properties/vtexId"
+            },
+            "catalogId": {
+              "$ref": "#/components/schemas/catalogId"
+            },
+            "name": {
+              "$ref": "#/components/schemas/Category/properties/name"
+            },
+            "referenceId": {
+              "$ref": "#/components/schemas/AttributeGroup/properties/referenceId"
+            },
+            "title": {
+              "$ref": "#/components/schemas/Brand/properties/title"
+            },
+            "dateCreatedDay": {
+              "$ref": "#/components/schemas/dateCreatedDay"
+            },
+            "publish.status": {
+              "$ref": "#/components/schemas/publish/properties/status"
+            },
+            "import.status": {
+              "$ref": "#/components/schemas/import/properties/status"
+            }
+          }
+        }
+      },
+      "PendingPublishItemsFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "catalogId": {
+              "$ref": "#/components/schemas/catalogId"
+            },
+            "referenceId": {
+              "$ref": "#/components/schemas/PendingPublishItem/properties/referenceId"
+            },
+            "accountId": {
+              "$ref": "#/components/schemas/accountId"
+            },
+            "notifiedDateRange": {
+              "$ref": "#/components/schemas/notifiedDateRange"
+            }
+          }
+        }
+      },
+      "ProductSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "vtexId",
+            "referenceId",
+            "name",
+            "title",
+            "dateCreated",
+            "import.status",
+            "import.endDate",
+            "publish.status",
+            "publish.endDate"
+          ]
+        }
+      },
+      "ProductFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/Product/properties/id"
+            },
+            "vtexId": {
+              "$ref": "#/components/schemas/Product/properties/vtexId"
+            },
+            "catalogId": {
+              "$ref": "#/components/schemas/catalogId"
+            },
+            "name": {
+              "$ref": "#/components/schemas/Product/properties/name"
+            },
+            "referenceId": {
+              "$ref": "#/components/schemas/AttributeGroup/properties/referenceId"
+            },
+            "title": {
+              "$ref": "#/components/schemas/Brand/properties/title"
+            },
+            "dateCreatedDay": {
+              "$ref": "#/components/schemas/dateCreatedDay"
+            },
+            "publish.status": {
+              "$ref": "#/components/schemas/publish/properties/status"
+            },
+            "import.status": {
+              "$ref": "#/components/schemas/import/properties/status"
+            }
+          }
+        }
+      },
+      "SkuSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "vtexId",
+            "skuName",
+            "referenceId",
+            "dateCreated",
+            "import.status",
+            "import.endDate",
+            "publish.status",
+            "publish.endDate"
+          ]
+        }
+      },
+      "SkuFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/Sku/properties/id"
+            },
+            "vtexId": {
+              "$ref": "#/components/schemas/Sku/properties/vtexId"
+            },
+            "catalogId": {
+              "$ref": "#/components/schemas/catalogId"
+            },
+            "skuName": {
+              "$ref": "#/components/schemas/Sku/properties/skuName"
+            },
+            "referenceId": {
+              "$ref": "#/components/schemas/AttributeGroup/properties/referenceId"
+            },
+            "dateCreatedDay": {
+              "$ref": "#/components/schemas/dateCreatedDay"
+            },
+            "publish.status": {
+              "$ref": "#/components/schemas/publish/properties/status"
+            },
+            "import.status": {
+              "$ref": "#/components/schemas/import/properties/status"
+            }
+          }
+        }
+      },
+      "WebhookHistorySortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "account",
+            "skusQuantity",
+            "dateCreated",
+            "status"
+          ]
+        }
+      },
+      "WebhookHistoryFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/WebhookHistory/properties/id"
+            },
+            "account": {
+              "$ref": "#/components/schemas/WebhookHistory/properties/accountId"
+            },
+            "accountVtexName": {
+              "$ref": "#/components/schemas/WebhookHistory/properties/accountVtexName"
+            },
+            "vtexId": {
+              "$ref": "#/components/schemas/vtexId"
+            },
+            "status": {
+              "$ref": "#/components/schemas/WebhookHistory/properties/status"
+            },
+            "errorType": {
+              "$ref": "#/components/schemas/WebhookHistory/properties/errorType"
+            },
+            "dateCreated": {
+              "$ref": "#/components/schemas/dateCreated"
+            }
+          }
+        }
+      }
+    },
+    "headers": {
+      "x-janis-total-updated": {
+        "description": "The total amount of items updated",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "x-janis-total-not-modified": {
+        "description": "The total amount of items not modified",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "x-janis-total-error": {
+        "description": "The total amount of items with error",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "responses": {
+      "GenericSuccess": {
+        "description": "Operation succeeded",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "BadRequest": {
+        "description": "A client error has ocurred.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Authentication missing or invalid",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Not authorized request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "InternalError": {
+        "description": "A server error has occurred."
+      },
+      "BatchResponse": {
+        "description": "Batch responses",
+        "headers": {
+          "x-janis-total-updated": {
+            "$ref": "#/components/headers/x-janis-total-updated"
+          },
+          "x-janis-total-not-modified": {
+            "$ref": "#/components/headers/x-janis-total-not-modified"
+          },
+          "x-janis-total-error": {
+            "$ref": "#/components/headers/x-janis-total-error"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "description": "item Batch response",
+              "type": "object",
+              "properties": {
+                "itemsUpdated": {
+                  "description": "The items that were updated correctly.\n- The *key* of the *object* is the `referenceId` of the updated item.\n- The *value* of the *object* is the `id` of the updated item.\n",
+                  "type": "object",
+                  "example": {
+                    "item-ref-id-3": "606606782e232624c18f1c18",
+                    "item-ref-id-4": "6066067ff04765697cdd4d9a"
+                  }
+                },
+                "itemsNotModified": {
+                  "description": "The items that were not modified.\nThis occurs when the item in the service **is equal** to the received item.\n- The *key* of the *object* is the `referenceId` of the non modified item.\n- The *value* of the *object* is the `id` of the non modified item.\n",
+                  "type": "object",
+                  "example": {
+                    "item-ref-id-5": "606606827c96a136ead9065e",
+                    "item-ref-id-6": "60660686f42efcf71529e69d"
+                  }
+                },
+                "itemsError": {
+                  "description": "Items with some error.\n- The *key* of the *object* is the `referenceId` of the item.\n- The *value* of the *object* is the validation message error.\n",
+                  "type": "object",
+                  "example": {
+                    "item-ref-id-7": "Invalid Accounts"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "x-webhooks": {
+    "product-import-error": {
+      "post": {
+        "operationId": "ProductImportErrorWebhook",
+        "tags": [
+          "Webhooks"
+        ],
+        "summary": "The product cannot be Imported",
+        "description": "The product cannot be Imported because some field are duplicated",
+        "requestBody": {
+          "description": "The information about the event",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "service": {
+                    "$ref": "#/components/schemas/VtexCatalogWebhookService"
+                  },
+                  "entity": {
+                    "$ref": "#/components/schemas/ProductWebhookEntity"
+                  },
+                  "eventName": {
+                    "description": "The name of the event",
+                    "type": "string",
+                    "example": "product-import-error",
+                    "enum": [
+                      "product-import-error"
+                    ]
+                  },
+                  "metadata": {
+                    "$ref": "#/components/schemas/ProductImportErrorWebhook"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GenericSuccess"
+          }
+        }
+      }
+    },
+    "sku-import-error": {
+      "post": {
+        "operationId": "SkuImportErrorWebhook",
+        "tags": [
+          "Webhooks"
+        ],
+        "summary": "The sku cannot be Imported",
+        "description": "The sku cannot be Imported because some field are duplicated",
+        "requestBody": {
+          "description": "The information about the event",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "service": {
+                    "$ref": "#/components/schemas/VtexCatalogWebhookService"
+                  },
+                  "entity": {
+                    "$ref": "#/components/schemas/SkuWebhookEntity"
+                  },
+                  "eventName": {
+                    "description": "The name of the event",
+                    "type": "string",
+                    "example": "sku-import-error",
+                    "enum": [
+                      "sku-import-error"
+                    ]
+                  },
+                  "metadata": {
+                    "$ref": "#/components/schemas/SkuImportErrorWebhook"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GenericSuccess"
+          }
+        }
+      }
+    }
+  }
+}

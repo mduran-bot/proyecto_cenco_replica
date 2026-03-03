@@ -1,0 +1,1702 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Mirakl Service",
+    "description": "Mirakl Service\n\n **Last update**: 17 jun 25, 04:42 a. m.",
+    "version": "1.10.0",
+    "x-logo": null,
+    "x-janis-keywords": [
+      "mirakl",
+      "order",
+      "seller",
+      "location",
+      "warehouse"
+    ],
+    "lastUpdate": "2025-06-17T08:42:46.135Z"
+  },
+  "tags": [
+    {
+      "name": "Location",
+      "description": "For View Locations Imported"
+    },
+    {
+      "name": "Logistics Dimension",
+      "description": "For managing Mirakl Logistics Dimensions"
+    },
+    {
+      "name": "Seller",
+      "description": "For View Sellers Imported"
+    },
+    {
+      "name": "Warehouse",
+      "description": "For View Warehouses Imported"
+    }
+  ],
+  "servers": [
+    {
+      "url": "https://mirakl.janis.in/api",
+      "description": "The Prod API server",
+      "variables": {
+        "environment": {
+          "default": "prod"
+        }
+      }
+    },
+    {
+      "url": "https://mirakl.janisqa.in/api",
+      "description": "The QA API server",
+      "variables": {
+        "environment": {
+          "default": "qa"
+        }
+      }
+    },
+    {
+      "url": "https://mirakl.janisdev.in/api",
+      "description": "The Beta API server",
+      "variables": {
+        "environment": {
+          "default": "beta"
+        }
+      }
+    },
+    {
+      "url": "http://mirakl.janis.localhost:3089/api",
+      "description": "The Local API server",
+      "variables": {
+        "environment": {
+          "default": "local"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/location/{id}": {
+      "get": {
+        "x-janis-namespace": "location",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "mirakl:location:read"
+        ],
+        "operationId": "getLocation",
+        "tags": [
+          "Location"
+        ],
+        "summary": "Get a Location by ID",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "example": "d555345345345as67a342a"
+            },
+            "required": true,
+            "description": "The Location ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Location"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/location": {
+      "get": {
+        "x-janis-namespace": "location",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "mirakl:location:read"
+        ],
+        "operationId": "listLocation",
+        "tags": [
+          "Location"
+        ],
+        "summary": "Get a list of Locations",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/LocationSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/LocationFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "x-janis-total": {
+                "description": "The total amount of records in the list",
+                "schema": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocationList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/logistics-dimension/{id}": {
+      "get": {
+        "x-janis-namespace": "logistics-dimension",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "mirakl:logistics-dimension:read"
+        ],
+        "operationId": "getLogisticsDimension",
+        "tags": [
+          "Logistics Dimension"
+        ],
+        "summary": "Get a Logistics Dimension",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Logistics Dimension found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LogisticsDimension"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "x-janis-namespace": "logistics-dimension",
+        "x-janis-method": "update",
+        "x-janis-permissions": [
+          "mirakl:logistics-dimension:write"
+        ],
+        "operationId": "updateLogisticsDimension",
+        "tags": [
+          "Logistics Dimension"
+        ],
+        "summary": "Update a Logistics Dimension",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "requestBody": {
+          "description": "A Logistics Dimension",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LogisticsDimension"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessUpdateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/logistics-dimension": {
+      "get": {
+        "x-janis-namespace": "logistics-dimension",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "mirakl:logistics-dimension:read"
+        ],
+        "operationId": "listLogisticsDimensions",
+        "tags": [
+          "Logistics Dimension"
+        ],
+        "summary": "List Logistics Dimensions",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/LogisticsDimensionSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/LogisticsDimensionFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Logistics Dimensions listed",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LogisticsDimensionList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "x-janis-namespace": "logistics-dimension",
+        "x-janis-method": "create",
+        "x-janis-permissions": [
+          "mirakl:logistics-dimension:write"
+        ],
+        "operationId": "createLogisticsDimension",
+        "tags": [
+          "Logistics Dimension"
+        ],
+        "summary": "Create a Logistics Dimension",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "A Logistics Dimension",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LogisticsDimension"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessCreateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/mirakl-seller": {
+      "get": {
+        "x-janis-namespace": "mirakl-seller",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "mirakl:seller:read"
+        ],
+        "operationId": "getMiraklSeller",
+        "tags": [
+          "Seller"
+        ],
+        "summary": "Get Mirakl Seller by ID",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/miraklId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The Mirakl Seller"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/seller/{id}": {
+      "get": {
+        "x-janis-namespace": "seller",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "mirakl:seller:read"
+        ],
+        "operationId": "getSeller",
+        "tags": [
+          "Seller"
+        ],
+        "summary": "Get a Seller by ID",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "example": "d555345345345as67a342a"
+            },
+            "required": true,
+            "description": "The Seller ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Seller"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/seller": {
+      "get": {
+        "x-janis-namespace": "seller",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "mirakl:seller:read"
+        ],
+        "operationId": "listSeller",
+        "tags": [
+          "Seller"
+        ],
+        "summary": "Get a list of Sellers",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/SellerSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/SellerFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "x-janis-total": {
+                "description": "The total amount of records in the list",
+                "schema": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SellerList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/warehouse/{id}": {
+      "get": {
+        "x-janis-namespace": "warehouse",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "mirakl:warehouse:read"
+        ],
+        "operationId": "getWarehouse",
+        "tags": [
+          "Warehouse"
+        ],
+        "summary": "Get a Warehouse by ID",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "example": "d555345345345as67a342a"
+            },
+            "required": true,
+            "description": "The Warehouse ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Warehouse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/warehouse": {
+      "get": {
+        "x-janis-namespace": "warehouse",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "mirakl:warehouse:read"
+        ],
+        "operationId": "listWarehouse",
+        "tags": [
+          "Warehouse"
+        ],
+        "summary": "Get a list of Warehouses",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/WarehouseSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/WarehouseFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "x-janis-total": {
+                "description": "The total amount of records in the list",
+                "schema": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WarehouseList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-key",
+        "description": "The API Key"
+      },
+      "ApiSecret": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-secret",
+        "description": "The API Secret"
+      },
+      "JanisClient": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-client",
+        "description": "The Client Code"
+      }
+    },
+    "parameters": {
+      "id": {
+        "name": "id",
+        "in": "path",
+        "schema": {
+          "type": "string",
+          "example": "d555345345345as67a342a"
+        },
+        "required": true,
+        "description": "The unique identifier of the item"
+      },
+      "ListSortDirection": {
+        "name": "sortDirection",
+        "in": "query",
+        "description": "The direction to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
+        }
+      },
+      "ListPageNumber": {
+        "name": "x-janis-page",
+        "in": "header",
+        "description": "The page to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "default": 1
+        }
+      },
+      "ListPageSize": {
+        "name": "x-janis-page-size",
+        "in": "header",
+        "description": "The page size to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "default": 60
+        }
+      },
+      "miraklId": {
+        "in": "query",
+        "name": "miraklId",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "description": "The Mirakl Item ID"
+      },
+      "LocationSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "name",
+            "miraklId",
+            "import.status",
+            "import.endDate",
+            "dateCreated"
+          ]
+        }
+      },
+      "LocationFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/Location/properties/id"
+            },
+            "miraklId": {
+              "$ref": "#/components/schemas/Location/properties/miraklId"
+            },
+            "name": {
+              "$ref": "#/components/schemas/Location/properties/name"
+            },
+            "dateCreatedDay": {
+              "$ref": "#/components/schemas/dateRangeFilter"
+            },
+            "importEndDateDay": {
+              "$ref": "#/components/schemas/dateRangeFilter"
+            },
+            "import.status": {
+              "$ref": "#/components/schemas/import/properties/status"
+            }
+          }
+        }
+      },
+      "LogisticsDimensionSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "code"
+          ]
+        }
+      },
+      "LogisticsDimensionFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "$ref": "#/components/schemas/LogisticsDimension/properties/code"
+            }
+          }
+        }
+      },
+      "SellerSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "name",
+            "miraklId",
+            "import.status",
+            "import.endDate",
+            "dateCreated"
+          ]
+        }
+      },
+      "SellerFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/Seller/properties/id"
+            },
+            "miraklId": {
+              "$ref": "#/components/schemas/Seller/properties/miraklId"
+            },
+            "name": {
+              "$ref": "#/components/schemas/Seller/properties/name"
+            },
+            "email": {
+              "$ref": "#/components/schemas/Seller/properties/email"
+            },
+            "dateCreatedDay": {
+              "$ref": "#/components/schemas/dateRangeFilter"
+            },
+            "importEndDateDay": {
+              "$ref": "#/components/schemas/dateRangeFilter"
+            },
+            "import.status": {
+              "$ref": "#/components/schemas/import/properties/status"
+            }
+          }
+        }
+      },
+      "WarehouseSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "name",
+            "miraklId",
+            "import.status",
+            "import.endDate",
+            "dateCreated"
+          ]
+        }
+      },
+      "WarehouseFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/Warehouse/properties/id"
+            },
+            "miraklId": {
+              "$ref": "#/components/schemas/Warehouse/properties/miraklId"
+            },
+            "name": {
+              "$ref": "#/components/schemas/Warehouse/properties/name"
+            },
+            "dateCreatedDay": {
+              "$ref": "#/components/schemas/dateRangeFilter"
+            },
+            "importEndDateDay": {
+              "$ref": "#/components/schemas/dateRangeFilter"
+            },
+            "import.status": {
+              "$ref": "#/components/schemas/import/properties/status"
+            }
+          }
+        }
+      }
+    },
+    "headers": {
+      "x-janis-total": {
+        "description": "The total amount of records in the list",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "responses": {
+      "SuccessCreateResponse": {
+        "description": "The item was created",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "SuccessUpdateResponse": {
+        "description": "The item was updated",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "GenericSuccess": {
+        "description": "Operation succeeded",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "BadRequest": {
+        "description": "A client error has ocurred.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Authentication missing or invalid",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Not authorized request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "InternalError": {
+        "description": "A server error has ocurred."
+      }
+    },
+    "schemas": {
+      "id": {
+        "description": "The unique identifier of the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "d555345345345as67a342a"
+      },
+      "status": {
+        "description": "The item status",
+        "type": "string",
+        "default": "active",
+        "enum": [
+          "active",
+          "inactive"
+        ],
+        "example": "active"
+      },
+      "dateCreated": {
+        "description": "The date of creation",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-12T19:00:00.000Z"
+      },
+      "dateModified": {
+        "description": "The date of the last modification",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-20T19:00:00.000Z"
+      },
+      "import": {
+        "type": "object",
+        "description": "The Item's import properties",
+        "properties": {
+          "status": {
+            "description": "The Item's import status",
+            "readOnly": true,
+            "type": "string",
+            "enum": [
+              "pending",
+              "imported",
+              "error"
+            ],
+            "example": "imported"
+          },
+          "startDate": {
+            "description": "The Item's import start date",
+            "readOnly": true,
+            "type": "string",
+            "format": "date-time",
+            "example": "2022-12-09T18:44:50.637Z"
+          },
+          "endDate": {
+            "description": "The Item's import end date",
+            "readOnly": true,
+            "type": "string",
+            "format": "date-time",
+            "example": "2022-12-09T18:44:50.637Z"
+          },
+          "errorMessage": {
+            "description": "A message about the importation",
+            "type": "string",
+            "readOnly": true,
+            "example": "Importation fails because .."
+          }
+        }
+      },
+      "dateRangeFilter": {
+        "type": "object",
+        "description": "A range for date. It will filter from 00:00Hs to 23:59:59Hs of the given range",
+        "properties": {
+          "from": {
+            "type": "string",
+            "description": "The beginning of the range",
+            "format": "date-time",
+            "example": "2019-11-27T16:08:24.994Z"
+          },
+          "to": {
+            "type": "string",
+            "description": "The end of the range",
+            "format": "date-time",
+            "example": "2019-11-30T16:08:24.994Z"
+          }
+        }
+      },
+      "AccountGet": {
+        "type": "object",
+        "description": "A Account",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/AccountBase"
+          }
+        ],
+        "properties": {
+          "hasFrontKey": {
+            "type": "boolean",
+            "description": "if the account has access key to use in the integration",
+            "example": false
+          }
+        },
+        "required": [
+          "integration",
+          "urlBase",
+          "hasFrontKey"
+        ]
+      },
+      "AccountUpdate": {
+        "type": "object",
+        "description": "A Account",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/AccountBase"
+          }
+        ],
+        "properties": {
+          "changeApiKey": {
+            "type": "boolean",
+            "description": "If the access key has been updated",
+            "example": true
+          },
+          "frontKey": {
+            "type": "string",
+            "description": "Access key to use in the integration",
+            "example": "45612AS321AS9ASOHFUH"
+          }
+        },
+        "required": [
+          "integration"
+        ]
+      },
+      "AccountBase": {
+        "type": "object",
+        "description": "An account",
+        "properties": {
+          "integration": {
+            "type": "boolean",
+            "description": "If the integration is active",
+            "example": true
+          },
+          "urlBase": {
+            "type": "string",
+            "description": "URL to use in the integration",
+            "example": "https://example.mirakl.com/api"
+          },
+          "mapOrderItemDimensions": {
+            "type": "boolean",
+            "description": "Determines if it is necessary to map map order items dimensions with the Mirakl logistics dimensions",
+            "example": true
+          },
+          "skipForSellers": {
+            "type": "array",
+            "description": "List of sellers to skip for Mirakl integration",
+            "items": {
+              "$ref": "#/components/schemas/id"
+            }
+          },
+          "automaticCapturePostPicking": {
+            "type": "boolean",
+            "description": "Indicates if orders should automatically capture payments after picking",
+            "example": true
+          }
+        }
+      },
+      "Location": {
+        "description": "A Location from Mirakl",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "commerceId": {
+            "description": "The unique identifier of the [Location](/v2/service/commerce#tag/Location) in Commerce Service",
+            "type": "string",
+            "example": "f555345345345as67a3400"
+          },
+          "miraklId": {
+            "description": "The Location's Mirakl ID. It is the same ID from the Seller",
+            "type": "string",
+            "readOnly": true,
+            "example": "20"
+          },
+          "name": {
+            "description": "The Location name",
+            "type": "string",
+            "readOnly": true,
+            "example": "Bruce Wayne"
+          },
+          "latitude": {
+            "description": "Location's latitude",
+            "type": "number",
+            "example": -34.5864066
+          },
+          "longitude": {
+            "description": "Location's longitude",
+            "type": "number",
+            "example": -58.4321807
+          },
+          "address": {
+            "$ref": "#/components/schemas/LocationAddress"
+          },
+          "status": {
+            "$ref": "#/components/schemas/status"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "import": {
+            "$ref": "#/components/schemas/import"
+          }
+        }
+      },
+      "LocationAddress": {
+        "description": "Address Information of the Location",
+        "type": "object",
+        "properties": {
+          "country": {
+            "type": "string",
+            "description": "The country of the location",
+            "example": "URY"
+          },
+          "city": {
+            "type": "string",
+            "description": "The city of the location",
+            "example": "Montevideo"
+          },
+          "neighborhood": {
+            "type": "string",
+            "description": "The neighborhood of the location",
+            "example": "Centro"
+          },
+          "street": {
+            "type": "string",
+            "description": "The street of the location",
+            "example": "Av. Italia"
+          },
+          "number": {
+            "type": "string",
+            "description": "The street's number of the location",
+            "example": "5555"
+          },
+          "phone": {
+            "type": "string",
+            "description": "The phone's number of the location",
+            "example": "1544445555"
+          },
+          "email": {
+            "type": "string",
+            "description": "The email of the location",
+            "example": "depot@wayne-company.com"
+          },
+          "postalCode": {
+            "type": "string",
+            "description": "The postal code of the location",
+            "example": "10000"
+          }
+        }
+      },
+      "LocationList": {
+        "description": "The list data",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Location"
+        }
+      },
+      "LogisticsDimension": {
+        "type": "object",
+        "description": "A Logistics Dimension",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Logistics code",
+            "example": "large"
+          },
+          "weight": {
+            "type": "number",
+            "description": "The weight for mapping in this code",
+            "example": 15
+          },
+          "height": {
+            "type": "number",
+            "description": "The height for mapping in this code",
+            "example": 15
+          },
+          "width": {
+            "type": "number",
+            "description": "The width for mapping in this code",
+            "example": 15
+          },
+          "length": {
+            "type": "number",
+            "description": "The length for mapping in this code",
+            "example": 15
+          }
+        },
+        "required": [
+          "code",
+          "weight",
+          "height",
+          "width",
+          "length"
+        ]
+      },
+      "LogisticsDimensionList": {
+        "type": "array",
+        "description": "A list of Logistics Dimensions",
+        "items": {
+          "$ref": "#/components/schemas/LogisticsDimension"
+        }
+      },
+      "OMSOrderHookNotification": {
+        "type": "object",
+        "description": "A notification for an Order Hook from Janis OMS",
+        "properties": {
+          "order": {
+            "type": "object",
+            "description": "An [OMS Order](/v2/service/oms#operation/getOrder). See full example there",
+            "example": {
+              "id": "d555345345345as67a342a",
+              "commerceId": "4354534545-01",
+              "status": "new"
+            }
+          },
+          "taskToken": {
+            "type": "string",
+            "description": "A token to notify when task succeeds or fails"
+          }
+        }
+      },
+      "Seller": {
+        "description": "A Seller from Mirakl",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "omsId": {
+            "description": "The unique identifier of the [Seller](/v2/service/oms#tag/Seller) in OMS Service",
+            "type": "string",
+            "example": "f555345345345as67a3400"
+          },
+          "miraklId": {
+            "description": "The Seller's Mirakl ID",
+            "type": "string",
+            "readOnly": true,
+            "example": "20"
+          },
+          "name": {
+            "description": "The Seller name",
+            "type": "string",
+            "readOnly": true,
+            "example": "Bruce Wayne"
+          },
+          "email": {
+            "description": "The Seller email",
+            "type": "string",
+            "readOnly": true,
+            "example": "bruce.wayne@wayne-company.com"
+          },
+          "logoUrl": {
+            "description": "The Seller logo's URL",
+            "type": "string",
+            "readOnly": true,
+            "example": "https://image.wayne-company.com.goth/public/ceo.png"
+          },
+          "phone": {
+            "description": "The Seller phone",
+            "type": "string",
+            "readOnly": true,
+            "example": "1544445556"
+          },
+          "status": {
+            "$ref": "#/components/schemas/status"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "import": {
+            "$ref": "#/components/schemas/import"
+          }
+        }
+      },
+      "SellerList": {
+        "description": "The list data",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Seller"
+        }
+      },
+      "Warehouse": {
+        "description": "A Warehouse from Mirakl",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "wmsId": {
+            "description": "The unique identifier of the [Warehouse](/v2/service/wms#tag/Warehouse) in Commerce Service",
+            "type": "string",
+            "example": "f555345345345as67a3400"
+          },
+          "miraklId": {
+            "description": "The Warehouse's Mirakl ID. It is the same ID from the Seller",
+            "type": "string",
+            "readOnly": true,
+            "example": "20"
+          },
+          "name": {
+            "description": "The Warehouse name",
+            "type": "string",
+            "readOnly": true,
+            "example": "Bruce Wayne"
+          },
+          "salesChannels": {
+            "description": "A list with Warehouse Sales Channels IDs. This refer to the `id` of the **SalesChannel** Entity. See [SalesChannels](/v2/service/commerce#tag/Sales-Channel).",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "5fa2f817bf7350096e71e2c8",
+              "60d5bb1fbc650100142b835e"
+            ],
+            "readOnly": true
+          },
+          "limitedToSellers": {
+            "description": "The Sellers to limit the Warehouse usage. This refer to the `id` of the [Sellers](/v2/service/oms#tag/Seller) in OMS Service.",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": "6085bfd1ce5a1a0007a0dd00"
+            },
+            "readOnly": true
+          },
+          "locationCommerceId": {
+            "description": "The unique identifier of the [Location](/v2/service/commerce#tag/Location) in Commerce Service, where the Warehouse belongs",
+            "type": "string",
+            "example": "f555345345345as67a3400"
+          },
+          "status": {
+            "$ref": "#/components/schemas/status"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "import": {
+            "$ref": "#/components/schemas/import"
+          }
+        }
+      },
+      "WarehouseList": {
+        "description": "The list data",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Warehouse"
+        }
+      },
+      "listenerEvent": {
+        "description": "A JANIS Event object",
+        "type": "object",
+        "properties": {
+          "service": {
+            "description": "The source service name",
+            "type": "string",
+            "example": "id"
+          },
+          "entity": {
+            "description": "The event related entity",
+            "type": "string",
+            "example": "profile"
+          },
+          "event": {
+            "description": "The event name",
+            "type": "string",
+            "example": "created"
+          },
+          "client": {
+            "description": "The source event client",
+            "type": "string",
+            "example": "fizzmod"
+          },
+          "id": {
+            "description": "The event related entity ID",
+            "type": "string",
+            "example": "5d699c1ae8ebb95eaa24aca9"
+          }
+        },
+        "required": [
+          "service",
+          "entity",
+          "event"
+        ]
+      },
+      "deliveryListenerEventBase": {
+        "description": "A JANIS Event object",
+        "type": "object",
+        "properties": {
+          "service": {
+            "description": "The source service name",
+            "type": "string",
+            "example": "delivery"
+          },
+          "client": {
+            "description": "The source event client",
+            "type": "string",
+            "example": "fizzmod"
+          },
+          "id": {
+            "description": "The event related entity ID",
+            "type": "string",
+            "example": "5d699c1ae8ebb95eaa24aca9"
+          },
+          "entity": {
+            "description": "The event related entity",
+            "type": "string"
+          },
+          "event": {
+            "description": "The event name",
+            "type": "string"
+          }
+        }
+      },
+      "ShippingEventEntity": {
+        "description": "The event related entity",
+        "type": "string",
+        "example": "shipping"
+      },
+      "deliveryShippingListenerBase": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/deliveryListenerEventBase"
+          },
+          {
+            "properties": {
+              "entity": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ShippingEventEntity"
+                  }
+                ],
+                "example": "shipping"
+              }
+            }
+          }
+        ]
+      },
+      "deliveryShippingDeliveredListener": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/deliveryShippingListenerBase"
+          },
+          {
+            "properties": {
+              "event": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/deliveryListenerEventBase/properties/event"
+                  }
+                ],
+                "example": "delivered"
+              }
+            }
+          }
+        ]
+      },
+      "deliveryShippingStartedListener": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/deliveryShippingListenerBase"
+          },
+          {
+            "properties": {
+              "event": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/deliveryListenerEventBase/properties/event"
+                  }
+                ],
+                "example": "started"
+              }
+            }
+          }
+        ]
+      },
+      "deliveryShippingScheduledListener": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/deliveryShippingListenerBase"
+          },
+          {
+            "properties": {
+              "event": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/deliveryListenerEventBase/properties/event"
+                  }
+                ],
+                "example": "scheduled"
+              }
+            }
+          }
+        ]
+      },
+      "deliveryShippingDispatchedListener": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/deliveryShippingListenerBase"
+          },
+          {
+            "properties": {
+              "event": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/deliveryListenerEventBase/properties/event"
+                  }
+                ],
+                "example": "dispatched"
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

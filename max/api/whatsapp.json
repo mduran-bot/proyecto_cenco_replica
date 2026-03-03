@@ -1,0 +1,1854 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "WhatsApp Service",
+    "description": "WhatsApp Service\n\n **Last update**: 17 nov 25, 07:20 p. m.",
+    "version": "1.11.0",
+    "x-logo": null,
+    "x-janis-keywords": [
+      "conversation",
+      "whatsapp"
+    ],
+    "lastUpdate": "2025-11-17T22:20:30.646Z"
+  },
+  "tags": [
+    {
+      "name": "Account",
+      "description": "For managing Accounts"
+    },
+    {
+      "name": "Client",
+      "description": "For managing Clients"
+    },
+    {
+      "name": "Message",
+      "description": "For managing Messages"
+    },
+    {
+      "name": "Phone",
+      "description": "For managing Phones"
+    },
+    {
+      "name": "Template",
+      "description": "For managing Templates"
+    }
+  ],
+  "servers": [
+    {
+      "url": "https://whatsapp.conversation.janis.in/api",
+      "description": "The Prod API server",
+      "variables": {
+        "environment": {
+          "default": "prod"
+        }
+      }
+    },
+    {
+      "url": "https://whatsapp.conversation.janisqa.in/api",
+      "description": "The QA API server",
+      "variables": {
+        "environment": {
+          "default": "qa"
+        }
+      }
+    },
+    {
+      "url": "https://whatsapp.conversation.janisdev.in/api",
+      "description": "The Beta API server",
+      "variables": {
+        "environment": {
+          "default": "beta"
+        }
+      }
+    },
+    {
+      "url": "http://conversation-whatsapp.janis.localhost:3112/api",
+      "description": "The Local API server",
+      "variables": {
+        "environment": {
+          "default": "local"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/account/{id}": {
+      "get": {
+        "x-janis-namespace": "account",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "conversation-whatsapp:account:read"
+        ],
+        "operationId": "getAccount",
+        "tags": [
+          "Account"
+        ],
+        "summary": "Get a Account",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Account found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Account"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "x-janis-namespace": "account",
+        "x-janis-method": "update",
+        "x-janis-permissions": [
+          "conversation-whatsapp:account:write"
+        ],
+        "operationId": "updateAccount",
+        "tags": [
+          "Account"
+        ],
+        "summary": "Update a Account",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "requestBody": {
+          "description": "A Account for update",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutAccount"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessUpdateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/account": {
+      "get": {
+        "x-janis-namespace": "account",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "conversation-whatsapp:account:read"
+        ],
+        "operationId": "listAccounts",
+        "tags": [
+          "Account"
+        ],
+        "summary": "List Accounts",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AccountSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/AccountFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Accounts listed",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "x-janis-namespace": "account",
+        "x-janis-method": "create",
+        "x-janis-permissions": [
+          "conversation-whatsapp:account:write"
+        ],
+        "operationId": "createAccount",
+        "tags": [
+          "Account"
+        ],
+        "summary": "Create a Account",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "A Account",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Account"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessCreateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/message/{id}": {
+      "get": {
+        "x-janis-namespace": "message",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "conversation-whatsapp:message:read"
+        ],
+        "operationId": "getMessage",
+        "tags": [
+          "Message"
+        ],
+        "summary": "Get a Message",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A Message found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Message"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/message": {
+      "get": {
+        "x-janis-namespace": "message",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "conversation-whatsapp:message:read"
+        ],
+        "operationId": "listMessages",
+        "tags": [
+          "Message"
+        ],
+        "summary": "List Messages",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/MessageSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/MessageFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Messages listed",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/phone/{id}": {
+      "get": {
+        "x-janis-namespace": "phone",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "conversation-whatsapp:phone:read"
+        ],
+        "operationId": "getPhone",
+        "tags": [
+          "Phone"
+        ],
+        "summary": "Get a Phone",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Phone found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetPhone"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "x-janis-namespace": "phone",
+        "x-janis-method": "update",
+        "x-janis-permissions": [
+          "conversation-whatsapp:phone:write"
+        ],
+        "operationId": "updatePhone",
+        "tags": [
+          "Phone"
+        ],
+        "summary": "Update a Phone",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "requestBody": {
+          "description": "A Phone",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Phone"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessUpdateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/phone": {
+      "get": {
+        "x-janis-namespace": "phone",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "conversation-whatsapp:phone:read"
+        ],
+        "operationId": "listPhones",
+        "tags": [
+          "Phone"
+        ],
+        "summary": "List Phones",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PhoneSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/PhoneFilters"
+          },
+          {
+            "$ref": "#/components/parameters/PhoneListAccountData"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Phones listed",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PhoneList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "x-janis-namespace": "phone",
+        "x-janis-method": "create",
+        "x-janis-permissions": [
+          "conversation-whatsapp:phone:write"
+        ],
+        "operationId": "createPhone",
+        "tags": [
+          "Phone"
+        ],
+        "summary": "Create a Phone",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "A Phone",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Phone"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessCreateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/template/{id}": {
+      "get": {
+        "x-janis-namespace": "template",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "conversation-whatsapp:template:read"
+        ],
+        "operationId": "getTemplate",
+        "tags": [
+          "Template"
+        ],
+        "summary": "Get a Template",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Template found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Template"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "x-janis-namespace": "template",
+        "x-janis-method": "update",
+        "x-janis-permissions": [
+          "conversation-whatsapp:template:write"
+        ],
+        "operationId": "updateTemplate",
+        "tags": [
+          "Template"
+        ],
+        "summary": "Update a Template",
+        "description": "Update a Template\n\n**It is only possible to modify templates that are related to an Auronix account**\n",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "requestBody": {
+          "description": "A Template for update\n\n> No field is required, but at least one must be set.\n",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PutTemplate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessUpdateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/template": {
+      "get": {
+        "x-janis-namespace": "template",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "conversation-whatsapp:template:read"
+        ],
+        "operationId": "listTemplates",
+        "tags": [
+          "Template"
+        ],
+        "summary": "List Templates",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TemplateSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/TemplateFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Templates listed",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TemplateList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-key",
+        "description": "The API Key"
+      },
+      "ApiSecret": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-secret",
+        "description": "The API Secret"
+      },
+      "JanisClient": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-client",
+        "description": "The Client Code"
+      }
+    },
+    "parameters": {
+      "id": {
+        "name": "id",
+        "in": "path",
+        "schema": {
+          "type": "string",
+          "example": "631fb04c8fe08f51a8ee5949"
+        },
+        "required": true,
+        "description": "The unique identifier of the item"
+      },
+      "ListSortDirection": {
+        "name": "sortDirection",
+        "in": "query",
+        "description": "The direction to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
+        }
+      },
+      "ListPageNumber": {
+        "name": "x-janis-page",
+        "in": "header",
+        "description": "The page to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "default": 1
+        }
+      },
+      "ListPageSize": {
+        "name": "x-janis-page-size",
+        "in": "header",
+        "description": "The page size to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "default": 60
+        }
+      },
+      "JanisEntity": {
+        "name": "janis-entity",
+        "in": "header",
+        "description": "The entity name",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "AccountSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "name",
+            "integrationName",
+            "publishTemplate",
+            "status",
+            "userCreated",
+            "userModified",
+            "dateCreated",
+            "dateModified"
+          ]
+        }
+      },
+      "AccountFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/id"
+            },
+            "name": {
+              "$ref": "#/components/schemas/BaseAccount/properties/name"
+            },
+            "accountId": {
+              "type": "string",
+              "description": "The WhatsApp Business Account Id",
+              "example": "246351444217940"
+            },
+            "integrationName": {
+              "$ref": "#/components/schemas/integrationName"
+            },
+            "publishTemplate": {
+              "$ref": "#/components/schemas/BaseAccount/properties/publishTemplate"
+            },
+            "userCreated": {
+              "$ref": "#/components/schemas/userCreated"
+            },
+            "dateCreatedRange": {
+              "$ref": "#/components/schemas/dateCreatedRange"
+            },
+            "userModified": {
+              "$ref": "#/components/schemas/userModified"
+            },
+            "dateModifiedRange": {
+              "$ref": "#/components/schemas/dateModifiedRange"
+            },
+            "status": {
+              "$ref": "#/components/schemas/status"
+            }
+          }
+        }
+      },
+      "MessageSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "dateSent",
+            "userCreated",
+            "userModified",
+            "dateCreated",
+            "dateModified",
+            "status"
+          ]
+        }
+      },
+      "MessageFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/Message/properties/id"
+            },
+            "integrationId": {
+              "$ref": "#/components/schemas/Message/properties/integrationId"
+            },
+            "phoneId": {
+              "$ref": "#/components/schemas/Message/properties/phoneId"
+            },
+            "conversationId": {
+              "$ref": "#/components/schemas/Message/properties/conversationId"
+            },
+            "templateId": {
+              "$ref": "#/components/schemas/Message/properties/templateId"
+            },
+            "dateSent": {
+              "$ref": "#/components/schemas/Message/properties/dateSent"
+            },
+            "userCreated": {
+              "$ref": "#/components/schemas/userCreated"
+            },
+            "dateCreatedRange": {
+              "$ref": "#/components/schemas/dateCreatedRange"
+            },
+            "userModified": {
+              "$ref": "#/components/schemas/userModified"
+            },
+            "dateModifiedRange": {
+              "$ref": "#/components/schemas/dateModifiedRange"
+            },
+            "status": {
+              "type": "string",
+              "description": "The message status name",
+              "readOnly": true,
+              "enum": [
+                "pending",
+                "sending",
+                "sent",
+                "error"
+              ],
+              "default": "pending",
+              "example": "pending"
+            }
+          }
+        }
+      },
+      "PhoneListAccountData": {
+        "name": "accountData",
+        "in": "query",
+        "description": "Indicates if more information about account needs to be added.",
+        "required": false,
+        "schema": {
+          "type": "boolean",
+          "example": true
+        }
+      },
+      "PhoneSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "integrationId",
+            "accountId",
+            "prefix",
+            "phoneNumber",
+            "userCreated",
+            "userModified",
+            "dateCreated",
+            "dateModified",
+            "status"
+          ]
+        }
+      },
+      "PhoneFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/id"
+            },
+            "integrationId": {
+              "$ref": "#/components/schemas/Phone/properties/integrationId"
+            },
+            "accountId": {
+              "$ref": "#/components/schemas/Phone/properties/accountId"
+            },
+            "prefix": {
+              "$ref": "#/components/schemas/Phone/properties/prefix"
+            },
+            "phoneNumber": {
+              "$ref": "#/components/schemas/Phone/properties/phoneNumber"
+            },
+            "userCreated": {
+              "$ref": "#/components/schemas/userCreated"
+            },
+            "dateCreatedRange": {
+              "$ref": "#/components/schemas/dateCreatedRange"
+            },
+            "userModified": {
+              "$ref": "#/components/schemas/userModified"
+            },
+            "dateModifiedRange": {
+              "$ref": "#/components/schemas/dateModifiedRange"
+            },
+            "status": {
+              "$ref": "#/components/schemas/status"
+            }
+          }
+        }
+      },
+      "TemplateSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "name",
+            "userCreated",
+            "userModified",
+            "dateCreated",
+            "dateModified",
+            "status"
+          ]
+        }
+      },
+      "TemplateFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/Template/properties/id"
+            },
+            "integrationId": {
+              "$ref": "#/components/schemas/Template/properties/integrationId"
+            },
+            "accountId": {
+              "$ref": "#/components/schemas/Template/properties/accountId"
+            },
+            "name": {
+              "$ref": "#/components/schemas/Template/properties/name"
+            },
+            "userCreated": {
+              "$ref": "#/components/schemas/userCreated"
+            },
+            "dateCreatedRange": {
+              "$ref": "#/components/schemas/dateCreatedRange"
+            },
+            "userModified": {
+              "$ref": "#/components/schemas/userModified"
+            },
+            "dateModifiedRange": {
+              "$ref": "#/components/schemas/dateModifiedRange"
+            },
+            "status": {
+              "$ref": "#/components/schemas/Template/properties/status"
+            }
+          }
+        }
+      }
+    },
+    "headers": {
+      "x-janis-total": {
+        "description": "The total amount of records in the list",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "responses": {
+      "SuccessCreateResponse": {
+        "description": "The item was created",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "SuccessUpdateResponse": {
+        "description": "The item was updated",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "GenericSuccess": {
+        "description": "Operation succeeded",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "BadRequest": {
+        "description": "A client error has ocurred.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Authentication missing or invalid",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Not authorized request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "InternalError": {
+        "description": "A server error has ocurred."
+      }
+    },
+    "schemas": {
+      "id": {
+        "description": "The unique identifier of the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "631fb04c8fe08f51a8ee5949"
+      },
+      "accessToken": {
+        "description": "A token that identifies a account and can be used to make API calls",
+        "type": "string",
+        "example": "BvLHSFFeyunzXY"
+      },
+      "accountId": {
+        "description": "The related Account ID. This refer to the `id` of the **Account** Entity. See [Account](/v2/service/conversation-whatsapp#tag/Account)",
+        "type": "string",
+        "example": "645f7924136a1ecf9f60ae48"
+      },
+      "integrationId": {
+        "type": "string",
+        "description": "The unique identifier in WhatsApp integration",
+        "example": "628234567890"
+      },
+      "integrationName": {
+        "type": "string",
+        "description": "The type of integration with WhatsApp of the account",
+        "enum": [
+          "meta",
+          "auronix"
+        ],
+        "example": "meta"
+      },
+      "phoneId": {
+        "description": "The Phone Id of the template. This refer to the `id` of the **Phone** Entity of **Janis Conversation-Whatsapp Service**. See [Phone](v2/service/conversation-whatsapp#tag/Phone)",
+        "type": "string",
+        "example": "645a3af1c731b0e761e5b4ec"
+      },
+      "header": {
+        "description": "The header of the item",
+        "type": "object",
+        "properties": {
+          "text": {
+            "$ref": "#/components/schemas/text"
+          },
+          "parameters": {
+            "$ref": "#/components/schemas/parameters"
+          }
+        }
+      },
+      "body": {
+        "description": "The body of the item",
+        "type": "object",
+        "properties": {
+          "text": {
+            "$ref": "#/components/schemas/text"
+          },
+          "parameters": {
+            "$ref": "#/components/schemas/parameters"
+          }
+        }
+      },
+      "footer": {
+        "description": "The footer of the item",
+        "type": "object",
+        "properties": {
+          "text": {
+            "$ref": "#/components/schemas/text"
+          },
+          "parameters": {
+            "$ref": "#/components/schemas/parameters"
+          }
+        }
+      },
+      "text": {
+        "description": "The text of the item",
+        "type": "string",
+        "example": "Welcome, {{1}}!"
+      },
+      "parameters": {
+        "description": "The parameters that the text has",
+        "type": "array",
+        "items": {
+          "description": "The parameter value",
+          "type": "string",
+          "example": "Jonh"
+        }
+      },
+      "status": {
+        "description": "The item status",
+        "type": "string",
+        "default": "active",
+        "enum": [
+          "active",
+          "inactive"
+        ],
+        "example": "active"
+      },
+      "dateCreated": {
+        "description": "The date of creation",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-12T19:00:00.000Z"
+      },
+      "dateModified": {
+        "description": "The date of the last modification",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-20T19:00:00.000Z"
+      },
+      "dateCreatedRange": {
+        "type": "object",
+        "description": "The day of creation by date range",
+        "properties": {
+          "from": {
+            "$ref": "#/components/schemas/dateFrom"
+          },
+          "to": {
+            "$ref": "#/components/schemas/dateTo"
+          }
+        }
+      },
+      "dateModifiedRange": {
+        "type": "object",
+        "description": "The day of last modification by date range",
+        "properties": {
+          "from": {
+            "$ref": "#/components/schemas/dateFrom"
+          },
+          "to": {
+            "$ref": "#/components/schemas/dateTo"
+          }
+        }
+      },
+      "dateFrom": {
+        "type": "string",
+        "description": "Date from",
+        "format": "date-time",
+        "example": "2023-10-04T19:00:00.000Z"
+      },
+      "dateTo": {
+        "type": "string",
+        "description": "Date to",
+        "format": "date-time",
+        "example": "2023-10-05T22:00:00.000Z"
+      },
+      "dateCreatedDay": {
+        "description": "The day of creation",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-08-07T16:00:00.000Z"
+      },
+      "dateModifiedDay": {
+        "description": "The day of last modification",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-08-07T16:00:00.000Z"
+      },
+      "userCreated": {
+        "description": "The ID of the user who created the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "6a1fc1eeb5b68406e0487a10"
+      },
+      "userModified": {
+        "description": "The ID of the user who last modified the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "7e1fc1eeb5b68406e048796"
+      },
+      "Account": {
+        "type": "object",
+        "description": "A Account",
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/AuronixAccount"
+          },
+          {
+            "$ref": "#/components/schemas/MetaAccount"
+          }
+        ]
+      },
+      "BaseAccount": {
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "name": {
+            "type": "string",
+            "description": "The Account name",
+            "example": "Some account"
+          },
+          "accessToken": {
+            "$ref": "#/components/schemas/accessToken"
+          },
+          "integrationName": {
+            "$ref": "#/components/schemas/integrationName"
+          },
+          "publishTemplate": {
+            "type": "boolean",
+            "description": "Determines whether account templates should be published",
+            "example": true
+          },
+          "status": {
+            "$ref": "#/components/schemas/status"
+          }
+        }
+      },
+      "AuronixAccount": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseAccount"
+          }
+        ],
+        "required": [
+          "name",
+          "accessToken",
+          "integrationName"
+        ]
+      },
+      "MetaAccount": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseAccount"
+          },
+          {
+            "properties": {
+              "accountId": {
+                "type": "string",
+                "description": "The WhatsApp Business Account Id",
+                "example": "246351444217940"
+              }
+            }
+          }
+        ],
+        "required": [
+          "name",
+          "accountId",
+          "accessToken",
+          "integrationName"
+        ]
+      },
+      "PutAccount": {
+        "type": "object",
+        "description": "A Account for update",
+        "properties": {
+          "accessToken": {
+            "$ref": "#/components/schemas/accessToken"
+          },
+          "integrationName": {
+            "$ref": "#/components/schemas/integrationName"
+          },
+          "status": {
+            "$ref": "#/components/schemas/status"
+          }
+        }
+      },
+      "AccountList": {
+        "type": "array",
+        "description": "A list of Accounts",
+        "items": {
+          "$ref": "#/components/schemas/Account"
+        }
+      },
+      "Message": {
+        "type": "object",
+        "description": "A Message",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "integrationId": {
+            "$ref": "#/components/schemas/integrationId"
+          },
+          "phoneId": {
+            "$ref": "#/components/schemas/phoneId"
+          },
+          "conversationId": {
+            "type": "string",
+            "description": "The related Conversation Message ID. This refer to the `id` of the **Message** Entity. See [Message](/v2/service/conversation#tag/Message)",
+            "example": "64773a03785b5f4479dd5a72"
+          },
+          "templateId": {
+            "type": "string",
+            "description": "The related Conversation Whatsapp Template ID. This refer to the `id` of the **Template** Entity. See [Template](/v2/service/conversation-whatsapp#tag/Template)",
+            "example": "6472c2c6594a3fcd0678f66b"
+          },
+          "to": {
+            "type": "string",
+            "description": "The recipient of the message",
+            "example": "1167418771"
+          },
+          "header": {
+            "$ref": "#/components/schemas/header"
+          },
+          "body": {
+            "$ref": "#/components/schemas/body"
+          },
+          "footer": {
+            "$ref": "#/components/schemas/footer"
+          },
+          "data": {
+            "description": "The information which will be used to replace in the message",
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "error": {
+            "type": "string",
+            "description": "Error message that provides additional information about the failure or exception occurred",
+            "example": "Request to the Meta API failed"
+          },
+          "dateSent": {
+            "type": "string",
+            "description": "Date the message was sent",
+            "example": "2023-05-28T01:08:52.766Z",
+            "format": "date-time"
+          },
+          "useInternalTemplate": {
+            "description": "Indicates if the message was created using an internal template. If true, some fields will not be returned in the response",
+            "readOnly": true,
+            "type": "boolean",
+            "example": false
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "status": {
+            "description": "The message status",
+            "type": "string",
+            "default": "pending",
+            "enum": [
+              "pending",
+              "sending",
+              "sent",
+              "error"
+            ],
+            "example": "sent"
+          }
+        }
+      },
+      "MessageList": {
+        "type": "array",
+        "description": "A list of Messages",
+        "items": {
+          "$ref": "#/components/schemas/Message"
+        }
+      },
+      "Phone": {
+        "type": "object",
+        "description": "A Phone",
+        "properties": {
+          "integrationId": {
+            "$ref": "#/components/schemas/integrationId"
+          },
+          "accountId": {
+            "$ref": "#/components/schemas/accountId"
+          },
+          "accountName": {
+            "description": "\nThe name of the account. This refer to the `name` of the [Account](/v2/service/conversation-whatsapp#tag/Account) Entity.\n\n**Important**: This field is only available when the `accountData` parameter is send as `true`\n",
+            "type": "string",
+            "readOnly": true,
+            "example": "Janis Whatsapp"
+          },
+          "accountIntegrationName": {
+            "description": "\nThe integration name of the account. This refer to the `integrationName` of the [Account](/v2/service/conversation-whatsapp#tag/Account) Entity.\n\n**Important**: This field is only available when the `accountData` parameter is send as `true`\n",
+            "type": "string",
+            "readOnly": true,
+            "example": "Meta"
+          },
+          "prefix": {
+            "type": "string",
+            "description": "The international phone code for country",
+            "example": "54"
+          },
+          "phoneNumber": {
+            "type": "string",
+            "description": "The phone number",
+            "example": "1132547354"
+          }
+        },
+        "required": [
+          "integrationId",
+          "accountId",
+          "prefix",
+          "phoneNumber"
+        ]
+      },
+      "GetPhone": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Phone"
+          },
+          {
+            "properties": {
+              "id": {
+                "$ref": "#/components/schemas/id"
+              },
+              "userCreated": {
+                "$ref": "#/components/schemas/userCreated"
+              },
+              "dateCreated": {
+                "$ref": "#/components/schemas/dateCreated"
+              },
+              "userModified": {
+                "$ref": "#/components/schemas/userModified"
+              },
+              "dateModified": {
+                "$ref": "#/components/schemas/dateModified"
+              },
+              "status": {
+                "$ref": "#/components/schemas/status"
+              }
+            }
+          }
+        ]
+      },
+      "PhoneList": {
+        "type": "array",
+        "description": "A list of Phones",
+        "items": {
+          "$ref": "#/components/schemas/GetPhone"
+        }
+      },
+      "Template": {
+        "type": "object",
+        "description": "A Template",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "integrationId": {
+            "$ref": "#/components/schemas/integrationId"
+          },
+          "accountId": {
+            "$ref": "#/components/schemas/accountId"
+          },
+          "name": {
+            "type": "string",
+            "description": "The template name",
+            "example": "welcome-janis"
+          },
+          "to": {
+            "description": "The recipient of the template",
+            "type": "array",
+            "items": {
+              "description": "The recipient phone number",
+              "type": "string",
+              "example": "54911020312"
+            }
+          },
+          "header": {
+            "$ref": "#/components/schemas/header"
+          },
+          "body": {
+            "$ref": "#/components/schemas/body"
+          },
+          "footer": {
+            "$ref": "#/components/schemas/footer"
+          },
+          "sampleData": {
+            "description": "The information which will be used to replace in the body of the template",
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "publish": {
+            "description": "The information about the publication",
+            "type": "object",
+            "properties": {
+              "status": {
+                "description": "The status of the template's publication",
+                "type": "string",
+                "enum": [
+                  "readyForPublish",
+                  "published",
+                  "publishError"
+                ],
+                "example": "published"
+              },
+              "startDate": {
+                "description": "Start date of the template publication",
+                "type": "string",
+                "format": "date-time",
+                "example": "2023-09-01T16:00:00.000Z"
+              },
+              "endDate": {
+                "description": "End date of the template publication",
+                "type": "string",
+                "format": "date-time",
+                "example": "2023-09-01T16:10:00.000Z"
+              },
+              "errorMessage": {
+                "description": "The reason for the publication failure",
+                "type": "string",
+                "example": "Meta could not update the template"
+              },
+              "integrationStatus": {
+                "description": "The status of the template in the integration",
+                "type": "string",
+                "example": "pending"
+              },
+              "integrationResponse": {
+                "description": "The response to the publication request",
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "status": {
+            "$ref": "#/components/schemas/status"
+          }
+        }
+      },
+      "PutTemplate": {
+        "type": "object",
+        "properties": {
+          "integrationId": {
+            "$ref": "#/components/schemas/integrationId"
+          },
+          "language": {
+            "description": "The language code of the template",
+            "type": "string",
+            "example": "es_MX"
+          }
+        }
+      },
+      "TemplateList": {
+        "type": "array",
+        "description": "A list of Templates",
+        "items": {
+          "$ref": "#/components/schemas/Template"
+        }
+      },
+      "IncomingTemplate": {
+        "type": "object",
+        "description": "A Template",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The related Conversation Template ID. This refer to the `id` of the **Template** Entity. See [Template](/v2/service/conversation#tag/Template)",
+            "example": "645a254875e66935849b950e"
+          },
+          "topic": {
+            "type": "string",
+            "description": "The template topic",
+            "example": "order-canceled"
+          },
+          "to": {
+            "description": "The recipient of the template",
+            "type": "array",
+            "items": {
+              "description": "The recipient phone number",
+              "type": "string",
+              "example": "54911020312"
+            }
+          },
+          "header": {
+            "description": "The header of the item",
+            "type": "string",
+            "example": "Welcome, {{name}}!"
+          },
+          "body": {
+            "description": "The body of the item",
+            "type": "string",
+            "example": "We are happy to welcome you in {{group}}!"
+          },
+          "footer": {
+            "description": "The footer of the item",
+            "type": "string",
+            "example": "This is a message from JANIS"
+          },
+          "phoneId": {
+            "type": "string",
+            "description": "The related Phone ID. This refer to the `id` of the **Phone** Entity. See [Template](/v2/service/conversation-whatsapp#tag/Phone)",
+            "example": "646cdc6e70bd925ff4e87453"
+          },
+          "sampleData": {
+            "$ref": "#/components/schemas/Template/properties/sampleData"
+          },
+          "status": {
+            "$ref": "#/components/schemas/status"
+          }
+        },
+        "required": [
+          "id",
+          "topic",
+          "to",
+          "body",
+          "phoneId",
+          "status"
+        ]
+      }
+    }
+  }
+}

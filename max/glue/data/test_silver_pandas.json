@@ -1,0 +1,112 @@
+[
+  {
+    "id":"1001",
+    "cliente_nombre":"Juan P\u00e9rez",
+    "producto_nombre":"Laptop HP",
+    "monto":2500.8,
+    "fecha_venta":"2026-02-15T10:30:00.000",
+    "estado":"completado",
+    "metadata_sucursal":"Sucursal Centro",
+    "es_valido":true,
+    "has_critical_gaps":false
+  },
+  {
+    "id":"1002",
+    "cliente_nombre":"Mar\u00eda Gonz\u00e1lez",
+    "producto_nombre":"Teclado Mec\u00e1nico",
+    "monto":850.5,
+    "fecha_venta":"2026-02-16T14:20:00.000",
+    "estado":"completado",
+    "metadata_sucursal":"Sucursal Norte",
+    "es_valido":true,
+    "has_critical_gaps":false
+  },
+  {
+    "id":"1003",
+    "cliente_nombre":"Pedro L\u00f3pez",
+    "producto_nombre":"Mouse Inal\u00e1mbrico",
+    "monto":350.0,
+    "fecha_venta":"2026-02-17T09:15:00.000",
+    "estado":"pendiente",
+    "metadata_sucursal":"Sucursal Centro",
+    "es_valido":true,
+    "has_critical_gaps":false
+  },
+  {
+    "id":"1004",
+    "cliente_nombre":"Ana Mart\u00ednez",
+    "producto_nombre":"Monitor 27\"",
+    "monto":3200.0,
+    "fecha_venta":"2026-02-18T11:45:00.000",
+    "estado":"completado",
+    "metadata_sucursal":"Sucursal Sur",
+    "es_valido":true,
+    "has_critical_gaps":false
+  },
+  {
+    "id":"1005",
+    "cliente_nombre":"Carlos Ruiz",
+    "producto_nombre":"Webcam HD",
+    "monto":450.0,
+    "fecha_venta":"2026-02-18T16:30:00.000",
+    "estado":"cancelado",
+    "metadata_sucursal":"Sucursal Norte",
+    "es_valido":false,
+    "has_critical_gaps":false
+  },
+  {
+    "id":"1006",
+    "cliente_nombre":"Laura S\u00e1nchez",
+    "producto_nombre":"Auriculares",
+    "monto":280.0,
+    "fecha_venta":"2026-02-19T08:00:00.000",
+    "estado":"completado",
+    "metadata_sucursal":"Sucursal Centro",
+    "es_valido":true,
+    "has_critical_gaps":true
+  },
+  {
+    "id":"1007",
+    "cliente_nombre":"Roberto Silva",
+    "producto_nombre":"Impresora L\u00e1ser",
+    "monto":5600.0,
+    "fecha_venta":"2026-02-19T10:15:00.000",
+    "estado":"completado",
+    "metadata_sucursal":"Sucursal Sur",
+    "es_valido":true,
+    "has_critical_gaps":false
+  },
+  {
+    "id":"1008",
+    "cliente_nombre":"Diana Torres",
+    "producto_nombre":"Tablet",
+    "monto":1200.0,
+    "fecha_venta":"2026-02-19T12:30:00.000",
+    "estado":"pendiente",
+    "metadata_sucursal":"Sucursal Norte",
+    "es_valido":false,
+    "has_critical_gaps":true
+  },
+  {
+    "id":"1009",
+    "cliente_nombre":"Diego Torres",
+    "producto_nombre":"Notebook Gaming",
+    "monto":12500.99,
+    "fecha_venta":"2026-02-19T14:00:00.000",
+    "estado":"completado",
+    "metadata_sucursal":"Sucursal Centro",
+    "es_valido":true,
+    "has_critical_gaps":false
+  },
+  {
+    "id":"1010",
+    "cliente_nombre":"Sofia Ram\u00edrez",
+    "producto_nombre":"SSD 1TB",
+    "monto":890.0,
+    "fecha_venta":"2026-02-19T15:45:00.000",
+    "estado":"rechazado",
+    "metadata_sucursal":"Sucursal Sur",
+    "es_valido":false,
+    "has_critical_gaps":false
+  }
+]

@@ -1,0 +1,1985 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "VTEX Pricing Service",
+    "description": "Manage communication between Janis Pricing and VTEX Prices\n\n **Last update**: 18 feb 26, 07:42 a. m.",
+    "version": "1.65.2",
+    "x-logo": null,
+    "x-janis-keywords": [
+      "VTEX",
+      "Pricing",
+      "Price"
+    ],
+    "lastUpdate": "2026-02-18T10:42:02.758Z"
+  },
+  "tags": [
+    {
+      "name": "Price Sheet",
+      "description": "For managing Price Sheets"
+    },
+    {
+      "name": "Sales Channel",
+      "description": "For managing Sales Channels"
+    },
+    {
+      "name": "VTEX Commerce Account",
+      "description": "For managing VTEX Commerce accounts"
+    },
+    {
+      "name": "Price",
+      "description": "For managing Prices"
+    },
+    {
+      "name": "Base Price",
+      "description": "For managing Base Prices"
+    }
+  ],
+  "servers": [
+    {
+      "url": "https://vtex.pricing.janis.in/api",
+      "description": "The Prod API server",
+      "variables": {
+        "environment": {
+          "default": "prod"
+        }
+      }
+    },
+    {
+      "url": "https://vtex.pricing.janisqa.in/api",
+      "description": "The QA API server",
+      "variables": {
+        "environment": {
+          "default": "qa"
+        }
+      }
+    },
+    {
+      "url": "https://vtex.pricing.janisdev.in/api",
+      "description": "The Beta API server",
+      "variables": {
+        "environment": {
+          "default": "beta"
+        }
+      }
+    },
+    {
+      "url": "http://vtex.pricing.janis.localhost:3039/api",
+      "description": "The Local API server",
+      "variables": {
+        "environment": {
+          "default": "local"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/base-price/{id}": {
+      "get": {
+        "x-janis-namespace": "base-price",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "vtex-pricing:base-price:read"
+        ],
+        "operationId": "getBasePrice",
+        "tags": [
+          "Base Price"
+        ],
+        "summary": "Get a Base Price",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasePrice"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/base-price": {
+      "get": {
+        "x-janis-namespace": "base-price",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "vtex-pricing:base-price:read"
+        ],
+        "operationId": "listBasePrice",
+        "tags": [
+          "Base Price"
+        ],
+        "summary": "Get a list of the base prices",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/BasePriceSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/BasePriceFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasePriceList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "x-janis-namespace": "base-price",
+        "x-janis-method": "publish",
+        "operationId": "basePricePublish",
+        "tags": [
+          "Base Price"
+        ],
+        "summary": "Publish base prices",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "The base prices to publish",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BasePricePublishList"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GenericSuccess"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/listener/pricing/price-sheet/saved": {
+      "post": {
+        "x-janis-namespace": "price-sheet",
+        "x-janis-method": "saved-listener",
+        "tags": [
+          "Price Sheet"
+        ],
+        "summary": "Price sheet saved event listener",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "description": "Price sheet saved event listener",
+        "operationId": "priceSheetSavedListener",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/listenerEvent"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GenericSuccess"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/listener/vtex-commerce/account/saved": {
+      "post": {
+        "x-janis-namespace": "vtex-commerce-account",
+        "x-janis-method": "saved-listener",
+        "tags": [
+          "VTEX Commerce Account"
+        ],
+        "summary": "VTEX Commerce account saved event listener",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "description": "VTEX Commerce account saved event listener",
+        "operationId": "vtexCommerceAccountSavedListener",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/listenerEvent"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GenericSuccess"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/listener/vtex-commerce/sales-channel/saved": {
+      "post": {
+        "x-janis-namespace": "vtex-commerce-sales-channel",
+        "x-janis-method": "saved-listener",
+        "tags": [
+          "Sales Channel"
+        ],
+        "summary": "VTEX Commerce Sales channel saved event listener",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "description": "VTEX Commerce Sales channel saved event listener",
+        "operationId": "vtexCommerceSalesChannelSavedListener",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/listenerEvent"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GenericSuccess"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/GetPrice": {
+      "get": {
+        "summary": "Get Price using Price Model",
+        "operationId": "FnGetPrice",
+        "tags": [
+          "Functions"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/FunctionsFields"
+          },
+          {
+            "$ref": "#/components/parameters/FunctionsFilters"
+          },
+          {
+            "$ref": "#/components/parameters/FunctionsCalculateTotals"
+          },
+          {
+            "$ref": "#/components/parameters/FunctionsAllItems"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "number",
+                      "example": 200
+                    },
+                    "payload": {
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/FunctionItemList"
+                        },
+                        {
+                          "$ref": "#/components/schemas/FunctionError"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/price/{id}": {
+      "get": {
+        "x-janis-namespace": "price",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "vtex-pricing:price:read"
+        ],
+        "operationId": "getPrice",
+        "tags": [
+          "Price"
+        ],
+        "summary": "Get a price",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Price"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/price": {
+      "get": {
+        "x-janis-namespace": "price",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "vtex-pricing:price:read"
+        ],
+        "operationId": "listPrice",
+        "tags": [
+          "Price"
+        ],
+        "summary": "Get a list of prices",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PriceSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/PriceFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PriceList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "x-janis-namespace": "price",
+        "x-janis-method": "publish",
+        "operationId": "pricePublish",
+        "tags": [
+          "Price"
+        ],
+        "summary": "Publish prices",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "The prices to publish",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PricePublishList"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GenericSuccess"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/price-publish-queue/{id}": {
+      "get": {
+        "x-janis-namespace": "price-publish-queue",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "vtex-pricing:price:read"
+        ],
+        "operationId": "getPricePublishQueue",
+        "tags": [
+          "Price"
+        ],
+        "summary": "Get a price publish queue item",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PricePublishQueue"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/price-publish-queue": {
+      "get": {
+        "x-janis-namespace": "price-publish-queue",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "vtex-pricing:price:read"
+        ],
+        "operationId": "listPricePublishQueue",
+        "tags": [
+          "Price"
+        ],
+        "summary": "List Price Publish Queue",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PricePublishQueueSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/PricePublishQueueFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Price Publish Queue listed",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PricePublishQueueList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/price-sheet/{id}": {
+      "get": {
+        "x-janis-namespace": "price-sheet",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "vtex-pricing:price-sheet:read"
+        ],
+        "operationId": "getPriceSheet",
+        "tags": [
+          "Price Sheet"
+        ],
+        "summary": "Get a price sheet",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PriceSheet"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/price-sheet": {
+      "get": {
+        "x-janis-namespace": "price-sheet",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "vtex-pricing:price-sheet:read"
+        ],
+        "operationId": "listPriceSheet",
+        "tags": [
+          "Price Sheet"
+        ],
+        "summary": "Get a list of price sheets",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PriceSheetSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/PriceSheetFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "x-janis-total": {
+                "description": "The total amount of price sheets in the list",
+                "schema": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PriceSheetList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/vtex-price/{id}": {
+      "get": {
+        "x-janis-namespace": "vtex-price",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "vtex-pricing:price:read",
+          "vtex-pricing:base-price:read"
+        ],
+        "operationId": "getVtexPrice",
+        "tags": [
+          "Price",
+          "Base Price"
+        ],
+        "summary": "Get VTEX prices for the Sku of a Price or BasePrice",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The SKU VTEX Prices"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "id": {
+        "description": "The unique identifier of the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "66cf32502b17da9f43b57623"
+      },
+      "dateCreated": {
+        "description": "The date of creation",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-12T19:00:00.000Z"
+      },
+      "dateModified": {
+        "description": "The date of the last modification",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-20T19:00:00.000Z"
+      },
+      "userCreated": {
+        "description": "The ID of the user who created the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "6a1fc1eeb5b68406e0487a10"
+      },
+      "dateCreatedDay": {
+        "description": "The day of creating",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-08-07T16:00:00.000Z"
+      },
+      "dateModifiedDay": {
+        "description": "The day of last modification",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-08-07T16:00:00.000Z"
+      },
+      "userModified": {
+        "description": "The ID of the user who last modified the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "7e1fc1eeb5b68406e048796"
+      },
+      "dateCreatedFrom": {
+        "description": "Matches with items that were created from the received date",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-08-07T16:00:00.000Z"
+      },
+      "dateCreatedTo": {
+        "description": "Matches with items that were created up to the received date",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-08-07T16:00:00.000Z"
+      },
+      "dateModifiedFrom": {
+        "description": "Matches with items that were modified from the received date",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-08-07T16:00:00.000Z"
+      },
+      "dateModifiedTo": {
+        "description": "Matches with items that were modified up to the received date",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-08-07T16:00:00.000Z"
+      },
+      "priceValue": {
+        "description": "The price value",
+        "type": "number",
+        "minimum": 0,
+        "example": 499.99,
+        "exclusiveMinimum": true
+      },
+      "basePriceValue": {
+        "description": "The base price value",
+        "type": "number",
+        "minimum": 0,
+        "example": 299.99,
+        "exclusiveMinimum": true
+      },
+      "costPriceValue": {
+        "description": "The cost price value",
+        "type": "number",
+        "minimum": 0,
+        "example": 799.99,
+        "exclusiveMinimum": true
+      },
+      "listPriceValue": {
+        "description": "The list price value. This price must be greater than the `price` field.\n",
+        "type": "number",
+        "minimum": 0,
+        "example": 500,
+        "exclusiveMinimum": true
+      },
+      "skuCatalogId": {
+        "description": "The ID of the SKU. Refers to the `id` of the catalog **SKU** entity. See [SKU](/v2/service/catalog#tag/Sku).",
+        "type": "string",
+        "example": "5e98802da6e52ff9586c36ad"
+      },
+      "skuVtexId": {
+        "description": "The VTEX SKU `id`.\nThis field refer to [SKU](v2/service/vtex-catalog#tag/Sku) entity of **Janis VTEX Catalog Service**. See [Janis VTEX Catalog Service](/v2/service/vtex-catalog).\n",
+        "type": "number",
+        "example": 27
+      },
+      "accountId": {
+        "description": "The Account `id`.\nThis field refer to **Janis VTEX Commerce Service**. See [Account](/v2/service/vtex-commerce#tag/Account).\n",
+        "type": "string",
+        "example": "5fe39f06b91fed3cbf9f551f"
+      },
+      "status": {
+        "description": "The item status",
+        "type": "string",
+        "default": "active",
+        "enum": [
+          "active",
+          "inactive"
+        ],
+        "example": "active"
+      },
+      "publish": {
+        "description": "The VTEX publish status",
+        "type": "object",
+        "properties": {
+          "status": {
+            "description": "The publish status",
+            "type": "string",
+            "enum": [
+              "pending",
+              "readyForPublish",
+              "published",
+              "unpublished",
+              "validationError",
+              "publishError"
+            ],
+            "example": "published"
+          },
+          "startDate": {
+            "description": "The publish start date",
+            "type": "string",
+            "format": "date-time",
+            "example": "2020-09-18T15:26:47.928Z"
+          },
+          "endDate": {
+            "description": "The publish end date",
+            "type": "string",
+            "format": "date-time",
+            "example": "2020-09-18T15:27:10.043Z"
+          },
+          "errorMessage": {
+            "description": "The publish error message (if any)",
+            "type": "string",
+            "example": "VTEX Request Error"
+          },
+          "stateMachineArn": {
+            "description": "The current/last publish State Machine Execution ARN (visible only for DEV users)",
+            "type": "string"
+          },
+          "stateMachineUrl": {
+            "description": "The current/last publish State Machine Execution URL in AWS (visible only for DEV users)",
+            "type": "string"
+          }
+        },
+        "readOnly": true
+      },
+      "import": {
+        "description": "The VTEX import status",
+        "type": "object",
+        "properties": {
+          "status": {
+            "description": "The import status",
+            "type": "string",
+            "enum": [
+              "imported",
+              "importError",
+              "published",
+              "notModified",
+              "publishError"
+            ],
+            "example": "imported"
+          },
+          "startDate": {
+            "description": "The import start date",
+            "type": "string",
+            "format": "date-time",
+            "example": "2020-09-18T15:26:47.928Z"
+          },
+          "endDate": {
+            "description": "The import end date",
+            "type": "string",
+            "format": "date-time",
+            "example": "2020-09-18T15:27:10.043Z"
+          },
+          "errorMessage": {
+            "description": "The import error message (if any)",
+            "type": "string",
+            "example": "VTEX Request Error"
+          },
+          "stateMachineArn": {
+            "description": "The current/last import State Machine Execution ARN (visible only for DEV users)",
+            "type": "string"
+          },
+          "stateMachineUrl": {
+            "description": "The current/last import State Machine Execution URL in AWS (visible only for DEV users)",
+            "type": "string"
+          }
+        },
+        "readOnly": true
+      },
+      "BasePrice": {
+        "description": "A base price object",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "skuCatalogId": {
+            "$ref": "#/components/schemas/skuCatalogId"
+          },
+          "skuVtexId": {
+            "$ref": "#/components/schemas/skuVtexId"
+          },
+          "basePrice": {
+            "$ref": "#/components/schemas/basePriceValue"
+          },
+          "costPrice": {
+            "$ref": "#/components/schemas/costPriceValue"
+          },
+          "listPrice": {
+            "$ref": "#/components/schemas/listPriceValue"
+          },
+          "accountId": {
+            "$ref": "#/components/schemas/accountId"
+          },
+          "markup": {
+            "description": "The markup percentage",
+            "example": 10,
+            "minimum": 0,
+            "exclusiveMinimum": true
+          },
+          "import": {
+            "$ref": "#/components/schemas/import"
+          },
+          "publish": {
+            "$ref": "#/components/schemas/publish"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          }
+        }
+      },
+      "BasePriceList": {
+        "description": "A list of base prices",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/BasePrice"
+        }
+      },
+      "BasePricePublish": {
+        "description": "A base price to publish object",
+        "type": "object",
+        "properties": {
+          "sku": {
+            "$ref": "#/components/schemas/BasePrice/properties/skuCatalogId"
+          },
+          "price": {
+            "$ref": "#/components/schemas/BasePrice/properties/basePrice"
+          },
+          "costPrice": {
+            "$ref": "#/components/schemas/BasePrice/properties/costPrice"
+          },
+          "listPrice": {
+            "$ref": "#/components/schemas/BasePrice/properties/listPrice"
+          },
+          "markup": {
+            "$ref": "#/components/schemas/BasePrice/properties/markup"
+          }
+        }
+      },
+      "BasePricePublishList": {
+        "description": "A list of base prices to publish",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/BasePricePublish"
+        },
+        "maxItems": 500
+      },
+      "listenerEvent": {
+        "description": "A JANIS Event object",
+        "type": "object",
+        "properties": {
+          "service": {
+            "description": "The source service name",
+            "type": "string",
+            "example": "id"
+          },
+          "entity": {
+            "description": "The event related entity",
+            "type": "string",
+            "example": "profile"
+          },
+          "event": {
+            "description": "The event name",
+            "type": "string",
+            "example": "created"
+          },
+          "client": {
+            "description": "The source event client",
+            "type": "string",
+            "example": "fizzmod"
+          },
+          "id": {
+            "description": "The event related entity ID",
+            "type": "string",
+            "example": "5d699c1ae8ebb95eaa24aca9"
+          }
+        },
+        "required": [
+          "service",
+          "entity",
+          "event"
+        ]
+      },
+      "FunctionItemList": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "$ref": "#/components/schemas/Price"
+          },
+          "totals": {
+            "$ref": "#/components/schemas/FunctionTotals"
+          }
+        }
+      },
+      "FunctionError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "description": "The error message",
+            "type": "string",
+            "readOnly": true,
+            "example": "Database Failed"
+          }
+        }
+      },
+      "FunctionTotals": {
+        "type": "object",
+        "description": "The totals data. It is only available when `calculateTotals` parameter is active",
+        "properties": {
+          "total": {
+            "description": "The total items found in database applied filters",
+            "type": "number",
+            "readOnly": true,
+            "example": 2
+          },
+          "pages": {
+            "description": "The total pages for the filters applied",
+            "type": "number",
+            "readOnly": true,
+            "example": 1
+          },
+          "page": {
+            "description": "The actual page",
+            "type": "number",
+            "readOnly": true,
+            "example": 1
+          }
+        }
+      },
+      "Price": {
+        "description": "A price object",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "skuCatalogId": {
+            "$ref": "#/components/schemas/skuCatalogId"
+          },
+          "priceSheet": {
+            "description": "The ID of the price sheet. Refers to the `id` of the pricing **price-sheet** entity. See [price-sheet](/v2/service/pricing#tag/Price-Sheet)",
+            "type": "string",
+            "example": "507f1f77bcf86cd799439011"
+          },
+          "pricingId": {
+            "description": "The Pricing `id`.\nThis field refer to **Janis Pricing Service**. See [Price](/v2/service/pricing#tag/Price).\n",
+            "type": "string",
+            "readOnly": true,
+            "example": "5fe39f06b91fed3cbf9f551f"
+          },
+          "accountId": {
+            "$ref": "#/components/schemas/accountId"
+          },
+          "skuVtexId": {
+            "$ref": "#/components/schemas/skuVtexId"
+          },
+          "tradePolicyId": {
+            "description": "The VTEX tradePolicyId of the [price-sheet's](/v2/service/pricing#tag/Price-Sheet) [sales-channels](/v2/service/pricing#tag/Sales-Channel)",
+            "type": "string",
+            "example": "27",
+            "readOnly": true
+          },
+          "price": {
+            "$ref": "#/components/schemas/priceValue"
+          },
+          "listPrice": {
+            "$ref": "#/components/schemas/listPriceValue"
+          },
+          "minQuantity": {
+            "description": "The minimal quantity of an SKU to apply the specified price.\nThis field is used to generate the concept known as \"price by quantity\".\n",
+            "type": "number",
+            "example": 2,
+            "minimum": 1,
+            "default": 1
+          },
+          "dateFrom": {
+            "description": "The date from where the price will apply.\n\n**Important**: This value must be a ISOString. See more information in [ISO_8601](https://en.wikipedia.org/wiki/ISO_8601).\n\nThis field should be lesser than `dateTo`\n",
+            "type": "string",
+            "format": "date-time",
+            "example": "2019-01-01T00:00:00.000Z"
+          },
+          "dateTo": {
+            "description": "The date until the price will apply.\n\n**Important**: This value must be a ISOString. See more information in [ISO_8601](https://en.wikipedia.org/wiki/ISO_8601).\n\nThis field must be greater than `dateFrom`\n",
+            "type": "string",
+            "format": "date-time",
+            "example": "2020-01-01T05:59:59.000Z"
+          },
+          "import": {
+            "$ref": "#/components/schemas/import"
+          },
+          "publish": {
+            "$ref": "#/components/schemas/publish"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          }
+        }
+      },
+      "PriceList": {
+        "description": "A list of prices",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Price"
+        }
+      },
+      "PricePublish": {
+        "description": "A price to publish object",
+        "type": "object",
+        "properties": {
+          "sku": {
+            "$ref": "#/components/schemas/Price/properties/skuCatalogId"
+          },
+          "priceSheet": {
+            "$ref": "#/components/schemas/Price/properties/priceSheet"
+          },
+          "price": {
+            "$ref": "#/components/schemas/Price/properties/price"
+          },
+          "listPrice": {
+            "$ref": "#/components/schemas/Price/properties/listPrice"
+          }
+        }
+      },
+      "PricePublishList": {
+        "description": "A list of prices to publish",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/PricePublish"
+        },
+        "maxItems": 500
+      },
+      "PricePublishQueue": {
+        "type": "object",
+        "description": "A PricePublish queue item",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "accountId": {
+            "$ref": "#/components/schemas/accountId"
+          },
+          "skusIds": {
+            "description": "The Sku ids of the prices or base prices that will be published.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/skuCatalogId"
+            }
+          },
+          "status": {
+            "description": "The status of the PublishQueue item.\n- `pending` is when the queue item is created and is waiting to be processed, also after fails and waiting to be retried.\n- `processing` is when the queue item is been processed.\n- `readyForPublish` is when the queue item is processed and all items are ready to be published/unpublished.\n- `success` is when all the prices and/or base prices were published/unpublished.\n- `error` is when an error ocurred while publishing.\n- `validationError` is when the Account has a problem and cannot be publish. eg. Account is inactive.\n",
+            "type": "string",
+            "readOnly": true,
+            "default": "pending",
+            "enum": [
+              "pending",
+              "processing",
+              "readyForPublish",
+              "success",
+              "error",
+              "validationError"
+            ],
+            "example": "success"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          }
+        },
+        "required": [
+          "id",
+          "accountId",
+          "skusIds",
+          "status"
+        ]
+      },
+      "PricePublishQueueList": {
+        "type": "array",
+        "description": "A list of Price Publish Queue items",
+        "items": {
+          "$ref": "#/components/schemas/PricePublishQueue"
+        }
+      },
+      "PriceSheet": {
+        "description": "A price-sheet object",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "pricingId": {
+            "description": "The Pricing `id`.\nThis field refer to **Janis Pricing Service**. See [Price](/v2/service/pricing#tag/PriceSheet).\n"
+          },
+          "name": {
+            "description": "The Price Sheet Name",
+            "type": "string",
+            "example": "Some Price Sheet"
+          },
+          "referenceId": {
+            "description": "The Price Sheet ReferenceID",
+            "type": "string",
+            "example": "some-account-table1"
+          },
+          "accountId": {
+            "$ref": "#/components/schemas/accountId"
+          },
+          "vtexId": {
+            "description": "The VTEX ID of the Price Table",
+            "type": "string",
+            "example": "table1"
+          },
+          "salesChannels": {
+            "description": "A list of sales channels IDs. This refer to the `id` of the **Sales Channel** Entity of **Janis Commerce Service**. See [Sales Channel](/v2/service/commerce#tag/Sales-Channel).\n",
+            "type": "array",
+            "items": {
+              "description": "The Sales Channel ID. This refer to the `id` of the **Sales Channel** Entity of **Janis Commerce Service**. See [Sales Channel](/v2/service/commerce#tag/Sales-Channel).\n",
+              "type": "string",
+              "example": "5e711c7b3d5b9100074b9504"
+            }
+          },
+          "priceTable": {
+            "description": "Indicates if the Price Sheet is a Price Table on VTEX",
+            "type": "boolean",
+            "example": true
+          },
+          "import": {
+            "$ref": "#/components/schemas/import"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          },
+          "status": {
+            "$ref": "#/components/schemas/status"
+          }
+        }
+      },
+      "PriceSheetList": {
+        "description": "A list of PriceSheets",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/PriceSheet"
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-key",
+        "description": "The API Key"
+      },
+      "ApiSecret": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-secret",
+        "description": "The API Secret"
+      },
+      "JanisClient": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-client",
+        "description": "Janis Client"
+      }
+    },
+    "parameters": {
+      "id": {
+        "name": "id",
+        "in": "path",
+        "schema": {
+          "type": "string",
+          "example": "d555345345345as67a342a"
+        },
+        "required": true,
+        "description": "The unique identifier of the item"
+      },
+      "ListSortDirection": {
+        "name": "sortDirection",
+        "in": "query",
+        "description": "The direction to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
+        }
+      },
+      "ListPageNumber": {
+        "name": "x-janis-page",
+        "in": "header",
+        "description": "The page to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "default": 1
+        }
+      },
+      "ListPageSize": {
+        "name": "x-janis-page-size",
+        "in": "header",
+        "description": "The page size to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "default": 60
+        }
+      },
+      "BasePriceSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "id",
+            "skuCatalogId",
+            "skuVtexId",
+            "accountId",
+            "basePrice",
+            "costPrice",
+            "listPrice",
+            "markup",
+            "import.status",
+            "dateCreated",
+            "dateModified",
+            "userCreated",
+            "userModified"
+          ]
+        }
+      },
+      "BasePriceFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/BasePrice/properties/id"
+            },
+            "skuCatalogId": {
+              "$ref": "#/components/schemas/BasePrice/properties/skuCatalogId"
+            },
+            "accountId": {
+              "$ref": "#/components/schemas/BasePrice/properties/accountId"
+            },
+            "skuVtexId": {
+              "$ref": "#/components/schemas/BasePrice/properties/skuVtexId"
+            },
+            "importPrices.status": {
+              "$ref": "#/components/schemas/BasePrice/properties/import/properties/status"
+            },
+            "dateCreated": {
+              "$ref": "#/components/schemas/BasePrice/properties/dateCreated"
+            },
+            "dateCreatedDay": {
+              "$ref": "#/components/schemas/dateCreatedDay"
+            },
+            "dateCreatedFrom": {
+              "$ref": "#/components/schemas/dateCreatedFrom"
+            },
+            "dateCreatedTo": {
+              "$ref": "#/components/schemas/dateCreatedTo"
+            },
+            "dateModified": {
+              "$ref": "#/components/schemas/BasePrice/properties/dateModified"
+            },
+            "dateModifiedDay": {
+              "$ref": "#/components/schemas/dateModifiedDay"
+            },
+            "dateModifiedFrom": {
+              "$ref": "#/components/schemas/dateModifiedFrom"
+            },
+            "dateModifiedTo": {
+              "$ref": "#/components/schemas/dateModifiedTo"
+            }
+          }
+        }
+      },
+      "FunctionsFields": {
+        "name": "fields",
+        "in": "query",
+        "description": "Reduce the response to fields",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "example": [
+            "id",
+            "name",
+            "referenceId"
+          ]
+        }
+      },
+      "FunctionsFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the model",
+        "schema": {
+          "type": "object",
+          "description": "The filters to apply to the model",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "The id to filter",
+              "example": "d555345345345as67a342b"
+            }
+          }
+        }
+      },
+      "FunctionsCalculateTotals": {
+        "name": "calculateTotals",
+        "in": "query",
+        "description": "Indicates if the response must return the totals data applied filters. **Default** `false`",
+        "schema": {
+          "type": "boolean",
+          "example": true
+        }
+      },
+      "FunctionsAllItems": {
+        "name": "allItems",
+        "in": "query",
+        "description": "Indicates if the response must return all items. **Default** `false`",
+        "schema": {
+          "type": "boolean",
+          "example": true
+        }
+      },
+      "PriceSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "id",
+            "sku",
+            "accountId",
+            "priceSheet",
+            "price",
+            "listPrice",
+            "skuVtexId",
+            "publish.status",
+            "publish.dateEnd",
+            "import.status",
+            "import.dateEnd",
+            "dateCreated",
+            "dateModified",
+            "userCreated",
+            "userModified"
+          ]
+        }
+      },
+      "PriceFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/Price/properties/id"
+            },
+            "sku": {
+              "$ref": "#/components/schemas/Price/properties/skuCatalogId"
+            },
+            "accountId": {
+              "$ref": "#/components/schemas/Price/properties/accountId"
+            },
+            "skuVtexId": {
+              "$ref": "#/components/schemas/Price/properties/skuVtexId"
+            },
+            "tradePolicyId": {
+              "$ref": "#/components/schemas/Price/properties/tradePolicyId"
+            },
+            "pricingId": {
+              "$ref": "#/components/schemas/Price/properties/pricingId"
+            },
+            "priceSheet": {
+              "$ref": "#/components/schemas/Price/properties/priceSheet"
+            },
+            "publish.status": {
+              "$ref": "#/components/schemas/Price/properties/publish/properties/status"
+            },
+            "dateCreated": {
+              "$ref": "#/components/schemas/Price/properties/dateCreated"
+            },
+            "dateCreatedDay": {
+              "$ref": "#/components/schemas/dateCreatedDay"
+            },
+            "dateCreatedFrom": {
+              "$ref": "#/components/schemas/dateCreatedFrom"
+            },
+            "dateCreatedTo": {
+              "$ref": "#/components/schemas/dateCreatedTo"
+            },
+            "dateModified": {
+              "$ref": "#/components/schemas/Price/properties/dateModified"
+            },
+            "dateModifiedDay": {
+              "$ref": "#/components/schemas/dateModifiedDay"
+            },
+            "dateModifiedFrom": {
+              "$ref": "#/components/schemas/dateModifiedFrom"
+            },
+            "dateModifiedTo": {
+              "$ref": "#/components/schemas/dateModifiedTo"
+            }
+          }
+        }
+      },
+      "PricePublishQueueSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "accountId",
+            "status",
+            "dateCreated"
+          ]
+        }
+      },
+      "PricePublishQueueFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "accountId": {
+              "$ref": "#/components/schemas/PricePublishQueue/properties/accountId"
+            },
+            "skusIds": {
+              "$ref": "#/components/schemas/PricePublishQueue/properties/skusIds"
+            },
+            "status": {
+              "$ref": "#/components/schemas/PricePublishQueue/properties/status"
+            },
+            "dateCreatedFrom": {
+              "$ref": "#/components/schemas/dateCreatedFrom"
+            },
+            "dateCreatedTo": {
+              "$ref": "#/components/schemas/dateCreatedTo"
+            }
+          }
+        }
+      },
+      "PriceSheetSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "id",
+            "pricingId",
+            "name",
+            "referenceId",
+            "accountId",
+            "vtexId",
+            "import.status",
+            "import.dateEnd",
+            "dateCreated",
+            "dateModified",
+            "userCreated",
+            "userModified",
+            "status"
+          ]
+        }
+      },
+      "PriceSheetFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/PriceSheet/properties/id"
+            },
+            "pricingId": {
+              "$ref": "#/components/schemas/PriceSheet/properties/pricingId"
+            },
+            "name": {
+              "$ref": "#/components/schemas/PriceSheet/properties/name"
+            },
+            "referenceId": {
+              "$ref": "#/components/schemas/PriceSheet/properties/referenceId"
+            },
+            "accountId": {
+              "$ref": "#/components/schemas/PriceSheet/properties/accountId"
+            },
+            "vtexId": {
+              "$ref": "#/components/schemas/PriceSheet/properties/vtexId"
+            },
+            "import.status": {
+              "$ref": "#/components/schemas/PriceSheet/properties/import/properties/status"
+            },
+            "dateCreated": {
+              "$ref": "#/components/schemas/PriceSheet/properties/dateCreated"
+            },
+            "dateCreatedDay": {
+              "$ref": "#/components/schemas/dateCreatedDay"
+            },
+            "dateCreatedFrom": {
+              "$ref": "#/components/schemas/dateCreatedFrom"
+            },
+            "dateCreatedTo": {
+              "$ref": "#/components/schemas/dateCreatedTo"
+            },
+            "dateModified": {
+              "$ref": "#/components/schemas/PriceSheet/properties/dateModified"
+            },
+            "dateModifiedDay": {
+              "$ref": "#/components/schemas/dateModifiedDay"
+            },
+            "dateModifiedFrom": {
+              "$ref": "#/components/schemas/dateModifiedFrom"
+            },
+            "dateModifiedTo": {
+              "$ref": "#/components/schemas/dateModifiedTo"
+            },
+            "userCreated": {
+              "$ref": "#/components/schemas/PriceSheet/properties/userCreated"
+            },
+            "userModified": {
+              "$ref": "#/components/schemas/PriceSheet/properties/userModified"
+            },
+            "status": {
+              "$ref": "#/components/schemas/PriceSheet/properties/status"
+            }
+          }
+        }
+      }
+    },
+    "responses": {
+      "GenericSuccess": {
+        "description": "Operation succeeded",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "BadRequest": {
+        "description": "A client error has ocurred.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Authentication missing or invalid",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Not authorized request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "InternalError": {
+        "description": "A server error has ocurred."
+      },
+      "SuccessLambdaResponse": {
+        "description": "OK",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "statusCode": {
+                  "type": "number",
+                  "example": 200
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "headers": {
+      "x-janis-total": {
+        "description": "The total amount of records in the list",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,1574 @@
+CREATE OR REPLACE PROCEDURE dl_sp_dashboards_ecommerce.sp_genera_operaciones_hoy()
+	LANGUAGE plpgsql
+AS $$
+
+declare
+
+var_fecha int;
+var_orderid_min_legacy int;
+var_orderid_max_legacy int;
+var_orderid_min_metroio int;
+var_orderid_max_metroio int;
+var_orderid_min_wongio int;
+var_orderid_max_wongio int;
+
+begin
+	
+
+var_fecha 	:=cast(to_char(dateadd(day,-0,convert_timezone('GMT','GMT+5',getdate())),'yyyymmdd') as int);
+
+drop table if exists #data_programados_consolidado_orden;--10 seg
+select
+from_unixtime_janis(o.date_created)				as fechapedido
+,o.seq_id										as op
+,o.vtex_id										as vtex_id
+,shipping_window_start
+,shipping_window_end
+into #data_programados_consolidado_orden
+from stg_ecommerce_janis_legacy.wms_orders o
+left join stg_ecommerce_janis_legacy.wms_stores s on (s.id=o.store)
+left join stg_ecommerce_janis_legacy.wms_order_shipping shi on (shi.order_id=o.id)
+left join stg_ecommerce_janis_legacy.wms_logistic_carriers c on (c.ref_id=shi.carrier_id)
+where to_char(from_unixtime_janis(shi.shipping_window_start),'yyyymmdd')=var_fecha
+union all
+select
+from_unixtime_janis(o.date_created)				as fechapedido
+,o.seq_id										as op
+,o.vtex_id										as vtex_id
+,shipping_window_start
+,shipping_window_end
+from stg_ecommerce_janis_metroio.wms_orders o
+left join stg_ecommerce_janis_metroio.wms_stores s on (s.id=o.store)
+left join stg_ecommerce_janis_metroio.wms_order_shipping shi on (shi.order_id=o.id)
+left join stg_ecommerce_janis_metroio.wms_logistic_carriers c on (c.ref_id=shi.carrier_id)
+where to_char(from_unixtime_janis(shi.shipping_window_start),'yyyymmdd')=var_fecha
+union all
+select
+from_unixtime_janis(o.date_created)				as fechapedido
+,o.seq_id										as op
+,o.vtex_id										as vtex_id
+,shipping_window_start
+,shipping_window_end
+from stg_ecommerce_janis_wongio.wms_orders o
+left join stg_ecommerce_janis_wongio.wms_stores s on (s.id=o.store)
+left join stg_ecommerce_janis_wongio.wms_order_shipping shi on (shi.order_id=o.id)
+left join stg_ecommerce_janis_wongio.wms_logistic_carriers c on (c.ref_id=shi.carrier_id)
+where to_char(from_unixtime_janis(shi.shipping_window_start),'yyyymmdd')=var_fecha;
+
+
+drop table if exists #cambios_orden;--0 seg
+select
+vtex_id
+,count(distinct shipping_window_start)		as shipping_window_start
+,count(distinct shipping_window_end)		as shipping_window_end 
+into #cambios_orden
+from #data_programados_consolidado_orden
+group by
+vtex_id;
+
+drop table if exists #pedido_modificado_entrega;--0 seg
+select
+vtex_id
+into #pedido_modificado_entrega
+from #cambios_orden
+where (shipping_window_start>1 or shipping_window_end>1);
+
+
+-- Janis Legacy
+drop table if exists #data_programados_consolidado_legacy;--7 seg
+select
+ o.id																																			as order_id
+,from_unixtime_janis(o.date_created)																											as fechapedido
+,from_unixtime_janis(o.invoice_date)																											as fecha_invoice
+,from_unixtime_janis(o.date_picked)																												as fecha_picked
+,s.title																																		as title
+,o.seq_id																																		as op
+,o.vtex_id																																		as vtex_id
+,o.picker
+,o.status																																		as statusorder
+,o.invoice_ammount																																as costinvoice
+,upper(website_name)																															as cuenta
+,((o.invoice_ammount-o.total_shipping)/1.18)																									as costnet
+,from_unixtime_janis(shi.shipping_window_start)																									as wstart
+,from_unixtime_janis(shi.shipping_window_end)																									as wend
+,from_unixtime_janis(shi.shipped_date_start)																									as shistart
+,from_unixtime_janis(shi.shipped_date_end)																										as shiend
+,to_char(from_unixtime_janis(shi.shipping_window_start),'HH24:MI')																				as hora_ini
+,to_char(from_unixtime_janis(shi.shipping_window_end),'HH24:MI')																				as hora_fin
+,'['+to_char(from_unixtime_janis(shi.shipping_window_start),'HH24:MI')+'-'+to_char(from_unixtime_janis(shi.shipping_window_end),'HH24:MI')+']'	as ventana_despacho
+,upper(c.type)																																	as tipo
+,o.items_qty
+,o.items_qty_picked
+,o.items_substitute_qty
+,o.items_substituted_qty
+,o.items_qty_missing
+,o.items_qty_original
+,shi.id
+,convert(varchar(20),'LEGACY')																													as origen
+--,shi.*
+into #data_programados_consolidado_legacy
+from stg_ecommerce_janis_legacy.wms_orders o
+left join stg_ecommerce_janis_legacy.wms_stores s on (s.id=o.store)
+left join stg_ecommerce_janis_legacy.wms_order_shipping shi on (shi.order_id=o.id)
+inner join 	(
+			select
+			order_id
+			, max(id) as id
+			from stg_ecommerce_janis_legacy.wms_order_shipping
+			group by
+			order_id
+			) shi_max on (shi_max.order_id=shi.order_id and shi_max.id=shi.id)
+left join stg_ecommerce_janis_legacy.wms_logistic_carriers c on (c.ref_id=shi.carrier_id)
+where to_char(from_unixtime_janis(shi.shipping_window_start),'yyyymmdd')=var_fecha
+and shi_max.id is not null;
+
+-- Janis Metro IO
+drop table if exists #data_programados_consolidado_metro;--4 seg
+select
+ o.id																																			as order_id
+,from_unixtime_janis(o.date_created)																											as fechapedido
+,from_unixtime_janis(o.invoice_date)																											as fecha_invoice
+,from_unixtime_janis(o.date_picked)																												as fecha_picked
+,s.title																																		as title
+,o.seq_id																																		as op
+,o.vtex_id																																		as vtex_id
+,o.picker
+,o.status																																		as statusorder
+,o.invoice_ammount																																as costinvoice
+,upper(website_name)																															as cuenta
+,((o.invoice_ammount-o.total_shipping)/1.18)																									as costnet
+,from_unixtime_janis(shi.shipping_window_start)																									as wstart
+,from_unixtime_janis(shi.shipping_window_end)																									as wend
+,from_unixtime_janis(shi.shipped_date_start)																									as shistart
+,from_unixtime_janis(shi.shipped_date_end)																										as shiend
+,to_char(from_unixtime_janis(shi.shipping_window_start),'HH24:MI')																				as hora_ini
+,to_char(from_unixtime_janis(shi.shipping_window_end),'HH24:MI')																				as hora_fin
+,'['+to_char(from_unixtime_janis(shi.shipping_window_start),'HH24:MI')+'-'+to_char(from_unixtime_janis(shi.shipping_window_end),'HH24:MI')+']'	as ventana_despacho
+,upper(c.type)																																	as tipo
+,o.items_qty
+,o.items_qty_picked
+,o.items_substitute_qty
+,o.items_substituted_qty
+,o.items_qty_missing
+,o.items_qty_original
+,shi.id
+,convert(varchar(20),'METRO_IO')																												as origen
+into #data_programados_consolidado_metro
+from stg_ecommerce_janis_metroio.wms_orders o
+left join stg_ecommerce_janis_metroio.wms_stores s on (s.id=o.store)
+left join stg_ecommerce_janis_metroio.wms_order_shipping shi on (shi.order_id=o.id)
+inner join 	(
+			select
+			order_id
+			, max(id) as id
+			from stg_ecommerce_janis_metroio.wms_order_shipping
+			group by
+			order_id
+			) shi_max on (shi_max.order_id=shi.order_id and shi_max.id=shi.id)
+left join stg_ecommerce_janis_metroio.wms_logistic_carriers c on (c.ref_id=shi.carrier_id)
+where to_char(from_unixtime_janis(shi.shipping_window_start),'yyyymmdd')=var_fecha
+and shi_max.id is not null;
+
+-- Janis Wong IO
+drop table if exists #data_programados_consolidado_wong;--4 seg
+select
+ o.id																																			as order_id
+,from_unixtime_janis(o.date_created)																											as fechapedido
+,from_unixtime_janis(o.invoice_date)																											as fecha_invoice
+,from_unixtime_janis(o.date_picked)																												as fecha_picked
+,s.title																																		as title
+,o.seq_id																																		as op
+,o.vtex_id																																		as vtex_id
+,o.picker
+,o.status																																		as statusorder
+,o.invoice_ammount																																as costinvoice
+,upper(website_name)																															as cuenta
+,((o.invoice_ammount-o.total_shipping)/1.18)																									as costnet
+,from_unixtime_janis(shi.shipping_window_start)																									as wstart
+,from_unixtime_janis(shi.shipping_window_end)																									as wend
+,from_unixtime_janis(shi.shipped_date_start)																									as shistart
+,from_unixtime_janis(shi.shipped_date_end)																										as shiend
+,to_char(from_unixtime_janis(shi.shipping_window_start),'HH24:MI')																				as hora_ini
+,to_char(from_unixtime_janis(shi.shipping_window_end),'HH24:MI')																				as hora_fin
+,'['+to_char(from_unixtime_janis(shi.shipping_window_start),'HH24:MI')+'-'+to_char(from_unixtime_janis(shi.shipping_window_end),'HH24:MI')+']'	as ventana_despacho
+,upper(c.type)																																	as tipo
+,o.items_qty
+,o.items_qty_picked
+,o.items_substitute_qty
+,o.items_substituted_qty
+,o.items_qty_missing
+,o.items_qty_original
+,shi.id
+,convert(varchar(20),'WONG_IO')																													as origen
+into #data_programados_consolidado_wong
+from stg_ecommerce_janis_wongio.wms_orders o
+left join stg_ecommerce_janis_wongio.wms_stores s on (s.id=o.store)
+left join stg_ecommerce_janis_wongio.wms_order_shipping shi on (shi.order_id=o.id)
+inner join 	(
+			select
+			order_id
+			, max(id) as id
+			from stg_ecommerce_janis_wongio.wms_order_shipping
+			group by
+			order_id
+			) shi_max on (shi_max.order_id=shi.order_id and shi_max.id=shi.id)
+left join stg_ecommerce_janis_wongio.wms_logistic_carriers c on (c.ref_id=shi.carrier_id)
+where to_char(from_unixtime_janis(shi.shipping_window_start),'yyyymmdd')=var_fecha
+--and o.id between var_orderid_min_wongio and var_orderid_max_wongio
+and shi_max.id is not null;
+
+drop table if exists #data_programados_consolidado;--0 seg
+select *
+into #data_programados_consolidado
+from #data_programados_consolidado_legacy
+union all
+select *
+from #data_programados_consolidado_metro
+union all
+select *
+from #data_programados_consolidado_wong;
+
+alter table #data_programados_consolidado add constraint vtex_id unique (vtex_id);
+alter table #data_programados_consolidado add descestado varchar(100);
+alter table #data_programados_consolidado add constraint order_id unique (order_id);
+alter table #data_programados_consolidado add constraint origen unique (origen);
+alter table #data_programados_consolidado_legacy add constraint order_id_legacy unique (order_id);
+alter table #data_programados_consolidado_metro add constraint order_id_metro unique (order_id);
+alter table #data_programados_consolidado_wong add constraint order_id_wong unique (order_id);
+
+
+
+--actualizar estados
+update #data_programados_consolidado set--0 seg
+descestado	=case statusorder	when 5 then 'PENDIENTE DE AUDITORÍA'
+								when 1 then 'NUEVA ORDEN'
+								when 6 then 'AUDITORÍA RECHAZADA'
+								when 9 then 'PENDIENTE DE PICKING EN EL SELLER'
+								when 10 then 'PENDIENTE DE PICKING'
+								when 11 then 'PENDIENTE DE REPICKING'
+								when 20 then 'EN PICKING'
+								when 21 then 'PENDIENTE DE FINALIZAR PICKING'
+								when 22 then 'FINALIZANDO PICKING'
+								when 23 then 'PREPICKING'
+								when 25 then 'PREPICKING'
+								when 30 then 'PICKEADO POR FACTURAR'
+								when 35 then 'PRECANCELADA'
+								when 40 then 'FACTURADO'
+								when 50 then 'A RECUPERAR'
+								when 60 then 'LISTO PARA ENVIAR'
+								when 65 then 'LISTO PARA RETIRAR'
+								when 66 then 'ESPERANDO POR LOGISTICA EXTERNA'
+								when 70 then 'DESPACHADO'
+								when 80 then 'A REPROGRAMAR ENTREGA'
+								when 90 then 'ENTREGADO'
+								when 95 then 'LIQUIDADO'
+								when 100 then 'ANULADO'
+								when 105 then 'ANULACIÓN AUTOMÁTICA PENDIENTE'
+								when 110 then 'ANULACIÓN CONFIRMADA'
+								when 120 then 'CANCELACIÓN PENDIENTE'
+								when 125 then 'CANCELADO'
+								when 130 then 'DEVOLUCIÓN PARCIAL'
+								when 135 then 'DEVOLUCIÓN TOTAL'
+								when 33 then 'PROCESANDO DESCUENTOS'
+								else null end;
+
+--Nuevo
+drop table if exists #eco_oms_general;
+select *
+into #eco_oms_general
+from  stg_ecommerce_vtex.eco_oms
+WHERE creationdate>=to_date(getdate()-20,'YYYY-MM-DD');
+														
+--hora de fecha real de eco_oms
+drop table if exists #eco_oms;
+select distinct
+a.ordernum						as vtex_id
+,a.shipped_date_start
+,a.prime_order
+,a.clientdocument				as dni
+into #eco_oms
+from #eco_oms_general a inner join #data_programados_consolidado b on (a.ordernum=b.vtex_id)
+and a.quantity_sku<>0;
+
+--pedidos creados hoy
+drop table if exists #eco_oms_1;
+select distinct
+a.ordernum						as vtex_id
+,a.prime_order
+,a.statusorder
+,a.clientdocument				as dni
+,a.creationdate					as fecha_creacion
+,a.paymentsystemname			as medio_pago
+into #eco_oms_1
+from #eco_oms_general a 
+where to_char(a.creationdate,'yyyymmdd') = var_fecha
+and a.quantity_sku<>0;
+
+
+update #data_programados_consolidado set--0 seg
+shistart	=b.shipped_date_start
+,shiend		=b.shipped_date_start
+from #data_programados_consolidado a
+inner join #eco_oms b on (a.vtex_id=b.vtex_id)
+where (a.shistart is null or a.shistart<='1970-01-01 00:00');
+
+--actualizar con fecha de cambio de estado
+drop table if exists #data_hora_despacho_consolidado;--9 seg
+select
+o.id
+,o.vtex_id
+,o.statusorder
+,os.old_status
+,os.new_status
+,from_unixtime_janis(os.date_created)		as osfechadate
+into #data_hora_despacho_consolidado
+from  #data_programados_consolidado_legacy o
+left join stg_ecommerce_janis_legacy.wms_order_status_changes os on (o.order_id=os.order_id)
+union all
+select
+o.id
+,o.vtex_id
+,o.statusorder
+,os.old_status
+,os.new_status
+,from_unixtime_janis(os.date_created)		as osfechadate
+from  #data_programados_consolidado_metro o
+left join stg_ecommerce_janis_metroio.wms_order_status_changes os on (o.order_id=os.order_id)
+union all
+select
+o.id
+,o.vtex_id
+,o.statusorder
+,os.old_status
+,os.new_status
+,from_unixtime_janis(os.date_created)		as osfechadate
+from  #data_programados_consolidado_wong o
+left join stg_ecommerce_janis_wongio.wms_order_status_changes os on (o.order_id=os.order_id);
+
+drop table if exists #pedido_hora_estado_entregado;--0 seg
+select
+vtex_id
+,new_status
+,osfechadate fecha_hora_estado
+into #pedido_hora_estado_entregado
+from #data_hora_despacho_consolidado
+where new_status=90
+group by
+vtex_id
+,new_status
+,osfechadate;
+
+update #data_programados_consolidado set--0 seg
+shistart	=fecha_hora_estado
+,shiend		=fecha_hora_estado
+from #data_programados_consolidado a
+inner join #pedido_hora_estado_entregado b on (a.vtex_id=b.vtex_id)
+where (a.shistart<='1970-01-01 00:00:00.0000000' or a.shistart is null);
+
+--tipo de despacho
+drop table if exists #data_adic_programado;--0 seg
+select distinct
+a.*
+, case  when d.id_cadena='02' then 'METRO'
+		when d.id_cadena='01' then 'WONG' end 																																										as cadena
+,to_char(a.wstart,'yyyymmdd')/100 																																													as mes_programado
+,substring(a.title,1,4)																																																as cod_tienda
+,substring(a.title,7,40)																																															as desc_tienda
+,to_char(a.fechapedido,'yyyymmdd')																																													as fecha_pedido
+,to_char(a.wstart,'yyyymmdd')																																														as fecha_programado
+,to_char(a.shistart,'yyyymmdd')																																														as fecha_entregado 
+,to_char(a.fecha_picked,'yyyymmdd')																																													as fechapicked
+,convert(varchar(25),a.wstart) 																																														as fecha_programada_ini
+,convert(varchar(25),a.wend) 																																														as fecha_programada_fin
+,convert(varchar(25),a.shistart) 																																													as fecha_entrega_ini
+,convert(varchar(25),a.shiend) 																																														as fecha_entrega_fin
+,case 	when a.items_qty_picked>a.items_qty then a.items_qty
+		else a.items_qty_picked end 																																												as qpickeada
+,case when a.tipo='ENTREGA A DOMICILIO' or tipo='DESPACHO DESDE TIENDA' or a.tipo='DESPACHO A DOMICILIO' 
+or a.tipo like '%ENTREGA A DOMICILIO NOCTURNA%'
+       or a.tipo='DESPACHADO POR PROVEEDOR' then 'ENTREGA A DOMICILIO' 
+   		when a.tipo like '%RETIRO%' then 'RETIRO EN TIENDA'
+   		when a.tipo like '%WONG AL AUTO%' then 'WONG AL AUTO'
+   		when a.tipo like '%DELIVERY DOM%' then 'DELIVERY POLLO BRASA'
+   		when a.tipo like '%EXPRESS%' then 'EXPRESS'
+	   	else a.tipo end																																															as tipo_despacho
+,b.desc_estado_orden_online 
+,upper(b.desc_estado_orden_online_agrupado) 																																										as desc_estado_orden_online_agrupado 
+,convert_timezone('GMT','GMT+5',getdate()) 																																																		as hora_consulta
+into #data_adic_programado
+from #data_programados_consolidado a
+left join dl_sp_maestras.dim_estado_orden_online b on (a.statusorder=b.id_estado_orden_online)
+left join dl_sp_maestras.dim_tienda c on (substring(a.title,1,4)=c.id_tienda)
+left join dl_sp_maestras.dim_cadena d on (c.sk_cadena=d.sk_cadena);
+	
+update #data_adic_programado set--0 seg
+cadena	='WONG'
+where cod_tienda='TH12';
+
+update #data_adic_programado set--0 seg
+cod_tienda	='W101'
+where cod_tienda='TH12';
+
+drop table if exists #data_adic_programado_orden;--0 seg
+select distinct
+*
+,row_number()over(partition by vtex_id order by id desc)		as orden
+into #data_adic_programado_orden
+from #data_adic_programado;
+
+delete--0 seg
+from #data_adic_programado_orden
+where orden not in (1);
+
+delete--0 seg
+from #data_adic_programado_orden
+where desc_estado_orden_online_agrupado in ('ANULADO Y DEVOLUCIONES',null);
+
+alter table #data_adic_programado_orden add q_solicitada numeric(18,2);
+alter table #data_adic_programado_orden add q_pickeada numeric(18,2);
+
+update #data_adic_programado_orden set--0 seg
+q_solicitada	=0
+,q_pickeada		=0
+where descestado in 
+('PICKEADO POR FACTURAR','PROCESANDO DESCUENTOS','PRE CANCELADO','FACTURADO','PENDIENTE SAC','LISTO PARA ENVIAR',
+'LISTO PARA RETIRAR','DESPACHADO','A REPROGRAMAR ENTREGA','ENTREGADO','LIQUIDADO');
+
+------------------------------------------------------------------------------------------------------------------
+---------------semaforo----------------------------
+
+alter table #data_adic_programado_orden add semaforo int;
+alter table #data_adic_programado_orden add dif_hconsulta_hfinal_ventana int;
+
+update #data_adic_programado_orden set--0 seg
+semaforo =0
+where descestado in ('PENDIENTE DE AUDITORIA','AUDITORIA RECHAZADA','PENDIENTE DE PICKING','EN PICKING','PREPICKING');
+
+update #data_adic_programado_orden set--0 seg
+dif_hconsulta_hfinal_ventana	=datediff(minute,wstart, hora_consulta)
+where descestado in ('PENDIENTE DE AUDITORIA','AUDITORIA RECHAZADA','PENDIENTE DE PICKING','EN PICKING','PREPICKING');
+
+--rojo
+update #data_adic_programado_orden set--0 seg
+semaforo	=1
+where dif_hconsulta_hfinal_ventana>=-15
+and descestado in ('PENDIENTE DE AUDITORIA','AUDITORIA RECHAZADA','PENDIENTE DE PICKING','EN PICKING','PREPICKING');
+
+--ambar
+update #data_adic_programado_orden set--0 seg
+semaforo	=2
+where dif_hconsulta_hfinal_ventana<-15
+and dif_hconsulta_hfinal_ventana>=-30
+and descestado in ('PENDIENTE DE AUDITORIA','AUDITORIA RECHAZADA','PENDIENTE DE PICKING','EN PICKING','PREPICKING');
+
+--verde
+update #data_adic_programado_orden set--0 seg
+semaforo	=3
+where dif_hconsulta_hfinal_ventana<-30
+and descestado in ('PENDIENTE DE AUDITORIA','AUDITORIA RECHAZADA','PENDIENTE DE PICKING','EN PICKING','PREPICKING');
+
+----------------------------------------------------------------------------------------------------------------
+
+--ontime: avance de picking dlv
+alter table #data_adic_programado_orden add en_tiempo_pick_dlv int;
+alter table #data_adic_programado_orden add total_pick_dlv int;
+
+--LISTO PARA ENVIO
+drop table if exists #PEDIDO_HORA_ENVIAR;
+SELECT VTEX_ID,NEW_STATUS,max(OSFECHADATE) FECHA_HORA_ESTADO 
+INTO #PEDIDO_HORA_ENVIAR FROM #data_hora_despacho_consolidado
+WHERE NEW_STATUS=60
+group by VTEX_ID,NEW_STATUS;
+
+--LISTO PARA FACTURADO
+drop table if exists #PEDIDO_HORA_FACTURADO;
+SELECT VTEX_ID,NEW_STATUS,max(OSFECHADATE) FECHA_HORA_ESTADO 
+INTO #PEDIDO_HORA_FACTURADO FROM #data_hora_despacho_consolidado
+WHERE NEW_STATUS=40
+group by VTEX_ID,NEW_STATUS;
+
+ALTER TABLE #data_adic_programado_orden ADD  FECHA_FACTURADO datetime;
+
+UPDATE #DATA_ADIC_PROGRAMADO_ORDEN 
+SET FECHA_FACTURADO=FECHA_HORA_ESTADO
+FROM #DATA_ADIC_PROGRAMADO_ORDEN A INNER JOIN #PEDIDO_HORA_FACTURADO B ON A.VTEX_ID=B.VTEX_ID;
+
+update #data_adic_programado_orden set--0 seg
+en_tiempo_pick_dlv		=0
+,total_pick_dlv			=1
+where descestado in ('FACTURADO','PENDIENTE SAC','LISTO PARA ENVIAR','LISTO PARA RETIRAR','DESPACHADO','A REPROGRAMAR ENTREGA','ENTREGADO','LIQUIDADO')
+and (tipo_despacho in ('ENTREGA A DOMICILIO','DELIVERY POLLO BRASA'));
+
+update #data_adic_programado_orden set--0 seg
+en_tiempo_pick_dlv		=1 
+where FECHA_FACTURADO<(dateadd(minute,-15,wstart))
+and descestado in ('FACTURADO','PENDIENTE SAC','LISTO PARA ENVIAR','LISTO PARA RETIRAR','DESPACHADO','A REPROGRAMAR ENTREGA','ENTREGADO','LIQUIDADO')
+and tipo_despacho in ('ENTREGA A DOMICILIO','DELIVERY POLLO BRASA','EXPRESS'); 
+
+update #data_adic_programado_orden set--0 seg
+en_tiempo_pick_dlv	=0 
+where semaforo=1
+and tipo_despacho in ('ENTREGA A DOMICILIO','DELIVERY POLLO BRASA','EXPRESS');
+
+update #data_adic_programado_orden set--0 seg
+semaforo=4
+where tipo_despacho in ('EXPRESS');
+
+
+------------------------------------------------------
+
+--ontime: avance de picking rt
+alter table #data_adic_programado_orden add en_tiempo_pick_rt int;
+alter table #data_adic_programado_orden add total_pick_rt int;
+
+update #data_adic_programado_orden set--0 seg
+en_tiempo_pick_rt	=0
+,total_pick_rt		=1
+where descestado in ('PICKEADO POR FACTURAR','FACTURADO','LISTO PARA ENVIAR','LISTO PARA RETIRAR','DESPACHADO','A REPROGRAMAR ENTREGA','ENTREGADO','LIQUIDADO')
+and (tipo_despacho in ('RETIRO EN TIENDA') or dif_hconsulta_hfinal_ventana>=-5);
+
+
+-----------------tiempo prom. entrega despacho-------------------------------
+
+drop table if exists #pedido_hora_estado;--0 seg
+select
+vtex_id,new_status
+,max(osfechadate)		as fecha_hora_estado 
+into #pedido_hora_estado 
+from #data_hora_despacho_consolidado
+where new_status=70
+group by
+vtex_id
+,new_status;
+
+alter table #data_adic_programado_orden add fecha_despacho datetime;
+
+update #data_adic_programado_orden set--0 seg
+fecha_despacho	=fecha_hora_estado
+from #data_adic_programado_orden a
+inner join #pedido_hora_estado b on (a.vtex_id=b.vtex_id);
+
+--listo para retiro
+drop table if exists #pedido_hora_retiro;--0 seg
+select
+vtex_id
+,new_status
+,max(osfechadate) 	as fecha_hora_estado 
+into #pedido_hora_retiro
+from #data_hora_despacho_consolidado
+where new_status=65
+group by
+vtex_id
+,new_status;
+
+
+alter table #data_adic_programado_orden add fecha_retiro datetime;
+
+update #data_adic_programado_orden set--0 seg
+fecha_retiro	=fecha_hora_estado
+from #data_adic_programado_orden a
+inner join #pedido_hora_retiro b on (a.vtex_id=b.vtex_id);
+
+update #data_adic_programado_orden set--0 seg
+fecha_retiro	=fecha_hora_estado
+from #data_adic_programado_orden a
+inner join #pedido_hora_enviar b on (a.vtex_id=b.vtex_id)
+where a.fecha_retiro is null;
+
+--calculo avance picking rt
+update #data_adic_programado_orden set--0 seg--select distinct tipo_despacho from #data_adic_programado_orden
+en_tiempo_pick_rt	=1 
+where fecha_picked<(dateadd(minute,-5,wstart))--cambio 04/07
+and descestado in ('PICKEADO POR FACTURAR','FACTURADO','LISTO PARA ENVIAR','LISTO PARA RETIRAR','DESPACHADO','A REPROGRAMAR ENTREGA','ENTREGADO','LIQUIDADO')
+and tipo_despacho in ('RETIRO EN TIENDA');
+
+--select vtex_id,desc_estado_orden_online,dif_hconsulta_hfinal_ventana,en_tiempo_pick_dlv,total_pick_dlv,en_tiempo_pick_rt,total_pick_rt 
+--from #data_adic_programado_orden
+
+--select * from #data_adic_programado_orden
+--where fecha_picked is not null
+
+
+update #data_adic_programado_orden
+set fecha_entrega_ini=shiend
+where shistart='7188-12-30 00:00:00.000';
+
+alter table #data_adic_programado_orden add dif_hdespacho_hentrega int;
+
+update #data_adic_programado_orden set--0 seg
+dif_hdespacho_hentrega	=case when (datediff(minute,fecha_despacho::timestamp,fecha_entrega_ini::timestamp))<0 then 0 else (datediff(minute,fecha_despacho::timestamp,fecha_entrega_ini::timestamp))  end
+where descestado IN ('ENTREGADO','LIQUIDADO')
+and tipo_despacho in ('ENTREGA A DOMICILIO','DELIVERY POLLO BRASA','EXPRESS');
+
+---------------------------------------
+
+alter table #data_adic_programado_orden add en_tiempo_ventana int;
+alter table #data_adic_programado_orden add en_tiempo_ventana_30 int;
+alter table #data_adic_programado_orden add total_ped_entre int;
+
+update #data_adic_programado_orden set--0 seg
+en_tiempo_ventana	=0,en_tiempo_ventana_30=0
+,total_ped_entre	=1
+where descestado in ('ENTREGADO','LIQUIDADO')
+and tipo_despacho in ('ENTREGA A DOMICILIO','DELIVERY POLLO BRASA','EXPRESS');
+
+update #data_adic_programado_orden set--0 seg
+en_tiempo_ventana 	=1
+where fecha_entrega_ini<=dateadd(minute, +3,wend)
+and descestado in ('ENTREGADO','LIQUIDADO')
+and tipo_despacho in ('ENTREGA A DOMICILIO','DELIVERY POLLO BRASA','EXPRESS');
+
+update #data_adic_programado_orden set--0 seg
+en_tiempo_ventana_30=1
+where fecha_entrega_ini<=dateadd(minute, +30,wend)
+and descestado in ('ENTREGADO','LIQUIDADO')
+and tipo_despacho in ('ENTREGA A DOMICILIO','DELIVERY POLLO BRASA','EXPRESS');
+
+--- tiempo de atencion retiro en tienda
+alter table #data_adic_programado_orden add dif_hlisto_hretiro int;
+
+update #data_adic_programado_orden set--0 seg
+dif_hlisto_hretiro	=datediff(minute,fecha_retiro::timestamp, fecha_entrega_ini::timestamp)
+where descestado in ('LISTO PARA RETIRAR','FACTURADO','ENTREGADO','LIQUIDADO')
+and  tipo_despacho in ('RETIRO EN TIENDA');
+
+alter table #data_adic_programado_orden add entregado_atrazado int;
+alter table #data_adic_programado_orden add cuenta_io int;
+
+update #data_adic_programado_orden set--0 seg
+entregado_atrazado		=0
+,cuenta_io				=0;
+
+update #data_adic_programado_orden set--0 seg
+entregado_atrazado	=1
+where en_tiempo_ventana=1;
+
+update #data_adic_programado_orden set--0 seg
+entregado_atrazado	=1
+where en_tiempo_pick_rt=1;
+
+update #data_adic_programado_orden set--0 seg--select distinct cuenta from #data_adic_programado_orden
+cuenta_io= case when cuenta in ('WONGIO','METROIO') then 1 
+				else 0 end;
+
+alter table #data_adic_programado_orden add q_pickeada_sin_susti numeric(14,2);
+
+update #data_adic_programado_orden set--0 seg
+q_pickeada_sin_susti	=0
+where descestado in ('PICKEADO POR FACTURAR','PROCESANDO DESCUENTOS','PRE CANCELADO','FACTURADO','PENDIENTE SAC'	,'LISTO PARA ENVIAR','LISTO PARA RETIRAR','DESPACHADO','A REPROGRAMAR ENTREGA','ENTREGADO','LIQUIDADO');
+
+alter table #data_adic_programado_orden add prime int;
+alter table #data_adic_programado_orden add entrega_modificada int;
+
+update #data_adic_programado_orden set--0 seg
+entrega_modificada	=0;
+
+update #data_adic_programado_orden set--0 seg
+entrega_modificada	=1
+from #data_adic_programado_orden a
+inner join #pedido_modificado_entrega b on (a.vtex_id=b.vtex_id);
+
+alter table #data_adic_programado_orden add orden_perfecta int;
+alter table #data_adic_programado_orden add orden_perfecta_universo int;
+
+update #data_adic_programado_orden set--0 seg
+orden_perfecta					=0
+,orden_perfecta_universo		=1
+where descestado in ('ENTREGADO','LIQUIDADO')
+and entrega_modificada=0
+and tipo_despacho in ('ENTREGA A DOMICILIO','DELIVERY POLLO BRASA','EXPRESS');
+
+alter table #data_adic_programado_orden add pedido_ventana_inicial_1_consulta int;
+
+update #data_adic_programado_orden
+set pedido_ventana_inicial_1_consulta=case when wstart=DATE_TRUNC('hour', dateadd(hour,+1,hora_consulta) ::timestamp) then 
+1 else 0 end;
+
+
+
+
+var_orderid_min_legacy		:=(select min(order_id) from #data_programados_consolidado_legacy);
+var_orderid_max_legacy		:=(select max(order_id) from #data_programados_consolidado_legacy);
+var_orderid_min_metroio		:=(select min(order_id) from #data_programados_consolidado_metro);
+var_orderid_max_metroio		:=(select max(order_id) from #data_programados_consolidado_metro);
+var_orderid_min_wongio		:=(select min(order_id) from #data_programados_consolidado_wong);
+var_orderid_max_wongio		:=(select max(order_id) from #data_programados_consolidado_wong);
+
+-------materiales
+
+drop table if exists #data_programados_mat_consolidado;--16 seg
+select
+o.fechapedido
+,o.fecha_picked
+,o.title
+,o.cuenta
+--,o.op
+,o.vtex_id
+,oi.name										as material
+,oi.ref_id
+,oi.substitute_of								as es_sustituto
+,oi.price
+--,oi.selling_price
+,oi.quantity
+,oi.quantity_picked
+,convert(decimal(18,3),main_weight.total)		as unit_pickeadas
+,upper(oi.measurement_unit)						as measurement_unit
+,oi.unit_multiplier
+--,o.picker
+,o.statusorder
+--,o.costinvoice
+--,o.costnet
+,o.wstart
+,o.wend
+,o.shistart
+,o.shiend
+,o.ventana_despacho
+,o.tipo
+--,o.items_qty
+--,o.items_qty_picked
+--,o.items_substitute_qty
+--,o.items_substituted_qty
+--,o.items_qty_missing
+--,o.items_qty_original
+into #data_programados_mat_consolidado
+from #data_programados_consolidado_legacy o
+inner join stg_ecommerce_janis_legacy.wms_order_items oi on (o.order_id=oi.order_id)-- and oi.substitute_of is null;
+left join	(	
+			select
+			order_item
+			,sum(nvl(weight,0))		as total
+			from stg_ecommerce_janis_legacy.wms_order_item_weighables
+			--where order_id between cast(var_orderid_min_legacy as int) and cast(var_orderid_max_legacy as int) -- parametro de pedidos
+			group by
+			order_item
+			) main_weight on (main_weight.order_item=oi.id)
+where oi.order_id between cast(var_orderid_min_legacy as int) and cast(var_orderid_max_legacy as int)
+union all
+select
+o.fechapedido
+,o.fecha_picked
+,o.title
+,o.cuenta
+--,o.op
+,o.vtex_id
+,oi.name										as material
+,oi.ref_id
+,oi.substitute_of								as es_sustituto
+,oi.price
+--,oi.selling_price
+,oi.quantity
+,oi.quantity_picked
+,convert(decimal(18,3),main_weight.total)		as unit_pickeadas
+,upper(oi.measurement_unit)						as measurement_unit
+,oi.unit_multiplier
+--,o.picker
+,o.statusorder
+--,o.costinvoice
+--,o.costnet
+,o.wstart
+,o.wend
+,o.shistart
+,o.shiend
+,o.ventana_despacho
+,o.tipo
+--,o.items_qty
+--,o.items_qty_picked
+--,o.items_substitute_qty
+--,o.items_substituted_qty
+--,o.items_qty_missing
+--,o.items_qty_original
+from #data_programados_consolidado_metro o
+inner join stg_ecommerce_janis_metroio.wms_order_items oi on (o.order_id=oi.order_id)-- and oi.substitute_of is null;
+left join	(	
+			select
+			order_item
+			,sum(nvl(weight,0))		as total
+			from stg_ecommerce_janis_metroio.wms_order_item_weighables
+			--where order_id between cast(var_orderid_min_metroio as int) and cast(var_orderid_max_metroio as int) -- parametro de pedidos
+			group by
+			order_item
+			) main_weight on (main_weight.order_item=oi.id)
+where oi.order_id between cast(var_orderid_min_metroio as int) and cast(var_orderid_max_metroio as int)
+union all
+select
+o.fechapedido
+,o.fecha_picked
+,o.title
+,o.cuenta
+--,o.op
+,o.vtex_id
+,oi.name										as material
+,oi.ref_id
+,oi.substitute_of								as es_sustituto
+,oi.price
+--,oi.selling_price
+,oi.quantity
+,oi.quantity_picked
+,convert(decimal(18,3),main_weight.total)		as unit_pickeadas
+,upper(oi.measurement_unit)						as measurement_unit
+,oi.unit_multiplier
+--,o.picker
+,o.statusorder
+--,o.costinvoice
+--,o.costnet
+,o.wstart
+,o.wend
+,o.shistart
+,o.shiend
+,o.ventana_despacho
+,o.tipo
+--,o.items_qty
+--,o.items_qty_picked
+--,o.items_substitute_qty
+--,o.items_substituted_qty
+--,o.items_qty_missing
+--,o.items_qty_original
+from #data_programados_consolidado_wong o
+inner join stg_ecommerce_janis_wongio.wms_order_items oi on (o.order_id=oi.order_id)-- and oi.substitute_of is null;
+left join	(	
+			select
+			order_item
+			,sum(nvl(weight,0))		as total
+			from stg_ecommerce_janis_wongio.wms_order_item_weighables
+			--where order_id between cast(var_orderid_min_wongio as int) and cast(var_orderid_max_wongio as int) -- parametro de pedidos
+			group by
+			order_item
+			) main_weight on (main_weight.order_item=oi.id)
+where oi.order_id between cast(var_orderid_min_wongio as int) and cast(var_orderid_max_wongio as int);
+
+alter table #data_programados_mat_consolidado add descestado varchar(100);
+alter table #data_programados_mat_consolidado add sustituto varchar(100);
+
+update  #data_programados_mat_consolidado set--9 seg
+sustituto	=case 	when es_sustituto is not null then 'SI'
+					else 'NO' end;
+
+--actualizar estados
+update #data_programados_mat_consolidado set--10 seg
+descestado	=case statusorder	when 5 then 'PENDIENTE DE AUDITORÍA'
+								when 1 then 'NUEVA ORDEN'
+								when 6 then 'AUDITORÍA RECHAZADA'
+								when 9 then 'PENDIENTE DE PICKING EN EL SELLER'
+								when 10 then 'PENDIENTE DE PICKING'
+								when 11 then 'PENDIENTE DE REPICKING'
+								when 20 then 'EN PICKING'
+								when 21 then 'PENDIENTE DE FINALIZAR PICKING'
+								when 22 then 'FINALIZANDO PICKING'
+								when 23 then 'PREPICKING'
+								when 25 then 'PREPICKING'
+								when 30 then 'PICKEADO POR FACTURAR'
+								when 35 then 'PRECANCELADA'
+								when 40 then 'FACTURADO'
+								when 50 then 'A RECUPERAR'
+								when 60 then 'LISTO PARA ENVIAR'
+								when 65 then 'LISTO PARA RETIRAR'
+								when 66 then 'ESPERANDO POR LOGISTICA EXTERNA'
+								when 70 then 'DESPACHADO'
+								when 80 then 'A REPROGRAMAR ENTREGA'
+								when 90 then 'ENTREGADO'
+								when 95 then 'LIQUIDADO'
+								when 100 then 'ANULADO'
+								when 105 then 'ANULACIÓN AUTOMÁTICA PENDIENTE'
+								when 110 then 'ANULACIÓN CONFIRMADA'
+								when 120 then 'CANCELACIÓN PENDIENTE'
+								when 125 then 'CANCELADO'
+								when 130 then 'DEVOLUCIÓN PARCIAL'
+								when 135 then 'DEVOLUCIÓN TOTAL'
+								when 33 then 'PROCESANDO DESCUENTOS'
+								else null end;
+
+--tipo de despacho
+drop table if exists #data_adic_programado_mat;--20 seg
+select distinct
+a.*
+,case 	when d.id_cadena='02' then 'METRO'
+		when d.id_cadena='01' then 'WONG' end 																																									as cadena
+,to_char(wstart,'yyyymmdd')/100 																																												as mes_programado
+,substring(title,1,4)																																															as cod_tienda
+,substring(title,7,40)																																															as desc_tienda
+,to_char(fechapedido,'yyyymmdd')																																												as fecha_pedido
+,to_char(wstart,'yyyymmdd')																																														as fecha_programado
+,to_char(shistart,'yyyymmdd')																																													as fecha_entregado 
+,to_char(fecha_picked,'yyyymmdd')																																												as fechapicked
+,convert(varchar(25),wstart) 																																													as fecha_programada_ini
+,convert(varchar(25),wend)																																														as fecha_programada_fin
+,convert(varchar(25),shistart) 																																													as fecha_entrega_ini
+,convert(varchar(25),shiend)																																													as fecha_entrega_fin
+,case 	when tipo='ENTREGA A DOMICILIO' or tipo='DESPACHO DESDE TIENDA' or tipo='DESPACHO A DOMICILIO' or tipo like '%EXPRESS%' or tipo like '%ENTREGA A DOMICILIO NOCTURNA%' then 'ENTREGA A DOMICILIO' 
+   		when tipo like '%RETIRO%' then 'RETIRO EN TIENDA'
+   		when tipo like '%WONG AL AUTO%' then 'WONG AL AUTO'
+   		when tipo like '%DELIVERY DOM%' then 'DELIVERY POLLO BRASA'
+   		when tipo like '%EXPRESS%' then 'ENTREGA EXPRESS'
+	   	else tipo end 																																															as tipo_despacho
+,b.desc_estado_orden_online  
+,upper(b.desc_estado_orden_online_agrupado)																																									as desc_estado_orden_online_agrupado 
+,convert_timezone('GMT','GMT+5',getdate())								 																																									as hora_consulta
+into #data_adic_programado_mat
+from #data_programados_mat_consolidado a
+left join dl_sp_maestras.dim_estado_orden_online b on (a.statusorder=b.id_estado_orden_online)
+left join dl_sp_maestras.dim_tienda c on (substring(a.title,1,4)=c.id_tienda)
+left join dl_sp_maestras.dim_cadena d on (c.sk_cadena=d.sk_cadena)
+where descestado in ('PICKEADO POR FACTURAR','PROCESANDO DESCUENTOS','PRE CANCELADO','FACTURADO','PENDIENTE SAC','LISTO PARA ENVIAR','LISTO PARA RETIRAR','DESPACHADO','A REPROGRAMAR ENTREGA','ENTREGADO','LIQUIDADO');
+
+update #data_adic_programado_mat set--9 seg
+cadena	='WONG'
+where cod_tienda='TH12';
+
+update #data_adic_programado_mat set--9 seg
+cod_tienda	='W101'
+where cod_tienda='TH12';
+
+delete--0 seg
+from #data_adic_programado_mat--select distinct desc_estado_orden_online_agrupado from #data_adic_programado_mat;
+where desc_estado_orden_online_agrupado in ('ANULADO Y DEVOLUCIONES',null);
+
+delete--0 seg
+from  #data_adic_programado_mat
+where ref_id in('770406','960780','966142','770407','969575','965489');
+
+alter table #data_adic_programado_mat add cuenta_io int;
+
+update #data_adic_programado_mat set--9 seg
+cuenta_io	=0;
+
+update #data_adic_programado_mat set--9 seg
+cuenta_io	=case 	when cuenta in ('WONGIO','METROIO') then 1
+					else 0 end;
+
+update #data_adic_programado_mat set--8 seg
+quantity_picked		=0
+where quantity_picked is null;
+
+update #data_adic_programado_mat set--9 seg
+unit_pickeadas	=0
+where unit_pickeadas is null
+and measurement_unit='KG';
+
+drop table if exists #vw_details_material;
+select
+convert(varchar(18),id_material)	as id_material/*,id_ean_principal,a.sk_dia_creacion_material,desc_material,desc_marca,id_um_base,id_proveedor,desc_proveedor,id_grupo_articulo
+,desc_grupo_articulo,id_categoria,desc_categoria,desc_jefe_categoria,desc_jefe_categoria_mp,desc_jefe_categoria_imp,id_sub_categoria,desc_sub_categoria,id_seccion,desc_seccion,
+id_departamento,desc_departamento,id_area,desc_area,id_gerencia_comercial,desc_gerencia_comercial,id_gerente,desc_gerente,desc_unidad_negocio,a.sk_tipo_material,id_tipo_material
+,desc_tipo_material as tipo_material,sk_tipo_set_venta,sk_tipo_surtido_incluido,id_tipo_igv,id_bloqueo_ecommerce*/
+,e.desc_categoria					as categoria
+,m.desc_gerencia_comercial			as gerencia_comercial
+into #vw_details_material
+from dl_sp_capa_semantica.dw_cencofcic_dim_material a
+--left join dl_sp_capa_semantica.dw_cencofcic_dim_marca b on (a.sk_marca=b.sk_marca)
+--left join dl_sp_capa_semantica.dw_cencofcic_dim_proveedor c on (a.sk_proveedor=c.sk_proveedor)
+inner join dl_sp_maestras.dim_grupo_articulo d on (a.sk_grupo_articulo=d.sk_grupo_articulo)
+left join dl_sp_maestras.dim_categoria e on (d.sk_categoria=e.sk_categoria)
+--left join dl_sp_maestras.dim_jefe_categoria f on (d.sk_jefe_categoria=f.sk_jefe_categoria)
+--left join dl_sp_maestras.dim_jefe_categoria_mp g on (d.sk_jefe_categoria_mp=g.sk_jefe_categoria_mp)
+--left join dl_sp_maestras.dim_jefe_categoria_imp h on (d.sk_jefe_categoria_imp=h.sk_jefe_categoria_imp)
+--left join dl_sp_maestras.dim_sub_categoria i on (d.sk_sub_categoria=i.sk_sub_categoria)
+--left join dl_sp_maestras.dim_seccion j on (d.sk_seccion=j.sk_seccion)
+--left join dl_sp_maestras.dim_departamento k on (d.sk_departamento=k.sk_departamento)
+--left join dl_sp_maestras.dim_area l on (d.sk_area=l.sk_area)
+left join dl_sp_maestras.dim_gerencia_comercial m on (d.sk_gerencia_comercial=m.sk_gerencia_comercial);
+--left join dl_sp_maestras.dim_gerente n on (d.sk_gerente=n.sk_gerente)
+--left join dl_sp_maestras.dim_tipo_material t on (a.sk_tipo_material=t.sk_tipo_material);
+
+drop table if exists #data_adic_programado_mat_gerencia;
+select
+e.*
+,m.categoria
+,m.gerencia_comercial
+into #data_adic_programado_mat_gerencia
+from #data_adic_programado_mat e
+inner join #vw_details_material m on (right('000000000000000000'+e.ref_id,18)=m.id_material);
+
+delete
+from #data_adic_programado_mat_gerencia
+where gerencia_comercial not in ('FOOD ABARROTES','FOOD PERECIBLES','NON FOOD','MARKETING');
+
+--regional 10% de tolerancia
+drop table if exists #pedidos_unidades_detalles_10;
+select distinct
+vtex_id
+,ref_id
+,sustituto
+,measurement_unit 																																																												as un
+,sum(quantity*unit_multiplier) 																																																									as unid_solicitadas
+,sum(case measurement_unit 	when 'KG' then unit_pickeadas/1000
+							when 'UN' then quantity_picked*unit_multiplier end) 																																												as unid_pickeadas_con_susti
+,case 	when sum(case	when measurement_unit='KG' and sustituto='NO' then unit_pickeadas/1000
+						when measurement_unit='UN' and sustituto='NO' then quantity_picked*unit_multiplier end)>sum(quantity*unit_multiplier) then sum(quantity*unit_multiplier)
+		when sum(case 	when measurement_unit='KG' and sustituto='NO' then unit_pickeadas/1000
+						when measurement_unit='UN' then quantity_picked*unit_multiplier end)<=sum(quantity*unit_multiplier)	then sum(case 	when measurement_unit='KG' and sustituto='NO' then unit_pickeadas/1000
+																																			when measurement_unit='UN' then quantity_picked*unit_multiplier end)
+		else sum(case 	when measurement_unit='KG' then unit_pickeadas/1000
+						when measurement_unit='UN' then quantity_picked*unit_multiplier end) end 																																								as unid_pickeadas_con_susti_menor_100
+,case	when sum(case 	when measurement_unit='KG' and sustituto='NO' then unit_pickeadas/1000 
+						when measurement_unit='UN' and sustituto='NO' then quantity_picked*unit_multiplier end)>sum(quantity*unit_multiplier) then sum(quantity*unit_multiplier)
+		when sum(case 	when measurement_unit='KG' and sustituto='NO' then unit_pickeadas/1000 
+						when measurement_unit='UN' and  sustituto='NO' then quantity_picked*unit_multiplier end)<=sum(quantity*unit_multiplier) then sum((case 	when measurement_unit='KG' and sustituto='NO' then unit_pickeadas/1000
+																																								when measurement_unit='UN' and sustituto='NO' then quantity_picked*unit_multiplier end))
+		else 0 end 																																																												as unid_pickeadas_sin_susti_menor_100
+,sum(case	when measurement_unit='KG' and sustituto='SI' then unit_pickeadas/1000
+			when measurement_unit='UN' and sustituto='SI' then quantity_picked*unit_multiplier
+			else 0 end) 																																																										as unid_susti
+,sum(quantity*unit_multiplier)																																																									as unid_pickeadas_con_susti_final
+,sum(quantity*unit_multiplier)																																																									as unid_pickeadas_sin_susti_final 
+into #pedidos_unidades_detalles_10
+from #data_adic_programado_mat_gerencia
+group by
+vtex_id
+,ref_id
+,sustituto
+,measurement_unit;
+
+update #pedidos_unidades_detalles_10 set
+unid_pickeadas_con_susti_final		=0
+,unid_pickeadas_sin_susti_final		=0;
+
+update #pedidos_unidades_detalles_10 set
+unid_pickeadas_con_susti_final		=case 	when sustituto='NO' and unid_pickeadas_con_susti_menor_100/nullif(cast(unid_solicitadas as numeric(14,2)),0)>0.9 then unid_solicitadas 
+											else 0 end
+,unid_pickeadas_sin_susti_final		=case 	when sustituto='NO' and unid_pickeadas_sin_susti_menor_100/nullif(cast(unid_solicitadas as numeric(14,2)),0)>0.9 then unid_solicitadas 
+											else 0 end
+where un='KG'
+and sustituto='NO';
+
+update #pedidos_unidades_detalles_10 set
+unid_pickeadas_con_susti_final		=unid_pickeadas_con_susti_menor_100
+,unid_pickeadas_sin_susti_final		=unid_pickeadas_sin_susti_menor_100
+where un='KG'
+and sustituto='SI';
+
+update #pedidos_unidades_detalles_10 set
+unid_pickeadas_con_susti_final		=unid_pickeadas_con_susti_menor_100
+,unid_pickeadas_sin_susti_final		=unid_pickeadas_sin_susti_menor_100
+where un='UN';
+
+drop table if exists #pedidos_unidades_10;
+select distinct
+vtex_id
+,sum(unid_solicitadas)							as unid_solicitadas
+,sum(unid_pickeadas_con_susti_final)			as unid_pickeadas_con_susti
+,sum(unid_pickeadas_sin_susti_final)			as unid_pickeadas_sin_susti
+,sum(unid_susti)								as unid_susti
+into #pedidos_unidades_10
+from #pedidos_unidades_detalles_10
+group by
+vtex_id;
+
+update #pedidos_unidades_10 set
+unid_pickeadas_con_susti	=case 	when unid_pickeadas_con_susti>unid_solicitadas then unid_solicitadas
+									else unid_pickeadas_con_susti end
+,unid_pickeadas_sin_susti	=case 	when unid_pickeadas_sin_susti>unid_solicitadas then unid_solicitadas
+									else unid_pickeadas_sin_susti end;
+								
+---------------------------------------------------------------------------------------------------------
+
+drop table if exists #rfm;
+select
+'METRO'		as cadena
+,dni
+into #rfm--select top 1 * from dl_sp_temporal.datascience_rfm_output_ecommerce_food_metro
+from dl_sp_temporal.datascience_rfm_output_ecommerce_food_metro
+where periodo=(select max(periodo) from dl_sp_temporal.datascience_rfm_output_ecommerce_food_metro)
+and rfm='TOP'
+union
+select
+'WONG'		as cadena
+,dni
+--select top 1 * from dl_sp_temporal.datascience_rfm_output_ecommerce_food_wong
+from dl_sp_temporal.datascience_rfm_output_ecommerce_food_wong
+where periodo=(select max(periodo) from dl_sp_temporal.datascience_rfm_output_ecommerce_food_wong)
+and rfm='TOP';
+
+drop table if exists #pedidos_prime;
+select distinct
+a.vtex_id
+,a.prime_order
+,a.dni --nuevo
+into #pedidos_prime
+from #eco_oms a
+inner join #data_adic_programado_orden b on (a.vtex_id=b.vtex_id);
+
+alter table #data_adic_programado_orden add dni varchar(50);
+alter table #data_adic_programado_orden add rfm_top int;
+alter table #data_adic_programado_orden add marca int;
+
+update #data_adic_programado_orden set
+rfm_top		=0
+,marca		=0
+,prime		=0;
+
+update #data_adic_programado_orden set
+dni			=b.dni
+,prime		=prime_order
+from #data_adic_programado_orden a
+inner join #pedidos_prime b on (a.vtex_id=b.vtex_id);
+
+update #data_adic_programado_orden set
+rfm_top		=1
+from #data_adic_programado_orden a
+inner join #rfm b on (a.dni=b.dni and a.cadena=b.cadena);
+
+update #data_adic_programado_orden set
+q_solicitada			=unid_solicitadas
+,q_pickeada				=unid_pickeadas_con_susti
+,q_pickeada_sin_susti	=unid_pickeadas_sin_susti
+from #data_adic_programado_orden a
+inner join #pedidos_unidades_10 b on (a.vtex_id=b.vtex_id);
+
+update #data_adic_programado_orden set
+marca	=case 	when prime=1 and rfm_top=1 then 1
+				when prime=1 and rfm_top=0 then 2
+				when prime=0 and rfm_top=1 then 3
+				else 4 end;
+		
+delete from dl_sp_dashboards_ecommerce.tbl_pedidos_programados_hoy;
+
+insert into dl_sp_dashboards_ecommerce.tbl_pedidos_programados_hoy
+(
+fechapedido
+,fecha_invoice
+,fecha_picked
+,title
+,op
+,vtex_id
+,picker
+,statusorder
+,costinvoice
+,cuenta
+,costnet
+,wstart
+,wend
+,shistart
+,shiend
+,hora_ini
+,hora_fin
+,ventana_despacho
+,tipo
+,items_qty
+,items_qty_picked
+,items_substitute_qty
+,items_substituted_qty
+,items_qty_missing
+,items_qty_original
+,id
+,descestado
+,cadena
+,mes_programado
+,cod_tienda
+,desc_tienda
+,fecha_pedido
+,fecha_programado
+,fecha_entregado
+,fechapicked
+,fecha_programada_ini
+,fecha_programada_fin
+,fecha_entrega_ini
+,fecha_entrega_fin
+,qpickeada
+,tipo_despacho
+,desc_estado_orden_online
+,desc_estado_orden_online_agrupado
+,hora_consulta
+,orden
+,q_solicitada
+,q_pickeada
+,semaforo
+,dif_hconsulta_hfinal_ventana
+,en_tiempo_pick_dlv
+,total_pick_dlv
+,en_tiempo_pick_rt
+,total_pick_rt
+,fecha_despacho
+,fecha_retiro
+,dif_hdespacho_hentrega
+,en_tiempo_ventana
+,total_ped_entre
+,dif_hlisto_hretiro
+,entregado_atrazado
+,cuenta_io
+,q_pickeada_sin_susti
+,prime
+,entrega_modificada
+,orden_perfecta
+,orden_perfecta_universo
+,dni
+,rfm_top
+,marca
+,fecha_facturado
+,en_tiempo_ventana_30
+,pedido_ventana_inicial_1_consulta
+)
+select
+fechapedido
+,fecha_invoice
+,fecha_picked
+,title
+,op
+,vtex_id
+,picker
+,statusorder
+,costinvoice
+,origen
+,costnet
+,wstart
+,wend
+,shistart
+,shiend
+,hora_ini
+,hora_fin
+,ventana_despacho
+,tipo
+,items_qty
+,items_qty_picked
+,items_substitute_qty
+,items_substituted_qty
+,items_qty_missing
+,items_qty_original
+,order_id as id
+,INITCAP(descestado)descestado
+,cadena
+,cast(mes_programado as int)
+,cod_tienda
+,desc_tienda
+,fecha_pedido
+,fecha_programado
+,fecha_entregado
+,fechapicked
+,fecha_programada_ini
+,fecha_programada_fin
+,fecha_entrega_ini
+,fecha_entrega_fin
+,qpickeada
+,tipo_despacho
+,desc_estado_orden_online
+,desc_estado_orden_online_agrupado
+,hora_consulta
+,orden
+,q_solicitada
+,q_pickeada
+,semaforo
+,dif_hconsulta_hfinal_ventana
+,en_tiempo_pick_dlv
+,total_pick_dlv
+,en_tiempo_pick_rt
+,total_pick_rt
+,fecha_despacho
+,fecha_retiro
+,dif_hdespacho_hentrega
+,en_tiempo_ventana
+,total_ped_entre
+,dif_hlisto_hretiro
+,entregado_atrazado
+,cuenta_io
+,q_pickeada_sin_susti
+,prime
+,entrega_modificada
+,orden_perfecta
+,orden_perfecta_universo
+,dni
+,rfm_top
+,marca
+,fecha_facturado
+,en_tiempo_ventana_30
+,pedido_ventana_inicial_1_consulta
+from #data_adic_programado_orden;
+
+--orden perfecta
+update dl_sp_dashboards_ecommerce.tbl_pedidos_programados_hoy set
+orden_perfecta	=case when (q_pickeada_sin_susti/q_solicitada)>=1.0 and en_tiempo_ventana=1 then 1 else 0 end
+where descestado in ('Entregado','Liquidado') and entrega_modificada=0 and tipo_despacho in ('ENTREGA A DOMICILIO','DELIVERY  BRASA','EXPRESS');
+
+update dl_sp_dashboards_ecommerce.tbl_pedidos_programados_hoy --NUEVO 2024
+set cadena ='METRO ALMACEN'
+where  cod_tienda  IN ('S038','S014','H010','S043','S085','S010','S029','S089','S044','S055','S046','S076');
+
+drop table if exists #aleatorio_1;
+select *, row_number()over(order by dni desc)Aleatorio_1 into #aleatorio_1 from dl_sp_dashboards_ecommerce.tbl_pedidos_programados_hoy;
+
+update  dl_sp_dashboards_ecommerce.tbl_pedidos_programados_hoy
+set  Aleatorio=b.Aleatorio_1
+from  dl_sp_dashboards_ecommerce.tbl_pedidos_programados_hoy a inner join  #aleatorio_1 b on a.vtex_id=b.vtex_id;
+
+delete
+from dl_sp_dashboards_ecommerce.tbl_material_entrega_hoy;
+
+insert into dl_sp_dashboards_ecommerce.tbl_material_entrega_hoy
+(
+vtex_id
+,sku
+,material
+,unid_solicitadas
+,unid_pickeadas
+,unid_faltantes
+,ventana_despacho
+,cadena
+,cod_tienda
+,tipo_despacho
+,descestado
+,desc_estado_orden_online_agrupado
+,hora_consulta
+,cuenta_io
+,venta_bruta
+,un_kg
+)
+select distinct
+vtex_id
+,ref_id 																													as sku
+,material
+,quantity*unit_multiplier 																									as unid_solicitadas
+,case measurement_unit 	when 'KG' then unit_pickeadas/1000
+						when 'UN' then quantity_picked*unit_multiplier end  												as unid_pickeadas
+,(quantity*unit_multiplier)-case measurement_unit 	when 'KG' then unit_pickeadas/1000
+													when 'UN' then quantity_picked*unit_multiplier end 						as unid_faltantes
+,ventana_despacho
+,cadena
+,cod_tienda
+,tipo_despacho
+,descestado
+,desc_estado_orden_online_agrupado
+,convert_timezone('GMT','GMT+5',getdate())																													as hora_consulta
+,cuenta_io
+,((quantity*unit_multiplier)-case measurement_unit 	when 'KG' then unit_pickeadas/1000
+													when 'UN' then quantity_picked*unit_multiplier end)*price 				as venta_bruta
+,measurement_unit 																											as un_kg 
+from #data_adic_programado_mat_gerencia;
+
+drop table if exists #pedidos_hoy;
+select distinct
+a.vtex_id
+,a.statusorder 																	as estado
+,a.fecha_creacion
+,convert_timezone('GMT','GMT+5',getdate())										as hora_consulta
+,datediff(minute,a.fecha_creacion,convert_timezone('GMT','GMT+5',getdate()))		as min_que_no_cambia_estado
+,medio_pago
+into #pedidos_hoy
+from #eco_oms_1 a 
+where  upper(a.statusorder)='PAYMENT-PENDING'
+and a.statusorder<>'';
+
+
+delete
+from dl_sp_dashboards_ecommerce.tbl_pedidos_no_janis_sap;
+
+insert into dl_sp_dashboards_ecommerce.tbl_pedidos_no_janis_sap
+(
+vtex_id
+,estado
+,fecha_creacion
+,hora_consulta
+,min_que_no_cambia_estado
+,medio_pago
+)
+select
+vtex_id
+,estado
+,fecha_creacion
+,hora_consulta
+,min_que_no_cambia_estado
+,medio_pago
+from #pedidos_hoy--select top 1 * from #pedidos_hoy
+where min_que_no_cambia_estado>=60
+and upper(medio_pago) not like '%PAGOEFECTIVO%';
+
+delete
+from dl_sp_dashboards_ecommerce.tbl_pedidos_programados_hoy
+where (upper(title)='WSM' OR title='WCC');--nuevo
+
+delete
+from dl_sp_dashboards_ecommerce.tbl_pedidos_programados_hoy
+where (title='I101 - Evento eCommerce');--nuevo
+
+UPDATE dl_sp_dashboards_ecommerce.tbl_pedidos_programados_hoy --NUEVO
+SET TIPO_DESPACHO='ENTREGA A DOMICILIO'
+WHERE TIPO_DESPACHO='DESPACHO METRO ALMACEN';
+
+--ALERTA PEDIDOS QUE NO BAJAN A JANIS
+
+drop table if exists #pedidos_creados_hoy;
+SELECT  ordernum Vtex_id,statusorder Estado,creationdate Fecha_Creación,
+CASE WHEN  (SellerName in ('wongfood','metrofood','app','appmetro')or SellerName like '%wongiot%' or SellerName like '%metroios%' or SellerName like '%metroioh%')
+then 'Tienda' else 'Almacen' end as OPERACION,dateadd(HOUR, +5, estimatedeliverydate)FECHA_PROGRAMADO_VTEX
+,to_char(dateadd(HOUR, +5, estimatedeliverydate),'YYYYMMDD')DIA_PROGRAMADO_VTEX
+,to_char(dateadd(HOUR, +5, estimatedeliverydate),'HH24') HORA_PROGRAMADO_VTEX
+,CASE WHEN (SellerName NOT IN ('wongfood','metrofood','appmetro','app') AND SellerName NOT like '%wongiot%' AND SellerName NOT like '%metroios%' 
+AND  SellerName NOT like '%metroioh%') AND (HOST LIKE '%metro%' or HOST='appmetro')  THEN 'S129' 
+WHEN (SellerName NOT IN ('wongfood','metrofood','appmetro','app') AND SellerName NOT like '%wongiot%' 
+AND SellerName NOT like '%metroios%' AND  SellerName NOT like '%metroioh%')AND (HOST LIKE '%wong%' OR HOST='app') THEN 'T129'
+WHEN SUBSTRING(COURRIER,1,4) = 'TH12' THEN 'W101' 
+ELSE SUBSTRING (COURRIER,1,4) END COD_TIENDA
+INTO #pedidos_creados_hoy
+from #eco_oms_general
+WHERE creationdate>=to_date(getdate(),'YYYY-MM-DD') and statusorder='payment-approved' and statusorder<>'';
+
+delete from  #pedidos_creados_hoy
+where OPERACION='Almacen';
+
+drop table if exists #pedidos_creados_hoy_legado;
+select vtex_id,status as statusOrder into #pedidos_creados_hoy_legado from stg_ecommerce_janis_legacy.wms_orders
+where to_char(from_unixtime_janis(date_created),'yyyymmdd')=var_fecha;
+
+drop table if exists #pedidos_creados_hoy_wong_io;
+select vtex_id,status as statusOrder into #pedidos_creados_hoy_wong_io from stg_ecommerce_janis_wongio.wms_orders
+where to_char(from_unixtime_janis(date_created),'yyyymmdd')=var_fecha;
+
+drop table if exists #pedidos_creados_hoy_metro_io;
+select vtex_id,status as statusOrder into #pedidos_creados_hoy_metro_io from stg_ecommerce_janis_metroio.wms_orders
+where to_char(from_unixtime_janis(date_created),'yyyymmdd')=var_fecha;
+
+drop table if exists #pedidos_creados_total;
+select * into #pedidos_creados_total from #pedidos_creados_hoy_legado
+union all
+select * from #pedidos_creados_hoy_wong_io
+union all
+select * from #pedidos_creados_hoy_metro_io;
+
+alter table #pedidos_creados_hoy add esta_en_janis int;
+update #pedidos_creados_hoy set esta_en_janis=0;
+update #pedidos_creados_hoy 
+set esta_en_janis=1
+from #pedidos_creados_hoy a inner join #pedidos_creados_total b on a.vtex_id=b.vtex_id ;
+
+delete from #pedidos_creados_hoy
+where esta_en_janis=1;
+
+delete from dl_sp_dashboards_ecommerce.tbl_pedidos_hoy_aprobados;
+insert into dl_sp_dashboards_ecommerce.tbl_pedidos_hoy_aprobados
+select Vtex_id,Estado,Fecha_Creación,Operacion,Fecha_programado_vtex,Dia_programado_vtex,Hora_Programado_Vtex,cod_tienda,esta_en_janis
+from  #pedidos_creados_hoy;
+
+	------------------------------------------------------------------
+	--ARCUS - 10 segundos
+	------------------------------------------------------------------
+	drop table if exists #ARCUS_MATERIALES_UNIDO;
+	SELECT distinct
+	A.ID_MATERIAL as COD_MATERIAL,
+	A.ID_EAN_PRINCIPAL,
+	--A.SK_DIA_CREACION_MATERIAL,
+	DESC_MATERIAL as MATERIAL,
+	--DESC_MARCA,
+	--ID_UM_BASE,
+	--ID_PROVEEDOR,
+	DESC_PROVEEDOR,
+	--ID_GRUPO_ARTICULO,
+	--DESC_GRUPO_ARTICULO,
+	--ID_CATEGORIA,
+	--DESC_CATEGORIA,
+	--DESC_JEFE_CATEGORIA,
+	--DESC_JEFE_CATEGORIA_MP,
+	--DESC_JEFE_CATEGORIA_IMP,
+	--ID_SUB_CATEGORIA,
+	--DESC_SUB_CATEGORIA,
+	ID_SECCION,
+	DESC_SECCION,
+	ID_DEPARTAMENTO,
+	DESC_DEPARTAMENTO,
+	--ID_AREA,
+	--DESC_AREA,
+	--ID_GERENCIA_COMERCIAL,
+	--DESC_GERENCIA_COMERCIAL,
+	--ID_GERENTE,DESC_GERENTE,
+	--DESC_UNIDAD_NEGOCIO,
+	ID_ES_MARCA_PROPIA,
+	ID_ES_MARCA_IMPORTADA
+	INTO #ARCUS_MATERIALES_UNIDO 
+	FROM dl_sp_capa_semantica.dw_cencofcic_dim_material A
+	LEFT JOIN dl_sp_capa_semantica.dw_cencofcic_dim_marca B ON A.SK_MARCA=B.SK_MARCA
+	LEFT JOIN dl_sp_capa_semantica.dw_cencofcic_dim_proveedor C ON A.SK_PROVEEDOR=C.SK_PROVEEDOR
+	LEFT JOIN dl_sp_maestras.dim_grupo_articulo D ON A.SK_GRUPO_ARTICULO=D.SK_GRUPO_ARTICULO -- Se cambio de inner join a left join
+	LEFT JOIN dl_sp_maestras.dim_categoria E ON D.SK_CATEGORIA=E.SK_CATEGORIA
+	LEFT JOIN dl_sp_maestras.dim_jefe_categoria F ON D.SK_JEFE_CATEGORIA=F.SK_JEFE_CATEGORIA
+	LEFT JOIN dl_sp_maestras.dim_jefe_categoria_mp G ON D.SK_JEFE_CATEGORIA_MP=G.SK_JEFE_CATEGORIA_MP
+	LEFT JOIN dl_sp_maestras.dim_jefe_categoria_imp H ON D.SK_JEFE_CATEGORIA_IMP=H.SK_JEFE_CATEGORIA_IMP
+	LEFT JOIN dl_sp_maestras.dim_sub_categoria I ON D.SK_SUB_CATEGORIA=I.SK_SUB_CATEGORIA
+	LEFT JOIN dl_sp_maestras.dim_seccion J ON D.SK_SECCION=J.SK_SECCION
+	LEFT JOIN dl_sp_maestras.dim_departamento K ON D.SK_DEPARTAMENTO=K.SK_DEPARTAMENTO
+	LEFT JOIN dl_sp_maestras.dim_area L ON D.SK_AREA=L.SK_AREA
+	LEFT JOIN dl_sp_maestras.dim_gerencia_comercial M ON D.SK_GERENCIA_COMERCIAL=M.SK_GERENCIA_COMERCIAL
+	LEFT JOIN dl_sp_maestras.dim_gerente N ON D.SK_GERENTE=N.SK_GERENTE;
+
+	drop table if exists #ARCUS_eco_material_entrega_hoy;
+	select 
+		B.VTEX_ID,
+		B.sku as sku,
+		B.UN_KG as UN_KG,
+		sum(B.UNID_SOLICITADAS) as UNID_SOLICITADAS,
+		sum(B.UNID_PICKEADAS) as UNID_PICKEADAS,
+		sum(B.UNID_FALTANTES) as UNID_FALTANTES
+	into #ARCUS_eco_material_entrega_hoy
+	from datalabs.dl_sp_dashboards_ecommerce.tbl_material_entrega_hoy B
+	group by VTEX_ID, sku,UN_KG;
+
+	drop table if exists #PEDIDO_MATERIAL;
+	SELECT 
+	A.COD_TIENDA as store,
+	trim(A.OP) as order_number,
+	A.FECHAPEDIDO as order_datetime,
+	A.Fecha_Picked as picking_end_datetime,
+	trim(M.ID_EAN_PRINCIPAL) as ean,
+	trim(B.sku) as sku,
+	trim(M.MATERIAL) as product_name, -- Se Cambio por SAP
+	B.UNID_SOLICITADAS as order_quantity,
+	B.UNID_PICKEADAS as found_quantity, 
+	B.UNID_FALTANTES as missing_quantity,
+	trim(B.UN_KG) as base_unit,
+	trim(M.ID_DEPARTAMENTO) as department_code, 
+	trim(M.DESC_DEPARTAMENTO) as department_description,
+	trim(M.ID_SECCION) as section_code, 
+	trim(M.DESC_SECCION) as section_description,
+	trim(M.DESC_PROVEEDOR) as provider,
+	M.ID_ES_MARCA_PROPIA as provider_marca_propia, 
+	M.ID_ES_MARCA_IMPORTADA as provider_marca_importada 
+	INTO #PEDIDO_MATERIAL 
+	FROM datalabs.dl_sp_dashboards_ecommerce.tbl_pedidos_programados_hoy A 
+	LEFT JOIN #ARCUS_eco_material_entrega_hoy B ON A.VTEX_ID=B.VTEX_ID 
+	LEFT JOIN #ARCUS_MATERIALES_UNIDO M ON right('000000000000000000' + B.SKU,18) = M.COD_MATERIAL
+	WHERE upper(A.DESCESTADO) IN ('PICKEADO POR FACTURAR','PROCESANDO DESCUENTOS','PRE CANCELADO','FACTURADO','PENDIENTE SAC'
+	,'LISTO PARA ENVIAR','LISTO PARA RETIRAR','DESPACHADO','A REPROGRAMAR ENTREGA','ENTREGADO','LIQUIDADO')
+	and to_char(A.Fecha_Picked,'YYYYMMDD') = to_char(CONVERT_TIMEZONE('GMT','GMT+5',getdate()),'YYYYMMDD');
+
+	UPDATE #PEDIDO_MATERIAL
+	SET missing_quantity = 0
+	WHERE missing_quantity < 0;
+	
+	--truncate table dl_sp_dashboards_ecommerce.arcus_productos_faltantes;
+	delete dl_sp_dashboards_ecommerce.arcus_productos_faltantes;
+	insert into dl_sp_dashboards_ecommerce.arcus_productos_faltantes
+	SELECT distinct * FROM #PEDIDO_MATERIAL
+	WHERE missing_quantity > 0 AND order_quantity > 0 ;
+	
+	--------------------------------------------------------------------
+	--------------------------------------------------------------------	
+	
+------------------------------------------------------------------------------------------------------	--
+------------------------------Reporte Pedidos Delivery por Entregar Hoy--------------------------------
+------------------------------------------------------------------------------------------------------------------
+drop table if exists #pedidos_hoy;
+select distinct cadena,cod_tienda,desc_tienda,vtex_id,op pedido,wstart ventana_inicial,wend ventana_final,dni,en_tiempo_ventana, en_tiempo_pick_dlv,descestado estado,
+desc_estado_orden_online_agrupado,ventana_despacho,total_ped_entre,total_pick_dlv 
+into #pedidos_hoy from dl_sp_dashboards_ecommerce.tbl_pedidos_programados_hoy 
+where tipo_despacho='ENTREGA A DOMICILIO';
+
+alter table #pedidos_hoy add nombre varchar(500);
+alter table #pedidos_hoy add dni_2 varchar(500);
+alter table #pedidos_hoy add telefono varchar(500);
+alter table #pedidos_hoy add correo varchar(500);
+
+update #pedidos_hoy
+set  nombre=clientname+' '+clientlastname,dni_2=b.clientdocument, telefono=b.phone, correo=b.emailoms
+from #pedidos_hoy a inner join  #eco_oms_general b on a.vtex_id=b.ordernum; 
+
+delete from dl_sp_dashboards_ecommerce.pedidos_atrazados ;
+
+insert into  dl_sp_dashboards_ecommerce.pedidos_atrazados 
+select distinct  *,convert_timezone('GMT','GMT+5',getdate())Hora_Actualización  from #pedidos_hoy;
+
+delete  from dl_sp_dashboards_ecommerce.pedidos_atrazados
+where  cadena='METRO ALMACEN';
+
+delete  from  dl_sp_dashboards_ecommerce.pedidos_atrazados
+where cod_tienda  in ('S076','S046','S053','S051');
+
+end
+
+$$
+;
+

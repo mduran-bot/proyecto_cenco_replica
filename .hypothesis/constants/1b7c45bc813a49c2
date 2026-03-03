@@ -1,0 +1,4 @@
+# file: C:\Users\maxim\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\pyspark\sql\dataframe.py
+# hypothesis_version: 6.151.9
+
+[', ', 'ArrowMapIterFunction', 'CANNOT_BE_EMPTY', 'Column', 'ColumnOrName', 'DataFrame', 'DataFrameNaFunctions', 'ExecutionInfo', 'GroupedData', 'JavaObject', 'LiteralType', 'Observation', 'PandasDataFrameLike', 'PrimitiveType', 'PySparkPlotAccessor', 'RDD[Row]', 'RDD[str]', 'SQLContext', 'SparkContext', 'SparkSession', 'ZERO_INDEX', 'any', 'arg_name', 'arg_type', 'ascending', 'backward', 'col', 'cols', 'item', 'pa.Table']

@@ -1,0 +1,4 @@
+# file: C:\Users\maxim\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\pyspark\taskcontext.py
+# hypothesis_version: 6.151.9
+
+[',', 'BarrierTaskContext', 'BarrierTaskInfo', 'NOT_IN_BARRIER_STAGE', 'ResourceInformation', 'TaskContext', '__main__', 'addresses', 'allGather', 'barrier', 'func_name', 'getTaskInfos', 'local[2]', 'object', 'spark', 'taskcontext tests', 'utf-8']

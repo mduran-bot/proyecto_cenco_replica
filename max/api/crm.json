@@ -1,0 +1,2621 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "description": "Customer Relationship Management Service\n\n **Last update**: 22 dic 25, 10:30 a. m.",
+    "title": "CRM Service",
+    "version": "1.16.0",
+    "x-janis-keywords": [
+      "customers",
+      "addresses",
+      "clusters"
+    ],
+    "x-logo": null,
+    "lastUpdate": "2025-12-22T13:30:37.139Z"
+  },
+  "tags": [
+    {
+      "name": "Cluster",
+      "description": "Clusters are a way to group customers by some condition, for example: recurring customers, customers in some affinity program, etc.\n\nYou can configure clusters in order to show a badge in the customer to easily identify them.\n"
+    },
+    {
+      "name": "Customer",
+      "description": "Real customers are created and updated automatically when they place an order. But in case you want to add more customers manually, o update them with external sources of information,\nyou can use the following APIs\n\nCustomers are identified uniquely so we can recognize, for example, a customer that uses multiple email addresses. That way you can effectively manage them and have better customer relationships.\n"
+    },
+    {
+      "name": "Customer Address",
+      "description": "For managing Customers Address"
+    },
+    {
+      "name": "Settings",
+      "description": "For managing CRM settings"
+    }
+  ],
+  "servers": [
+    {
+      "url": "https://crm.janis.in/api",
+      "description": "The Prod API server",
+      "variables": {
+        "environment": {
+          "default": "prod"
+        }
+      }
+    },
+    {
+      "url": "https://crm.janisqa.in/api",
+      "description": "The QA API server",
+      "variables": {
+        "environment": {
+          "default": "qa"
+        }
+      }
+    },
+    {
+      "url": "https://crm.janisdev.in/api",
+      "description": "The Beta API server",
+      "variables": {
+        "environment": {
+          "default": "beta"
+        }
+      }
+    },
+    {
+      "url": "http://crm.janis.localhost:3046/api",
+      "description": "The Local API server",
+      "variables": {
+        "environment": {
+          "default": "local"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/cluster/{id}": {
+      "get": {
+        "x-janis-namespace": "cluster",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "crm:cluster:read"
+        ],
+        "operationId": "getCluster",
+        "tags": [
+          "Cluster"
+        ],
+        "summary": "Get a cluster",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The cluster id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cluster"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "x-janis-namespace": "cluster",
+        "x-janis-method": "update",
+        "x-janis-permissions": [
+          "crm:cluster:write"
+        ],
+        "operationId": "updateCluster",
+        "tags": [
+          "Cluster"
+        ],
+        "summary": "Update a cluster",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The cluster id"
+          }
+        ],
+        "requestBody": {
+          "description": "The cluster to update",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Cluster"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The cluster updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "The cluster id"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/cluster": {
+      "get": {
+        "x-janis-namespace": "cluster",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "crm:cluster:read"
+        ],
+        "operationId": "listCluster",
+        "tags": [
+          "Cluster"
+        ],
+        "summary": "List of clusters",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ClusterFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ClusterSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClusterList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "x-janis-namespace": "cluster",
+        "x-janis-method": "create",
+        "x-janis-permissions": [
+          "crm:cluster:write"
+        ],
+        "operationId": "createCluster",
+        "tags": [
+          "Cluster"
+        ],
+        "summary": "Create a cluster",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "The cluster to create",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Cluster"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The cluster created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "The cluster id"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/customer/{id}": {
+      "get": {
+        "x-janis-namespace": "customer",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "crm:customer:read"
+        ],
+        "operationId": "getCustomer",
+        "tags": [
+          "Customer"
+        ],
+        "summary": "Get a customer",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "5dd7f163c736de0011204175"
+            },
+            "description": "The customer id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Customer"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "x-janis-namespace": "customer",
+        "x-janis-method": "update",
+        "x-janis-permissions": [
+          "crm:customer:write"
+        ],
+        "operationId": "updateCustomer",
+        "tags": [
+          "Customer"
+        ],
+        "summary": "Update a customer",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "example": "5dd7f163c736de0011204175",
+              "type": "string"
+            },
+            "description": "The customer id"
+          }
+        ],
+        "requestBody": {
+          "description": "### Customer identification\n\nIt must have at least one of the following unique identifiers.\n- `documentType` and `documentNumber`\n- `email`\n\n### Customer emails and phones\n\nThe following fields can hold multiple values:\n- `phone` and `phones`\n- `email` and `emails`\n- `clusters`\n\nWhen updating a customer, you can send the main value in the single-value field (for example `email`),\nand alternative values (such as an alternative email) in the multi-valued field (for example `emails`)\n\nWhether or not you send alternative values, the multi-valued fields will store all the possible values. For example, if you send the following request:\n```json\n{\n  \"email\": \"john.doe@example.com\",\n  \"emails\": [\"john.doe@alternative.com\"]\n}\n```\n\nWe will store `\"john.doe@example.com\"` as the primary `email`, and both addresses in the customers `emails` property.\n\nThis works the same way with the customer phone numbers.\n\nAlso, there are a couple of special fields you can use to add alternative values, without needing to know current values.\n\nThis properties are: `addEmails`, `addPhones` and `addClusters`. This properties will add one or more values to the multi-valued fields without overriding the existing ones.\n\n---\n",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CustomerUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The customer updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "The customer id"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/customer": {
+      "get": {
+        "x-janis-namespace": "customer",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "crm:customer:read"
+        ],
+        "operationId": "listCustomer",
+        "tags": [
+          "Customer"
+        ],
+        "summary": "List of customers",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CustomerFilters"
+          },
+          {
+            "$ref": "#/components/parameters/CustomerSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "x-janis-namespace": "customer",
+        "x-janis-method": "create",
+        "x-janis-permissions": [
+          "crm:customer:write"
+        ],
+        "operationId": "createCustomer",
+        "tags": [
+          "Customer"
+        ],
+        "summary": "Create a customer",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "### Customer identification\n\nIt must have at least one of the following unique identifiers.\n- `documentType` and `documentNumber`\n- `email`\n\n### Customer emails and phones\n\nThe following fields can hold multiple values:\n- `phone` and `phones`\n- `email` and `emails`\n\nWhen creating a customer, you can send the main value in the single-value field (for example `email`),\nand alternative values (such as an alternative email) in the multi-valued field (for example `emails`)\n\nWhether or not you send alternative values, the multi-valued fields will store all the possible values. For example, if you send the following request:\n```json\n{\n  \"email\": \"john.doe@example.com\",\n  \"emails\": [\"john.doe@alternative.com\"]\n}\n```\n\nWe will store `\"john.doe@example.com\"` as the primary `email`, and both addresses in the customers `emails` property.\n\nThis works the same way with the customer phone numbers.\n\n---\n",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Customer"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The customer created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "The customer id"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/customer-address/{id}": {
+      "get": {
+        "x-janis-namespace": "customer-address",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "crm:customer-address:read"
+        ],
+        "operationId": "getCustomerAddress",
+        "tags": [
+          "Customer Address"
+        ],
+        "summary": "Get one",
+        "description": "Get a Customer address",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "5dd7f163c736de0011204175"
+            },
+            "description": "The Customer address ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerAddress"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "x-janis-namespace": "customer-address",
+        "x-janis-method": "update",
+        "x-janis-permissions": [
+          "crm:customer-address:write"
+        ],
+        "operationId": "updateCustomerAddress",
+        "tags": [
+          "Customer Address"
+        ],
+        "summary": "Update one",
+        "description": "Update a Customer address",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "example": "5dd7f163c736de0011204175",
+              "type": "string"
+            },
+            "description": "The Customer address ID"
+          }
+        ],
+        "requestBody": {
+          "description": "Customer address",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CustomerAddress"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The customer address updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "The Customer address ID"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/customer-address": {
+      "get": {
+        "x-janis-namespace": "customer-address",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "crm:customer-address:read"
+        ],
+        "operationId": "listCustomerAddress",
+        "tags": [
+          "Customer Address"
+        ],
+        "summary": "Get many",
+        "description": "Get a List of Customer addresses",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CustomerAddressFilters"
+          },
+          {
+            "$ref": "#/components/parameters/CustomerAddressSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerAddressList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "x-janis-namespace": "customer-address",
+        "x-janis-method": "create",
+        "x-janis-permissions": [
+          "crm:customer-address:write"
+        ],
+        "operationId": "createCustomerAddress",
+        "tags": [
+          "Customer Address"
+        ],
+        "summary": "Create one",
+        "description": "Create a Customer address",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "Customer address",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CustomerAddress"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Customer address created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "The Customer address ID"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/customer-address-batch": {
+      "post": {
+        "x-janis-namespace": "customer-address-batch",
+        "x-janis-method": "post",
+        "x-janis-permissions": [
+          "crm:customer-address:write"
+        ],
+        "operationId": "CustomerAddressBatch",
+        "tags": [
+          "Customer Address"
+        ],
+        "summary": "Create or massively update customer addresses",
+        "description": "Create or update massive customer addresses. The maximum of customer addresses admitted is `500`.",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "List of customer addresses to be created or updated",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/CustomerAddressToCreate"
+                    },
+                    {
+                      "$ref": "#/components/schemas/CustomerAddressToUpdate"
+                    }
+                  ]
+                },
+                "minItems": 1,
+                "maxItems": 500,
+                "uniqueItems": true
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/CustomerAddressBatchResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/customer-domain/{id}": {
+      "get": {
+        "x-janis-namespace": "customer-domain",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "crm:customer-domain:read"
+        ],
+        "operationId": "getCustomerDomain",
+        "tags": [
+          "Customer Domain"
+        ],
+        "summary": "Get a customer domain",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "example": "6914f13e9edfe0e276d23145"
+            },
+            "required": true,
+            "description": "The customer domain id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The customer domain retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerDomain"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "x-janis-namespace": "customer-domain",
+        "x-janis-method": "update",
+        "x-janis-permissions": [
+          "crm:customer-domain:write"
+        ],
+        "operationId": "updateCustomerDomain",
+        "tags": [
+          "Customer Domain"
+        ],
+        "summary": "Update a customer domain",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "example": "6914f13e9edfe0e276d23145"
+            },
+            "required": true,
+            "description": "The customer domain id"
+          }
+        ],
+        "requestBody": {
+          "description": "The customer domain to update",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CustomerDomain"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The customer domain updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "The customer domain id",
+                      "example": "6914f13e9edfe0e276d23145"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/customer-domain": {
+      "get": {
+        "x-janis-namespace": "customer-domain",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "crm:customer-domain:read"
+        ],
+        "operationId": "listCustomerDomain",
+        "tags": [
+          "Customer Domain"
+        ],
+        "summary": "List of customer domains",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CustomerDomainFilters"
+          },
+          {
+            "$ref": "#/components/parameters/CustomerDomainSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The customer domain list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerDomainList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "x-janis-namespace": "customer-domain",
+        "x-janis-method": "create",
+        "x-janis-permissions": [
+          "crm:customer-domain:write"
+        ],
+        "operationId": "createCustomerDomain",
+        "tags": [
+          "Customer Domain"
+        ],
+        "summary": "Create a customer domain",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "The customer domain to create",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CustomerDomain"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The customer domain created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "The customer domain id",
+                      "example": "6914f13e9edfe0e276d23145"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/setting/{entity}": {
+      "get": {
+        "x-janis-namespace": "setting",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "crm:setting:read"
+        ],
+        "x-janis-roles": [
+          "deliveryPickup"
+        ],
+        "operationId": "getSetting",
+        "tags": [
+          "Settings"
+        ],
+        "summary": "Get the setting of an entity",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "entity",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "example": "entityName"
+            },
+            "required": true,
+            "description": "The name of the entity that owns the settings to be retrieved"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The settings were retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/CustomerSettings"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "x-janis-namespace": "setting",
+        "x-janis-method": "update",
+        "x-janis-permissions": [
+          "crm:setting:write"
+        ],
+        "operationId": "updateSetting",
+        "tags": [
+          "Settings"
+        ],
+        "summary": "Update the setting of an entity",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "entity",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "customer"
+              ],
+              "example": "customer"
+            },
+            "required": true,
+            "description": "The name of the entity that owns the settings to be updated"
+          }
+        ],
+        "requestBody": {
+          "description": "The settings configurations",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/CustomerSettings"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The settings were updated"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-key",
+        "description": "The API Key"
+      },
+      "ApiSecret": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-secret",
+        "description": "The API Secret"
+      },
+      "JanisClient": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-client",
+        "description": "The client code"
+      }
+    },
+    "parameters": {
+      "ListSortDirection": {
+        "name": "sortDirection",
+        "in": "query",
+        "description": "The direction to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
+        }
+      },
+      "ListPageNumber": {
+        "name": "x-janis-page",
+        "in": "header",
+        "description": "The page to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "default": 1
+        }
+      },
+      "ListPageSize": {
+        "name": "x-janis-page-size",
+        "in": "header",
+        "description": "The page size to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "default": 60
+        }
+      },
+      "ClusterSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "id",
+            "referenceId",
+            "internalName",
+            "title",
+            "status",
+            "dateCreated"
+          ]
+        }
+      },
+      "ClusterFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "description": "The cluster id",
+              "type": "string"
+            },
+            "internalName": {
+              "description": "The cluster internal name",
+              "type": "string"
+            },
+            "title": {
+              "description": "The cluster title",
+              "type": "string"
+            },
+            "status": {
+              "description": "The cluster status",
+              "type": "string"
+            },
+            "userCreated": {
+              "description": "The cluster user created",
+              "type": "string"
+            },
+            "dateCreated": {
+              "description": "The cluster date created",
+              "type": "string"
+            }
+          }
+        }
+      },
+      "CustomerSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "documentNumber",
+            "firstname",
+            "lastname",
+            "email",
+            "status",
+            "dateCreated"
+          ]
+        }
+      },
+      "CustomerFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "description": "The customer id",
+              "type": "string"
+            },
+            "documentNumber": {
+              "description": "The customer document number",
+              "type": "string"
+            },
+            "firstname": {
+              "description": "The customer firstname",
+              "type": "string"
+            },
+            "lastname": {
+              "description": "The customer lastname",
+              "type": "string"
+            },
+            "email": {
+              "description": "The customer email",
+              "type": "string"
+            },
+            "isNew": {
+              "description": "The customer new",
+              "type": "boolean"
+            },
+            "blackListed": {
+              "description": "The customer blacklisted",
+              "type": "boolean"
+            },
+            "associate": {
+              "description": "The customer associate",
+              "type": "boolean"
+            },
+            "status": {
+              "description": "The customer status",
+              "type": "string"
+            },
+            "userCreated": {
+              "description": "The customer user created",
+              "type": "string"
+            },
+            "dateCreatedRange": {
+              "type": "object",
+              "description": "A range for creation day",
+              "properties": {
+                "from": {
+                  "type": "string",
+                  "description": "The beginning of the range",
+                  "format": "date-time",
+                  "example": "2021-11-27T16:08:24.994Z"
+                },
+                "to": {
+                  "type": "string",
+                  "description": "The end of the range",
+                  "format": "date-time",
+                  "example": "2021-11-30T16:08:24.994Z"
+                }
+              }
+            },
+            "customerDomainId": {
+              "description": "The customer domain id",
+              "type": "string"
+            }
+          }
+        }
+      },
+      "CustomerAddressSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "id",
+            "status",
+            "country",
+            "userCreated",
+            "userModified"
+          ]
+        }
+      },
+      "CustomerAddressFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "description": "The customer address id",
+              "type": "string"
+            },
+            "customerId": {
+              "description": "The customer id",
+              "type": "string"
+            },
+            "street": {
+              "description": "The customer address street",
+              "type": "string"
+            },
+            "country": {
+              "description": "The customer address country",
+              "type": "string"
+            },
+            "status": {
+              "description": "The customer address status",
+              "type": "string"
+            },
+            "userCreated": {
+              "description": "The customer address user created",
+              "type": "string"
+            },
+            "dateCreated": {
+              "description": "A range for creation date",
+              "type": "object",
+              "properties": {
+                "from": {
+                  "type": "string",
+                  "description": "The beginning of the range",
+                  "format": "date-time",
+                  "example": "2021-11-27T16:08:24.994Z"
+                },
+                "to": {
+                  "type": "string",
+                  "description": "The end of the range",
+                  "format": "date-time",
+                  "example": "2021-11-30T16:08:24.994Z"
+                }
+              }
+            },
+            "dateModified": {
+              "type": "object",
+              "description": "A range for modification date",
+              "properties": {
+                "from": {
+                  "type": "string",
+                  "description": "The beginning of the range",
+                  "format": "date-time",
+                  "example": "2021-11-27T16:08:24.994Z"
+                },
+                "to": {
+                  "type": "string",
+                  "description": "The end of the range",
+                  "format": "date-time",
+                  "example": "2021-11-30T16:08:24.994Z"
+                }
+              }
+            },
+            "geoVerified": {
+              "$ref": "#/components/schemas/CustomerAddress/properties/geoVerified"
+            }
+          }
+        }
+      },
+      "CustomerDomainFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/id"
+            },
+            "name": {
+              "$ref": "#/components/schemas/CustomerDomain/properties/name"
+            },
+            "salesChannelIds": {
+              "$ref": "#/components/schemas/CustomerDomain/properties/salesChannelIds"
+            },
+            "status": {
+              "$ref": "#/components/schemas/status"
+            },
+            "dateCreated": {
+              "$ref": "#/components/schemas/dateRangeFilter"
+            },
+            "dateModified": {
+              "$ref": "#/components/schemas/dateRangeFilter"
+            }
+          }
+        }
+      },
+      "CustomerDomainSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort the list by",
+        "required": false,
+        "style": "form",
+        "explode": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "name",
+            "status",
+            "dateCreated",
+            "dateModified"
+          ]
+        }
+      },
+      "FunctionsFields": {
+        "name": "fields",
+        "in": "query",
+        "description": "Reduce the response to fields",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "example": [
+            "id",
+            "name",
+            "referenceId"
+          ]
+        }
+      },
+      "FunctionsFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the model",
+        "schema": {
+          "type": "object",
+          "description": "The filters to apply to the model",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "The id to filter",
+              "example": "637f87faa56629f7651bd4e8"
+            }
+          }
+        }
+      }
+    },
+    "headers": {
+      "x-janis-total": {
+        "description": "The total amount of records in the list",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "x-janis-total-created": {
+        "description": "The total amount of records created",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "x-janis-total-updated": {
+        "description": "The total amount of records updated",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "x-janis-total-not-modified": {
+        "description": "The total amount of records not modified",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "x-janis-total-error": {
+        "description": "The total amount of records with errors",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "responses": {
+      "GenericSuccess": {
+        "description": "Operation succeeded",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "BadRequest": {
+        "description": "A client error has ocurred.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Authentication missing or invalid",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Not authorized request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "InternalError": {
+        "description": "A server error has ocurred."
+      },
+      "CustomerAddressBatchResponse": {
+        "description": "Response object for batch creation or update of customer addresses. Includes lists of created, updated, unchanged, and errored addresses.",
+        "headers": {
+          "x-janis-total-created": {
+            "$ref": "#/components/headers/x-janis-total-created"
+          },
+          "x-janis-total-updated": {
+            "$ref": "#/components/headers/x-janis-total-updated"
+          },
+          "x-janis-total-not-modified": {
+            "$ref": "#/components/headers/x-janis-total-not-modified"
+          },
+          "x-janis-total-error": {
+            "$ref": "#/components/headers/x-janis-total-error"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "description": "Customer address batch response",
+              "type": "object",
+              "properties": {
+                "itemsCreated": {
+                  "description": "List of customer addresses successfully created",
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CustomerAddressCreateOrUpdate"
+                  }
+                },
+                "itemsUpdated": {
+                  "description": "List of customer addresses successfully updated",
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CustomerAddressCreateOrUpdate"
+                  }
+                },
+                "itemsNotModified": {
+                  "description": "List of customer addresses that were not modified (no changes detected)",
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CustomerAddressNotModified"
+                  }
+                },
+                "itemsError": {
+                  "description": "List of customer addresses that encountered errors during processing",
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CustomerAddressWithError"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "id": {
+        "description": "The unique identifier of the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "69150380cf2c81afd00e67c2"
+      },
+      "status": {
+        "description": "The item status",
+        "type": "string",
+        "default": "active",
+        "enum": [
+          "active",
+          "inactive"
+        ],
+        "example": "active"
+      },
+      "userCreated": {
+        "description": "The ID of the user who created the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "6915035cf7a57add81dff263"
+      },
+      "userModified": {
+        "description": "The ID of the user who last modified the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "6915035cf7a57add81dff263"
+      },
+      "dateCreated": {
+        "description": "The date of creation",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2025-11-12T19:00:00.000Z"
+      },
+      "dateModified": {
+        "description": "The date of the last modification",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2025-11-12T19:00:00.000Z"
+      },
+      "dateRangeFilter": {
+        "type": "object",
+        "description": "A range for date",
+        "properties": {
+          "from": {
+            "type": "string",
+            "description": "The beginning of the range",
+            "format": "date-time",
+            "example": "2019-11-27T16:08:24.994Z"
+          },
+          "to": {
+            "type": "string",
+            "description": "The end of the range",
+            "format": "date-time",
+            "example": "2019-11-30T16:08:24.994Z"
+          }
+        }
+      },
+      "Cluster": {
+        "type": "object",
+        "description": "A cluster of customers. Clusters can be used to group clients, show badges for them and segment your customer DB",
+        "properties": {
+          "id": {
+            "description": "The cluster ID",
+            "type": "string",
+            "example": "5dd7f163c736de0011204175",
+            "readOnly": true
+          },
+          "referenceId": {
+            "description": "The cluster reference id",
+            "type": "string",
+            "nullable": true,
+            "example": "4asdf54asd564"
+          },
+          "internalName": {
+            "description": "The cluster internal name",
+            "type": "string",
+            "example": "cluster name"
+          },
+          "title": {
+            "description": "The cluster title",
+            "type": "string",
+            "example": "cluster title"
+          },
+          "featured": {
+            "description": "The cluster featured",
+            "type": "boolean",
+            "example": true
+          },
+          "status": {
+            "description": "The cluster status",
+            "type": "string",
+            "enum": [
+              "active",
+              "inactive"
+            ],
+            "example": "active"
+          }
+        },
+        "required": [
+          "internalName",
+          "status"
+        ]
+      },
+      "ClusterList": {
+        "description": "The cluster list",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Cluster"
+        }
+      },
+      "Customer": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CustomerBase"
+          },
+          {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CustomerWithDocumentIdentifier"
+              },
+              {
+                "$ref": "#/components/schemas/CustomerWithEmailIdentifier"
+              }
+            ]
+          }
+        ]
+      },
+      "CustomerUpdate": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CustomerBase"
+          },
+          {
+            "$ref": "#/components/schemas/CustomerAppend"
+          },
+          {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CustomerWithDocumentIdentifier"
+              },
+              {
+                "$ref": "#/components/schemas/CustomerWithEmailIdentifier"
+              }
+            ]
+          }
+        ]
+      },
+      "CustomerWithDocumentIdentifier": {
+        "type": "object",
+        "description": "A customer unique identifier based on it's document",
+        "properties": {
+          "documentType": {
+            "type": "string",
+            "description": "The customer's document type",
+            "example": "passport"
+          },
+          "documentNumber": {
+            "type": "string",
+            "description": "The customer's document number (as string)",
+            "example": "34234233N"
+          }
+        },
+        "required": [
+          "documentType",
+          "documentNumber"
+        ]
+      },
+      "CustomerWithEmailIdentifier": {
+        "type": "object",
+        "description": "A customer unique identifier based on it's email",
+        "properties": {
+          "email": {
+            "$ref": "#/components/schemas/CustomerEmail"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "CustomerBase": {
+        "type": "object",
+        "description": "A customer.",
+        "properties": {
+          "id": {
+            "description": "The customer ID",
+            "type": "string",
+            "example": "5dd7f163c736de0011204175",
+            "readOnly": true
+          },
+          "commerceId": {
+            "description": "The customer commerceId",
+            "type": "string",
+            "example": "4asdf54asd564"
+          },
+          "firstname": {
+            "description": "The customer firstname. It's only required to create the customer, not to update it.",
+            "type": "string",
+            "example": "John"
+          },
+          "lastname": {
+            "description": "The customer lastname. It's only required to create the customer, not to update it.",
+            "type": "string",
+            "example": "Doe"
+          },
+          "documentType": {
+            "description": "The customer document type",
+            "type": "string",
+            "example": "DNI"
+          },
+          "documentNumber": {
+            "description": "The customer document number",
+            "type": "string",
+            "example": "99999999"
+          },
+          "email": {
+            "$ref": "#/components/schemas/CustomerEmail"
+          },
+          "emails": {
+            "description": "A list with all the customer emails",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomerEmail"
+            },
+            "example": [
+              "john.doe@mail.com",
+              "alternate-email@mail.com",
+              "work-email@mail.com"
+            ]
+          },
+          "gender": {
+            "description": "The customer gender",
+            "type": "string",
+            "example": "female",
+            "enum": [
+              "male",
+              "female"
+            ]
+          },
+          "birthdate": {
+            "description": "The customer birthdate",
+            "type": "string",
+            "format": "date-time",
+            "example": "2019-11-21T00:00:00.000Z"
+          },
+          "phone": {
+            "$ref": "#/components/schemas/CustomerPhone"
+          },
+          "phones": {
+            "description": "A list with all the customer phones",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomerPhone"
+            },
+            "example": [
+              "+549 11 4545 4545",
+              "+549 11 2222 3333"
+            ]
+          },
+          "clusters": {
+            "description": "The list with all the customer cluster IDs",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomerCluster"
+            }
+          },
+          "habeasData": {
+            "description": "If the customer accepted the habeas data and the last modified",
+            "type": "object",
+            "properties": {
+              "accepted": {
+                "description": "If the customer accepted the habeas data",
+                "type": "boolean",
+                "example": true
+              },
+              "lastModified": {
+                "description": "Latest modification of habeas data",
+                "type": "string",
+                "format": "date-time",
+                "example": "2022-10-15T15:00:00.000Z",
+                "readOnly": true
+              }
+            }
+          },
+          "fullname": {
+            "description": "The customer firstname and lastname.",
+            "type": "string",
+            "example": "John Doe",
+            "readOnly": true
+          },
+          "status": {
+            "description": "The customer status",
+            "type": "string",
+            "enum": [
+              "active",
+              "inactive"
+            ],
+            "example": "active"
+          },
+          "employeeId": {
+            "description": "The customer employeeId",
+            "type": "string",
+            "example": "12999A"
+          },
+          "blackListed": {
+            "description": "The customer blackListed",
+            "type": "boolean",
+            "example": true
+          },
+          "isNew": {
+            "description": "The customer isNew",
+            "type": "boolean",
+            "example": false
+          },
+          "associate": {
+            "description": "The customer associate",
+            "type": "boolean",
+            "example": false
+          },
+          "pointsCard": {
+            "description": "The customer points card",
+            "type": "string",
+            "example": "00565465454564"
+          },
+          "customerDomainId": {
+            "description": "The customer domain id",
+            "type": "string",
+            "example": "69150380cf2c81afd00e67c2"
+          },
+          "dateCreated": {
+            "description": "The customer date created",
+            "type": "string",
+            "format": "date-time",
+            "example": "2019-11-21T22:58:11.966Z",
+            "readOnly": true
+          },
+          "dateModified": {
+            "description": "The menu item date created",
+            "type": "string",
+            "format": "date-time",
+            "example": "2019-11-21T22:58:11.966Z",
+            "readOnly": true
+          },
+          "userCreated": {
+            "description": "The user creator id",
+            "type": "string",
+            "example": "5dd7f163c736de0011204174",
+            "readOnly": true
+          },
+          "userModified": {
+            "description": "The user creator id",
+            "type": "string",
+            "example": "5dd7f163c736de0011204175",
+            "readOnly": true
+          }
+        },
+        "required": [
+          "firstname",
+          "lastname"
+        ]
+      },
+      "CustomerAppend": {
+        "description": "Customer fields to allow appending values to lists",
+        "type": "object",
+        "properties": {
+          "addEmails": {
+            "description": "Emails to append to the existing ones",
+            "writeOnly": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomerEmail"
+            }
+          },
+          "addPhones": {
+            "description": "Phones to append to the existing ones",
+            "writeOnly": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomerPhone"
+            }
+          },
+          "addClusters": {
+            "description": "Cluster IDs to append to the existing ones",
+            "writeOnly": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomerCluster"
+            }
+          }
+        }
+      },
+      "CustomerCluster": {
+        "description": "The cluster ID",
+        "type": "string",
+        "example": "6dd716834a9a650011a21003"
+      },
+      "CustomerEmail": {
+        "description": "The customer email",
+        "type": "string",
+        "example": "john.doe@mail.com"
+      },
+      "CustomerPhone": {
+        "description": "The customer phone",
+        "type": "string",
+        "example": "+549 11 4545 4545"
+      },
+      "CustomerList": {
+        "description": "The customer list",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Customer"
+        }
+      },
+      "CustomerAddressId": {
+        "description": "The customer address ID",
+        "type": "string",
+        "example": "5dd7f163c736de0011204175"
+      },
+      "CustomerAddress": {
+        "type": "object",
+        "description": "A customer address",
+        "properties": {
+          "id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CustomerAddressId"
+              }
+            ],
+            "readOnly": true
+          },
+          "customerId": {
+            "description": "The customer address id",
+            "type": "string",
+            "example": "5dd7f163c736de0011204174"
+          },
+          "commerceId": {
+            "description": "The customer address commerceId",
+            "type": "string",
+            "example": "4asdf54asd564"
+          },
+          "postalCode": {
+            "description": "The customer address postal code",
+            "type": "string",
+            "example": "1515"
+          },
+          "country": {
+            "description": "The customer address country",
+            "type": "string",
+            "example": "ARG"
+          },
+          "city": {
+            "description": "The customer address city",
+            "type": "string",
+            "example": "Autonomous City of Buenos Aires"
+          },
+          "street": {
+            "description": "The customer address street",
+            "type": "string",
+            "example": "Costa rica"
+          },
+          "state": {
+            "description": "The customer address state",
+            "type": "string",
+            "example": "Buenos Aires"
+          },
+          "number": {
+            "description": "The customer address number",
+            "type": "string",
+            "example": "1414"
+          },
+          "lat": {
+            "description": "The customer address latitude",
+            "type": "number",
+            "example": -34.5863272
+          },
+          "lng": {
+            "description": "The customer address longitude",
+            "type": "number",
+            "example": -58.4298193
+          },
+          "neighborhood": {
+            "description": "The customer address neighborhood",
+            "type": "string",
+            "example": "Palermo"
+          },
+          "complement": {
+            "description": "The customer address complement",
+            "type": "string",
+            "example": "1"
+          },
+          "status": {
+            "description": "The customer address status",
+            "type": "string",
+            "default": "active",
+            "enum": [
+              "active",
+              "inactive"
+            ],
+            "example": "active"
+          },
+          "dateCreated": {
+            "description": "The customer address date created",
+            "type": "string",
+            "format": "date-time",
+            "example": "2019-11-21T22:58:11.966Z",
+            "readOnly": true
+          },
+          "dateModified": {
+            "description": "The customer address date created",
+            "type": "string",
+            "format": "date-time",
+            "example": "2019-11-21T22:58:11.966Z",
+            "readOnly": true
+          },
+          "userCreated": {
+            "description": "The user creator id",
+            "type": "string",
+            "example": "5dd7f163c736de0011204174",
+            "readOnly": true
+          },
+          "userModified": {
+            "description": "The user creator id",
+            "type": "string",
+            "example": "5dd7f163c736de0011204175",
+            "readOnly": true
+          },
+          "geoVerified": {
+            "type": "boolean",
+            "description": "Indicates if the address geolocation (`lat` and `lng`) has been verified. This can happen in two ways:\n\n1. Automatically: When three consecutive deliveries made through Janis Delivery APP are in a 100-meter area.\n2. Manually: By setting this field to `true`\n\nIf a verified address is modified (for example, the street number changes), the automatic geo verification will reset:\n- `oldCoordinates` and `coordinatesDeliveries` are removed\n- `geoVerified` is set to `false`\n",
+            "example": true
+          },
+          "oldCoordinates": {
+            "type": "object",
+            "readOnly": true,
+            "description": "This is set to the original coordinates (if any) when an address geolocation is automatically verified",
+            "properties": {
+              "lat": {
+                "type": "number",
+                "description": "The old address latitude",
+                "example": -34.5863272
+              },
+              "lng": {
+                "type": "number",
+                "description": "The old address longitude",
+                "example": -58.4298193
+              }
+            }
+          },
+          "coordinatesDeliveries": {
+            "type": "array",
+            "readOnly": true,
+            "description": "Stores the coordinates of the last 3 deliveries made in for this address with the Janis Delivery APP.\n\nThis is used for the automatic geo verification (see `geoVerified`)\n",
+            "items": {
+              "type": "object",
+              "description": "The coordinate of a delivery made for this address with the Janis Delivery APP",
+              "properties": {
+                "lat": {
+                  "type": "number",
+                  "description": "The coordinate latitude",
+                  "example": -34.5863272
+                },
+                "lng": {
+                  "type": "number",
+                  "description": "The coordinate longitude",
+                  "example": -58.4298193
+                }
+              }
+            }
+          },
+          "needsAddressCompletion": {
+            "type": "boolean",
+            "description": "Indicates if the address needs to be completed. \n\n- This is set to `true` when the address is incomplete (when the `state` is empty or the `city` and `neighborhood` are empty)\n- This is set to `false` when the address is complete.\n",
+            "example": true
+          }
+        },
+        "required": [
+          "customerId",
+          "country",
+          "street"
+        ]
+      },
+      "CustomerAddressList": {
+        "description": "The customer address list",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/CustomerAddress"
+        }
+      },
+      "CustomerAddressBatchBase": {
+        "description": "Base object containing shared attributes required for creating or updating a customer address",
+        "type": "object",
+        "properties": {
+          "customerId": {
+            "$ref": "#/components/schemas/CustomerAddress/properties/customerId"
+          },
+          "commerceId": {
+            "$ref": "#/components/schemas/CustomerAddress/properties/commerceId"
+          },
+          "postalCode": {
+            "$ref": "#/components/schemas/CustomerAddress/properties/postalCode"
+          },
+          "country": {
+            "$ref": "#/components/schemas/CustomerAddress/properties/country"
+          },
+          "state": {
+            "$ref": "#/components/schemas/CustomerAddress/properties/state"
+          },
+          "city": {
+            "$ref": "#/components/schemas/CustomerAddress/properties/city"
+          },
+          "street": {
+            "$ref": "#/components/schemas/CustomerAddress/properties/street"
+          },
+          "number": {
+            "$ref": "#/components/schemas/CustomerAddress/properties/number"
+          },
+          "lat": {
+            "$ref": "#/components/schemas/CustomerAddress/properties/lat"
+          },
+          "lng": {
+            "$ref": "#/components/schemas/CustomerAddress/properties/lng"
+          },
+          "neighborhood": {
+            "$ref": "#/components/schemas/CustomerAddress/properties/neighborhood"
+          },
+          "complement": {
+            "$ref": "#/components/schemas/CustomerAddress/properties/complement"
+          },
+          "geoVerified": {
+            "description": "Whether the address is geo verified",
+            "type": "boolean",
+            "nullable": true,
+            "example": true
+          },
+          "status": {
+            "$ref": "#/components/schemas/CustomerAddress/properties/status"
+          }
+        }
+      },
+      "CustomerAddressToCreate": {
+        "title": "Customer address to create",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CustomerAddressBatchBase"
+          }
+        ],
+        "description": "Object representing the required data to create a new customer address.\n    \nIncluding customer ID, address details, and optional geo verification status\n",
+        "required": [
+          "customerId",
+          "country",
+          "street"
+        ]
+      },
+      "CustomerAddressToUpdate": {
+        "title": "Customer address to update",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CustomerAddressBatchBase"
+          }
+        ],
+        "description": "Object representing the required data to update an existing customer address.\n    \nIncluding address ID and any fields to be updated\n",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/CustomerAddressId"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "CustomerAddressCreateOrUpdate": {
+        "type": "object",
+        "description": "Customer address created or updated",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/CustomerAddressId"
+          },
+          "customerId": {
+            "$ref": "#/components/schemas/CustomerAddress/properties/customerId"
+          },
+          "commerceId": {
+            "$ref": "#/components/schemas/CustomerAddress/properties/commerceId"
+          },
+          "address": {
+            "type": "string",
+            "description": "The address formatted in a single string",
+            "example": "Corrientes, 1234, 1000, Centro, Buenos Aires, Autonomous City of Buenos Aires"
+          }
+        }
+      },
+      "CustomerAddressNotModified": {
+        "$ref": "#/components/schemas/CustomerAddressCreateOrUpdate"
+      },
+      "CustomerAddressWithError": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CustomerAddressBatchBase"
+          }
+        ],
+        "description": "Represents a customer address that failed during processing, including its input data and a detailed error message",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/CustomerAddress/properties/id"
+          },
+          "errorMessage": {
+            "description": "The description of the error that occurred at trying to create or update the customer address",
+            "type": "string",
+            "example": "Customer address not found with the specified id. Both \\'customerId\\', \\'country\\', and \\'street\\' are required to create a new address."
+          }
+        }
+      },
+      "CustomerDomain": {
+        "type": "object",
+        "description": "A customer domain",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "name": {
+            "description": "The customer domain name",
+            "type": "string",
+            "example": "Janis"
+          },
+          "salesChannelIds": {
+            "description": "Array of object IDs representing the different sales channels to which the customer domain will be applied",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "6914ee2657a62c1fe15318be",
+              "6914ee29473e03d7d3ea376b"
+            ]
+          },
+          "status": {
+            "$ref": "#/components/schemas/status"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          }
+        },
+        "required": [
+          "name",
+          "salesChannelIds"
+        ]
+      },
+      "CustomerDomainList": {
+        "description": "The customer domain list",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/CustomerDomain"
+        }
+      },
+      "FunctionError": {
+        "type": "object",
+        "description": "The error message",
+        "properties": {
+          "message": {
+            "description": "The error message",
+            "type": "string",
+            "readOnly": true,
+            "example": "An error occurred"
+          }
+        }
+      },
+      "CustomerSettings": {
+        "description": "This setting must be used by the APP to display the habeas data agreement.",
+        "type": "object",
+        "title": "Customer",
+        "properties": {
+          "habeasData": {
+            "$ref": "#/components/schemas/HabeasData"
+          },
+          "identifyBy": {
+            "type": "string",
+            "description": "This setting determines if should fetch customers by email or document",
+            "enum": [
+              "document",
+              "email"
+            ],
+            "example": "document",
+            "default": "document"
+          }
+        }
+      },
+      "HabeasData": {
+        "description": "The settings that will be user to accept or decline the habeas data",
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "The title to be used in the app",
+            "example": "Terms & conditions"
+          },
+          "link": {
+            "type": "string",
+            "description": "The url of the file to be agreed",
+            "example": "https://example.com/file.pdf"
+          },
+          "linkText": {
+            "type": "string",
+            "description": "The text to be used in place of the default text to access the link",
+            "example": "See terms and conditions"
+          }
+        }
+      }
+    }
+  }
+}

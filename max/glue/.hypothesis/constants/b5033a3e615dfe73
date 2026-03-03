@@ -1,0 +1,4 @@
+# file: C:\Users\maxim\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\pyspark\java_gateway.py
+# hypothesis_version: 6.151.9
+
+[0.1, '%s=%s', '--conf', './bin/spark-submit', '/c', '/f', '/pid', '/t', '0', 'GATEWAY_SERVER', 'JAVA_GATEWAY_EXITED', 'PYSPARK_GATEWAY_PORT', 'PYSPARK_PIN_THREAD', 'PYSPARK_SUBMIT_ARGS', 'SPARK_CONNECT_MODE', 'SPARK_TESTING', 'Windows', '_callback_server', 'cmd', 'env', 'preexec_fn', 'pyspark-shell', 'rb', 'scala.Tuple2', 'stdin', 'taskkill', 'true']

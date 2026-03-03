@@ -1,0 +1,49 @@
+{
+  "apis": {
+    "orders": {
+      "endpoint": "orders",
+      "schedule": "rate(5 minutes)",
+      "requires_enrichment": true,
+      "enrichment_endpoint": "orders/{id}/items",
+      "priority": "high"
+    },
+    "products": {
+      "endpoint": "products",
+      "schedule": "rate(1 hour)",
+      "requires_enrichment": true,
+      "enrichment_endpoint": "products/{id}/skus",
+      "priority": "medium"
+    },
+    "stock": {
+      "endpoint": "stock",
+      "schedule": "rate(10 minutes)",
+      "requires_enrichment": false,
+      "priority": "high"
+    },
+    "prices": {
+      "endpoint": "prices",
+      "schedule": "rate(30 minutes)",
+      "requires_enrichment": false,
+      "priority": "medium"
+    },
+    "stores": {
+      "endpoint": "stores",
+      "schedule": "rate(1 day)",
+      "requires_enrichment": false,
+      "priority": "low"
+    }
+  },
+  "rate_limiting": {
+    "max_requests_per_minute": 100,
+    "backoff_factor": 2,
+    "max_retries": 3
+  },
+  "pagination": {
+    "page_size": 100,
+    "max_pages": 1000
+  },
+  "incremental": {
+    "overlap_minutes": 1,
+    "date_field": "dateModified"
+  }
+}

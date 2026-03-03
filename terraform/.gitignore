@@ -1,0 +1,84 @@
+# Terraform State Files
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+
+# Terraform Plan Files
+*.tfplan
+*.tfplan.*
+
+# Terraform Directory
+.terraform/
+.terraform.lock.hcl
+
+# Crash log files
+crash.log
+crash.*.log
+
+# Exclude all .tfvars files with real values
+terraform.tfvars
+**/terraform.tfvars
+*.auto.tfvars
+*.auto.tfvars.json
+
+# Keep example files
+!terraform.tfvars.example
+!*.tfvars.example
+
+# Credentials and Sensitive Files
+credentials.tfvars
+**/credentials.tfvars
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Logs
+*.log
+terraform.log
+
+# Backup files
+*.backup
+*.backup.*
+*.bak
+
+# LocalStack specific
+localstack.tfvars
+localstack_override.tf*
+test_localstack.tf
+
+# Testing configurations
+terraform.tfvars.testing
+terraform.tfvars.testing.*
+*.tfvars.testing
+*.tfvars.minimal
+
+# OS specific
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE specific
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.settings/
+.classpath
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Override files
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# CLI configuration files
+.terraformrc
+terraform.rc

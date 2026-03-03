@@ -1,0 +1,4 @@
+# file: C:\Users\maxim\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\pyspark\sql\udf.py
+# hypothesis_version: 6.151.9
+
+['CANNOT_SET_TOGETHER', 'ColumnOrName', 'DataTypeOrString', 'JavaObject', 'NOT_CALLABLE', 'NOT_DATATYPE_OR_STR', 'NOT_IMPLEMENTED', 'NOT_INT', 'SparkContext', 'SparkSession', 'UDFRegistration', 'UserDefinedFunction', '__main__', '__module__', '__name__', 'arg_list', 'arg_name', 'arg_type', 'asNondeterministic', 'evalType', 'eval_type', 'f', 'false', 'feature', 'func', 'local[4]', 'returnType', 'return_type', 'spark', 'spark.python.profile', 'sql.udf tests', 'true']

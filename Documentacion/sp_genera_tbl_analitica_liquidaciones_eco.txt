@@ -1,0 +1,941 @@
+-- DROP PROCEDURE dl_sp_dashboards_ecommerce.sp_genera_tbl_analitica_liquidaciones_eco();
+
+CREATE OR REPLACE PROCEDURE dl_sp_dashboards_ecommerce.sp_genera_tbl_analitica_liquidaciones_eco()
+	LANGUAGE plpgsql
+AS $$
+	
+
+--------------------------------------------------------------------------------------------------
+--------------------------Reporte Pedidos Facturados Janis---------------------------------
+---------------------------------------------------------------------------------------------------	
+	
+	
+declare
+
+var_fecha int;
+
+begin
+	
+var_fecha 			:=cast(to_char(dateadd(day,-1,convert_timezone('GMT','GMT+5',getdate())),'yyyymmdd') as int);
+--var_fecha 			:=cast(to_char(dateadd(day,-1,getdate()),'yyyymmdd') as int);	
+
+delete
+--select count(1)--select distinct sk_dia
+from dl_sp_temporal.tbl_analitica_liquidaciones_eco;
+--where sk_dia=var_fecha;
+
+drop table if exists #metro_io;
+select
+case	when upper(s.title) like '%metro%' then 'metro'
+		when upper(s.title) like '%METRO%' then 'METRO'
+		else 'METRO'     end											    as cadena
+,left(s.title,4)															as cod_tienda
+,o.seq_id
+,o.vtex_id
+,case	when c.name like '%XDELIVERY%' then 'DELIVERY POLLO BRASA'
+		when c.name like '%ENT_DOMIC%' then 'ENTREGA A DOMICILIO'
+		when c.name like '%WCLK_AUTO%' then 'CLICK AL AUTO'
+		when c.name like '%XEXPRESS_DOMIC%' then 'DELIVERY EXPRES'
+		when c.name like '%REC_TNDA%' then 'RETIRO EN TIENDA'
+		when c.name like '%PLAYA%' then 'RETPLAYA'
+		when c.name like '%CYBER%' then 'CYBER APOYO'
+		else null end														as metodo_despacho
+,o.invoice_ammount															as vta_neta
+,case o.status	when 5 then 'PENDIENTE DE AUDITORIA' 
+				when 6 then 'AUDITORIA RECHAZADA'
+				when 9 then 'PENDIENTE DE PICKING EN EL SELLER'
+				when 10 then 'PENDIENTE DE PICKING'
+				when 11 then 'PENDIENTE DE REPICKING'
+				when 20 then 'EN PICKING'
+				when 21 then 'PENDIENTE DE FINALIZAR PICKING'
+				when 22 then 'FINALIZANDO PICKING'
+				when 23 then 'PREPICKING'
+				when 25 then 'PREPICKING'
+				when 30 then 'PICKEADO POR FACTURAR'
+				when 35 then 'PRECANCELADA'
+				when 40 then 'FACTURADO'
+				when 50 then 'A RECUPERAR'
+				when 60 then 'LISTO PARA ENVIAR'
+				when 65 then 'LISTO PARA RETIRAR'
+				when 66 then 'ESPERANDO POR LOGISTICA EXTERNA'
+				when 70 then 'DESPACHADO'
+				when 80 then 'A REPROGRAMAR ENTREGA'
+				when 90 then 'ENTREGADO'
+				when 95 then 'LIQUIDADO'
+				when 100 then 'ANULADO'
+				when 105 then 'ANULACION AUTOMATICA PENDIENTE'
+				when 110 then 'ANULACION CONFIRMADA'
+				when 120 then 'CANCELACION PENDIENTE'
+				when 125 then 'CANCELADO'
+				when 130 then 'DEVOLUCION PARCIAL'
+				when 135 then 'DEVOLUCION TOTAL'
+				else null end												as descestado
+,case o.seller_id 	when 1 then 'LEGACY'
+					else 'IO'end											as janis
+,p.auth_id
+,upper(p.payment_system_name)												as medio_de_pago
+,to_char(from_unixtime_janis(o.invoice_date),'yyyymmdd') 					as fecha_facturada
+,json_extract_path_text(json_extract_path_text(json_extract_path_text(cd.value, 'authResponseFood'),'order'),'purchaseNumber') AS purchase_number
+--,date_format(from_unixtime(o.invoice_date),'%d-%m-%y')
+into #metro_io--select * from #metro_io where seq_id=8900990;--select count(1) from #metro_io
+--select top 1 *
+from stg_ecommerce_janis_metroio.wms_orders o
+left join stg_ecommerce_janis_metroio.wms_stores s on (s.id=o.store)
+left join stg_ecommerce_janis_metroio.wms_order_payments p on (p.order_id=o.id)
+left join stg_ecommerce_janis_metroio.wms_order_shipping shi on (shi.order_id=o.id)
+left join stg_ecommerce_janis_metroio.wms_logistic_carriers c on (c.ref_id=shi.carrier_id)
+left join stg_ecommerce_janis_metroio.admins a on (o.picker=a.id)
+left join stg_ecommerce_janis_metroio.wms_order_payments_connector_responses op on (o.id=op.id)
+left join stg_ecommerce_janis_metroio.wms_order_custom_data_fields cd on o.id=cd.order_id  and app_id='yapeonline'
+--where o.id between 260112 and 277222
+--where to_char(from_unixtime_janis(o.invoice_date),'yyyymmdd')=20231018--var_fecha
+where to_char(from_unixtime_janis(o.invoice_date),'yyyymmdd')=var_fecha
+and shi.flags not in (2,10)
+and o.status=95
+and upper(p.payment_system_name) not like ('%CASH%')  
+and upper(p.payment_system_name) not like ('%CARDPROMISSORY%');
+
+drop table if exists #boxes_metroio;
+select
+o.seq_id
+,extra
+,case os.old_status	when 120 then 'CANCELACION PENDIENTE' 
+					when 135 then 'DEVOLUCION TOTAL' 					
+					when 1 then 'NUEVO' 
+					when 5 then 'PENDIENTE DE AUDITORIA' 
+					when 6 then 'AUDITORIA RECHAZADA'
+					when 105 then 'ANULACION AUTOMATICA PENDIENTE'
+					when 100 then 'ANULADO'
+					when 110 then 'ANULACION CONFIRMADA'
+					when 65 then 'LISTO PARA RETIRAR'
+					when 10 then 'PENDIENTE DE PICKING'
+					when 20 then 'EN PICKING'
+					when 23 then 'PROCESANDO PICKING'
+					when 25 then 'PREPICKING'
+					when 30 then 'PICKEADO POR FACTURAR'	
+					when 40 then 'FACTURADO'
+					when 60 then 'LISTO PARA ENVIAR'
+					when 70 then 'DESPACHADO'
+					when 90 then 'ENTREGADO'
+					when 95 then 'LIQUIDADO'
+					else null end 											as old_status
+,case OS.new_status	when 120 then 'CANCELACION PENDIENTE' 
+					when 135 then 'DEVOLUCION TOTAL' 
+					when 1 then 'NUEVO' 
+					when 5 then 'PENDIENTE DE AUDITORIA' 
+					when 6 then 'AUDITORIA RECHAZADA'
+					when 105 then 'ANULACION AUTOMATICA PENDIENTE'
+					when 100 then 'ANULADO'
+					when 110 then 'ANULACION CONFIRMADA'
+					when 65 then 'LISTO PARA RETIRAR'
+					when 10 then 'PENDIENTE DE PICKING'
+					when 20 then 'EN PICKING'
+					when 23 then 'PROCESANDO PICKING'
+					when 25 then 'PREPICKING'
+					when 30 then 'PICKEADO POR FACTURAR'
+					when 40 then 'FACTURADO'
+					when 60 then 'LISTO PARA ENVIAR'
+					when 70 then 'DESPACHADO'
+					when 90 then 'ENTREGADO'
+					when 95 then 'LIQUIDADO'
+					else null end											as new_status
+,to_char(from_unixtime_janis(os.date_created),'yyyymmdd') 					as fecha_modificacion
+--,date_format(from_unIXTIME(OS.date_created),'%d-%m-%Y') 'fecha modifiacion'
+,a.id																		as employee
+,upper(a.firstname)															as first_name
+,purchase_number
+into #boxes_metroio--select * from #boxes_metroio where seq_id=8900990;
+from stg_ecommerce_janis_metroio.wms_order_status_changes os--select * from stg_ecommerce_janis_metroio.wms_order_status_changes limit 10
+left join stg_ecommerce_janis_metroio.wms_orders o on (os.order_id=o.id)--select * from stg_ecommerce_janis_metroio.wms_orders limit 10
+inner join #metro_io b on (o.seq_id=b.seq_id)
+left join stg_ecommerce_janis_metroio.wms_order_shipping shi on (o.id=shi.order_id)
+left join stg_ecommerce_janis_metroio.admins a on (os.user_created=a.id)
+where upper(os.extra) like '%CONFIRMACTION%'
+and upper(os.extra) like '%INVOICE_AMMOUNT%';
+--
+
+--------------------------------------------------------------------------------------------------------------------------------------------
+
+drop table if exists #wong_io;
+select
+case	when upper(s.title) like '%WONG%' then 'WONG'
+		when upper(s.title) like '%METRO%' then 'METRO'
+		else 'WONG' end														as cadena
+,left(s.title,4)															as cod_tienda
+,o.seq_id
+,o.vtex_id
+,case	when c.name like '%XDELIVERY%' then 'DELIVERY POLLO BRASA'
+		when c.name like '%ENT_DOMIC%' then 'ENTREGA A DOMICILIO'
+		when c.name like '%WCLK_AUTO%' then 'CLICK AL AUTO'
+		when c.name like '%XEXPRESS_DOMIC%' then 'DELIVERY EXPRES'
+		when c.name like '%REC_TNDA%' then 'RETIRO EN TIENDA'
+		when c.name like '%PLAYA%' then 'RETPLAYA'
+		when c.name like '%CYBER%' then 'CYBER APOYO'
+		else null end														as metodo_despacho
+,o.invoice_ammount															as vta_neta
+,case o.status	when 5 then 'PENDIENTE DE AUDITORIA' 
+				when 6 then 'AUDITORIA RECHAZADA'
+				when 9 then 'PENDIENTE DE PICKING EN EL SELLER'
+				when 10 then 'PENDIENTE DE PICKING'
+				when 11 then 'PENDIENTE DE REPICKING'
+				when 20 then 'EN PICKING'
+				when 21 then 'PENDIENTE DE FINALIZAR PICKING'
+				when 22 then 'FINALIZANDO PICKING'
+				when 23 then 'PREPICKING'
+				when 25 then 'PREPICKING'
+				when 30 then 'PICKEADO POR FACTURAR'
+				when 35 then 'PRECANCELADA'
+				when 40 then 'FACTURADO'
+				when 50 then 'A RECUPERAR'
+				when 60 then 'LISTO PARA ENVIAR'
+				when 65 then 'LISTO PARA RETIRAR'
+				when 66 then 'ESPERANDO POR LOGISTICA EXTERNA'
+				when 70 then 'DESPACHADO'
+				when 80 then 'A REPROGRAMAR ENTREGA'
+				when 90 then 'ENTREGADO'
+				when 95 then 'LIQUIDADO'
+				when 100 then 'ANULADO'
+				when 105 then 'ANULACION AUTOMATICA PENDIENTE'
+				when 110 then 'ANULACION CONFIRMADA'
+				when 120 then 'CANCELACION PENDIENTE'
+				when 125 then 'CANCELADO'
+				when 130 then 'DEVOLUCION PARCIAL'
+				when 135 then 'DEVOLUCION TOTAL'
+				else null end												as descestado
+,case o.seller_id 	when 1 then 'LEGACY'
+					else 'IO'end											as janis
+,p.auth_id
+,upper(p.payment_system_name)												as medio_de_pago
+,to_char(from_unixtime_janis(o.invoice_date),'yyyymmdd') 					as fecha_facturada
+,json_extract_path_text(json_extract_path_text(json_extract_path_text(cd.value, 'authResponseFood'),'order'),'purchaseNumber') AS purchase_number
+--,date_format(from_unixtime(o.invoice_date),'%d-%m-%y')
+into #wong_io--select * from #wong_io where seq_id=8900990;
+--select top 1 *
+from stg_ecommerce_janis_wongio.wms_orders o
+left join stg_ecommerce_janis_wongio.wms_stores s on (s.id=o.store)
+left join stg_ecommerce_janis_wongio.wms_order_payments p on (p.order_id=o.id)
+left join stg_ecommerce_janis_wongio.wms_order_shipping shi on (shi.order_id=o.id)
+left join stg_ecommerce_janis_wongio.wms_logistic_carriers c on (c.ref_id=shi.carrier_id)
+left join stg_ecommerce_janis_wongio.admins a on (o.picker=a.id)
+left join stg_ecommerce_janis_wongio.wms_order_payments_connector_responses op on (o.id=op.id)
+left join stg_ecommerce_janis_wongio.wms_order_custom_data_fields cd on o.id=cd.order_id and app_id='yapeonline'
+--where o.id between 260112 and 277222
+--where to_char(from_unixtime_janis(o.invoice_date),'yyyymmdd')=20231018--var_fecha
+where to_char(from_unixtime_janis(o.invoice_date),'yyyymmdd')=var_fecha
+and shi.flags not in (2,10)
+and o.status=95
+and upper(p.payment_system_name) not like ('%CASH%')  
+and upper(p.payment_system_name) not like ('%CARDPROMISSORY%');
+
+drop table if exists #boxes_wongio;
+select
+o.seq_id
+,extra
+,case os.old_status	when 120 then 'CANCELACION PENDIENTE' 
+					when 135 then 'DEVOLUCION TOTAL' 					
+					when 1 then 'NUEVO' 
+					when 5 then 'PENDIENTE DE AUDITORIA' 
+					when 6 then 'AUDITORIA RECHAZADA'
+					when 105 then 'ANULACION AUTOMATICA PENDIENTE'
+					when 100 then 'ANULADO'
+					when 110 then 'ANULACION CONFIRMADA'
+					when 65 then 'LISTO PARA RETIRAR'
+					when 10 then 'PENDIENTE DE PICKING'
+					when 20 then 'EN PICKING'
+					when 23 then 'PROCESANDO PICKING'
+					when 25 then 'PREPICKING'
+					when 30 then 'PICKEADO POR FACTURAR'	
+					when 40 then 'FACTURADO'
+					when 60 then 'LISTO PARA ENVIAR'
+					when 70 then 'DESPACHADO'
+					when 90 then 'ENTREGADO'
+					when 95 then 'LIQUIDADO'
+					else null end 											as old_status
+,case OS.new_status	when 120 then 'CANCELACION PENDIENTE' 
+					when 135 then 'DEVOLUCION TOTAL' 
+					when 1 then 'NUEVO' 
+					when 5 then 'PENDIENTE DE AUDITORIA' 
+					when 6 then 'AUDITORIA RECHAZADA'
+					when 105 then 'ANULACION AUTOMATICA PENDIENTE'
+					when 100 then 'ANULADO'
+					when 110 then 'ANULACION CONFIRMADA'
+					when 65 then 'LISTO PARA RETIRAR'
+					when 10 then 'PENDIENTE DE PICKING'
+					when 20 then 'EN PICKING'
+					when 23 then 'PROCESANDO PICKING'
+					when 25 then 'PREPICKING'
+					when 30 then 'PICKEADO POR FACTURAR'
+					when 40 then 'FACTURADO'
+					when 60 then 'LISTO PARA ENVIAR'
+					when 70 then 'DESPACHADO'
+					when 90 then 'ENTREGADO'
+					when 95 then 'LIQUIDADO'
+					else null end											as new_status
+,to_char(from_unixtime_janis(os.date_created),'yyyymmdd') 					as fecha_modificacion
+--,date_format(from_unIXTIME(OS.date_created),'%d-%m-%Y') 'fecha modifiacion'
+,a.id																		as employee
+,upper(a.firstname)															as first_name
+,purchase_number
+into #boxes_wongio--select * from #boxes_wongio where seq_id=8900990;
+from stg_ecommerce_janis_wongio.wms_order_status_changes os--select * from stg_ecommerce_janis_wongio.wms_order_status_changes limit 10
+left join stg_ecommerce_janis_wongio.wms_orders o on (os.order_id=o.id)--select * from stg_ecommerce_janis_wongio.wms_orders limit 10
+inner join #wong_io b on (o.seq_id=b.seq_id)
+left join stg_ecommerce_janis_wongio.wms_order_shipping shi on (o.id=shi.order_id)
+left join stg_ecommerce_janis_wongio.admins a on (os.user_created=a.id)
+where upper(os.extra) like '%CONFIRMACTION%'
+and upper(os.extra) like '%INVOICE_AMMOUNT%';
+
+
+drop table if exists #limpiar;
+select
+a.auth_id
+,a.cadena
+,a.cod_tienda
+,a.fecha_facturada
+,b.*
+,replace(replace(replace(substring(b.extra,charindex('mount":',b.extra)+7,9),'"',''),',',''),'d','')									as liquidado
+,replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(
+	substring(b.extra,charindex('payments":',b.extra)+10,len(b.extra))
+	,'{',''),'}',''),'"',''),'4621-1',''),'831-1',''),'482-1',''),'481-1',''),'7-1',''),'6-1',''),'5-1',''),'4-1',''),'3-1',''),'2-1',''),'1-1',''),',','')		as extraer
+into #limpiar
+from #wong_io a
+inner join #boxes_wongio b on (a.seq_id=b.seq_id);
+
+
+
+drop table if exists #limpiar_metro;
+
+select
+a.auth_id
+,a.cadena
+,a.cod_tienda
+,a.fecha_facturada
+,b.*
+,replace(replace(replace(substring(b.extra,charindex('mount":',b.extra)+7,9),'"',''),',',''),'d','')									as liquidado
+,replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(
+	substring(b.extra,charindex('payments":',b.extra)+11,len(b.extra))
+	,'{',''),'}',''),'"',''),'7293-1',''),'4792-1',''),'176-1',''),'482-1',''),'481-1',''),'7-1',''),'6-1',''),'5-1',''),'4-1',''),'3-1',''),'2-1',''),'1-1',''),',','')		as extraer
+--select *
+into #limpiar_metro
+from #metro_io a
+inner join #boxes_metroio b on (a.seq_id=b.seq_id);
+   
+--select *
+--from #limpiar_metro;
+
+--select *
+--from #limpiar
+--where seq_id in (1002089,1012447,1007227,1016097,1011410,1000859,1012457,1008602)
+----where auth_id in (996232905778966,996232905085942)
+--limit 50
+
+
+
+drop table if exists #extraer;
+select
+*
+,split_part(extraer,':',2) as dinners
+,split_part(extraer,':',3) as mastercard
+,split_part(extraer,':',4) as amex
+,split_part(extraer,':',5) as visa
+,split_part(extraer,':',6) as pagoefectivo
+,split_part(extraer,':',7) as vale
+,split_part(extraer,':',8) as cash
+,split_part(extraer,':',9) as cardpromissory
+,split_part(extraer,':',10) as yape_plin
+,split_part(extraer,':',11) as yape_plin_linea
+,null  AS nuevo_medio_7293
+into #extraer--select * from #extraer where seq_id=8838085
+from #limpiar
+union all
+select
+    *
+    ,split_part(extraer,':',4) as dinners
+    ,split_part(extraer,':',5) as mastercard
+    ,split_part(extraer,':',2) as amex
+    ,split_part(extraer,':',3) as visa
+    ,split_part(extraer,':',8) as pagoefectivo
+    ,split_part(extraer,':',12) as vale
+    ,split_part(extraer,':',6) as cash
+    ,split_part(extraer,':',7) as cardpromissory
+    ,split_part(extraer,':',9) as yape_plin
+    ,split_part(extraer,':',10) as yape_plin_linea
+    ,split_part(extraer,':',11) as nuevo_medio_7293
+from #limpiar_metro;
+
+update #extraer set--select count(1) from #extraer--select * from #extraer where seq_id=8890784
+dinners			='0.00'
+,mastercard		='0.00'
+,amex			='0.00'
+,visa			='0.00'
+,pagoefectivo	='0.00'
+,vale			='0.00'
+,cash			='0.00'
+,cardpromissory	='0.00'
+,yape_plin	    ='0.00'
+,yape_plin_linea='0.00'
+,nuevo_medio_7293='0.00'
+where extra like '%"2-2"%';
+					
+update #extraer set--select count(1) from #extraer--select * from #extraer where seq_id=8890784
+dinners			=case 	when dinners='' then '0.00'
+						else dinners end
+,mastercard		=case 	when mastercard='' then '0.00'
+						else mastercard end
+,amex			=case 	when amex='' then '0.00'
+						else amex end
+,visa			=case 	when visa='' then '0.00'
+						else visa end
+,pagoefectivo	=case 	when pagoefectivo='' then '0.00'
+						else pagoefectivo end
+,vale			=case 	when vale='' then '0.00'
+						else vale end
+,cash			=case 	when cash='' then '0.00'
+						else cash end
+,cardpromissory	=case 	when cardpromissory='' then '0.00'
+						else cardpromissory end
+,yape_plin	=case 	when yape_plin='' then '0.00'
+						else yape_plin end
+,yape_plin_linea	=case 	when yape_plin_linea='' then '0.00'
+						else yape_plin_linea end
+,nuevo_medio_7293	=case 	when nuevo_medio_7293='' then '0.00'
+						else nuevo_medio_7293 end							
+where extra not like '%"2-2"%';
+
+
+
+
+insert into dl_sp_temporal.tbl_analitica_liquidaciones_eco--select count(1) from dl_sp_temporal.tbl_analitica_liquidaciones_eco--select * from dl_sp_temporal.tbl_analitica_liquidaciones_eco
+(
+id
+,sk_dia
+--,nro_registros
+,auth_id
+,cadena
+,cod_tienda
+,employee
+,seq_id
+,extra
+,old_status
+,new_status
+,fecha_facturada
+,fecha_modificacion
+,first_name
+,liquidado
+,dinners
+,mastercard
+,amex
+,visa
+,pagoefectivo
+,vale
+,cash
+,cardpromissory
+,yape_plin
+,yape_plin_en_linea
+,fecha_hora_actualizacion
+,purchase_number_yape
+)
+select
+row_number()over(order by auth_id)				as id
+,var_fecha										as sk_dia
+--,count(1)										as nro_registros
+,auth_id
+,cadena
+,cod_tienda
+,employee
+,cast(seq_id as int)							as seq_id
+,extra
+,old_status
+,new_status
+,cast(fecha_facturada as int)					as fecha_facturada
+,cast(fecha_modificacion as int)				as fecha_modificacion
+,first_name
+,liquidado
+,dinners
+,mastercard
+,amex
+,visa
+,pagoefectivo
+,vale
+,cash
+,cardpromissory
+,yape_plin
+,yape_plin_linea
+,convert_timezone('GMT','GMT+5',getdate())		as fecha_hora_actualizacion
+,purchase_number
+from #extraer
+where seq_id not in (9254347);
+
+update dl_sp_temporal.tbl_analitica_liquidaciones_eco
+set yape_plin_en_linea=0
+where yape_plin_en_linea=729 and cadena='METRO';
+
+/*
+--Contactabilidad de Vtex
+
+drop table if exists #eco_clientes;
+select * into #eco_clientes from stg_ecommerce_vtex.eco_clientes;
+
+drop table if exists #clientes_vtex;
+select distinct documento,email,min(auth_personal_create)auth_personal_create,auth_personal_data,max(auth_personal_update)auth_personal_update 
+into #clientes_vtex  from #eco_clientes
+where auth_personal_create is not null
+group by documento,email,auth_personal_data;
+
+delete from #clientes_vtex where documento in ('00000000','000000000','0000000000',' ','0');
+delete from #clientes_vtex where documento='99999999';
+delete from #clientes_vtex where documento is null;
+
+drop table if exists #clientes_vtex_orden;
+select distinct documento,email,auth_personal_create,auth_personal_data,auth_personal_update,row_number () over(partition by documento order by  auth_personal_update desc)orden,
+to_char(to_date(auth_personal_create ,'yyyy-mm-dd'),'yyyymmdd')auth_personal_create_dia,to_char(to_date(auth_personal_create ,'yyyy-mm-dd'),'yyyymm') auth_personal_create_mes
+into #clientes_vtex_orden  from #clientes_vtex;
+
+drop table if exists #contactables_vtex_orden_1;
+select * into #contactables_vtex_orden_1 from #clientes_vtex_orden
+where auth_personal_data is true and orden=1;
+
+drop table if exists #contactables_vtex;
+select * into #contactables_vtex from #clientes_vtex_orden
+where auth_personal_data is true and orden<>1;
+
+drop table if exists #contactables_vtex_orden_2;
+select *,row_number () over(partition by documento order by  auth_personal_update desc)orden_2
+into #contactables_vtex_orden_2  from #contactables_vtex;
+
+drop table if exists #contactables_vtex_orden_2_final;
+select * into #contactables_vtex_orden_2_final from #contactables_vtex_orden_2
+where orden_2=1 ;
+
+drop table if exists #no_contactables_vtex;
+select * into #no_contactables_vtex from #clientes_vtex_orden
+where auth_personal_data is false;
+
+drop table if exists #no_contactables_vtex_orden;
+select *,row_number () over(partition by documento order by  auth_personal_update desc)orden_2
+into #no_contactables_vtex_orden from #no_contactables_vtex;
+
+drop table if exists #no_contactables_vtex_orden_final;
+select * into #no_contactables_vtex_orden_final from #no_contactables_vtex_orden
+where orden_2=1 ;
+
+drop table if exists #no_marco_contactabilidad_vtex;
+select distinct documento,email,min(auth_personal_create)auth_personal_create,auth_personal_data,max(auth_personal_update)auth_personal_update 
+into #no_marco_contactabilidad_vtex  from #eco_clientes
+where auth_personal_data is  null or auth_personal_create is null
+group by documento,email,auth_personal_data;
+
+delete from #no_marco_contactabilidad_vtex where documento in ('00000000','000000000','0000000000',' ','0');
+delete from #no_marco_contactabilidad_vtex where documento='99999999';
+delete from #no_marco_contactabilidad_vtex where documento is null;
+
+drop table if exists #universo_vtex;
+select distinct  documento into #universo_vtex from #eco_clientes; --776906
+
+delete from #universo_vtex where documento in ('00000000','000000000','0000000000',' ','0');
+delete from #universo_vtex where documento='99999999';
+delete from #universo_vtex where documento is null;
+
+alter table #universo_vtex add  contactabilidad varchar (50);
+alter table #universo_vtex add  email text;
+alter table #universo_vtex add  auth_personal_create timestamp ;
+alter table #universo_vtex add  auth_personal_update timestamp ;
+alter table #universo_vtex add  auth_personal_data varchar(2);
+
+update #universo_vtex
+set contactabilidad='Otros';
+
+update #universo_vtex
+set   contactabilidad='Sí'
+from #universo_vtex a inner join #contactables_vtex_orden_1 b on a.documento=b.documento;
+
+update #universo_vtex
+set   contactabilidad='Sí'
+from #universo_vtex a inner join #contactables_vtex_orden_2_final b on a.documento=b.documento;
+
+update #universo_vtex
+set   email=b.email,auth_personal_create=cast(b.auth_personal_create as datetime),auth_personal_update=cast(b.auth_personal_update as datetime)--,auth_personal_data=b.auth_personal_data
+from #universo_vtex a inner join #contactables_vtex_orden_1 b on a.documento=b.documento;
+
+update #universo_vtex
+set   email=b.email,auth_personal_create=cast(b.auth_personal_create as datetime),auth_personal_update=cast(b.auth_personal_update as datetime)--,auth_personal_data=b.auth_personal_data
+from #universo_vtex a inner join #contactables_vtex_orden_2_final b on a.documento=b.documento;
+
+alter table #universo_vtex add nombre text;
+alter table #universo_vtex add sobrenombre text;
+alter table #universo_vtex add telefono_residencial text;
+alter table #universo_vtex add telefono text;
+alter table #universo_vtex add fecha_nacimientob varchar(500);
+
+update #universo_vtex
+set   nombre=b.nombre,sobrenombre=b.sobrenombre,telefono_residencial=b.telefono_residencial,telefono=b.telefono,
+fecha_nacimientob=to_char(to_date(b.fecha_nacimiento ,'yyyy-mm-dd'),'yyyymmdd') 
+from #universo_vtex a inner join #eco_clientes b on ltrim(rtrim(a.email))=ltrim(rtrim(b.email ));
+
+update #universo_vtex
+set   nombre=b.nombre,sobrenombre=b.sobrenombre,telefono_residencial=b.telefono_residencial,telefono=b.telefono,
+fecha_nacimientob=to_char(to_date(b.fecha_nacimiento ,'yyyy-mm-dd'),'yyyymmdd') 
+from #universo_vtex a inner join #eco_clientes b on a.documento=b.documento;
+
+update #universo_vtex
+set  contactabilidad='NO'
+where contactabilidad='Otros';
+
+delete from dl_sp_dashboards_ecommerce.clientes_vtex_contactabilidad;
+
+insert into dl_sp_dashboards_ecommerce.clientes_vtex_contactabilidad
+select *,convert_timezone('GMT','GMT+5',getdate())Fecha_Actualizacion  from #universo_vtex;
+
+update  #universo_vtex
+set contactabilidad='Sí', email=rtrim(ltrim((desc_email_cliente)))
+from #universo_vtex a inner join per_super_pd_stg.cat_cliente_admin b on a.documento = LTRIM(RTRIM(b.NUM_DOCUMENTO_IDENTIDAD)) 
+where   B.COD_AUTORIZA_DATOS='S' AND B.COD_AUTORIZA_CONTACTABILIDAD='S' and b.cod_tiene_email='S' and  a.contactabilidad='NO';
+
+delete from dl_sp_dashboards_ecommerce.clientes_vtex_bonus_contactabilidad;
+
+insert into dl_sp_dashboards_ecommerce.clientes_vtex_bonus_contactabilidad
+select *,convert_timezone('GMT','GMT+5',getdate())Fecha_Actualizacion from #universo_vtex;
+
+*/
+
+/*
+---------------------------------PEDIDOS PRIME PAGAN DLV----------------------------------------
+drop table if exists #fechas_dlv_prime;
+WITH tmp_variables AS (
+SELECT 
+cast(to_char(dateadd(day,-2,convert_timezone('GMT','GMT+5',getdate())),'yyyymmdd') as int) AS var_fecha_ini,
+cast(to_char(dateadd(day,-1,convert_timezone('GMT','GMT+5',getdate())),'yyyymmdd') as int)AS var_fecha_fin,
+TO_TIMESTAMP(to_char(dateadd(day,-2,convert_timezone('GMT','GMT+5',getdate())),'yyyy-mm-dd') ,'YYYY-MM-DD') as var_fecha_ini_timestamp,
+TO_TIMESTAMP(to_char(dateadd(day,-0,convert_timezone('GMT','GMT+5',getdate())),'yyyy-mm-dd') ,'YYYY-MM-DD') as var_fecha_fin_timestamp
+)
+
+select * into #fechas_dlv_prime  from  tmp_variables;
+
+drop table if exists #eco_oms_dlv_prime;
+select *  into #eco_oms_dlv_prime from stg_ecommerce_vtex.eco_oms a
+where creationdate >= (select var_fecha_ini_timestamp from #fechas_dlv_prime );
+
+drop table if exists #fechas_dlv_prime_dim;
+select SK_DIA as codfecha,sk_Semana Semana,desc_abrv_dia_sem as NOM_DIA into #fechas_dlv_prime_dim from dl_sp_maestras.dim_dia
+where SK_DIA>=(select var_fecha_ini from #fechas_dlv_prime ) and SK_DIA<=(select var_fecha_fin from #fechas_dlv_prime );
+
+drop table if exists #pedidos_prime;
+select  CreationDate fecha_creacion,to_char(CreationDate,'YYYYMM')MES
+        ,to_char(CreationDate,'YYYY')ANIO
+        ,to_char(CreationDate,'HH') HORA
+        ,to_char(CreationDate,'YYYYMMDD')DIA 
+        , emailoms 
+        , ClientDocument DNI
+        , clientname+' '+clientlastname  NOMBRES_APELLIDOS_CLIENTE
+        , phone TELEFONO
+        , ordernum VTEX_ID
+        , right('000000000000000000' + ReferenceCode,18)COD_MATERIAL
+        ,SKUName MATERIAL
+        , SUM(SKUTotalPrice * Quantity_SKU)VENTA_BRUTA
+        ,SUM(Quantity_SKU)Q_SKU
+        ,CASE WHEN  (SellerName in ('wongfood','metrofood','app','appmetro')or SellerName like '%wongiot%' or SellerName like '%metroios%' or SellerName like '%metroioh%')
+         then 'TIENDA' else 'ALMACEN' end as OPERACION
+        ,CASE WHEN (SellerName NOT IN ('wongfood','metrofood','appmetro','app') AND SellerName NOT like '%wongiot%' AND SellerName NOT like '%metroios%' AND  SellerName NOT like '%metroioh%') AND (HOST LIKE '%metro%' or HOST='appmetro')  THEN 'S129' 
+         WHEN (SellerName NOT IN ('wongfood','metrofood','appmetro','app') AND SellerName NOT like '%wongiot%' AND SellerName NOT like '%metroios%' AND  SellerName NOT like '%metroioh%')AND (HOST LIKE '%wong%' OR HOST='app') THEN 'T129'
+         WHEN SUBSTRING(COURRIER,1,4) = 'TH12' THEN 'W101' 
+         ELSE SUBSTRING (COURRIER,1,4) END COD_TIENDA
+        ,CASE WHEN  UtmSource like '%AppMetro%' or UtmSource like '%AppWong%' THEN 'APP' ELSE 'WEB' END CANAL_ECO
+        ,CASE WHEN  COURRIER LIKE '%REC%' OR COURRIER LIKE '%RETIRO%' OR  COURRIER LIKE '%AUTO%' THEN 'RETIRO EN TIENDA' ELSE 'DELIVERY' END DESPACHO 
+        ,shippingvalue
+        ,emailoms correo
+into #pedidos_prime
+from #eco_oms_dlv_prime a
+WHERE quantity_sku<>0 AND  Courrier not in ('Transportadora Donación','Transportadora Donacion') AND StatusOrder not in ('',' ') and prime_order is true
+group by
+CreationDate ,to_char(CreationDate,'YYYYMM')
+        ,to_char(CreationDate,'YYYY')
+        ,to_char(CreationDate,'HH') 
+        ,to_char(CreationDate,'YYYYMMDD') 
+        , emailoms 
+        , ClientDocument 
+        , clientname+' '+clientlastname  
+        , phone 
+        , ordernum 
+        , right('000000000000000000' + ReferenceCode,18)
+        ,SKUName 
+        ,CASE WHEN  (SellerName in ('wongfood','metrofood','app','appmetro')or SellerName like '%wongiot%' or SellerName like '%metroios%' or SellerName like '%metroioh%')
+         then 'TIENDA' else 'ALMACEN' end 
+        ,CASE WHEN (SellerName NOT IN ('wongfood','metrofood','appmetro','app') AND SellerName NOT like '%wongiot%' AND SellerName NOT like '%metroios%' AND  SellerName NOT like '%metroioh%') AND (HOST LIKE '%metro%' or HOST='appmetro')  THEN 'S129' 
+         WHEN (SellerName NOT IN ('wongfood','metrofood','appmetro','app') AND SellerName NOT like '%wongiot%' AND SellerName NOT like '%metroios%' AND  SellerName NOT like '%metroioh%')AND (HOST LIKE '%wong%' OR HOST='app') THEN 'T129'
+         WHEN SUBSTRING(COURRIER,1,4) = 'TH12' THEN 'W101' 
+         ELSE SUBSTRING (COURRIER,1,4) END
+        ,CASE WHEN  UtmSource like '%AppMetro%' or UtmSource like '%AppWong%' THEN 'APP' ELSE 'WEB' END 
+        ,CASE WHEN  COURRIER LIKE '%REC%' OR COURRIER LIKE '%RETIRO%' OR  COURRIER LIKE '%AUTO%' THEN 'RETIRO EN TIENDA' ELSE 'DELIVERY' end
+        ,shippingvalue
+        ,emailoms;
+ 
+drop table if exists #pedidos_unicos;
+select distinct dia,vtex_id,emailoms,CASE WHEN SUM(shippingvalue)>0 THEN 'SI' ELSE 'NO' END PAGO,sum(venta_bruta)venta_bruta,DESPACHO,operacion,fecha_creacion into #pedidos_unicos from #pedidos_prime
+group by dia,vtex_id,emailoms,DESPACHO,operacion,fecha_creacion;
+
+
+alter table #pedidos_unicos add   Contactabilidad varchar(2) ;
+
+UPDATE #pedidos_unicos
+SET Contactabilidad='NO';
+
+UPDATE #pedidos_unicos
+SET Contactabilidad='SI'
+FROM #pedidos_unicos A INNER JOIN dl_sp_dashboards_ecommerce.clientes_vtex_bonus_contactabilidad B ON A.emailoms=B.email 
+where b.Contactabilidad='Sí';
+
+delete from dl_sp_dashboards_ecommerce.pedidos_prime_pago_dlv_historico
+where vtex_id in (select distinct vtex_id from #pedidos_unicos );
+
+insert into dl_sp_dashboards_ecommerce.pedidos_prime_pago_dlv_historico
+select distinct dia,vtex_id,emailoms correo,venta_bruta,convert_timezone('GMT','GMT+5',getdate())fecha_actualizacion,fecha_creacion,contactabilidad from #pedidos_unicos
+where PAGO='SI' and venta_bruta>=79.90 and operacion='TIENDA' and despacho='DELIVERY';
+
+update dl_sp_dashboards_ecommerce.pedidos_prime_pago_dlv_historico
+set fecha_actualizacion=convert_timezone('GMT','GMT+5',getdate());
+
+*/
+
+
+--------------------------------------------------------------------------------------------------
+--------------------------Proyecciones Forecast Pedido Ecommerce---------------------------------
+---------------------------------------------------------------------------------------------------
+
+drop table if exists #variables;
+
+WITH tmp_variables AS (
+SELECT 
+   --to_char( getdate()-30,'YYYYMMDD')
+   '20250101'AS Fecha_Inicial_Forecast, --to_char(getdate()-15,'YYYYMMDD')
+   to_char( getdate()-1,'YYYYMMDD') as Fecha_Final_Resultado,
+   to_char((select max(to_date(fecha ,'yyyy-mm-dd')) from dl_sp_temporal.datascience_forecast_output_tienda_ecommerce_demanda),'YYYYMMDD') AS Fecha_Final_Forecast
+
+)
+
+select * into #variables  from  tmp_variables;
+
+drop table if exists #data_programados_consolidado_legacy;--7 seg
+select
+o.seq_id 																																		as Pedido
+,from_unixtime_janis(shi.shipping_window_start)																									as Fecha_Programada
+,to_char(from_unixtime_janis(shi.shipping_window_start),'yyyymmdd')																		        as Dia_Programado
+,convert(varchar(20),'LEGACY')																													as origen
+,s.title																																		as title
+,c."type"                                                                                                                                       as tipo
+into #data_programados_consolidado_legacy
+from stg_ecommerce_janis_legacy.wms_orders o
+left join stg_ecommerce_janis_legacy.wms_stores s on (s.id=o.store)
+left join stg_ecommerce_janis_legacy.wms_order_shipping shi on (shi.order_id=o.id)
+inner join 	(
+			select
+			order_id
+			, min(id) as id
+			from stg_ecommerce_janis_legacy.wms_order_shipping
+			group by
+			order_id
+			) shi_max on (shi_max.order_id=shi.order_id and shi_max.id=shi.id)
+left join stg_ecommerce_janis_legacy.wms_logistic_carriers c on (c.ref_id=shi.carrier_id)
+where to_char(from_unixtime_janis(shi.shipping_window_start),'yyyymmdd')>=(select distinct Fecha_Inicial_Forecast  from #variables) and 
+to_char(from_unixtime_janis(shi.shipping_window_start),'yyyymmdd')<=(select distinct Fecha_Final_Forecast  from #variables)
+and shi_max.id is not null;
+
+
+-- Janis Metro IO
+drop table if exists #data_programados_consolidado_metro;--4 seg
+select
+o.seq_id 																																		as Pedido
+,from_unixtime_janis(shi.shipping_window_start)																									as Fecha_Programada
+,to_char(from_unixtime_janis(shi.shipping_window_start),'yyyymmdd')																		        as Dia_Programado
+,convert(varchar(20),'METRO_IO')																												as origen
+,s.title																																		as title
+,c."type"                                                                                                                                       as tipo
+into #data_programados_consolidado_metro
+from stg_ecommerce_janis_metroio.wms_orders o
+left join stg_ecommerce_janis_metroio.wms_stores s on (s.id=o.store)
+left join stg_ecommerce_janis_metroio.wms_order_shipping shi on (shi.order_id=o.id)
+inner join 	(
+			select
+			order_id
+			, min(id) as id
+			from stg_ecommerce_janis_metroio.wms_order_shipping
+			group by
+			order_id
+			) shi_max on (shi_max.order_id=shi.order_id and shi_max.id=shi.id)
+left join stg_ecommerce_janis_metroio.wms_logistic_carriers c on (c.ref_id=shi.carrier_id)
+where to_char(from_unixtime_janis(shi.shipping_window_start),'yyyymmdd')>=(select distinct Fecha_Inicial_Forecast  from #variables) and 
+to_char(from_unixtime_janis(shi.shipping_window_start),'yyyymmdd')<=(select distinct Fecha_Final_Forecast  from #variables)
+and shi_max.id is not null;
+
+-- Janis Wong IO
+drop table if exists #data_programados_consolidado_wong;--4 seg
+select
+o.seq_id 																																	    as Pedido
+,from_unixtime_janis(shi.shipping_window_start)																									as Fecha_Programada
+,to_char(from_unixtime_janis(shi.shipping_window_start),'yyyymmdd')																		        as Dia_Programado
+,convert(varchar(20),'WONG_IO')																													as origen
+,s.title																																		as title
+,c."type"                                                                                                                                       as tipo
+into #data_programados_consolidado_wong
+from stg_ecommerce_janis_wongio.wms_orders o
+left join stg_ecommerce_janis_wongio.wms_stores s on (s.id=o.store)
+left join stg_ecommerce_janis_wongio.wms_order_shipping shi on (shi.order_id=o.id)
+inner join 	(
+			select
+			order_id
+			, min(id) as id
+			from stg_ecommerce_janis_wongio.wms_order_shipping
+			group by
+			order_id
+			) shi_max on (shi_max.order_id=shi.order_id and shi_max.id=shi.id)
+left join stg_ecommerce_janis_wongio.wms_logistic_carriers c on (c.ref_id=shi.carrier_id)
+where to_char(from_unixtime_janis(shi.shipping_window_start),'yyyymmdd')>=(select distinct Fecha_Inicial_Forecast  from #variables) and 
+to_char(from_unixtime_janis(shi.shipping_window_start),'yyyymmdd')<=(select distinct Fecha_Final_Forecast  from #variables)
+and shi_max.id is not null;
+
+drop table if exists #data_programados_consolidado;
+select * ,substring(title,1,4)Cod_Tienda,to_date(Dia_Programado, 'yyyymmdd')Fecha_Programado
+into #data_programados_consolidado
+from #data_programados_consolidado_legacy
+union all
+select * ,substring(title,1,4)Cod_Tienda,to_date(Dia_Programado, 'yyyymmdd')Fecha_Programado from #data_programados_consolidado_metro
+union all
+select *,substring(title,1,4)Cod_Tienda,to_date(Dia_Programado, 'yyyymmdd')Fecha_Programado from #data_programados_consolidado_wong;
+
+
+drop table if exists #data_programados_consolidado_cadena;
+SELECT a.*,sk_semana semana,initcap(b.desc_abrv1_tienda) Tienda,
+CASE WHEN Sk_cadena=1 THEN 'Wong' WHEN Sk_cadena=2 THEN 'Metro' END Cadena
+INTO #data_programados_consolidado_cadena  FROM #data_programados_consolidado a 
+LEFT JOIN dl_sp_maestras.dim_tienda b ON a.Cod_Tienda=b.id_tienda
+LEFT JOIN dl_sp_maestras.dim_dia  c ON c.SK_DIA=a.Dia_Programado;
+
+delete  from #data_programados_consolidado_cadena
+where title in ('I101 - Evento eCommerce','WongIO');
+
+delete  from #data_programados_consolidado_cadena
+where tipo='Despachado por proveedor' or tipo is null;
+
+drop table if exists #proyeccion;
+select distinct to_date(fecha ,'yyyy-mm-dd') Fecha_Programado,cod_tienda,limite_inferior,limite_superior ,pronostico Proyeccion_BI,to_char(to_date(fecha, 'yyyy-mm-dd'),'YYYYMMDD') Dia_Programado
+into #proyeccion from dl_sp_temporal.datascience_forecast_output_tienda_ecommerce_demanda
+where  to_char(to_date(fecha, 'yyyy-mm-dd'),'YYYYMMDD')>=(select distinct Fecha_Inicial_Forecast  from #variables) and
+to_char(to_date(fecha, 'yyyy-mm-dd'),'YYYYMMDD')<=(select distinct Fecha_Final_Forecast  from #variables)
+;
+
+
+drop table if exists #data_programados_consolidado_cadena_dia;
+select distinct substring(Dia_Programado,1,6)Mes_Programado,Dia_Programado,Semana,cadena,cod_tienda,Tienda,Fecha_Programado,count(distinct pedido)Pedidos_Reales 
+into #data_programados_consolidado_cadena_dia from #data_programados_consolidado_cadena
+group by  substring(Dia_Programado,1,6),Dia_Programado,Semana,cadena,cod_tienda,Tienda,Fecha_Programado;
+
+update #data_programados_consolidado_cadena_dia
+set cadena='Wong',cod_tienda='W101'
+where cod_tienda='TH12';
+
+alter table #proyeccion add Mes_Programado varchar(6) ;
+alter table #proyeccion add Semana varchar(6) ;
+alter table #proyeccion add Cadena varchar(6) ;
+alter table #proyeccion add Tienda varchar(50) ;
+alter table #proyeccion add Pedidos_Reales int ;
+
+update #proyeccion
+set Mes_Programado=substring(Dia_Programado,1,6);
+
+update #proyeccion
+set Semana=b.Semana,Cadena=b.Cadena,Tienda=b.Tienda,Pedidos_Reales=b.Pedidos_Reales
+from #proyeccion a inner join #data_programados_consolidado_cadena_dia b on a.cod_tienda=b.cod_tienda and a.dia_programado=b.Dia_Programado;
+
+alter table #proyeccion add Proyeccion_Comercial float ;
+alter table #proyeccion add Proyeccion_Operaciones float ;
+
+update #proyeccion
+set Proyeccion_Comercial=b.Proyeccion_Comercial,Proyeccion_Operaciones=b.Proyeccion_Operaciones
+from #proyeccion a inner join dl_sp_temporal.proyeccion  b on a.cod_tienda=b.cod_tienda and a.Dia_Programado=b.Dia_Programado;
+
+alter table #proyeccion
+add resultado int ;
+
+update #proyeccion set resultado=0;
+update #proyeccion set resultado=1 where dia_programado<= (select distinct Fecha_Final_Resultado  from #variables) ;
+
+update #proyeccion set Pedidos_Reales=0 where Pedidos_Reales is null;
+
+update #proyeccion 
+set Cadena=CASE WHEN Sk_cadena=1 THEN 'Wong' WHEN Sk_cadena=2 THEN 'Metro' END , Tienda=initcap(b.desc_abrv1_tienda) 
+from #proyeccion a inner JOIN dl_sp_maestras.dim_tienda b ON a.Cod_Tienda=b.id_tienda;
+
+update #proyeccion 
+set Semana=sk_semana
+from #proyeccion a inner join dl_sp_maestras.dim_dia  c ON c.SK_DIA=a.Dia_Programado;
+
+update #proyeccion 
+set Semana=sk_semana
+from #proyeccion a inner join dl_sp_maestras.dim_dia  c ON c.SK_DIA=a.Dia_Programado;
+
+alter table #proyeccion add region varchar (50);
+
+update #proyeccion 
+set region=d.desc_region 
+from #proyeccion a inner join dl_sp_maestras.dim_tienda  c ON a.cod_tienda=c.id_tienda
+inner join dl_sp_maestras.dim_region d on c.sk_region=d.sk_region ;
+
+
+delete from  dl_sp_dashboards_ecommerce.revision_demanda_pedidos_eco
+where  dia_programado  in (select distinct dia_programado from #proyeccion);
+
+insert into dl_sp_dashboards_ecommerce.revision_demanda_pedidos_eco
+select distinct cod_tienda,limite_inferior,limite_superior,mes_programado,dia_programado,semana,cadena,pedidos_reales,proyeccion_bi,proyeccion_comercial,proyeccion_operaciones,
+Fecha_Programado, Getdate() Actualización,resultado,region
+from #proyeccion
+where  cod_tienda in ('H005','H011','S009','T111','S044','S010','T102','S034','T121','H014','S064','S011','T107','T103','S001','T120','T104','T117','S005'
+,'S081','S014','T108','T106','T114','T131','S098','H016','S058','H010','S053','H002','T115','S082','H003','S087','S047','S062','S085','H006','T126','S037','S028'
+,'S067','S032','H009','W101','T132','S043','S051','S068','S093','T118','S038','S076','S002','T130','H008','T109','S013'
+,'S008','S003','T000','S097','S029','H013','S089','S049','S055','H007','H001','T101','S046','S036','S066','T116');
+
+
+
+--Proceso Scraping
+
+drop table if exists #scraping_metro;
+select * into #scraping_metro from datalabs.dl_sp_temporal.datascience_scrapping_metro
+where to_char(to_date(fecha_scraping_metro ,'dd-mm-yyyy'),'yyyymmdd') in 
+(select max(to_char(getdate(),'yyyymmdd'))from dl_sp_temporal.datascience_scrapping_metro );
+
+drop table if exists #scraping_wong;
+select * into #scraping_wong from datalabs.dl_sp_temporal.datascience_scrapping_wong
+where to_char(to_date(fecha_scraping_wong ,'dd-mm-yyyy'),'yyyymmdd') in 
+(select max(to_char(getdate(),'yyyymmdd'))from dl_sp_temporal.datascience_scrapping_wong );
+
+drop table if exists #sku_metro;
+select distinct split_part(categoria_metro,'/',2) Departamento,split_part(categoria_metro,'/',3) Categoria,split_part(categoria_metro,'/',4) Sub_Categoria
+,sku_metro Sku,nombre_metro Material,marca_metro Marca,link_producto,url_imagen_metro  imagen_vtex,to_char(to_date(fecha_scraping_metro ,'dd-mm-yyyy'),'yyyymmdd')Fecha
+,b.id_ean_principal, max(cast(precio_regular_metro as numeric(14,2))) precio_regular , max(cast(precio_online_metro as numeric(14,2))) precio_online
+into #sku_metro from #scraping_metro a
+left join dl_sp_capa_semantica.dw_cencofcic_dim_material b on right('000000000000000000'+ a.sku_metro ,18)=b.id_material
+group by split_part(categoria_metro,'/',2) ,split_part(categoria_metro,'/',3) ,split_part(categoria_metro,'/',4) 
+,sku_metro ,nombre_metro ,marca_metro ,link_producto,url_imagen_metro ,to_char(to_date(fecha_scraping_metro ,'dd-mm-yyyy'),'yyyymmdd'),b.id_ean_principal
+;
+
+drop table if exists #sku_wong;
+select distinct split_part(categoria_wong,'/',2) Departamento,split_part(categoria_wong,'/',3) Categoria,split_part(categoria_wong,'/',4) Sub_Categoria
+,sku_wong Sku,nombre_wong Material,marca_wong Marca,link_producto,url_imagen_wong  imagen_vtex,to_char(to_date(fecha_scraping_wong ,'dd-mm-yyyy'),'yyyymmdd')Fecha
+,b.id_ean_principal, max(cast(precio_regular_wong as numeric(14,2))) precio_regular , max(cast(precio_online_wong as numeric(14,2))) precio_online
+into #sku_wong from #scraping_wong a
+left join dl_sp_capa_semantica.dw_cencofcic_dim_material b on right('000000000000000000'+ a.sku_wong ,18)=b.id_material
+group by split_part(categoria_wong,'/',2) ,split_part(categoria_wong,'/',3) ,split_part(categoria_wong,'/',4) 
+,sku_wong ,nombre_wong ,marca_wong ,link_producto,url_imagen_wong ,to_char(to_date(fecha_scraping_wong ,'dd-mm-yyyy'),'yyyymmdd'),b.id_ean_principal
+;
+
+delete from dl_sp_dashboards_ecommerce.scraping_web_sku_hoy ;
+
+insert into dl_sp_dashboards_ecommerce.scraping_web_sku_hoy
+select 'METRO' cadena,*  from  #sku_metro
+union all
+select 'WONG' Cadena,* from #sku_wong;
+
+
+end
+	   
+
+$$
+;

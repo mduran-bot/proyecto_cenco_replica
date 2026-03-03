@@ -1,0 +1,138 @@
+{
+  "data": [
+    {
+      "id": "mock003order111222333aaa",
+      "commerceId": "SLR-v11209818test-03",
+      "orderGroupId": "mock003group111222333",
+      "commerceSequentialId": "513003",
+      "commerceDateCreated": "2024-02-24T11:00:00.000Z",
+      "dateCreated": "2024-02-24T11:00:08.456Z",
+      "dateModified": "2024-02-24T11:25:00.000Z",
+      "status": "new",
+      "totalAmount": 32.80,
+      "rawTotalAmount": 32.70,
+      "originalAmount": 32.70,
+      "currency": "PEN",
+      "seller": {
+        "id": "seller002wongio",
+        "name": "WongIO",
+        "externalIds": {
+          "account": "account002wongio",
+          "vtex": "1"
+        }
+      },
+      "account": {
+        "id": "account002wongio",
+        "name": "wongio",
+        "ecommerceName": "wongio",
+        "referenceId": "wongio",
+        "platform": "vtex"
+      },
+      "salesChannelId": "channel002",
+      "salesChannelName": "wongio-WongIO",
+      "salesChannelPrefix": "",
+      "customer": {
+        "id": "customer003",
+        "firstName": "Carlos",
+        "lastName": "Rodríguez",
+        "email": "carlos.rodriguez@example.com",
+        "documentType": "DNI",
+        "documentNumber": "11223344",
+        "phone": "+51998877665",
+        "isCorporate": false,
+        "isFirstOrder": false
+      },
+      "items": [
+        {
+          "id": "item006sku006",
+          "commerceSkuId": "6001",
+          "commerceProductId": "6001",
+          "name": "Fideos Don Vittorio Spaghetti 500g",
+          "refId": "600001",
+          "ean": "7750670000059",
+          "purchasedPrice": 2.90,
+          "purchasedListPrice": 3.20,
+          "purchasedQuantity": 8,
+          "sellingMeasurementUnit": "un",
+          "sellingUnitMultiplier": 1,
+          "measurementUnit": "un",
+          "unitMultiplier": 1,
+          "brandId": "601",
+          "brandName": "Don Vittorio",
+          "imageUrl": "https://example.com/images/fideos-donvittorio.jpg",
+          "isGift": false,
+          "isPicked": false,
+          "isPickingFulfilled": false
+        },
+        {
+          "id": "item007sku007",
+          "commerceSkuId": "7001",
+          "commerceProductId": "7001",
+          "name": "Atún en Aceite Florida 170g",
+          "refId": "700001",
+          "ean": "7750670000066",
+          "purchasedPrice": 4.50,
+          "purchasedListPrice": 5.00,
+          "purchasedQuantity": 2,
+          "sellingMeasurementUnit": "un",
+          "sellingUnitMultiplier": 1,
+          "measurementUnit": "un",
+          "unitMultiplier": 1,
+          "brandId": "701",
+          "brandName": "Florida",
+          "imageUrl": "https://example.com/images/atun-florida.jpg",
+          "isGift": false,
+          "isPicked": false,
+          "isPickingFulfilled": false
+        }
+      ],
+      "shippings": [
+        {
+          "id": "shipping003",
+          "status": "pending",
+          "type": "delivery",
+          "carrierId": "carrier001",
+          "price": 0,
+          "deliveryEstimateDate": "2024-02-25T20:00:00.000Z",
+          "items": [
+            {"id": "item006sku006", "quantity": 8},
+            {"id": "item007sku007", "quantity": 2}
+          ]
+        }
+      ],
+      "addresses": [
+        {
+          "commerceId": "addr003",
+          "type": "residential",
+          "countryCode": "PER",
+          "state": "Lima",
+          "city": "Lima",
+          "neighborhood": "Surco",
+          "postalCode": "15023",
+          "streetName": "Av. Primavera",
+          "streetNumber": "9876",
+          "receiverName": "Carlos Rodríguez"
+        }
+      ],
+      "totals": {
+        "items": {"originalAmount": 32.20, "amount": 32.20},
+        "discounts": {"originalAmount": 0, "amount": 0},
+        "taxes": {"originalAmount": 0, "amount": 0},
+        "shipping": {"originalAmount": 0, "amount": 0},
+        "costs": {"originalAmount": 0.50, "amount": 0.50},
+        "invoice": {"amount": 32.80}
+      },
+      "steps": {
+        "new": {"status": "in_progress", "dateStart": "2024-02-24T11:00:08.000Z"}
+      },
+      "payments": []
+    }
+  ],
+  "pagination": {
+    "page": 2,
+    "pageSize": 100,
+    "totalPages": 2,
+    "totalItems": 150,
+    "hasNextPage": false
+  }
+}

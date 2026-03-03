@@ -1,0 +1,29 @@
+{
+  "timestamp": "2026-02-25T14:13:19.019345",
+  "client": "metro",
+  "entities": [
+    "orders",
+    "products",
+    "stock"
+  ],
+  "results": {
+    "orders": {
+      "status": "FAILED",
+      "reason": "Test file not found"
+    },
+    "products": {
+      "status": "FAILED",
+      "reason": "Test file not found"
+    },
+    "stock": {
+      "status": "FAILED",
+      "reason": "Test file not found"
+    }
+  },
+  "summary": {
+    "total": 3,
+    "successful": 0,
+    "failed": 3,
+    "success_rate": 0.0
+  }
+}

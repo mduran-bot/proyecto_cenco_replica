@@ -1,0 +1,1639 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "description": "VTEX OMS Service\n\n **Last update**: 11 feb 26, 05:55 p. m.",
+    "title": "VTEX OMS Service",
+    "version": "1.83.0",
+    "x-logo": null,
+    "x-janis-keywords": [
+      "vtex",
+      "order",
+      "seller"
+    ],
+    "lastUpdate": "2026-02-11T20:55:13.950Z"
+  },
+  "tags": [
+    {
+      "name": "Order",
+      "description": "To handle Order management"
+    },
+    {
+      "name": "Order Status Change",
+      "description": "To handle Order Status Change management"
+    },
+    {
+      "name": "Settings",
+      "description": "The vtex oms service can have different settings grouped by entity"
+    }
+  ],
+  "servers": [
+    {
+      "url": "https://vtex-oms.janis.in/api",
+      "description": "The Prod API server",
+      "variables": {
+        "environment": {
+          "default": "prod"
+        }
+      }
+    },
+    {
+      "url": "https://vtex-oms.janisqa.in/api",
+      "description": "The QA API server",
+      "variables": {
+        "environment": {
+          "default": "qa"
+        }
+      }
+    },
+    {
+      "url": "https://vtex-oms.janisdev.in/api",
+      "description": "The Beta API server",
+      "variables": {
+        "environment": {
+          "default": "beta"
+        }
+      }
+    },
+    {
+      "url": "http://vtex-oms.janis.localhost:3041/api",
+      "description": "The Local API server",
+      "variables": {
+        "environment": {
+          "default": "local"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/order/{id}": {
+      "get": {
+        "x-janis-namespace": "order",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "vtex-oms:order:read"
+        ],
+        "operationId": "getOrder",
+        "tags": [
+          "Order"
+        ],
+        "summary": "Get an order",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/order": {
+      "get": {
+        "x-janis-namespace": "order",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "vtex-oms:order:read"
+        ],
+        "operationId": "listOrders",
+        "tags": [
+          "Order"
+        ],
+        "summary": "List Orders",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/OrderSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order listed",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/order-status-change/{id}": {
+      "get": {
+        "x-janis-namespace": "order-status-change",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "vtex-oms:order-status-change:read"
+        ],
+        "operationId": "getOrderStatusChange",
+        "tags": [
+          "Order Status Change"
+        ],
+        "summary": "Get an Order Status Change",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order Status Change found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderStatusChange"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/order-status-change": {
+      "get": {
+        "x-janis-namespace": "order-status-change",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "vtex-oms:order-status-change:read"
+        ],
+        "operationId": "listOrderStatusChanges",
+        "tags": [
+          "Order Status Change"
+        ],
+        "summary": "List Order Status Changes",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/OrderStatusChangeSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/OrderStatusChangeFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order Status Changes listed",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderStatusChangeList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/order-status-change/{id}/retry": {
+      "post": {
+        "x-janis-namespace": "order-status-change",
+        "x-janis-method": "retry",
+        "x-janis-permissions": [
+          "vtex-oms:order-status-change:write"
+        ],
+        "operationId": "retryOrderStatusChange",
+        "tags": [
+          "Order Status Change"
+        ],
+        "summary": "Retry the processing of an order status change",
+        "description": "**IMPORTANT**: Processing will happen asynchronously. To check the status call [Get an Order Status Change API](#operation/getOrderStatusChange).\n",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GenericSuccess"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/setting/{entity}": {
+      "get": {
+        "x-janis-namespace": "setting",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "vtex-oms:setting:read"
+        ],
+        "operationId": "getSetting",
+        "tags": [
+          "Settings"
+        ],
+        "summary": "Get the setting of an entity",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "entity",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "example": "order"
+            },
+            "required": true,
+            "description": "The name of the entity that owns the settings to be retrieved"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The settings were retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/VtexOrderSettings"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "x-janis-namespace": "setting",
+        "x-janis-method": "update",
+        "x-janis-permissions": [
+          "vtex-oms:setting:write"
+        ],
+        "operationId": "updateSetting",
+        "tags": [
+          "Settings"
+        ],
+        "summary": "Update the setting of an entity",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "entity",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "example": "order"
+            },
+            "required": true,
+            "description": "The name of the entity that owns the settings to be updated"
+          }
+        ],
+        "requestBody": {
+          "description": "The settings configurations",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/VtexOrderSettings"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The settings were updated"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/vtex-order": {
+      "get": {
+        "x-janis-namespace": "vtex-order",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "vtex-oms:order:read"
+        ],
+        "operationId": "getVtexOrder",
+        "tags": [
+          "Order"
+        ],
+        "summary": "Get VTEX Order",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "vtexId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "1270310518477-01"
+            },
+            "required": true,
+            "description": "The unique identifier of vtex resource, is required if vtexSeqId does not exist"
+          },
+          {
+            "name": "vtexSeqId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": 557169
+            },
+            "required": true,
+            "description": "The unique sequence identifier of vtex resource, is required if vtexId does not exist"
+          },
+          {
+            "$ref": "#/components/parameters/accountIdOptional"
+          },
+          {
+            "$ref": "#/components/parameters/accountNameOptional"
+          },
+          {
+            "name": "field",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "paymentData"
+            },
+            "description": "Specifies which order property should be returned in the response."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The VTEX Order"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "JanisClient": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-client",
+        "description": "The client code"
+      },
+      "ApiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-key",
+        "description": "The API Key"
+      },
+      "ApiSecret": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-secret",
+        "description": "The API Secret"
+      }
+    },
+    "parameters": {
+      "id": {
+        "name": "id",
+        "in": "path",
+        "schema": {
+          "type": "string",
+          "example": "d555345345345as67a342a"
+        },
+        "required": true,
+        "description": "The unique identifier of the item"
+      },
+      "ListSortDirection": {
+        "name": "sortDirection",
+        "in": "query",
+        "description": "The direction to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
+        }
+      },
+      "ListPageNumber": {
+        "name": "x-janis-page",
+        "in": "header",
+        "description": "The page to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "default": 1
+        }
+      },
+      "ListPageSize": {
+        "name": "x-janis-page-size",
+        "in": "header",
+        "description": "The page size to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "default": 60
+        }
+      },
+      "vtexId": {
+        "name": "vtexId",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "example": "1270310518477-01"
+        },
+        "required": true,
+        "description": "The unique identifier of vtex resource"
+      },
+      "vtexSeqId": {
+        "name": "vtexSeqId",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "example": 557169
+        },
+        "required": true,
+        "description": "The unique sequence identifier of vtex resource"
+      },
+      "accountId": {
+        "name": "accountId",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "example": "631faca9d04d04341a7b7611"
+        },
+        "required": true,
+        "description": "The account id of the vtex resource"
+      },
+      "accountName": {
+        "name": "accountName",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "example": "fizzmodarg"
+        },
+        "required": true,
+        "description": "The account name of the vtex resource"
+      },
+      "accountIdOptional": {
+        "name": "accountId",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "example": "631faca9d04d04341a7b7611"
+        },
+        "description": "The account id of the vtex resource"
+      },
+      "accountNameOptional": {
+        "name": "accountName",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "example": "fizzmodarg"
+        },
+        "description": "The account name of the vtex resource"
+      },
+      "AccountsSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "id",
+            "name",
+            "dateCreated",
+            "status"
+          ]
+        }
+      },
+      "AccountsFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "description": "The ID",
+              "type": "string"
+            },
+            "name": {
+              "description": "The name",
+              "type": "string"
+            },
+            "importOrders": {
+              "description": "Indicates if the account should import orders",
+              "type": "boolean"
+            },
+            "publishOrders": {
+              "description": "Indicates if the account should publish orders",
+              "type": "boolean"
+            },
+            "status": {
+              "description": "The status ID",
+              "type": "integer"
+            },
+            "statusName": {
+              "description": "The status name",
+              "type": "string"
+            }
+          }
+        }
+      },
+      "OrderSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "dateCreated",
+            "dateModified"
+          ]
+        }
+      },
+      "OrderStatusChangeSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "statusChangeDate",
+            "dateCreated",
+            "dateModified"
+          ]
+        }
+      },
+      "OrderStatusChangeFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/OrderStatusChange/properties/id"
+            },
+            "source": {
+              "$ref": "#/components/schemas/OrderStatusChange/properties/source"
+            },
+            "orderId": {
+              "$ref": "#/components/schemas/OrderStatusChange/properties/orderId"
+            },
+            "state": {
+              "$ref": "#/components/schemas/OrderStatusChange/properties/state"
+            },
+            "account": {
+              "$ref": "#/components/schemas/OrderStatusChange/properties/account"
+            },
+            "vtexKey": {
+              "$ref": "#/components/schemas/OrderStatusChange/properties/vtexKey"
+            },
+            "status": {
+              "$ref": "#/components/schemas/OrderStatusChange/properties/status"
+            },
+            "dateCreated": {
+              "$ref": "#/components/schemas/OrderStatusChange/properties/dateCreated"
+            }
+          }
+        }
+      },
+      "SellerSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "name",
+            "accountId",
+            "vtexId",
+            "import.status",
+            "import.endDate",
+            "dateCreated"
+          ]
+        }
+      },
+      "SellerFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/Seller/properties/id"
+            },
+            "vtexId": {
+              "$ref": "#/components/schemas/Seller/properties/vtexId"
+            },
+            "accountId": {
+              "$ref": "#/components/schemas/Seller/properties/accountId"
+            },
+            "name": {
+              "$ref": "#/components/schemas/Seller/properties/name"
+            },
+            "email": {
+              "$ref": "#/components/schemas/Seller/properties/email"
+            },
+            "dateCreatedRange": {
+              "$ref": "#/components/schemas/dateRangeFilter"
+            },
+            "importEndDateRange": {
+              "$ref": "#/components/schemas/dateRangeFilter"
+            },
+            "import.status": {
+              "$ref": "#/components/schemas/Seller/properties/import/properties/status"
+            }
+          }
+        }
+      }
+    },
+    "headers": {
+      "x-janis-total": {
+        "description": "The total amount of records in the list",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "schemas": {
+      "id": {
+        "description": "The unique identifier of the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "d555345345345as67a342a"
+      },
+      "userCreated": {
+        "description": "The ID of the user who created the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "6a1fc1eeb5b68406e0487a10"
+      },
+      "userModified": {
+        "description": "The ID of the user who last modified the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "7e1fc1eeb5b68406e048796"
+      },
+      "dateCreated": {
+        "description": "The date of creation",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-12T19:00:00.000Z"
+      },
+      "dateModified": {
+        "description": "The date of the last modification",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-20T19:00:00.000Z"
+      },
+      "Account": {
+        "type": "object",
+        "description": "A Account",
+        "properties": {
+          "id": {
+            "description": "The account ID",
+            "type": "string",
+            "readOnly": true,
+            "example": "5ddefd22683f6500076eb1df"
+          },
+          "name": {
+            "description": "The name",
+            "type": "string",
+            "readOnly": true,
+            "example": "fizzmodarg"
+          },
+          "user": {
+            "description": "The account authentication user",
+            "type": "string",
+            "readOnly": true,
+            "example": "vtexappkey-fizzmodarg-ABCDEF"
+          },
+          "importOrders": {
+            "description": "Indicates if the account imports orders",
+            "type": "boolean",
+            "readOnly": true,
+            "example": true
+          },
+          "usesSubstitutionCriterias": {
+            "type": "boolean",
+            "description": "Indicates if the account uses item substitution criterias and creates the custom app and fields in VTEX",
+            "example": true
+          },
+          "usesCustomerNotes": {
+            "type": "boolean",
+            "description": "Indicates if the account uses order customer notes and creates the custom app and fields in VTEX",
+            "example": true
+          },
+          "importOrdersFulfillment": {
+            "type": "boolean",
+            "description": "Indicates if orders should be fulfilled based on VTEX `invoiced` status or not. Only set this as `true` if you invoice directly in VTEX, not in Janis.",
+            "readOnly": true,
+            "example": false
+          },
+          "importOrdersFulfillmentPackageBehaviour": {
+            "type": "string",
+            "description": "Indicates if packages should be created (from products or order) or not, when importing the fulfillment.",
+            "readOnly": true,
+            "enum": [
+              "doNotCreate",
+              "createByOrder",
+              "createByProduct"
+            ],
+            "example": "doNotCreate"
+          },
+          "publishOrders": {
+            "description": "Indicates if the account publishes orders",
+            "type": "boolean",
+            "readOnly": true,
+            "example": false
+          },
+          "usesOrderCustomerNote": {
+            "type": "boolean",
+            "description": "Indicates if the account uses order customer note and creates the custom app and fields in VTEX",
+            "example": true
+          },
+          "status": {
+            "description": "The status name",
+            "type": "string",
+            "readOnly": true,
+            "example": "active"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "user",
+          "importOrders",
+          "usesSubstitutionCriterias",
+          "usesCustomerNotes",
+          "importOrdersFulfillment",
+          "importOrdersFulfillmentPackageBehaviour",
+          "publishOrders",
+          "usesOrderCustomerNote",
+          "status",
+          "dateCreated",
+          "userCreated"
+        ]
+      },
+      "Order": {
+        "type": "object",
+        "description": "An Order",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "accountId": {
+            "type": "string",
+            "description": "The Commerce Service Account id",
+            "example": "6000798c6b464000084d8d40"
+          },
+          "commerceId": {
+            "type": "string",
+            "description": "The VTEX Order ID",
+            "example": "1258752268211-01"
+          },
+          "orderGroupCommerceId": {
+            "type": "string",
+            "description": "The VTEX Order Group Commerce-ID",
+            "example": "1258752268212-01"
+          },
+          "omsOrderGroupId": {
+            "type": "string",
+            "description": "The OMS Order Group ID",
+            "example": "63124d9ddcd276d6edd992bf"
+          },
+          "omsOrderId": {
+            "type": "string",
+            "description": "The OMS Order ID",
+            "example": "63124d9ddcd276d6edd992bd"
+          },
+          "totalAmount": {
+            "type": "number",
+            "description": "The Order original amount (removing rounding error)",
+            "example": 150
+          },
+          "rawTotalAmount": {
+            "type": "number",
+            "description": "The Order original amount (including rounding error)",
+            "example": 150
+          },
+          "receipts": {
+            "type": "array",
+            "description": "The invoice and item changes applied in VTEX order",
+            "items": {
+              "type": "object"
+            },
+            "example": [
+              {
+                "type": "invoice",
+                "id": "15e0cac1-1a1c-40c7-af11-064ae2c48c9b",
+                "date": "2022-09-02T18:54:46.128Z"
+              },
+              {
+                "type": "change",
+                "id": "15e0cac1-1a1c-40c7-af11-064ae2c48c9b",
+                "date": "2022-09-02T18:54:46.128Z"
+              }
+            ]
+          },
+          "reservationIds": {
+            "type": "array",
+            "description": "Reservation ID created by Janis in VTEX",
+            "items": {
+              "type": "string",
+              "example": "JAN-959431069122-01-1"
+            }
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          }
+        }
+      },
+      "OrderList": {
+        "type": "array",
+        "description": "A list of Orders",
+        "items": {
+          "$ref": "#/components/schemas/Order"
+        }
+      },
+      "DataDelivered": {
+        "type": "object",
+        "description": "Order data for inform to VTEX that it is delivered",
+        "properties": {
+          "order": {
+            "$ref": "#/components/schemas/OrderDelivered"
+          },
+          "trackingId": {
+            "type": "string",
+            "description": "The tracking number of the Shipping",
+            "example": "771717172"
+          }
+        },
+        "required": [
+          "order"
+        ]
+      },
+      "OrderDelivered": {
+        "type": "object",
+        "description": "Order data for inform to VTEX that it is shipped",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The `id` of an **Order** in [OMS Service](/v2/service/oms#tag/Order)",
+            "example": "6000798c6b464000084d8d40"
+          },
+          "commerceId": {
+            "type": "string",
+            "description": "The VTEX Order ID. Refers to `commerceId` of an **Order** in [OMS Service](/v2/service/oms#tag/Order)",
+            "example": "4354534545-01"
+          },
+          "orderGroupCommerceId": {
+            "type": "string",
+            "description": "The VTEX Order Group Commerce-ID. Refers to `orderGroupCommerceId` of an **Order** in [OMS Service](/v2/service/oms#tag/Order)",
+            "example": "4354534545"
+          },
+          "invoiceIds": {
+            "type": "array",
+            "description": "List of `id` of an **Invoice**. See [Invoice](/v2/service/jef#tag/Invoice)",
+            "readOnly": true,
+            "items": {
+              "type": "string",
+              "description": "The `id` of an **Invoice**",
+              "example": "613a1e4148dfa4000884e15e"
+            }
+          },
+          "account": {
+            "type": "object",
+            "description": "The Account related to the Order",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "The `id` of an **Account** in [Commerce Service](/v2/service/commerce#tag/Account)",
+                "example": "6000798c6b464000084d8d40"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "commerceId",
+          "account"
+        ]
+      },
+      "DataShipped": {
+        "type": "object",
+        "description": "The data of the shipped order",
+        "properties": {
+          "order": {
+            "$ref": "#/components/schemas/OrderShipped"
+          },
+          "trackingId": {
+            "type": "string",
+            "description": "The tracking number of the Shipping",
+            "example": "771717172"
+          },
+          "trackingUrl": {
+            "type": "string",
+            "description": "The tracking URL of the Shipping",
+            "example": "http://routeoftracking.com"
+          }
+        },
+        "required": [
+          "order"
+        ]
+      },
+      "OrderShipped": {
+        "type": "object",
+        "description": "Order data for inform to VTEX that it is shipped",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The `id` of an **Order** in [OMS Service](/v2/service/oms#tag/Order)",
+            "example": "6000798c6b464000084d8d40"
+          },
+          "commerceId": {
+            "type": "string",
+            "description": "The VTEX Order ID. Refers to `commerceId` of an **Order** in [OMS Service](/v2/service/oms#tag/Order)",
+            "example": "4354534545-01"
+          },
+          "orderGroupCommerceId": {
+            "type": "string",
+            "description": "The VTEX Order Group Commerce-ID. Refers to `orderGroupCommerceId` of an **Order** in [OMS Service](/v2/service/oms#tag/Order)",
+            "example": "4354534545"
+          },
+          "invoiceIds": {
+            "type": "array",
+            "description": "List of `id` of an **Invoice**. See [Invoice](/v2/service/jef#tag/Invoice)",
+            "readOnly": true,
+            "items": {
+              "type": "string",
+              "description": "The `id` of an **Invoice**",
+              "example": "613a1e4148dfa4000884e15e"
+            }
+          },
+          "shipping": {
+            "type": "object",
+            "description": "The order's shipping to notify",
+            "properties": {
+              "companyName": {
+                "type": "string",
+                "description": "The `companyName` of a `shipping` in an **Order** in [OMS Service](/v2/service/oms#tag/Order)",
+                "example": "E-Delivery"
+              }
+            },
+            "required": [
+              "companyName"
+            ]
+          },
+          "account": {
+            "type": "object",
+            "description": "The Account related to the Order",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "The `id` of an **Account** in [Commerce Service](/v2/service/commerce#tag/Account)",
+                "example": "6000798c6b464000084d8d40"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "commerceId",
+          "shipping",
+          "account"
+        ]
+      },
+      "OrderStatusChange": {
+        "type": "object",
+        "description": "An Order Status Change",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "source": {
+            "type": "string",
+            "description": "The source of the status change",
+            "enum": [
+              "vtex"
+            ],
+            "example": "vtex"
+          },
+          "orderId": {
+            "type": "string",
+            "description": "The VTEX ID of the order",
+            "example": "46546546544-01"
+          },
+          "state": {
+            "type": "string",
+            "description": "The new state of the order",
+            "example": "ready-for-handling"
+          },
+          "account": {
+            "type": "string",
+            "description": "The name of the VTEX account that originated the status change",
+            "example": "fizzmod"
+          },
+          "vtexKey": {
+            "type": "string",
+            "description": "The VTEX APP Key that triggered the status change hook",
+            "example": "vtexappkey-4as564564"
+          },
+          "statusChangeDate": {
+            "type": "string",
+            "description": "The date of the status change in VTEX",
+            "example": "2021-06-22T20:36:19.008Z",
+            "format": "date-time"
+          },
+          "loggingData": {
+            "type": "array",
+            "description": "A list of logging information of the status change process",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "Saved status change in DB",
+              "Fetched order data from VTEX OMS"
+            ]
+          },
+          "status": {
+            "description": "The order status change processing status",
+            "type": "string",
+            "default": "pending",
+            "enum": [
+              "pending",
+              "processing",
+              "processed",
+              "skipped",
+              "error"
+            ],
+            "example": "pending"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          }
+        },
+        "required": [
+          "id",
+          "source",
+          "orderId",
+          "state",
+          "account",
+          "vtexKey",
+          "statusChangeDate",
+          "loggingData",
+          "status",
+          "dateCreated"
+        ]
+      },
+      "OrderStatusChangeList": {
+        "type": "array",
+        "description": "A list of Order Status Changes",
+        "items": {
+          "$ref": "#/components/schemas/OrderStatusChange"
+        }
+      },
+      "OrderStatusChangeHookPing": {
+        "type": "object",
+        "description": "A VTEX order status change hook ping",
+        "properties": {
+          "hookConfig": {
+            "type": "string",
+            "description": "The VTEX Hook Config Ping",
+            "enum": [
+              "ping"
+            ]
+          }
+        },
+        "required": [
+          "hookConfig"
+        ]
+      },
+      "OrderStatusChangeHookItem": {
+        "type": "object",
+        "description": "A VTEX order status change hook record",
+        "properties": {
+          "OrderId": {
+            "type": "string",
+            "description": "The VTEX Order ID"
+          },
+          "State": {
+            "type": "string",
+            "description": "The current order status"
+          },
+          "Origin": {
+            "type": "object",
+            "description": "The origin of the order",
+            "properties": {
+              "Account": {
+                "type": "string",
+                "description": "The order's account name"
+              },
+              "Key": {
+                "type": "string",
+                "description": "The vtex api key used to create the order"
+              }
+            },
+            "required": [
+              "Account",
+              "Key"
+            ]
+          },
+          "CurrentChange": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The date where the status change occurred"
+          }
+        },
+        "required": [
+          "OrderId",
+          "State",
+          "Origin",
+          "CurrentChange"
+        ]
+      },
+      "Seller": {
+        "description": "A Seller from VTEX",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "omsId": {
+            "description": "The unique identifier of the [Seller](/v2/service/oms#tag/Seller) in OMS Service",
+            "type": "string",
+            "example": "f555345345345as67a3400"
+          },
+          "vtexId": {
+            "description": "The Seller Vtex ID",
+            "type": "string",
+            "readOnly": true,
+            "example": "20"
+          },
+          "accountId": {
+            "description": "The Item's [Vtex-Commerce Account](/v2/service/vtex-commerce#tag/Account) ID",
+            "type": "string",
+            "readOnly": true,
+            "example": "1d1fc1eeb5b68406e0487a11"
+          },
+          "name": {
+            "description": "The Seller name",
+            "type": "string",
+            "readOnly": true,
+            "example": "Bruce Wayne"
+          },
+          "email": {
+            "description": "The Seller email",
+            "type": "string",
+            "readOnly": true,
+            "example": "bruce.wayne@wayne-company.com"
+          },
+          "logoUrl": {
+            "description": "The Seller logo's URL",
+            "type": "string",
+            "readOnly": true,
+            "example": "https://image.wayne-company.com.goth/public/ceo.png"
+          },
+          "status": {
+            "description": "The item status",
+            "type": "string",
+            "enum": [
+              "active",
+              "inactive"
+            ],
+            "example": "active"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "import": {
+            "type": "object",
+            "description": "The Item's import properties",
+            "properties": {
+              "status": {
+                "description": "The Item's import status",
+                "readOnly": true,
+                "type": "string",
+                "enum": [
+                  "pending",
+                  "imported",
+                  "error"
+                ],
+                "example": "imported"
+              },
+              "startDate": {
+                "description": "The Item's import start date",
+                "readOnly": true,
+                "type": "string",
+                "format": "date-time",
+                "example": "2022-12-09T18:44:50.637Z"
+              },
+              "endDate": {
+                "description": "The Item's import end date",
+                "readOnly": true,
+                "type": "string",
+                "format": "date-time",
+                "example": "2022-12-09T18:44:50.637Z"
+              },
+              "errorMessage": {
+                "description": "A message about the importation",
+                "type": "string",
+                "readOnly": true,
+                "example": "Importation fails because .."
+              }
+            }
+          }
+        }
+      },
+      "SellerList": {
+        "description": "The list data",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Seller"
+        }
+      },
+      "dateRangeFilter": {
+        "type": "object",
+        "description": "A range for date. It will filter from 00:00Hs to 23:59:59Hs of the given range",
+        "properties": {
+          "from": {
+            "type": "string",
+            "description": "The beginning of the range",
+            "format": "date-time",
+            "example": "2019-11-27T16:08:24.994Z"
+          },
+          "to": {
+            "type": "string",
+            "description": "The end of the range",
+            "format": "date-time",
+            "example": "2019-11-30T16:08:24.994Z"
+          }
+        }
+      },
+      "VtexOrderSettings": {
+        "type": "object",
+        "description": "Order settings",
+        "title": "Order",
+        "properties": {
+          "useKitComponents": {
+            "type": "boolean",
+            "description": "This setting will be used to determine if use kit item or kit item components for create a order in oms.",
+            "example": false,
+            "default": false
+          },
+          "currencyDecimalDigits": {
+            "type": "number",
+            "description": "This setting will be used to determine currency decimal digits.",
+            "example": 2,
+            "default": 2
+          }
+        }
+      },
+      "listenerEvent": {
+        "description": "A JANIS Event object",
+        "type": "object",
+        "properties": {
+          "service": {
+            "description": "The source service name",
+            "type": "string",
+            "example": "id"
+          },
+          "entity": {
+            "description": "The event related entity",
+            "type": "string",
+            "example": "profile"
+          },
+          "event": {
+            "description": "The event name",
+            "type": "string",
+            "example": "created"
+          },
+          "client": {
+            "description": "The source event client",
+            "type": "string",
+            "example": "fizzmod"
+          },
+          "id": {
+            "description": "The event related entity ID",
+            "type": "string",
+            "example": "5d699c1ae8ebb95eaa24aca9"
+          }
+        },
+        "required": [
+          "service",
+          "entity",
+          "event"
+        ]
+      }
+    },
+    "responses": {
+      "GenericSuccess": {
+        "description": "Operation succeeded",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "BadRequest": {
+        "description": "A client error has ocurred.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Authentication missing or invalid",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Not authorized request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "InternalError": {
+        "description": "A server error has ocurred."
+      },
+      "getAccountSuccess": {
+        "description": "OK",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Account"
+            }
+          }
+        }
+      },
+      "listAccountsSuccess": {
+        "description": "OK",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Account"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

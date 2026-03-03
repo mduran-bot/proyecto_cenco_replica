@@ -1,0 +1,1879 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Document-Generator Service",
+    "description": "This Service is use to convert HTML Templates into PDF files.\n\n **Last update**: 08 ene 26, 10:45 a. m.",
+    "version": "1.15.0",
+    "x-logo": null,
+    "x-janis-keywords": [
+      "PDF",
+      "HTML",
+      "Template",
+      "QR"
+    ],
+    "lastUpdate": "2026-01-08T13:45:44.491Z"
+  },
+  "tags": [
+    {
+      "name": "Template",
+      "description": "For generate HTML's Templates, to use to generate Documents"
+    },
+    {
+      "name": "Document",
+      "description": "For generate HTML and PDF documents, store it, and be ready to download it"
+    },
+    {
+      "name": "Document files",
+      "description": "For generate PDF files from HTML templates on demand"
+    },
+    {
+      "name": "Render",
+      "description": "For render examples of templates"
+    }
+  ],
+  "servers": [
+    {
+      "url": "https://document-generator.janis.in/api",
+      "description": "The Prod API server",
+      "variables": {
+        "environment": {
+          "default": "prod"
+        }
+      }
+    },
+    {
+      "url": "https://document-generator.janisqa.in/api",
+      "description": "The QA API server",
+      "variables": {
+        "environment": {
+          "default": "qa"
+        }
+      }
+    },
+    {
+      "url": "https://document-generator.janisdev.in/api",
+      "description": "The Beta API server",
+      "variables": {
+        "environment": {
+          "default": "beta"
+        }
+      }
+    },
+    {
+      "url": "http://document-generator.janis.localhost:3084/api",
+      "description": "The Local API server",
+      "variables": {
+        "environment": {
+          "default": "local"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/CreateDocument": {
+      "post": {
+        "operationId": "createDocumentFunction",
+        "tags": [
+          "Functions"
+        ],
+        "summary": "Create document",
+        "requestBody": {
+          "description": "The documents to create",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DocumentTemplate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The documents was created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ids": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/id"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/CreateDocumentFiles": {
+      "post": {
+        "operationId": "createDocumentFilesFunction",
+        "tags": [
+          "Functions"
+        ],
+        "summary": "Create document files",
+        "requestBody": {
+          "description": "The document files to create",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DocumentTemplate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The document files was created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "pdfLink": {
+                        "type": "string",
+                        "description": "Temporally link to download the document",
+                        "example": "https://cdn.storage.janis.in/files/expire=30/clientName/service/entity/2024/08/01/fileName.pdf"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/DeleteDocument": {
+      "post": {
+        "operationId": "deleteDocumentFunction",
+        "tags": [
+          "Functions"
+        ],
+        "summary": "Delete document",
+        "requestBody": {
+          "description": "The documents to delete. You can use documentId and/or customFields to find documents to remove.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "documentId": {
+                    "description": "The document id",
+                    "type": "string",
+                    "example": "d555345345345as67a342a"
+                  },
+                  "customFields": {
+                    "type": "object",
+                    "description": "Custom fields for find documents",
+                    "example": {
+                      "orderId": "d555345345345as67a342a"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The documents was deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "removed": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/id"
+                      }
+                    },
+                    "failed": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/id"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/GetDocument": {
+      "get": {
+        "summary": "Get Document using DocumentModel",
+        "operationId": "fnGetDocument",
+        "tags": [
+          "Functions"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/FunctionsFields"
+          },
+          {
+            "$ref": "#/components/parameters/FunctionsFilters"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "number",
+                      "description": "The status code of the request",
+                      "example": 200
+                    },
+                    "payload": {
+                      "$ref": "#/components/schemas/DocumentList"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/document-files": {
+      "post": {
+        "x-janis-namespace": "document-files",
+        "x-janis-method": "generate",
+        "operationId": "createDocumentFilesReference",
+        "tags": [
+          "Document files"
+        ],
+        "summary": "Create PDF from a template",
+        "description": "\nThis API received a **HTML Template** (and its variable's values) and generate a **PDF** file.\n\nIt starts the process to create a **PDF document**, when the creation is completed, the API returns a response with the PDF link to download.\n",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "The document files to create",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DocumentTemplate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The document files was created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "pdfLink": {
+                        "type": "string",
+                        "description": "Temporally link to download the document",
+                        "example": "https://cdn.storage.janis.in/files/expire=30/clientName/service/entity/2024/08/01/fileName.pdf"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/render": {
+      "post": {
+        "x-janis-namespace": "render",
+        "x-janis-method": "render",
+        "x-janis-permissions": [
+          "document-generator:template:read"
+        ],
+        "operationId": "renderTemplate",
+        "tags": [
+          "Render"
+        ],
+        "summary": "Render one",
+        "description": "Render a template",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": []
+          }
+        ],
+        "requestBody": {
+          "description": "A Render",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Render"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The Render was created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "rendered": {
+                      "type": "string",
+                      "description": "The template rendered",
+                      "example": "Name: Jhon"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/template": {
+      "post": {
+        "x-janis-namespace": "template",
+        "x-janis-method": "create",
+        "x-janis-permissions": [
+          "document-generator:template:write"
+        ],
+        "operationId": "createTemplate",
+        "tags": [
+          "Template"
+        ],
+        "summary": "Create a template",
+        "description": "This API allows to create different templates, using **HTML** code for services and entities.",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "The template to create",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TemplateCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessCreateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "get": {
+        "x-janis-namespace": "template",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "document-generator:template:read"
+        ],
+        "operationId": "listTemplate",
+        "tags": [
+          "Template"
+        ],
+        "summary": "Get many",
+        "description": "Get a List of Templates",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TemplateSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/TemplateFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The List of Templates",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TemplateList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/template/{id}": {
+      "get": {
+        "x-janis-namespace": "template",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "document-generator:template:read"
+        ],
+        "operationId": "getTemplate",
+        "tags": [
+          "Template"
+        ],
+        "summary": "Get one",
+        "description": "Get a Template by ID",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Template"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "x-janis-namespace": "template",
+        "x-janis-method": "update",
+        "x-janis-permissions": [
+          "document-generator:template:write"
+        ],
+        "operationId": "updateTemplate",
+        "tags": [
+          "Template"
+        ],
+        "summary": "Update a template by ID",
+        "description": "\n**IMPORTANT**: If `html`, `format` or `formatOptions` fields are updated, `canBeUpdated` property will \nbe saved as **false** regardless of whether in the same request is sent as **true**\n",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "requestBody": {
+          "description": "The template to update",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Template"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessUpdateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/document": {
+      "post": {
+        "x-janis-namespace": "document",
+        "x-janis-method": "generate",
+        "operationId": "createDocumentReference",
+        "tags": [
+          "Document"
+        ],
+        "summary": "Create PDF from a template",
+        "description": "\nThis API received a **HTML Template** (and its variable's values) and generate several **HTML** documents.\n\nIt starts the process to create **PDF documents**, when it finish to create the PDF, the service emits an event (**not ready yet**).\n",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "The documents to create",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DocumentTemplate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The Documents was created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ids": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/id"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "get": {
+        "x-janis-namespace": "document",
+        "x-janis-method": "list",
+        "operationId": "ListDocuments",
+        "tags": [
+          "Document"
+        ],
+        "summary": "Get many",
+        "description": "Get a List of Documents",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/DocumentSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/DocumentFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return a list of documents.",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/document/{id}": {
+      "delete": {
+        "x-janis-namespace": "document",
+        "x-janis-method": "delete",
+        "x-janis-permissions": [
+          "jdc:document:delete"
+        ],
+        "operationId": "DeleteDocument",
+        "tags": [
+          "Document"
+        ],
+        "summary": "Delete one",
+        "description": "Delete a Document by ID",
+        "security": [
+          {
+            "ApiKey": []
+          },
+          {
+            "ApiSecret": []
+          },
+          {
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A document was deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "description": "Document deleted",
+                      "type": "string",
+                      "example": "Document 5d1fc1eeb5b68406e0487a06 has been deleted"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "description": "A document was not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "description": "Document not found",
+                      "type": "string",
+                      "example": "Document 5d1fc1eeb5b68406e0487a06 not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "get": {
+        "x-janis-namespace": "document",
+        "x-janis-method": "get",
+        "operationId": "GetDocument",
+        "tags": [
+          "Document"
+        ],
+        "summary": "Get one",
+        "description": "Get a Document by ID",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return a single document",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Document"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/document/{id}/retry": {
+      "post": {
+        "x-janis-namespace": "document",
+        "x-janis-method": "retry",
+        "x-janis-permissions": [
+          "jdc:document:write"
+        ],
+        "operationId": "RetryDocument",
+        "tags": [
+          "Document"
+        ],
+        "summary": "Retry file generation",
+        "description": "Retry generate the Document's File",
+        "security": [
+          {
+            "ApiKey": []
+          },
+          {
+            "ApiSecret": []
+          },
+          {
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Retry to generate the document was successfully executed"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "description": "A document was not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "description": "Document not found",
+                      "type": "string",
+                      "example": "Document 5d1fc1eeb5b68406e0487a06 not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-key",
+        "description": "The API Key"
+      },
+      "ApiSecret": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-secret",
+        "description": "The API Secret"
+      },
+      "JanisClient": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-client",
+        "description": "The Client Code"
+      }
+    },
+    "parameters": {
+      "id": {
+        "name": "id",
+        "in": "path",
+        "schema": {
+          "type": "string",
+          "example": "d555345345345as67a342a"
+        },
+        "required": true,
+        "description": "The unique identifier of the item"
+      },
+      "ListSortDirection": {
+        "name": "sortDirection",
+        "in": "query",
+        "description": "The direction to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
+        }
+      },
+      "ListPageNumber": {
+        "name": "x-janis-page",
+        "in": "header",
+        "description": "The page to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "default": 1
+        }
+      },
+      "ListPageSize": {
+        "name": "x-janis-page-size",
+        "in": "header",
+        "description": "The page size to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "default": 60
+        }
+      },
+      "FunctionsFields": {
+        "name": "fields",
+        "in": "query",
+        "description": "Reduce the response to fields",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "example": [
+            "id",
+            "name",
+            "referenceId"
+          ]
+        }
+      },
+      "FunctionsFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the model",
+        "schema": {
+          "type": "object",
+          "description": "The filters to apply to the model",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "The id to filter",
+              "example": "637f87faa56629f7651bd4e8"
+            }
+          }
+        }
+      },
+      "TemplateSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "service",
+            "code",
+            "dateCreated",
+            "userCreated",
+            "dateModified",
+            "userModified",
+            "status"
+          ]
+        }
+      },
+      "TemplateFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/id"
+            },
+            "service": {
+              "$ref": "#/components/schemas/templateService"
+            },
+            "entity": {
+              "$ref": "#/components/schemas/templateEntity"
+            },
+            "code": {
+              "$ref": "#/components/schemas/templateCode"
+            },
+            "dateCreated": {
+              "$ref": "#/components/schemas/dateCreated"
+            },
+            "userCreated": {
+              "$ref": "#/components/schemas/userCreated"
+            },
+            "dateModified": {
+              "$ref": "#/components/schemas/dateModified"
+            },
+            "userModified": {
+              "$ref": "#/components/schemas/userModified"
+            },
+            "status": {
+              "$ref": "#/components/schemas/status"
+            }
+          }
+        }
+      },
+      "DocumentSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "id",
+            "service",
+            "entity",
+            "entityId",
+            "status",
+            "dateCreated"
+          ]
+        }
+      },
+      "DocumentFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/BaseDocument/properties/id"
+            },
+            "service": {
+              "$ref": "#/components/schemas/BaseDocument/properties/service"
+            },
+            "entity": {
+              "$ref": "#/components/schemas/BaseDocument/properties/entity"
+            },
+            "entityId": {
+              "$ref": "#/components/schemas/BaseDocument/properties/entityId"
+            },
+            "templateCode": {
+              "$ref": "#/components/schemas/BaseDocument/properties/templateCode"
+            },
+            "templateId": {
+              "$ref": "#/components/schemas/BaseDocument/properties/templateId"
+            },
+            "customFields": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/BaseDocument/properties/customFields"
+                }
+              ],
+              "description": "\nFilter for additional information provided by the service.\n\n- `property name *` : The field-name\n- `value`: the extra information\n\n**IMPORTANT**, example of use by query string:\n\n`api/document?filters[customFields][invoiceNumber]=0010023`\n",
+              "example": {
+                "invoiceNumber": 10023
+              }
+            },
+            "dateCreated": {
+              "description": "\nRange of the document's date of creation.\n\n**IMPORTANT**, example of use by query string:\n\n`api/document?filters[dateCreated][from]=2021-08-19T03%3A00%3A00.000Z&filters[dateCreated][to]=2021-08-27T03%3A00%3A00.000Z`\n",
+              "type": "object",
+              "properties": {
+                "from": {
+                  "type": "string",
+                  "description": "Date from..",
+                  "format": "date-time",
+                  "example": "2021-08-19T03:00:00.000Z"
+                },
+                "to": {
+                  "type": "string",
+                  "description": "Date to..",
+                  "format": "date-time",
+                  "example": "2021-08-27T03:00:00.000Z"
+                }
+              }
+            },
+            "status": {
+              "$ref": "#/components/schemas/BaseDocument/properties/status"
+            }
+          }
+        }
+      }
+    },
+    "headers": {
+      "x-janis-total": {
+        "description": "The total amount of records in the list",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "responses": {
+      "SuccessCreateResponse": {
+        "description": "The item was created",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "SuccessUpdateResponse": {
+        "description": "The item was updated",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "GenericSuccess": {
+        "description": "Operation succeeded",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "BadRequest": {
+        "description": "A client error has ocurred.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Authentication missing or invalid",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Not authorized request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "InternalError": {
+        "description": "A server error has ocurred."
+      },
+      "NotFound": {
+        "description": "An item is not Found.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "FunctionResponse": {
+        "description": "OK",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "statusCode": {
+                  "type": "number",
+                  "description": "The status code",
+                  "example": 200
+                },
+                "payload": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "description": "Empty payload"
+                    },
+                    {
+                      "$ref": "#/components/schemas/FunctionError"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "id": {
+        "description": "The unique identifier of the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "d555345345345as67a342a"
+      },
+      "status": {
+        "description": "The item status",
+        "type": "string",
+        "default": "active",
+        "enum": [
+          "active",
+          "inactive"
+        ],
+        "example": "active"
+      },
+      "dateCreated": {
+        "description": "The date of creation",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-12T19:00:00.000Z"
+      },
+      "dateModified": {
+        "description": "The date of the last modification",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-20T19:00:00.000Z"
+      },
+      "userCreated": {
+        "description": "The ID of the user who created the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "6a1fc1eeb5b68406e0487a10"
+      },
+      "userModified": {
+        "description": "The ID of the user who last modified the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "7e1fc1eeb5b68406e048796"
+      },
+      "templateService": {
+        "description": "The `code` of the service that makes the request. This refer to the `code` of the **Service** Entity. See [Service](/v2/service/devops#tag/service).",
+        "type": "string",
+        "example": "catalog"
+      },
+      "templateEntity": {
+        "description": "The name of the entities that the template would use.",
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "example": [
+          "attribute",
+          "category"
+        ]
+      },
+      "templateCode": {
+        "description": "The unique code of the template. This code is unique per service.",
+        "type": "string",
+        "example": "templ123"
+      },
+      "templateHtml": {
+        "type": "string",
+        "description": "The HTML code to be used as a template.",
+        "example": "<!DOCTYPE html><html><body><div><h1>{{tittle}}</h1><p>{{message}}</p></div><div><h2>Invoice</h2><p><b>name:</b> {{name}} </p><b>email:</b> {{email}}</p><b>price:</b> $1000</p></div></body></html>"
+      },
+      "templateFormat": {
+        "type": "string",
+        "description": "The format for the PDF Page's size. If `Custom` is choose it required `formatOptions`",
+        "enum": [
+          "Letter",
+          "Legal",
+          "Tabloid",
+          "Ledger",
+          "A0",
+          "A1",
+          "A2",
+          "A3",
+          "A4",
+          "A5",
+          "A6",
+          "Custom"
+        ],
+        "example": "Custom"
+      },
+      "templateFormatOptions": {
+        "type": "object",
+        "description": "Format for Custom type",
+        "properties": {
+          "width": {
+            "type": "number",
+            "description": "Page's width in \"cm\"",
+            "example": 21.2
+          },
+          "height": {
+            "type": "number",
+            "description": "Page's height in \"cm\"",
+            "example": 14.3
+          }
+        }
+      },
+      "typeFormat": {
+        "type": "string",
+        "description": "The type format of the template",
+        "enum": [
+          "pdf",
+          "zpl"
+        ],
+        "default": "pdf",
+        "example": "pdf"
+      },
+      "FunctionError": {
+        "type": "object",
+        "description": "The error message",
+        "properties": {
+          "message": {
+            "description": "The error message",
+            "type": "string",
+            "readOnly": true,
+            "example": "An error occurred"
+          }
+        }
+      },
+      "DefaultTemplate": {
+        "type": "object",
+        "description": "The template is the design that the PDF file will have when it is created.",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "service": {
+            "$ref": "#/components/schemas/templateService"
+          },
+          "entity": {
+            "$ref": "#/components/schemas/templateEntity"
+          },
+          "code": {
+            "$ref": "#/components/schemas/templateCode"
+          },
+          "html": {
+            "$ref": "#/components/schemas/templateHtml"
+          },
+          "format": {
+            "$ref": "#/components/schemas/templateFormat"
+          },
+          "formatOptions": {
+            "$ref": "#/components/schemas/templateFormatOptions"
+          },
+          "typeFormat": {
+            "$ref": "#/components/schemas/typeFormat"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          },
+          "status": {
+            "$ref": "#/components/schemas/status"
+          }
+        },
+        "required": [
+          "service",
+          "code",
+          "html"
+        ]
+      },
+      "DefaultTemplateCreate": {
+        "description": "The creation of the Template.",
+        "properties": {
+          "service": {
+            "$ref": "#/components/schemas/templateService"
+          },
+          "entity": {
+            "$ref": "#/components/schemas/templateEntity"
+          },
+          "code": {
+            "$ref": "#/components/schemas/templateCode"
+          },
+          "html": {
+            "$ref": "#/components/schemas/templateHtml"
+          }
+        },
+        "required": [
+          "service",
+          "code",
+          "html"
+        ]
+      },
+      "DefaultTemplateList": {
+        "type": "array",
+        "description": "A list of Default Template",
+        "items": {
+          "$ref": "#/components/schemas/DefaultTemplate"
+        }
+      },
+      "Render": {
+        "type": "object",
+        "description": "A Render",
+        "oneOf": [
+          {
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/RenderData"
+              },
+              "template": {
+                "description": "The template that will be compiled",
+                "type": "string",
+                "example": "Name: {{name}}"
+              }
+            },
+            "required": [
+              "data",
+              "template"
+            ]
+          },
+          {
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/RenderData"
+              },
+              "template": {
+                "description": "The template that will be compiled",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "example": [
+                  "{{name}}",
+                  "{{lastname}}"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "template"
+            ]
+          }
+        ]
+      },
+      "RenderData": {
+        "description": "The data which will be used to replace in the template\n\nIf you need to send a property of type **QR** the name of the same has to start with `qr_`\n\nIf you need to send a property of type **Barcode128** the name of the same has to start with `barcode128_`\n",
+        "type": "object",
+        "additionalProperties": {
+          "type": "string"
+        }
+      },
+      "Template": {
+        "type": "object",
+        "description": "The template is the design that the PDF file will have when it is created.",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "service": {
+            "$ref": "#/components/schemas/templateService"
+          },
+          "entity": {
+            "$ref": "#/components/schemas/templateEntity"
+          },
+          "code": {
+            "$ref": "#/components/schemas/templateCode"
+          },
+          "html": {
+            "$ref": "#/components/schemas/templateHtml"
+          },
+          "format": {
+            "$ref": "#/components/schemas/templateFormat"
+          },
+          "formatOptions": {
+            "$ref": "#/components/schemas/templateFormatOptions"
+          },
+          "typeFormat": {
+            "$ref": "#/components/schemas/typeFormat"
+          },
+          "canBeUpdated": {
+            "description": "The indicator of whether the template can be updated automatically, if it is not provided is saved as `true`.",
+            "type": "boolean",
+            "default": true,
+            "example": true
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          },
+          "status": {
+            "$ref": "#/components/schemas/status"
+          }
+        },
+        "required": [
+          "service",
+          "code",
+          "html"
+        ]
+      },
+      "TemplateCreate": {
+        "description": "The creation of the Template.",
+        "properties": {
+          "service": {
+            "$ref": "#/components/schemas/templateService"
+          },
+          "entity": {
+            "$ref": "#/components/schemas/templateEntity"
+          },
+          "code": {
+            "$ref": "#/components/schemas/templateCode"
+          },
+          "html": {
+            "$ref": "#/components/schemas/templateHtml"
+          },
+          "canBeUpdated": {
+            "$ref": "#/components/schemas/Template/properties/canBeUpdated"
+          }
+        },
+        "required": [
+          "service",
+          "code",
+          "html"
+        ]
+      },
+      "TemplateList": {
+        "type": "array",
+        "description": "A list of Template",
+        "items": {
+          "$ref": "#/components/schemas/Template"
+        }
+      },
+      "Document": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseDocument"
+          }
+        ],
+        "properties": {
+          "html": {
+            "type": "string",
+            "description": "HTML generated to render the pdf",
+            "example": "<!DOCTYPE html><html><body><div><h1>Zega Company</h1><p>Congratulations for buying our product. Enjoy It!!</p></div><div><h2>Invoice</h2><p><b>name:</b> John Doe</p><b>email:</b> jonh.doe@example.com</p><b>price:</b> $1000</p><img src=\"data:image/png;base64;ivBoQR01W\"/></div></body></html>"
+          }
+        }
+      },
+      "BaseDocument": {
+        "type": "object",
+        "description": "Document formatted with the URL to get the PDF document.",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "status": {
+            "type": "string",
+            "description": "State of the document",
+            "example": "pending",
+            "readOnly": true,
+            "enum": [
+              "pending",
+              "uploaded",
+              "uploadedError",
+              "generatedError"
+            ]
+          },
+          "service": {
+            "type": "string",
+            "description": "Service `code` that will be use the document",
+            "example": "oms"
+          },
+          "entity": {
+            "type": "string",
+            "description": "The entity used to required the **PDF** document file",
+            "example": "category"
+          },
+          "entityId": {
+            "type": "string",
+            "description": "The `id` of the entity",
+            "example": "61154d6155af360013a965fc"
+          },
+          "customFields": {
+            "type": "object",
+            "description": "Additional information provided by the service to identify a particular document",
+            "additionalProperties": true,
+            "example": {
+              "invoiceNumber": 10023
+            }
+          },
+          "templateCode": {
+            "type": "string",
+            "description": "\nThe Template `code`. This refer to the `code` of the **Template** Entity. See [Template](/v2/service/document-generator#tag/Template).\n",
+            "example": "template-playground"
+          },
+          "templateId": {
+            "description": "The Template ID. This refer to the `id` of the **Template** Entity. See [Template](/v2/service/document-generator#tag/Template).",
+            "type": "string",
+            "example": "3d1fc1eeb5b68406e0487a06"
+          },
+          "item": {
+            "type": "object",
+            "description": "The variables used for generate the **HTML** and **PDF** documents",
+            "example": {
+              "title": "Zega Company,",
+              "message": "Congratulations for buying our product. Enjoy It!!,",
+              "name": "John Doe,",
+              "email": "jonh.doe@example.com,",
+              "price": 1000,
+              "qr": "https://fizzmod.com/"
+            }
+          },
+          "errorMessage": {
+            "type": "string",
+            "description": "This error message appears only when the status is equal to **uploadedError** or **generatedError**",
+            "example": "Cannot create the pdf. Error: reason"
+          },
+          "pdfLink": {
+            "type": "string",
+            "description": "Generate a temporally link to download the document",
+            "example": "https://janis-document-generator-service-beta.s3.amazonaws.com/fizzmodarg/pdfs/playground/60ecac958241df000826f954.pdf?AWSAccessKeyId=ASIA2KPN7Q3ONV7LRM7K&Expires=1626715359&Signature=FPhP28A0FJIuhVh2bvkwbxqCQnQ%3D&x-amz-security-token=IQoJb3JpZ2luX2VjEJr%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaCXVzLWVhc3QtMSJHMEUCIC8EzjGBFpAq37jDPIo15lcg0uRe6n4dV%2FmbqsqS%2FPoBAiEA2NzMnR8EflddGyIYi2J6rt0qfY4%2BZTzk4F4TDWo78TwqtQIIkv%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FARAAGgw3MDk3MDU1NjU5MTYiDDIEcpDFwwwa9Uk1MyqJAlF8e18RSViB7107fr5sZKYhTUVMNxZQCfUqqzTaNVQvxQn3MbAJ5rcVFZCVoaEhia4WnGdw8vyk4K8nuGPLmZS1eDP0AjwHvoYXM%2F9koH1%2Fg6sIl4WqkV13gIc4yxzQ9QyWeF90EfFETlbjhTXpZkSJUJIeW2CrdcbovL3pPnwrgrlsFI6cWTEEgeq76t5FqJYv3jc%2FNCGCK55SoX%2FlD5LxENgNNx6td4L9cJ0f4Jm1JdPzsdwmNV6zoEFFDepHZU4%2B9PuoPkQaSzXlvZr6JeLplN3HV%2Fi0cuREEvTqbgsrOv6G2DN2fJc3X0EYFHFJrGvhlK3pS6tJW6fG%2BD8PL9%2B%2F839%2FMa576XEw2eLWhwY6mgFEkvfInuBxFu4WMxkxJPfpIAkNOLS2xFA0YJIje797EXcA0cX%2FZyibDpGCFs18S%2FnCLjiN3rdBto5nsuaAZBsj2JAaf13k9Lr7ztIg7x7WoC3csRShTGKRJPYr%2Fk9h1o9BRbTc5lldQtPMms7tgOo4sv7v4Fn%2FMEDIA7rxPpVrtwguA2O3HRdj3C%2FbqCXOVSdeBQdoClGqdNDu"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          }
+        }
+      },
+      "DocumentTemplate": {
+        "description": "A document template to create PDFs",
+        "type": "object",
+        "properties": {
+          "template": {
+            "type": "string",
+            "description": "\nThe **HTML template**, it must contains variables to generate the **HTML** and **PDFs** files.\n\nIt uses *Handlebar's* format for the variables. See [Handlebars](https://handlebarsjs.com/guide/#simple-expressions).\n",
+            "example": "<!DOCTYPE html><html><body><div><h1>{{title}}</h1><p>{{message}}</p></div><div><h2>Invoice</h2><p><b>name:</b> {{name}}</p><b>email:</b> {{email}}</p><b>price:</b> ${{price}}</p></div></body></html>"
+          },
+          "templateCode": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BaseDocument/properties/templateCode"
+              }
+            ],
+            "description": "\nThe Template `code`. This refer to the `code` of the **Template** Entity. See [Template](/v2/service/document-generator#tag/Template).\n\n**IMPORTANT** :  If this field is sent, the `template` field will be ignored, and use **Template** `html` field.\n"
+          },
+          "items": {
+            "$ref": "#/components/schemas/ItemsToCreate"
+          },
+          "itemsUrl": {
+            "$ref": "#/components/schemas/ItemsUrlToCreate"
+          },
+          "mergeDocuments": {
+            "type": "boolean",
+            "description": "Indicates if the `items` must be merged into a single Document. For `Document Create API` if it false will be create individual documents, for `Document-File Create API` always create a single Document.",
+            "default": false
+          },
+          "service": {
+            "type": "string",
+            "description": "Service `code` that will be use the document. **If it isn't sent, the session will be used to add it**",
+            "example": "oms"
+          },
+          "entity": {
+            "$ref": "#/components/schemas/BaseDocument/properties/entity"
+          },
+          "entityId": {
+            "$ref": "#/components/schemas/BaseDocument/properties/entityId"
+          },
+          "urlExpires": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 604800,
+            "default": 900,
+            "description": "Expiration time in seconds used to generate the public URL of the files.\n\n> In case the expiration time is not passed, it will be 15 minutes (900 seconds).\n>\n> The maximum expiration time allowed cannot exceed 7 days (604800 seconds).\n",
+            "example": 3600
+          }
+        },
+        "required": [
+          "template",
+          "templateCode",
+          "items",
+          "itemsUrl"
+        ]
+      },
+      "TemplateVariables": {
+        "type": "object",
+        "additionalProperties": true,
+        "example": {
+          "title": "Zega Company",
+          "message": "Congratulations for buying our product. Enjoy It!!",
+          "name": "John Doe",
+          "email": "jonh.doe@example.com",
+          "price": 1000,
+          "customFields": {
+            "invoiceNumber": 10023
+          }
+        }
+      },
+      "ItemsUrlToCreate": {
+        "type": "string",
+        "description": "An URL where a file with the items are hosted.\n\n* The file must be a JSON, with the structure of `items` field (of this API body request).\n* It can be use in cases where needs to pass a massive amount of items, and the basic payload is not enough.\n\nIf `itemsUrl` is sent, `items` is not required, and has priority over `items`, otherwise `items` is required.\n",
+        "example": "https://janiscommerce.com/archive/items-to-create-pdf.json"
+      },
+      "ItemsToCreate": {
+        "type": "array",
+        "description": "\nList of document's variables.\n\n**Every item in the list will generate 1 HTML and 1 PDF file**.\n\n* `property name*`: variable's names.\n\n* `qr_[NAME]`: _string_ or _object_. The data in this fields will be transform to a **QR Code** Image.\n  * Change `[NAME]` for something thats represents the QR\n  * **Recommend**: `<img src:\"{{qr_[NAME]}}\" />` to render property\n  * **Example**:\n    * `qr_fizzmod: 'https://fizzmod.com/'`\n    * `<img src:\"{{qr_fizzmod}}\" />`\n\n* `barcode128_[NAME]`: _string_. The data in this fields will be transform to a **Barcode 128** Image.\n  * Change `[NAME]` for something thats represents the Barcode\n  * **Recommend**: `<img src:\"{{barcode128_[NAME]}}\" />` to render property\n  * **Example**:\n    * `barcode128_positionKey: '10.A.AB'`\n    * `<img src:\"{{barcode128_positionKey}}\" />`\n\n**IMPORTANT** : In order to provide additional information that can be used for identify a particular document, you can add `customFields` as an extra `property name*`.\n\n`customFields`: _object_\n",
+        "items": {
+          "$ref": "#/components/schemas/TemplateVariables"
+        }
+      },
+      "DocumentList": {
+        "description": "The list of Documents.",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/BaseDocument"
+        }
+      }
+    }
+  }
+}

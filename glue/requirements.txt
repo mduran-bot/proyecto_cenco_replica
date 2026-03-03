@@ -1,0 +1,22 @@
+# AWS Glue ETL Dependencies
+# Note: PySpark is provided by AWS Glue runtime
+
+# Testing
+pytest==7.4.3
+pytest-cov==4.1.0
+hypothesis==6.92.1
+
+# Data validation
+pydantic==2.5.2
+
+# AWS SDK
+boto3==1.34.10
+botocore==1.34.10
+
+# Apache Iceberg (for local testing)
+# Note: In Glue, use the Iceberg connector provided by AWS
+pyiceberg==0.5.1
+
+# Utilities
+python-dateutil==2.8.2
+pytz==2023.3

@@ -1,0 +1,358 @@
+-- DROP PROCEDURE dl_sp_dashboards_ecommerce.indicadores_prime_region_semana();
+
+CREATE OR REPLACE PROCEDURE dl_sp_dashboards_ecommerce.indicadores_prime_region_semana()
+	LANGUAGE plpgsql
+AS $$
+	
+BEGIN	
+
+DROP TABLE IF EXISTS #fechas;
+	WITH tmp_variables AS (
+	    SELECT 
+	        to_char(dateadd(day,0,convert_timezone('GMT','GMT+5',getdate())),'yyyymmdd')::NUMERIC AS numeric_fecha_ini
+	),
+	semana AS (
+	    SELECT 
+	        sk_dia, 
+	        sk_dia_semana
+	    FROM 
+	        dl_sp_maestras.dim_dia, tmp_variables
+	    WHERE 
+	        sk_dia = numeric_fecha_ini
+	),
+	conv_fecha AS (
+	    SELECT 
+	        CAST(TO_CHAR(DATEADD('day', -sk_dia_semana, TO_DATE(sk_dia::VARCHAR, 'YYYYMMDD')), 'YYYYMMDD') AS INT) AS var_fecha_fin,
+	        CAST(TO_CHAR(DATEADD('day', -(sk_dia_semana+27), TO_DATE(sk_dia::VARCHAR, 'YYYYMMDD')), 'YYYYMMDD') AS INT) AS var_fecha_ini,
+	        DATEADD('day', -(sk_dia_semana-1), TO_DATE(sk_dia::VARCHAR, 'YYYYMMDD')) AS var_fecha_fin_timestamp,
+	        DATEADD('day', -(sk_dia_semana+27), TO_DATE(sk_dia::VARCHAR, 'YYYYMMDD')) AS var_fecha_ini_timestamp
+	    FROM 
+	        semana
+	)
+	SELECT * INTO #fechas FROM conv_fecha;
+
+
+	drop table if exists #eco_oms_3;
+	select * into #eco_oms_3 from stg_ecommerce_vtex.eco_oms a
+	where creationdate >=(select var_fecha_ini_timestamp from #fechas ) and creationdate<(select var_fecha_fin_timestamp from #fechas );
+	
+	drop table if exists #fecha;
+	select distinct SK_DIA as codfecha,sk_Semana Semana,desc_abrv_dia_sem as NOM_DIA into #fecha from dl_sp_maestras.dim_dia
+	where SK_DIA>=(select var_fecha_ini from #fechas ) and SK_DIA<=(select var_fecha_fin from #fechas );
+	
+	--Extraer Pedidos desde Vtex 3
+	drop table if exists #Pedidos_Vtex;
+	select  to_char(CreationDate,'YYYYMM')MES
+	        ,SEMANA
+	        ,to_char(CreationDate,'YYYYMMDD')DIA 
+	        , ClientDocument DNI
+	        , ReferenceCode COD_MAT
+	        , right('000000000000000000' + ReferenceCode,18)COD_MATERIAL
+	        , ordernum VTEX_ID
+	        ,SKUName MATERIAL 
+	        , DiscountsNames 
+	        , StatusOrder ESTADO
+	        ,SUM (Quantity_SKU) Q_SKU
+	        , SKUTotalPrice as SELLING_PRICE
+	        , SUM(SKUTotalPrice * Quantity_SKU)VENTA_BRUTA
+	        ,CASE WHEN  (SellerName in ('wongfood','metrofood','app','appmetro')or SellerName like '%wongiot%' or SellerName like '%metroios%' or SellerName like '%metroioh%')
+	         then 'TIENDA' else 'ALMACEN' end as OPERACION
+	        ,CASE WHEN (SellerName NOT IN ('wongfood','metrofood','appmetro','app') AND SellerName NOT like '%wongiot%' AND SellerName NOT like '%metroios%' AND  SellerName NOT like '%metroioh%') AND (HOST LIKE '%metro%' or HOST='appmetro')  THEN 'S129' 
+	         WHEN (SellerName NOT IN ('wongfood','metrofood','appmetro','app') AND SellerName NOT like '%wongiot%' AND SellerName NOT like '%metroios%' AND  SellerName NOT like '%metroioh%')AND (HOST LIKE '%wong%' OR HOST='app') THEN 'T129'
+	         WHEN SUBSTRING(COURRIER,1,4) = 'TH12' THEN 'W101' 
+	         ELSE SUBSTRING (COURRIER,1,4) END COD_TIENDA
+	        ,CASE WHEN  UtmSource like '%AppMetro%' or UtmSource like '%AppWong%' THEN 'APP' ELSE 'WEB' END CANAL_ECO
+	        ,CASE WHEN  COURRIER LIKE '%REC%' OR COURRIER LIKE '%RETIRO%' OR  COURRIER LIKE '%AUTO%' THEN 'RETIRO EN TIENDA' ELSE 'DELIVERY' END DESPACHO
+	        ,prime_order
+	        ,emailoms CORREO
+	        ,status_janis Estado_Janis
+	        ,sellerorderid
+	into #Pedidos_Vtex
+	from #eco_oms_3  a
+	inner join #fecha b on to_char(CreationDate,'YYYYMMDD') = b.codfecha
+	and StatusOrder not in ('',' ','canceled','cancel')
+	WHERE quantity_sku<>0 AND  Courrier not in ('Transportadora Donación','Transportadora Donacion') 
+	group by to_char(CreationDate,'YYYYMM')
+	        ,SEMANA
+	        ,to_char(CreationDate,'YYYYMMDD') 
+	         , ClientDocument 
+	        , ReferenceCode 
+	        , right('000000000000000000' + ReferenceCode,18)
+	        , ordernum 
+	        ,SKUName  
+	        , DiscountsNames 
+	        , StatusOrder 
+	        , SKUTotalPrice 
+	        ,CASE WHEN  (SellerName in ('wongfood','metrofood','app','appmetro')or SellerName like '%wongiot%' or SellerName like '%metroios%' or SellerName like '%metroioh%')
+	         then 'TIENDA' else 'ALMACEN' end
+	        ,CASE WHEN (SellerName NOT IN ('wongfood','metrofood','appmetro','app') AND SellerName NOT like '%wongiot%' AND SellerName NOT like '%metroios%' AND  SellerName NOT like '%metroioh%') AND (HOST LIKE '%metro%' or HOST='appmetro')  THEN 'S129' 
+	         WHEN (SellerName NOT IN ('wongfood','metrofood','appmetro','app') AND SellerName NOT like '%wongiot%' AND SellerName NOT like '%metroios%' AND  SellerName NOT like '%metroioh%')AND (HOST LIKE '%wong%' OR HOST='app') THEN 'T129'
+	         WHEN SUBSTRING(COURRIER,1,4) = 'TH12' THEN 'W101' 
+	         ELSE SUBSTRING (COURRIER,1,4) END 
+	        ,CASE WHEN  UtmSource like '%AppMetro%' or UtmSource like '%AppWong%' THEN 'APP' ELSE 'WEB' END  
+	        ,CASE WHEN  COURRIER LIKE '%REC%' OR COURRIER LIKE '%RETIRO%' OR  COURRIER LIKE '%AUTO%' THEN 'RETIRO EN TIENDA' ELSE 'DELIVERY' END
+	        ,prime_order
+	        ,emailoms
+	        ,status_janis
+	        ,sellerorderid;
+	 
+	       
+	drop table if exists #janis_pime;
+	select
+	from_unixtime_janis(o.date_created)				as fechapedido
+	,o.seq_id										as op
+	,o.vtex_id										as vtex_id
+	,seller_ecom_id                                 as Seller
+	,o.status                                       AS statusOrder
+	,from_unixtime_janis(shi.shipping_window_start) as fechaprogramada	 
+	into #janis_pime
+	from stg_ecommerce_janis_legacy.wms_orders o
+	left join stg_ecommerce_janis_legacy.wms_order_shipping shi on (shi.order_id=o.id)
+	left join 	(
+				select
+				order_id
+				, max(id) as id
+				from stg_ecommerce_janis_legacy.wms_order_shipping
+				group by
+				order_id
+				) shi_max on (shi_max.order_id=shi.order_id and shi_max.id=shi.id)
+	where to_char(from_unixtime_janis(o.date_created)	,'yyyymmdd')>=(select var_fecha_ini from #fechas )
+	and to_char(from_unixtime_janis(o.date_created)	,'yyyymmdd')<=(select var_fecha_fin from #fechas )
+	union all
+	select
+	from_unixtime_janis(o.date_created)				as fechapedido
+	,o.seq_id										as op
+	,o.vtex_id										as vtex_id
+	,seller_ecom_id                                 as Seller
+	,o.status                                       AS statusOrder
+	,from_unixtime_janis(shi.shipping_window_start) as fechaprogramada	 
+	from stg_ecommerce_janis_wongio.wms_orders o
+	left join stg_ecommerce_janis_wongio.wms_order_shipping shi on (shi.order_id=o.id)
+	left join 	(
+				select
+				order_id
+				, max(id) as id
+				from stg_ecommerce_janis_wongio.wms_order_shipping
+				group by
+				order_id
+				) shi_max on (shi_max.order_id=shi.order_id and shi_max.id=shi.id)
+	where to_char(from_unixtime_janis(o.date_created)	,'yyyymmdd')>=(select var_fecha_ini from #fechas )
+	and to_char(from_unixtime_janis(o.date_created)	,'yyyymmdd')<=(select var_fecha_fin from #fechas )
+	union all
+	select
+	from_unixtime_janis(o.date_created)				as fechapedido
+	,o.seq_id										as op
+	,o.vtex_id										as vtex_id
+	,seller_ecom_id                                 as Seller
+	,o.status                                       AS statusOrder
+	,from_unixtime_janis(shi.shipping_window_start) as fechaprogramada	 
+	from stg_ecommerce_janis_metroio.wms_orders o
+	left join stg_ecommerce_janis_metroio.wms_order_shipping shi on (shi.order_id=o.id)
+	left join 	(
+				select
+				order_id
+				, max(id) as id
+				from stg_ecommerce_janis_metroio.wms_order_shipping
+				group by
+				order_id
+				) shi_max on (shi_max.order_id=shi.order_id and shi_max.id=shi.id)
+	where to_char(from_unixtime_janis(o.date_created)	,'yyyymmdd')>=(select var_fecha_ini from #fechas )
+	and to_char(from_unixtime_janis(o.date_created)	,'yyyymmdd')<=(select var_fecha_fin from #fechas );
+				
+				
+	ALTER TABLE #janis_pime
+	ADD DESC_ESTADO_ORDEN_ONLINE_AGRUPADO VARCHAR(200);
+	 
+	UPDATE #janis_pime
+	SET DESC_ESTADO_ORDEN_ONLINE_AGRUPADO=B.DESC_ESTADO_ORDEN_ONLINE_AGRUPADO            
+	FROM  #janis_pime A INNER JOIN   dl_sp_maestras.dim_estado_orden_online B  ON A.statusOrder = B.ID_ESTADO_ORDEN_ONLINE;
+	
+	
+	drop table if exists #PEDIDOS_T129_prime;
+	SELECT DISTINCT N_Ped_eCommerce Seller
+		,SUBSTRING(N_Ped_eCommerce,5,21)VTEX_ID
+		,ESTADO
+		,Fec_Pedido FECHA_PEDIDO
+		, DESC_ESTADO_ORDEN_ONLINE_AGRUPADO
+		, primera_fecha 
+	INTO #PEDIDOS_T129_prime	
+	FROM per_super_pd_int.transacciones_nonfood A
+	    INNER JOIN #fecha C ON A.Fec_Pedido=C.CODFECHA
+		LEFT JOIN  dl_sp_maestras.dim_estado_orden_online B ON UPPER(A.ESTADO) = B.DESC_ESTADO_ORDEN_ONLINE
+	WHERE COD_MATERIAL <> 'FLETE ECOMMERCE' ;
+	
+	drop table if exists #PRIME_ESTADOS_ORIGEN_PRIME;
+	SELECT DISTINCT SELLER,VTEX_ID,DESC_ESTADO_ORDEN_ONLINE_AGRUPADO INTO #PRIME_ESTADOS_ORIGEN_PRIME FROM #janis_pime
+	UNION ALL
+	SELECT DISTINCT SELLER,VTEX_ID, DESC_ESTADO_ORDEN_ONLINE_AGRUPADO FROM #PEDIDOS_T129_prime;
+	 
+	ALTER TABLE #Pedidos_Vtex
+	ADD ESTADO_AGRUPADO_2 VARCHAR(100);
+	
+	UPDATE #Pedidos_Vtex
+	SET ESTADO_AGRUPADO_2=DESC_ESTADO_ORDEN_ONLINE_AGRUPADO
+	FROM  #Pedidos_Vtex A INNER JOIN #PRIME_ESTADOS_ORIGEN_PRIME B ON A.VTEX_ID=B.VTEX_ID;
+	
+	--Flag IGV
+	ALTER TABLE #Pedidos_Vtex
+	ADD id_tipo_igv int ;
+	
+	UPDATE #Pedidos_Vtex
+	SET id_tipo_igv=b.id_tipo_igv
+	FROM  #Pedidos_Vtex A INNER JOIN dl_sp_capa_semantica.dw_cencofcic_dim_material B ON A.COD_MATERIAL=B.ID_MATERIAL;
+	
+	drop table if exists #MATERIALES_UNIDO;
+	
+	SELECT ID_MATERIAL,ID_EAN_PRINCIPAL,A.SK_DIA_CREACION_MATERIAL,DESC_MATERIAL,DESC_MARCA,ID_UM_BASE,ID_PROVEEDOR,DESC_PROVEEDOR,
+	ID_GRUPO_ARTICULO,DESC_GRUPO_ARTICULO,ID_CATEGORIA,DESC_CATEGORIA,DESC_JEFE_CATEGORIA,DESC_JEFE_CATEGORIA_MP,DESC_JEFE_CATEGORIA_IMP,ID_SUB_CATEGORIA,DESC_SUB_CATEGORIA,ID_SECCION,DESC_SECCION,ID_DEPARTAMENTO,DESC_DEPARTAMENTO,ID_AREA,DESC_AREA,ID_GERENCIA_COMERCIAL,DESC_GERENCIA_COMERCIAL,ID_GERENTE,DESC_GERENTE,
+	DESC_UNIDAD_NEGOCIO,E.SK_CATEGORIA,A.SK_MATERIAL,B.SK_MARCA,ID_TIPO_IGV
+	INTO #MATERIALES_UNIDO FROM dl_sp_capa_semantica.dw_cencofcic_dim_material A
+	INNER JOIN dl_sp_capa_semantica.dw_cencofcic_dim_marca B ON A.SK_MARCA=B.SK_MARCA
+	INNER JOIN dl_sp_capa_semantica.dw_cencofcic_dim_proveedor C ON A.SK_PROVEEDOR=C.SK_PROVEEDOR
+	INNER JOIN dl_sp_maestras.dim_grupo_articulo D ON A.SK_GRUPO_ARTICULO=D.SK_GRUPO_ARTICULO
+	INNER JOIN dl_sp_maestras.dim_categoria E ON D.SK_CATEGORIA=E.SK_CATEGORIA
+	INNER JOIN dl_sp_maestras.dim_jefe_categoria F ON D.SK_JEFE_CATEGORIA=F.SK_JEFE_CATEGORIA
+	INNER JOIN dl_sp_maestras.dim_jefe_categoria_mp G ON D.SK_JEFE_CATEGORIA_MP=G.SK_JEFE_CATEGORIA_MP
+	INNER JOIN dl_sp_maestras.dim_jefe_categoria_imp H ON D.SK_JEFE_CATEGORIA_IMP=H.SK_JEFE_CATEGORIA_IMP
+	INNER JOIN dl_sp_maestras.dim_sub_categoria I ON D.SK_SUB_CATEGORIA=I.SK_SUB_CATEGORIA
+	INNER JOIN dl_sp_maestras.dim_seccion J ON D.SK_SECCION=J.SK_SECCION
+	INNER join dl_sp_maestras.dim_departamento K ON D.SK_DEPARTAMENTO=K.SK_DEPARTAMENTO
+	INNER JOIN dl_sp_maestras.dim_area L ON D.SK_AREA=L.SK_AREA
+	INNER JOIN dl_sp_maestras.dim_gerencia_comercial M ON D.SK_GERENCIA_COMERCIAL=M.SK_GERENCIA_COMERCIAL
+	INNER JOIN dl_sp_maestras.dim_gerente N ON D.SK_GERENTE=N.SK_GERENTE;
+	
+	drop table if exists #MATERIAL;
+	SELECT id_material as "COD_MATERIAL",ID_EAN_PRINCIPAL as "EAN",SK_DIA_CREACION_MATERIAL as "FECHA_CREACION",DESC_MATERIAL,DESC_MARCA as "MARCA"
+	,ID_UM_BASE as "UMB",ID_PROVEEDOR as "COD_PROVEEDOR",DESC_PROVEEDOR,ID_GRUPO_ARTICULO as "COD_GA",DESC_GRUPO_ARTICULO as"GRUPO_ARTICULO",
+	ID_CATEGORIA as "COD_CATEGORIA",DESC_CATEGORIA as "CATEGORIA",DESC_JEFE_CATEGORIA"JEFE_CATEGORIA"
+	,DESC_JEFE_CATEGORIA_MP"JEFE_CATEGORIA_MP",DESC_JEFE_CATEGORIA_IMP"JEFE_CATEGORIA_IMP",
+	ID_SUB_CATEGORIA"COD_SUB_CATEGORIA",DESC_SUB_CATEGORIA"SUB_CATEGORIA",ID_SECCION"COD_SECCION",DESC_SECCION"SECCION",
+	ID_DEPARTAMENTO"COD_DEPARTAMENTO",DESC_DEPARTAMENTO"DEPARTAMENTO",ID_AREA"COD_AREA",DESC_AREA"AREA",ID_GERENCIA_COMERCIAL"COD_GERENCIA",
+	DESC_GERENCIA_COMERCIAL"GERENCIA_COMERCIAL",ID_GERENTE"COD_GERENTE", DESC_GERENTE"GERENTE",DESC_UNIDAD_NEGOCIO UNIDAD_NEGOCIO,SK_CATEGORIA,SK_MATERIAL,SK_MARCA,ID_TIPO_IGV
+	INTO #MATERIAL FROM #MATERIALES_UNIDO;
+	
+	drop table if exists #BB_ECOM_FECHA;
+	SELECT a.*,CASE WHEN a.ID_TIPO_IGV IN (0,3,4,5) THEN VENTA_BRUTA ELSE VENTA_BRUTA/1.18  END as VENTA_NETA,
+	CASE WHEN SK_CADENA=1 THEN 'WONG' WHEN SK_CADENA=2 THEN 'METRO' END CADENA,marca,sk_categoria,categoria,sk_material,sk_cadena,sk_marca,UNIDAD_NEGOCIO,DESC_PROVEEDOR
+	INTO #BB_ECOM_FECHA  FROM #Pedidos_Vtex a
+	INNER JOIN #MATERIAL M ON a.COD_MATERIAL=M."COD_MATERIAL"
+	LEFT JOIN dl_sp_maestras.dim_tienda B ON a.COD_TIENDA=B.ID_TIENDA;
+	
+	DROP TABLE  if exists  #PEDIDOS_EVALUAR;
+	SELECT DISTINCT CADENA,ESTADO_AGRUPADO_2,OPERACION,DIA,VTEX_ID,PRIME_ORDER,DNI,MES,SEMANA,sellerorderid,SUM(VENTA_BRUTA)VENTA_BRUTA,SUM(Q_SKU)Q_SKU,
+	SUM(VENTA_NETA)VENTA_NETA,DESPACHO,CORREO,CANAL_ECO INTO #PEDIDOS_EVALUAR
+	FROM #BB_ECOM_FECHA
+	GROUP BY CADENA,ESTADO_AGRUPADO_2,OPERACION,DIA,VTEX_ID,PRIME_ORDER,DNI,MES,SEMANA,sellerorderid,DESPACHO,CORREO,CANAL_ECO;
+	
+	DROP TABLE if exists #CAB_TKT_ONLINE; --509248
+	SELECT * INTO #CAB_TKT_ONLINE
+	FROM (
+	select sk_folio_online,cod_ticket_vtex from dl_sp_capa_semantica.dw_cencofcic_dim_folio_online 
+	where  SK_DIA>=(select var_fecha_ini from #fechas ) and SK_DIA<=(select var_fecha_fin from #fechas ) --DINAMICO
+	);
+	
+	DROP TABLE if exists #DET_TKT_ONLINE;  --4824951
+	SELECT * INTO #DET_TKT_ONLINE
+	FROM (select sk_folio_online,sk_dia,sk_material,mto_margen_online from dl_sp_capa_semantica.dw_cencofcic_fact_pedido_cliente_promocion_online_mat 
+	where SK_DIA>=(select var_fecha_ini from #fechas ) and SK_DIA<=(select var_fecha_fin from #fechas ) --DINAMICO
+	);
+	
+	DROP table if exists #MARGEN_PEDIDO;
+	SELECT DISTINCT CADENA,DIA,ESTADO_AGRUPADO_2,VTEX_ID,sk_folio_online,sellerorderid INTO #MARGEN_PEDIDO
+	FROM  #PEDIDOS_EVALUAR A LEFT JOIN #CAB_TKT_ONLINE B ON A.sellerorderid=B.COD_TICKET_VTEX;
+	
+	DROP table if exists #MARGEN_PEDIDO_DETALLE;
+	SELECT DISTINCT CADENA,DIA,VTEX_ID,A.sk_folio_online,sellerorderid,SUM(MTO_MARGEN_ONLINE)MARGEN INTO #MARGEN_PEDIDO_DETALLE FROM  #MARGEN_PEDIDO A 
+	LEFT JOIN  #DET_TKT_ONLINE B ON A.sk_folio_online=B.sk_folio_online
+	GROUP BY CADENA,DIA,VTEX_ID,A.sk_folio_online,sellerorderid;
+	
+	ALTER TABLE #PEDIDOS_EVALUAR ADD MARGEN NUMERIC(14,2);
+	
+	UPDATE #PEDIDOS_EVALUAR
+	SET MARGEN=B.MARGEN
+	FROM #PEDIDOS_EVALUAR A INNER JOIN #MARGEN_PEDIDO_DETALLE B ON A.sellerorderid=B.sellerorderid;
+	
+	UPDATE #PEDIDOS_EVALUAR
+	SET MARGEN=27.293723
+	WHERE MARGEN IS null;
+	
+	ALTER TABLE #PEDIDOS_EVALUAR ADD NUEVO_PRIME INT;
+	
+	DROP TABLE if exists #PEDIDOS_PROMOCION;
+	SELECT DISTINCT VTEX_ID INTO #PEDIDOS_PROMOCION FROM #BB_ECOM_FECHA
+	WHERE DiscountsNames LIKE '%PRIME%';
+	
+	UPDATE #PEDIDOS_EVALUAR
+	SET NUEVO_PRIME=1
+	FROM #PEDIDOS_EVALUAR A INNER JOIN #PEDIDOS_PROMOCION B ON A.VTEX_ID=B.VTEX_ID;
+	
+	UPDATE #PEDIDOS_EVALUAR
+	SET NUEVO_PRIME=PRIME_ORDER
+	WHERE NUEVO_PRIME IS null;
+	
+	UPDATE #PEDIDOS_EVALUAR
+	SET NUEVO_PRIME=1
+	WHERE VTEX_ID IN 
+	(
+	'v9364456wofp-01','v9364621wofp-01','v9364403wofp-01','v9364938wofp-01','v9365789wofp-01','v9368753wofp-01','v9366070wofp-01','v9367312wofp-01','v9367593wofp-01','v9368332wofp-01','v9368349wofp-01','v9368612wofp-01','v9365808wofp-01','v9368930wofp-01','v9366495wofp-01','v9368937wofp-01','v9367369wofp-01','v9369235wofp-01','v9369510wofp-01','v9369555wofp-01','v9369212wofp-01','v9369753wofp-01'
+	);
+	
+	delete from dl_sp_dashboards_ecommerce.prime_pedidos_detalle_reporte_region
+	where dia>=(select var_fecha_ini from #fechas ) and dia<=(select var_fecha_fin from #fechas );
+	
+	insert into dl_sp_dashboards_ecommerce.prime_pedidos_detalle_reporte_region
+	select * from #PEDIDOS_EVALUAR;
+
+	DELETE FROM dl_sp_dashboards_ecommerce.prime_indicadores_semana_grupos ;
+	DELETE FROM dl_sp_dashboards_ecommerce.prime_indicadores_semana_total ;
+	DELETE FROM dl_sp_dashboards_ecommerce.prime_indicadores_mes_grupos;
+	DELETE FROM dl_sp_dashboards_ecommerce.prime_indicadores_mes_total;
+	
+	--dl_sp_temporal.seguimiento_prime_semana
+	
+	INSERT INTO dl_sp_dashboards_ecommerce.prime_indicadores_semana_grupos 
+	SELECT DISTINCT CASE WHEN NUEVO_PRIME=1 THEN 'PRIME' ELSE 'NO PRIME' END GRUPO,'WONG ECOMMERCE' CADENA,SEMANA,COUNT(DISTINCT DNI)CLIENTES,
+	SUM(VENTA_BRUTA)VENTA_BRUTA,COUNT(DISTINCT VTEX_ID)TRX,SUM(Q_SKU)UNIDADES,SUM(VENTA_NETA)VENTA_NETA,SUM(MARGEN)MARGEN,SUM(VENTA_BRUTA)/COUNT(DISTINCT DNI)GASTO_PROM,
+	COUNT(DISTINCT VTEX_ID)/CAST(COUNT(DISTINCT DNI) AS NUMERIC) FRECUENCIA, SUM(VENTA_BRUTA)/COUNT(DISTINCT VTEX_ID)TKP,SUM(Q_SKU)/COUNT(DISTINCT VTEX_ID)UNID_TICKET,
+	SUM(VENTA_BRUTA)/SUM(Q_SKU)PRECIO_PROM,SUM(MARGEN)/SUM(VENTA_NETA)MARGEN_POR from dl_sp_dashboards_ecommerce.prime_pedidos_detalle_reporte_region
+	WHERE CADENA='WONG' AND ESTADO_AGRUPADO_2 IN ('ENTREGADO','EN PROCESO') AND OPERACION='TIENDA'
+	GROUP BY CASE WHEN NUEVO_PRIME=1 THEN 'PRIME' ELSE 'NO PRIME' END,SEMANA;
+	
+	--dl_sp_temporal.seguimiento_prime_total
+	
+	INSERT INTO  dl_sp_dashboards_ecommerce.prime_indicadores_semana_total 
+	SELECT DISTINCT SEMANA,COUNT(DISTINCT DNI)CLIENTES,
+	SUM(VENTA_BRUTA)VENTA_BRUTA,COUNT(DISTINCT VTEX_ID)TRX,SUM(Q_SKU)UNIDADES,SUM(VENTA_NETA)VENTA_NETA,SUM(MARGEN)MARGEN,SUM(VENTA_BRUTA)/COUNT(DISTINCT DNI)GASTO_PROM,
+	COUNT(DISTINCT VTEX_ID)/CAST(COUNT(DISTINCT DNI) AS NUMERIC) FRECUENCIA, SUM(VENTA_BRUTA)/COUNT(DISTINCT VTEX_ID)TKP,SUM(Q_SKU)/COUNT(DISTINCT VTEX_ID)UNID_TICKET,
+	SUM(VENTA_BRUTA)/SUM(Q_SKU)PRECIO_PROM,SUM(MARGEN)/SUM(VENTA_NETA)MARGEN_POR FROM dl_sp_dashboards_ecommerce.prime_pedidos_detalle_reporte_region
+	WHERE CADENA='WONG' AND ESTADO_AGRUPADO_2 IN ('ENTREGADO','EN PROCESO') AND OPERACION='TIENDA'
+	GROUP BY SEMANA;
+	
+	--dl_sp_temporal.seguimiento_prime_mes
+	
+	INSERT INTO  dl_sp_dashboards_ecommerce.prime_indicadores_mes_grupos
+	SELECT DISTINCT CASE WHEN NUEVO_PRIME=1 THEN 'PRIME' ELSE 'NO PRIME' END GRUPO,'WONG ECOMMERCE' CADENA,MES,COUNT(DISTINCT DNI)CLIENTES,
+	SUM(VENTA_BRUTA)VENTA_BRUTA,COUNT(DISTINCT VTEX_ID)TRX,SUM(Q_SKU)UNIDADES,SUM(VENTA_NETA)VENTA_NETA,SUM(MARGEN)MARGEN,SUM(VENTA_BRUTA)/COUNT(DISTINCT DNI)GASTO_PROM,
+	COUNT(DISTINCT VTEX_ID)/CAST(COUNT(DISTINCT DNI) AS NUMERIC) FRECUENCIA, SUM(VENTA_BRUTA)/COUNT(DISTINCT VTEX_ID)TKP,SUM(Q_SKU)/COUNT(DISTINCT VTEX_ID)UNID_TICKET,
+	SUM(VENTA_BRUTA)/SUM(Q_SKU)PRECIO_PROM,SUM(MARGEN)/SUM(VENTA_NETA)MARGEN_POR FROM dl_sp_dashboards_ecommerce.prime_pedidos_detalle_reporte_region
+	WHERE CADENA='WONG' AND ESTADO_AGRUPADO_2 IN ('ENTREGADO','EN PROCESO')  AND OPERACION='TIENDA'
+	GROUP BY CASE WHEN NUEVO_PRIME=1 THEN 'PRIME' ELSE 'NO PRIME' END,MES;
+	
+	--dl_sp_temporal.seguimiento_prime_mes_total
+	
+	INSERT INTO dl_sp_dashboards_ecommerce.prime_indicadores_mes_total
+	SELECT DISTINCT MES,COUNT(DISTINCT DNI)CLIENTES,
+	SUM(VENTA_BRUTA)VENTA_BRUTA,COUNT(DISTINCT VTEX_ID)TRX,SUM(Q_SKU)UNIDADES,SUM(VENTA_NETA)VENTA_NETA,SUM(MARGEN)MARGEN,SUM(VENTA_BRUTA)/COUNT(DISTINCT DNI)GASTO_PROM,
+	COUNT(DISTINCT VTEX_ID)/CAST(COUNT(DISTINCT DNI) AS NUMERIC) FRECUENCIA, SUM(VENTA_BRUTA)/COUNT(DISTINCT VTEX_ID)TKP,SUM(Q_SKU)/COUNT(DISTINCT VTEX_ID)UNID_TICKET,
+	SUM(VENTA_BRUTA)/SUM(Q_SKU)PRECIO_PROM,SUM(MARGEN)/SUM(VENTA_NETA)MARGEN_POR FROM dl_sp_dashboards_ecommerce.prime_pedidos_detalle_reporte_region
+	WHERE CADENA='WONG' AND ESTADO_AGRUPADO_2 IN ('ENTREGADO','EN PROCESO') AND OPERACION='TIENDA'
+	GROUP BY MES;
+
+end
+
+
+
+
+$$
+;
+

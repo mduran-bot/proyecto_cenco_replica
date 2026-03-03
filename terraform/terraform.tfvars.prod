@@ -1,0 +1,139 @@
+# ============================================================================
+# CONFIGURACIÓN DE PRODUCCIÓN - INFRAESTRUCTURA BASE
+# ============================================================================
+# Este archivo configura solo la infraestructura base (VPC, Security Groups,
+# S3, Kinesis, EventBridge, Monitoring) sin los componentes que requieren código
+# (Lambda, API Gateway, Glue Jobs, MWAA)
+# ============================================================================
+
+# ============================================================================
+# AWS Configuration
+# ============================================================================
+
+aws_region     = "us-east-1"
+aws_account_id = "123456789012" # REEMPLAZAR con Account ID real
+
+# ============================================================================
+# Network Configuration
+# ============================================================================
+
+vpc_cidr = "10.0.0.0/16"
+
+# Subnets activas (Single-AZ en us-east-1a)
+public_subnet_a_cidr   = "10.0.1.0/24"
+private_subnet_1a_cidr = "10.0.10.0/24"
+private_subnet_2a_cidr = "10.0.20.0/24"
+
+# Multi-AZ: Cambiar a true cuando se requiera alta disponibilidad
+enable_multi_az = false
+
+# Subnets reservadas para futura expansión Multi-AZ (us-east-1b)
+public_subnet_b_cidr   = "10.0.2.0/24"
+private_subnet_1b_cidr = "10.0.11.0/24"
+private_subnet_2b_cidr = "10.0.21.0/24"
+
+# ============================================================================
+# Existing Infrastructure Integration
+# ============================================================================
+
+# Redshift Cluster Existente
+existing_redshift_cluster_id = "cencosud-redshift-prod" # REEMPLAZAR
+existing_redshift_sg_id      = "sg-0123456789abcdef0"   # REEMPLAZAR
+
+# Sistemas BI Existentes
+existing_bi_security_groups = []
+
+existing_bi_ip_ranges = [
+  "192.168.1.0/24", # REEMPLAZAR con rangos IP reales de BI
+  "192.168.2.0/24",
+]
+
+# Pipeline MySQL→Redshift actual (temporal durante migración)
+existing_mysql_pipeline_sg_id = ""
+
+# ============================================================================
+# Tagging Strategy (Estándares Corporativos)
+# ============================================================================
+
+project_name = "janis-cencosud-integration"
+environment  = "prod"
+owner        = "data-engineering-team"
+cost_center  = "CC-12345" # REEMPLAZAR con codigo real de cost center
+
+# Tags corporativos obligatorios
+application_name = "janis-cencosud-integration"
+business_unit    = "Data-Analytics"
+country          = "CL"
+criticality      = "high"
+
+# Tags adicionales opcionales
+additional_tags = {
+  DataClassification = "Confidential"
+  BackupPolicy       = "daily"
+  ComplianceLevel    = "SOC2"
+}
+
+# ============================================================================
+# Security Configuration
+# ============================================================================
+
+# IPs permitidas para webhooks de Janis
+allowed_janis_ip_ranges = [
+  "172.16.0.0/12",
+  "10.0.0.0/8",
+  "192.168.0.0/16",
+]
+
+# ============================================================================
+# Monitoring Configuration
+# ============================================================================
+
+vpc_flow_logs_retention_days = 90
+dns_logs_retention_days      = 90
+alarm_sns_topic_arn          = ""
+enable_vpc_flow_logs         = true
+enable_dns_query_logging     = true
+
+# ============================================================================
+# EventBridge Polling Configuration
+# ============================================================================
+
+order_polling_rate_minutes   = 5
+product_polling_rate_minutes = 60
+stock_polling_rate_minutes   = 10
+price_polling_rate_minutes   = 30
+store_polling_rate_minutes   = 1440
+
+# ARN del ambiente MWAA (vacío porque no se crea en esta fase)
+mwaa_environment_arn = ""
+
+# ============================================================================
+# VPC Endpoints Configuration
+# ============================================================================
+
+enable_s3_endpoint              = true
+enable_glue_endpoint            = true
+enable_secrets_manager_endpoint = true
+enable_logs_endpoint            = true
+enable_kms_endpoint             = true
+enable_sts_endpoint             = true
+enable_events_endpoint          = true
+
+# ============================================================================
+# Component Creation Flags - FASE 1: INFRAESTRUCTURA BASE
+# ============================================================================
+
+# Lambda Functions - DESHABILITADO (sin código aún)
+create_lambda_webhook_processor = false
+create_lambda_data_enrichment   = false
+create_lambda_api_polling       = false
+
+# API Gateway - DESHABILITADO (requiere Lambda)
+create_api_gateway = false
+
+# Glue Jobs - DESHABILITADO (sin scripts aún)
+create_glue_bronze_to_silver_job = false
+create_glue_silver_to_gold_job   = false
+
+# MWAA - DESHABILITADO (sin DAGs aún)
+create_mwaa_environment = false

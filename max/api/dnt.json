@@ -1,0 +1,1600 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Dnt Service",
+    "description": "Dnt Service\n\n **Last update**: 06 feb 26, 04:49 p. m.",
+    "version": "0.19.1",
+    "x-logo": null,
+    "x-janis-keywords": [
+      "dnt",
+      "discounts",
+      "taxes",
+      "promotions",
+      "promotion engine"
+    ],
+    "lastUpdate": "2026-02-06T19:49:46.344Z"
+  },
+  "tags": [
+    {
+      "name": "Custom Promotion Engine",
+      "description": "\nThis service work as an asynchronous promotion engine.\n\nJanis sends the `Promotions Query` and waits for a `Promotions Query Result`. Then, it applies the discounts and taxes to the order.\n\nThis process occurs only if a custom promotion engine is set up in the [Integration Profile](#tag/Integration-Profile).\n\n[Documentation](https://docs.janis.im/docs/c%C3%B3mo-implementar-un-motor-de-promociones-personalizado)\n"
+    },
+    {
+      "name": "Integration Profile",
+      "description": "For managing Integration Profiles\n\nThis profiles define whether promotions will be validated or not and with promotions engine should be used.\n\n[Documentation](https://docs.janis.im/docs/rec%C3%A1lculo-de-promociones-post-picking)\n"
+    },
+    {
+      "name": "Order",
+      "description": "To check orders that have been processed"
+    }
+  ],
+  "servers": [
+    {
+      "url": "https://dnt.janis.in/api",
+      "description": "The Prod API server",
+      "variables": {
+        "environment": {
+          "default": "prod"
+        }
+      }
+    },
+    {
+      "url": "https://dnt.janisqa.in/api",
+      "description": "The QA API server",
+      "variables": {
+        "environment": {
+          "default": "qa"
+        }
+      }
+    },
+    {
+      "url": "https://dnt.janisdev.in/api",
+      "description": "The Beta API server",
+      "variables": {
+        "environment": {
+          "default": "beta"
+        }
+      }
+    },
+    {
+      "url": "http://dnt.janis.localhost:3123/api",
+      "description": "The Local API server",
+      "variables": {
+        "environment": {
+          "default": "local"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/integration-profile/{id}": {
+      "get": {
+        "x-janis-namespace": "integration-profile",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "dnt:integration-profile:read"
+        ],
+        "operationId": "getIntegrationProfile",
+        "tags": [
+          "Integration Profile"
+        ],
+        "summary": "Get one",
+        "description": "Get an Integration Profile by ID",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Integration Profile found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationProfile"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "x-janis-namespace": "integration-profile",
+        "x-janis-method": "update",
+        "x-janis-permissions": [
+          "dnt:integration-profile:write"
+        ],
+        "operationId": "updateIntegrationProfile",
+        "tags": [
+          "Integration Profile"
+        ],
+        "summary": "Update one",
+        "description": "Update an Integration Profile by ID",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "requestBody": {
+          "description": "A Integration Profile",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IntegrationProfile"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The integration profile was updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "$ref": "#/components/schemas/id"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/integration-profile": {
+      "get": {
+        "x-janis-namespace": "integration-profile",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "dnt:integration-profile:read"
+        ],
+        "operationId": "listIntegrationProfiles",
+        "tags": [
+          "Integration Profile"
+        ],
+        "summary": "Get many",
+        "description": "Get a list of Integration Profiles",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IntegrationProfileSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/IntegrationProfileFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The Integration Profile list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationProfileList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/order/{id}": {
+      "get": {
+        "x-janis-namespace": "order",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "dnt:order:read"
+        ],
+        "operationId": "getOrder",
+        "tags": [
+          "Order"
+        ],
+        "summary": "Get one",
+        "description": "Get an Order by ID",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/order": {
+      "get": {
+        "x-janis-namespace": "order",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "dnt:order:read"
+        ],
+        "operationId": "listOrders",
+        "tags": [
+          "Order"
+        ],
+        "summary": "Get many",
+        "description": "Get a list of Orders",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/OrderSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/OrderFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Orders listed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/order/{id}/insert-promos": {
+      "post": {
+        "x-janis-namespace": "order",
+        "x-janis-method": "promotions-query-result",
+        "x-janis-permissions": [],
+        "operationId": "promotionsQueryResult",
+        "tags": [
+          "Custom Promotion Engine"
+        ],
+        "summary": "Promotions Query Result",
+        "description": "In this payload, promotions and taxes to be processed are expected.\n\nKeep in mind that the values are the amounts to be deducted or added as applicable, and not the final expected price, as these will be calculated by the service.\nI.e., a negative value represents a discount amount and a positive value represents a tax amount.\n",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PromotionsQueryResult"
+              },
+              "examples": {
+                "Full discounts": {
+                  "value": {
+                    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ8.eyJtZXNzYWdlIjoiU29tZSBKV1QiLCJpYXQiOjE1MTYyMzkwMjJ9.0auhMTkVGZixVswHrr2KYVfKBcob2AL53SWvacJykgg",
+                    "items": {
+                      "027DA22CEC8A4EECA2EB0675F14D356E-01": [
+                        {
+                          "commerceId": "DISCOUNT-01",
+                          "name": "Discount example",
+                          "value": -10
+                        },
+                        {
+                          "commerceId": "DISCOUNT-02",
+                          "name": "Discount example 2",
+                          "value": -8
+                        }
+                      ],
+                      "FNZLJ5JSXY-01": [
+                        {
+                          "commerceId": "DISCOUNT-01",
+                          "name": "Discount example",
+                          "value": -4
+                        }
+                      ]
+                    },
+                    "shipping": [
+                      {
+                        "name": "Shipping Discount",
+                        "value": -15
+                      }
+                    ],
+                    "global": [
+                      {
+                        "name": "Global Discount",
+                        "value": -40
+                      },
+                      {
+                        "name": "Extra Global Discount",
+                        "value": -10
+                      }
+                    ]
+                  }
+                },
+                "Full taxes": {
+                  "value": {
+                    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ8.eyJtZXNzYWdlIjoiU29tZSBKV1QiLCJpYXQiOjE1MTYyMzkwMjJ9.0auhMTkVGZixVswHrr2KYVfKBcob2AL53SWvacJykgg",
+                    "items": {
+                      "027DA22CEC8A4EECA2EB0675F14D356E-01": [
+                        {
+                          "commerceId": "TAX-01",
+                          "name": "Tax Example",
+                          "value": 30
+                        }
+                      ]
+                    },
+                    "shipping": [
+                      {
+                        "name": "Shipping Tax",
+                        "value": 25
+                      },
+                      {
+                        "name": "Other Shipping Tax",
+                        "value": 10
+                      }
+                    ],
+                    "global": [
+                      {
+                        "name": "Global Tax",
+                        "value": 50
+                      }
+                    ]
+                  }
+                },
+                "Full mix": {
+                  "value": {
+                    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ8.eyJtZXNzYWdlIjoiU29tZSBKV1QiLCJpYXQiOjE1MTYyMzkwMjJ9.0auhMTkVGZixVswHrr2KYVfKBcob2AL53SWvacJykgg",
+                    "items": {
+                      "027DA22CEC8A4EECA2EB0675F14D356E-01": [
+                        {
+                          "commerceId": "DISCOUNT-01",
+                          "name": "Discount example",
+                          "value": -10
+                        },
+                        {
+                          "commerceId": "TAX-01",
+                          "name": "Tax Example",
+                          "value": 30
+                        }
+                      ],
+                      "FNZLJ5JSXY-01": [
+                        {
+                          "commerceId": "DISCOUNT-01",
+                          "name": "Discount example",
+                          "value": -4
+                        }
+                      ]
+                    },
+                    "shipping": [
+                      {
+                        "name": "Shipping Discount",
+                        "value": -15
+                      },
+                      {
+                        "name": "Shipping Tax",
+                        "value": 25
+                      }
+                    ],
+                    "global": [
+                      {
+                        "name": "Global Tax",
+                        "value": 50
+                      },
+                      {
+                        "name": "Extra Global Discount",
+                        "value": -10
+                      }
+                    ]
+                  }
+                },
+                "Items with discount": {
+                  "value": {
+                    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ8.eyJtZXNzYWdlIjoiU29tZSBKV1QiLCJpYXQiOjE1MTYyMzkwMjJ9.0auhMTkVGZixVswHrr2KYVfKBcob2AL53SWvacJykgg",
+                    "items": {
+                      "027DA22CEC8A4EECA2EB0675F14D356E-01": [
+                        {
+                          "commerceId": "DISCOUNT-01",
+                          "name": "Discount example",
+                          "value": -10
+                        }
+                      ]
+                    }
+                  }
+                },
+                "Shipping with discount": {
+                  "value": {
+                    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ8.eyJtZXNzYWdlIjoiU29tZSBKV1QiLCJpYXQiOjE1MTYyMzkwMjJ9.0auhMTkVGZixVswHrr2KYVfKBcob2AL53SWvacJykgg",
+                    "shipping": [
+                      {
+                        "name": "Shipping Discount",
+                        "value": -15
+                      }
+                    ]
+                  }
+                },
+                "Global discount": {
+                  "value": {
+                    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ8.eyJtZXNzYWdlIjoiU29tZSBKV1QiLCJpYXQiOjE1MTYyMzkwMjJ9.0auhMTkVGZixVswHrr2KYVfKBcob2AL53SWvacJykgg",
+                    "global": [
+                      {
+                        "name": "Global Discount",
+                        "value": -40
+                      }
+                    ]
+                  }
+                },
+                "Items with tax": {
+                  "value": {
+                    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ8.eyJtZXNzYWdlIjoiU29tZSBKV1QiLCJpYXQiOjE1MTYyMzkwMjJ9.0auhMTkVGZixVswHrr2KYVfKBcob2AL53SWvacJykgg",
+                    "items": {
+                      "027DA22CEC8A4EECA2EB0675F14D356E-01": [
+                        {
+                          "commerceId": "TAX-01",
+                          "name": "Tax Example",
+                          "value": 30
+                        }
+                      ]
+                    }
+                  }
+                },
+                "Shipping with tax": {
+                  "value": {
+                    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ8.eyJtZXNzYWdlIjoiU29tZSBKV1QiLCJpYXQiOjE1MTYyMzkwMjJ9.0auhMTkVGZixVswHrr2KYVfKBcob2AL53SWvacJykgg",
+                    "shipping": [
+                      {
+                        "name": "Shipping Tax",
+                        "value": 25
+                      }
+                    ]
+                  }
+                },
+                "Global tax": {
+                  "value": {
+                    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ8.eyJtZXNzYWdlIjoiU29tZSBKV1QiLCJpYXQiOjE1MTYyMzkwMjJ9.0auhMTkVGZixVswHrr2KYVfKBcob2AL53SWvacJykgg",
+                    "global": [
+                      {
+                        "name": "Global Tax",
+                        "value": 50
+                      }
+                    ]
+                  }
+                },
+                "Error": {
+                  "value": {
+                    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ8.eyJtZXNzYWdlIjoiU29tZSBKV1QiLCJpYXQiOjE1MTYyMzkwMjJ9.0auhMTkVGZixVswHrr2KYVfKBcob2AL53SWvacJykgg",
+                    "error": {
+                      "message": "Error message"
+                    }
+                  }
+                },
+                "Coupons": {
+                  "value": {
+                    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ8.eyJtZXNzYWdlIjoiU29tZSBKV1QiLCJpYXQiOjE1MTYyMzkwMjJ9.0auhMTkVGZixVswHrr2KYVfKBcob2AL53SWvacJykgg",
+                    "coupons": [
+                      {
+                        "code": "COUPON-01",
+                        "applied": true,
+                        "verificationCode": 123456,
+                        "amount": -10
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GenericSuccess"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-key",
+        "description": "The API Key"
+      },
+      "ApiSecret": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-secret",
+        "description": "The API Secret"
+      },
+      "JanisClient": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-client",
+        "description": "The Client Code"
+      }
+    },
+    "parameters": {
+      "id": {
+        "name": "id",
+        "in": "path",
+        "schema": {
+          "type": "string",
+          "example": "631fb04c8fe08f51a8ee5949"
+        },
+        "required": true,
+        "description": "The unique identifier of the item"
+      },
+      "ListSortDirection": {
+        "name": "sortDirection",
+        "in": "query",
+        "description": "The direction to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
+        }
+      },
+      "ListPageNumber": {
+        "name": "x-janis-page",
+        "in": "header",
+        "description": "The page to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "default": 1
+        }
+      },
+      "ListPageSize": {
+        "name": "x-janis-page-size",
+        "in": "header",
+        "description": "The page size to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "default": 60
+        }
+      },
+      "JanisEntity": {
+        "name": "janis-entity",
+        "in": "header",
+        "description": "The entity name",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "IntegrationProfileSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "name",
+            "status",
+            "dateCreated",
+            "dateModified"
+          ]
+        }
+      },
+      "IntegrationProfileFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/id"
+            },
+            "name": {
+              "$ref": "#/components/schemas/IntegrationProfile/properties/name"
+            },
+            "integrationName": {
+              "$ref": "#/components/schemas/IntegrationProfile/properties/integration/properties/name"
+            },
+            "status": {
+              "$ref": "#/components/schemas/status"
+            }
+          }
+        }
+      },
+      "OrderSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "status",
+            "dateCreated",
+            "dateModified"
+          ]
+        }
+      },
+      "OrderFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/id"
+            },
+            "orderId": {
+              "$ref": "#/components/schemas/Order/properties/orderId"
+            },
+            "commerceId": {
+              "$ref": "#/components/schemas/Order/properties/commerceId"
+            },
+            "token": {
+              "$ref": "#/components/schemas/Order/properties/token"
+            },
+            "status": {
+              "$ref": "#/components/schemas/Order/properties/status"
+            }
+          }
+        }
+      }
+    },
+    "headers": {
+      "x-janis-total": {
+        "description": "The total amount of records in the list",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "responses": {
+      "SuccessCreateResponse": {
+        "description": "The item was created",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "SuccessUpdateResponse": {
+        "description": "The item was updated",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "GenericSuccess": {
+        "description": "Operation succeeded",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "BadRequest": {
+        "description": "A client error has ocurred.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Authentication missing or invalid",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Not authorized request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "InternalError": {
+        "description": "A server error has ocurred."
+      }
+    },
+    "schemas": {
+      "id": {
+        "description": "The unique identifier of the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "631fb04c8fe08f51a8ee5949"
+      },
+      "status": {
+        "description": "The item status",
+        "type": "string",
+        "default": "active",
+        "enum": [
+          "active",
+          "inactive"
+        ],
+        "example": "active"
+      },
+      "dateCreated": {
+        "description": "The date of creation",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-12T19:00:00.000Z"
+      },
+      "dateModified": {
+        "description": "The date of the last modification",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-20T19:00:00.000Z"
+      },
+      "dateCreatedDay": {
+        "description": "The day of creation",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-08-07T16:00:00.000Z"
+      },
+      "dateModifiedDay": {
+        "description": "The day of last modification",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-08-07T16:00:00.000Z"
+      },
+      "userCreated": {
+        "description": "The ID of the user who created the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "6a1fc1eeb5b68406e0487a10"
+      },
+      "userModified": {
+        "description": "The ID of the user who last modified the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "7e1fc1eeb5b68406e048796"
+      },
+      "IntegrationProfile": {
+        "description": "An Integration Profile",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "name": {
+            "description": "The name of the integration profile",
+            "type": "string",
+            "example": "default"
+          },
+          "integration": {
+            "description": "The integration profile configuration",
+            "type": "object",
+            "properties": {
+              "name": {
+                "description": "The name of the integration config",
+                "type": "string",
+                "enum": [
+                  "none",
+                  "custom",
+                  "vtex",
+                  "shopify"
+                ],
+                "example": "vtex"
+              },
+              "url": {
+                "description": "The url of the integration config (required if the integration is custom)",
+                "type": "string",
+                "example": "https://dntintegration.example.janis.in/api/custom"
+              },
+              "headers": {
+                "description": "The headers of the request in case the integration is custom",
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "processOnlyModifiedItems": {
+            "description": "Whether to process only new items, substitute items, and picked items with quantity differences",
+            "type": "boolean",
+            "default": false
+          },
+          "processItemsCandidates": {
+            "description": "Whether to process items candidates",
+            "type": "boolean",
+            "default": false
+          },
+          "status": {
+            "$ref": "#/components/schemas/status"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          }
+        },
+        "required": [
+          "name",
+          "integration"
+        ]
+      },
+      "IntegrationProfileList": {
+        "type": "array",
+        "description": "A list of Integration Profiles",
+        "items": {
+          "$ref": "#/components/schemas/IntegrationProfile"
+        }
+      },
+      "Order": {
+        "description": "An Order",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "orderId": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/id"
+              },
+              {
+                "description": "The id of the order. See [Orders](/v2/service/oms#operation/listOrder)"
+              }
+            ]
+          },
+          "commerceId": {
+            "description": "The order commerce id.",
+            "type": "string",
+            "example": "12345678901234-01"
+          },
+          "token": {
+            "description": "A random uuid for custom integration request authorization.",
+            "type": "string",
+            "example": "4c5df1f7-600a-40d0-8f7c-175d8615c8a7"
+          },
+          "integration": {
+            "description": "The integration type of the request.",
+            "type": "string",
+            "enum": [
+              "vtex",
+              "shopify",
+              "custom"
+            ],
+            "example": "custom"
+          },
+          "status": {
+            "description": "The order promotions processing status.",
+            "type": "string",
+            "default": "pending",
+            "enum": [
+              "pending",
+              "processing",
+              "processed",
+              "error"
+            ],
+            "example": "pending"
+          },
+          "error": {
+            "description": "The error when trying to process promotions.",
+            "type": "string",
+            "example": "The promotions are invalid"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          }
+        }
+      },
+      "OrderList": {
+        "type": "array",
+        "description": "A list of Orders",
+        "items": {
+          "$ref": "#/components/schemas/Order"
+        }
+      },
+      "WebhookOrder": {
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "string",
+            "description": "Unique identifier for the order",
+            "example": "666c2520a9fbda8852bcb6bf"
+          },
+          "mainInfo": {
+            "type": "object",
+            "description": "Main information about the order",
+            "properties": {
+              "orderCommerceId": {
+                "type": "string",
+                "description": "Commerce ID of the order",
+                "example": "1439710500203-01"
+              },
+              "orderPlacementDate": {
+                "type": "string",
+                "format": "date-time",
+                "description": "Date and time when the order was placed",
+                "example": "2024-06-14T11:09:48.925Z"
+              },
+              "orderSequentialCommerceId": {
+                "type": "string",
+                "description": "Sequential Commerce ID of the order",
+                "example": "500203"
+              }
+            },
+            "required": [
+              "orderCommerceId",
+              "orderPlacementDate"
+            ]
+          },
+          "account": {
+            "type": "object",
+            "description": "The information of the [Account](https://docs.janisdev.in/v2/service/commerce#operation/getAccount) where the order was placed.",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "The name of the Account",
+                "example": "Top account"
+              },
+              "ecommerceName": {
+                "type": "string",
+                "description": "The name of the Account in the ecommerce platform",
+                "example": "janis"
+              },
+              "referenceId": {
+                "type": "string",
+                "description": "The Reference ID of the Account",
+                "example": "janis"
+              },
+              "platform": {
+                "type": "string",
+                "description": "The name of the platform of the Account",
+                "example": "vtex"
+              }
+            },
+            "required": [
+              "name",
+              "ecommerceName",
+              "referenceId",
+              "platform"
+            ]
+          },
+          "seller": {
+            "type": "object",
+            "description": "Seller information",
+            "properties": {
+              "email": {
+                "type": "string",
+                "description": "Seller's email address",
+                "example": "example@janis.im"
+              },
+              "name": {
+                "type": "string",
+                "description": "Name of the seller",
+                "example": "Janis"
+              },
+              "ids": {
+                "type": "object",
+                "description": "A key-value object containing seller external IDs",
+                "additionalProperties": {
+                  "x-additionalPropertiesName": "<some ID property>",
+                  "type": "string",
+                  "description": "The ID Value"
+                },
+                "example": {
+                  "account": "64d611369411fef1116f4e10",
+                  "vtex": "thesellerid"
+                }
+              }
+            },
+            "required": [
+              "name"
+            ]
+          },
+          "customer": {
+            "type": "object",
+            "description": "The customer of an order",
+            "properties": {
+              "email": {
+                "type": "string",
+                "description": "The customer's email",
+                "example": "john.doe@example.com"
+              },
+              "firstName": {
+                "type": "string",
+                "description": "The customer's first name",
+                "example": "John"
+              },
+              "lastName": {
+                "type": "string",
+                "description": "The customer's last name",
+                "example": "Doe"
+              }
+            },
+            "required": [
+              "firstName",
+              "lastName"
+            ]
+          },
+          "items": {
+            "type": "array",
+            "description": "List of items in the order",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "A unique identifier for the item. This must be used in the Promotions Query Result for taxes/discounts that apply to items."
+                },
+                "referenceId": {
+                  "type": "string",
+                  "description": "Reference ID for the item"
+                },
+                "sellingMeasurementUnit": {
+                  "type": "string",
+                  "description": "The order item **Measurement Unit**"
+                },
+                "sellingQuantity": {
+                  "type": "integer",
+                  "deprecated": true,
+                  "description": "The quantity of the item that the customer bought. This will always be an integer.\n\n**This property is deprecated, use `totalQuantity` instead.**\n"
+                },
+                "actualQuantity": {
+                  "type": "integer",
+                  "deprecated": true,
+                  "description": "The quantity of the item actually picked. For weighable items, this can be a decimal number.\n\n**This property is deprecated, use `pickedTotalQuantity` instead.**\n"
+                },
+                "totalQuantity": {
+                  "type": "integer",
+                  "nullable": true,
+                  "description": "The total quantity of the item that the customer originally purchased (purchasedQuantity * sellingUnitMultiplier). Null when the item is a substitute."
+                },
+                "pickedTotalQuantity": {
+                  "type": "integer",
+                  "nullable": true,
+                  "description": "The total quantity of the item actually picked from the picking result. For weighable items, this can be a decimal number and can be null when the order is not picked."
+                },
+                "sellingUnitMultiplier": {
+                  "type": "integer",
+                  "description": "Multiplier for the selling unit"
+                },
+                "skuEan": {
+                  "type": "string",
+                  "description": "The picked EAN code for the SKU. For weighable items, this will contain the variable portion of the EAN with the corresponding values."
+                },
+                "skuName": {
+                  "type": "string",
+                  "description": "Name of the SKU"
+                }
+              },
+              "required": [
+                "id",
+                "referenceId",
+                "sellingMeasurementUnit",
+                "sellingQuantity",
+                "actualQuantity",
+                "sellingUnitMultiplier",
+                "skuEan",
+                "skuName"
+              ]
+            },
+            "example": [
+              {
+                "id": "027DA22CEC8A4EECA2EB0675F14D356E-01",
+                "referenceId": "1470",
+                "sellingMeasurementUnit": "un",
+                "sellingQuantity": 1,
+                "actualQuantity": 1,
+                "totalQuantity": 1,
+                "pickedTotalQuantity": 1,
+                "sellingUnitMultiplier": 1,
+                "skuEan": "7894900027013",
+                "skuName": "Energy drink"
+              },
+              {
+                "id": "FNZLJ5JSXY-01",
+                "referenceId": "8790",
+                "sellingMeasurementUnit": "un",
+                "sellingQuantity": 3,
+                "actualQuantity": 3,
+                "totalQuantity": 3,
+                "pickedTotalQuantity": 3,
+                "sellingUnitMultiplier": 1,
+                "skuEan": "7696328750944",
+                "skuName": "Yogurt"
+              }
+            ]
+          },
+          "payments": {
+            "type": "array",
+            "description": "List of payments associated with the order",
+            "items": {
+              "type": "object",
+              "properties": {
+                "paymentMethodName": {
+                  "type": "string",
+                  "description": "The name of the payment system",
+                  "example": "Promissory"
+                },
+                "paymentTypeName": {
+                  "type": "string",
+                  "description": "Type of payment",
+                  "example": "promissory"
+                },
+                "value": {
+                  "type": "number",
+                  "description": "Value of the payment",
+                  "example": 42.86
+                },
+                "valueWithInterests": {
+                  "type": "number",
+                  "description": "Value of the payment including interests",
+                  "example": 42.86
+                }
+              },
+              "required": [
+                "paymentMethodName",
+                "paymentTypeName",
+                "value"
+              ]
+            }
+          },
+          "shipping": {
+            "type": "object",
+            "description": "Shipping information",
+            "properties": {
+              "companyName": {
+                "type": "string",
+                "description": "The company that will deliver the items",
+                "example": "Pack Janis"
+              },
+              "countryCode": {
+                "type": "string",
+                "description": "Country code for the shipping destination",
+                "example": "ESP"
+              },
+              "deliveryEstimateDate": {
+                "type": "string",
+                "description": "Estimated delivery date and time",
+                "example": "2024-06-14T11:00:00.000Z"
+              },
+              "deliveryWindow": {
+                "type": "object",
+                "description": "Delivery window",
+                "properties": {
+                  "start": {
+                    "type": "string",
+                    "description": "The initial date of the delivery",
+                    "example": "2024-06-14T11:00:00.000Z"
+                  },
+                  "end": {
+                    "type": "string",
+                    "description": "The final date of the delivery",
+                    "example": "2024-06-14T13:00:00.000Z"
+                  }
+                }
+              },
+              "email": {
+                "type": "string",
+                "description": "Email for shipping",
+                "example": "example@janis.im"
+              },
+              "geolocation": {
+                "type": "array",
+                "description": "The coordinates of the address. First element is longitude, second is latitude.",
+                "items": {
+                  "type": "number"
+                },
+                "example": [
+                  2.8190749,
+                  41.9855224
+                ]
+              },
+              "postalCode": {
+                "type": "string",
+                "description": "Postal code for the delivery address",
+                "example": "17001"
+              },
+              "slaName": {
+                "type": "string",
+                "description": "The name of the selected SLA",
+                "example": "Same-day shipping"
+              }
+            },
+            "required": [
+              "companyName",
+              "deliveryEstimateDate",
+              "slaName"
+            ]
+          },
+          "coupons": {
+            "type": "array",
+            "description": "List of coupons associated with the order",
+            "items": {
+              "type": "object",
+              "description": "A coupon",
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "description": "The code of the coupon",
+                  "example": "15OFF"
+                }
+              },
+              "required": [
+                "code"
+              ]
+            }
+          },
+          "token": {
+            "type": "string",
+            "description": "Authentication token",
+            "example": "82ae124f-b8c7-47fa-ad2f-f3b9dc73b7fc"
+          }
+        },
+        "required": [
+          "orderId",
+          "mainInfo",
+          "customer",
+          "items",
+          "shipping",
+          "payments",
+          "token"
+        ]
+      },
+      "PromotionsQueryResult": {
+        "type": "object",
+        "description": "A Promotions Query Result",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "This must be the `token` from the Promotions Query."
+          },
+          "items": {
+            "type": "object",
+            "description": "A key-value object containing the promotions and taxes applied to each item.",
+            "additionalProperties": {
+              "type": "array",
+              "description": "A unique identifier for the item. This must be an `id` of an item from the Promotions Query.\n",
+              "x-additionalPropertiesName": "<item ID>",
+              "items": {
+                "type": "object",
+                "description": "A discount/tax applied to the item",
+                "properties": {
+                  "commerceId": {
+                    "type": "string",
+                    "description": "The ID of the tax/promotion from the Promotions engine."
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "The name of the tax/promotion"
+                  },
+                  "value": {
+                    "type": "number",
+                    "description": "The amount of the tax/promotion. This value represents the total sum that applies to the entire item.\n\nThis value is always a fixed amount applied directly to the order total, not a percentage.\n\nA negative value means a discount, while a positive value means a tax.\n"
+                  }
+                }
+              }
+            }
+          },
+          "shipping": {
+            "$ref": "#/components/schemas/DefaultStructureOfPromotionTax"
+          },
+          "global": {
+            "$ref": "#/components/schemas/DefaultStructureOfPromotionTax"
+          },
+          "error": {
+            "type": "object",
+            "description": "An error that occurred during the promotions query",
+            "properties": {
+              "message": {
+                "type": "string",
+                "description": "The error message",
+                "example": "Error message"
+              }
+            },
+            "required": [
+              "message"
+            ]
+          },
+          "coupons": {
+            "$ref": "#/components/schemas/CouponsStructure"
+          }
+        },
+        "required": [
+          "token",
+          "orderId"
+        ]
+      },
+      "DefaultStructureOfPromotionTax": {
+        "type": "array",
+        "description": "A list of taxes and/or discounts",
+        "items": {
+          "type": "object",
+          "description": "A tax or discount",
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "The name of the tax/promotion in the Promotions engine",
+              "example": "Free shipping"
+            },
+            "value": {
+              "type": "number",
+              "description": "The amount of the tax/promotion\n\nThis value is always a fixed amount applied directly to the order total, not a percentage.\n\nA negative value means a discount, while a positive value means a tax.\n",
+              "example": -10
+            }
+          },
+          "required": [
+            "name",
+            "value"
+          ]
+        }
+      },
+      "CouponsStructure": {
+        "type": "array",
+        "description": "A list of coupons",
+        "items": {
+          "type": "object",
+          "description": "A coupon",
+          "properties": {
+            "code": {
+              "type": "string",
+              "description": "The code of the coupon",
+              "example": "COUPON-01"
+            },
+            "applied": {
+              "type": "boolean",
+              "description": "If the coupon is applied",
+              "example": true
+            },
+            "verificationCode": {
+              "type": "string",
+              "description": "The verification code of the coupon",
+              "example": "123456"
+            },
+            "amount": {
+              "type": "number",
+              "description": "The amount of the coupon",
+              "example": -10
+            }
+          },
+          "required": [
+            "code",
+            "applied"
+          ]
+        }
+      }
+    }
+  },
+  "x-webhooks": {
+    "promotionsQuery": {
+      "post": {
+        "operationId": "promotionsQuery",
+        "tags": [
+          "Custom Promotion Engine"
+        ],
+        "summary": "Promotions Query",
+        "description": "This event is triggered when an order is picked to check if current promotions or taxes still apply, or if new ones should be applied instead.\n\nThis webhook expects a 2xx response in no more than 5 seconds.\n\nSee details about delivery policy and retries [here](https://docs.janis.im/docs/c%C3%B3mo-implementar-un-motor-de-promociones-personalizado#promotions-query).\n",
+        "requestBody": {
+          "description": "A Promotions Query",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WebhookOrder"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GenericSuccess"
+          }
+        }
+      }
+    }
+  }
+}

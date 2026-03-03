@@ -1,0 +1,4 @@
+# file: C:\Users\maxim\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\pyspark\serializers.py
+# hypothesis_version: 6.151.9
+
+[b'M', b'P', '!?', '!i', '!q', '%s()', "'i' format requires", '1', 'CPickleSerializer', 'MarshalSerializer', 'PickleSerializer', 'UTF8Deserializer', 'UTF8Deserializer(%s)', '__getslice__', '__hijack', '__len__', '__main__', '__reduce__', '_fields', '_hack_namedtuple', '_old_namedtuple', 'bytes', 'utf-8']

@@ -1,0 +1,4 @@
+# file: C:\Users\vicen\OneDrive\Documentos\3HTP\Cencosud\Proyecto Final Cenco\glue\modules\schema_evolution_manager.py
+# hypothesis_version: 6.151.9
+
+['(', 'BooleanType', 'DateType', 'DoubleType', 'FloatType', 'IntegerType', 'LongType', 'StringType', 'TimestampType', 'add_column', 'change_nullable', 'change_type', 'changes', 'changes_applied', 'completed', 'drop_column', 'field_name', 'glue_catalog', 'message', 'new_value', 'no_changes', 'old_value', 'reason', 'rename_column', 'safe', 'safe_changes', 'safety', 'schema', 'silver_db', 'sns', 'status', 'timestamp', 'unknown', 'unsafe', 'unsafe_changes']

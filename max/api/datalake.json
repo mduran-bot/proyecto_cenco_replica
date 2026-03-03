@@ -1,0 +1,2557 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "DataLake Service",
+    "description": "DataLake Service\n\n **Last update**: 13 feb 26, 01:37 p. m.",
+    "version": "0.64.0",
+    "x-logo": null,
+    "x-janis-keywords": [
+      "data-lake"
+    ],
+    "lastUpdate": "2026-02-13T16:37:44.518Z"
+  },
+  "tags": [
+    {
+      "name": "Client",
+      "description": "For managing Clients"
+    },
+    {
+      "name": "DataWarehouse",
+      "description": "For managing DataWarehouse"
+    }
+  ],
+  "servers": [
+    {
+      "url": "https://data-lake.janis.in/api",
+      "description": "The Prod API server",
+      "variables": {
+        "environment": {
+          "default": "prod"
+        }
+      }
+    },
+    {
+      "url": "https://data-lake.janisqa.in/api",
+      "description": "The QA API server",
+      "variables": {
+        "environment": {
+          "default": "qa"
+        }
+      }
+    },
+    {
+      "url": "https://data-lake.janisdev.in/api",
+      "description": "The Beta API server",
+      "variables": {
+        "environment": {
+          "default": "beta"
+        }
+      }
+    },
+    {
+      "url": "http://data-lake.janis.localhost:3104/api",
+      "description": "The Local API server",
+      "variables": {
+        "environment": {
+          "default": "local"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/client": {
+      "post": {
+        "x-janis-namespace": "client",
+        "x-janis-method": "create",
+        "operationId": "createClient",
+        "tags": [
+          "Client"
+        ],
+        "summary": "Create a new client",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": []
+          }
+        ],
+        "requestBody": {
+          "description": "The clients to create",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Clients"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Client created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/driver-productivity": {
+      "get": {
+        "x-janis-namespace": "driver-productivity",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "data-lake:driver-productivity:read"
+        ],
+        "operationId": "listDriverProductivity",
+        "tags": [
+          "Driver Productivity"
+        ],
+        "summary": "List Driver Productivity",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/DriverProductivitySortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/DriverProductivityFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Driver Productivity listed",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DriverProductivityList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/missing-item": {
+      "get": {
+        "x-janis-namespace": "missing-item",
+        "x-janis-method": "list",
+        "x-janis-permissions": "data-lake:missing-item:read",
+        "operationId": "listMissingItems",
+        "tags": [
+          "Missing Item"
+        ],
+        "summary": "List Missing Items",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/MissingItemSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/MissingItemFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Missing Items listed",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MissingItemList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/missing-item-by-sku": {
+      "get": {
+        "x-janis-namespace": "missing-item-by-sku",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "data-lake:missing-item-by-sku:read"
+        ],
+        "operationId": "listMissingItemBySku",
+        "tags": [
+          "Missing Item by SKU"
+        ],
+        "summary": "List Missing Items by Sku",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/MissingItemBySkuFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Missing Items listed and grouped by SKU",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MissingItemBySkuList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/missing-item-by-warehouse": {
+      "get": {
+        "x-janis-namespace": "missing-item-by-wh",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "data-lake:missing-item-by-wh:read"
+        ],
+        "operationId": "listMissingItemByWh",
+        "tags": [
+          "Missing Item by Warehouse"
+        ],
+        "summary": "List Missing Items by Warehouse",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/MissingItemByWhFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Missing Items listed and grouped by warehouse",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MissingItemByWhList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/order": {
+      "get": {
+        "x-janis-namespace": "order",
+        "x-janis-method": "list",
+        "x-janis-permissions": [],
+        "operationId": "orderGetGraph",
+        "tags": [
+          "Order"
+        ],
+        "summary": "Order get Graph",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GenericSuccess"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/picker-productivity": {
+      "get": {
+        "x-janis-namespace": "picker-productivity",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "data-lake:picker-productivity:read"
+        ],
+        "operationId": "listPickerProductivity",
+        "tags": [
+          "Picker Productivity"
+        ],
+        "summary": "List Picker Productivity",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PickerProductivitySortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/PickerProductivityFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Picker Productivity listed",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PickerProductivityList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/publication-report": {
+      "get": {
+        "x-janis-namespace": "publication-report",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "data-lake:publication-report:read"
+        ],
+        "operationId": "publicationReportGetGraph",
+        "tags": [
+          "Publication report"
+        ],
+        "summary": "Publication report get Graph",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GenericSuccess"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/sale": {
+      "get": {
+        "x-janis-namespace": "sale",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "data-lake:sale:read"
+        ],
+        "operationId": "saleGetGraph",
+        "tags": [
+          "Sale"
+        ],
+        "summary": "Sale get Graph",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GenericSuccess"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/setting/{entity}": {
+      "get": {
+        "x-janis-namespace": "setting",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "data-lake:setting:read"
+        ],
+        "operationId": "getSetting",
+        "tags": [
+          "Settings"
+        ],
+        "summary": "Get the setting of an entity",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "entity",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "example": "kpi"
+            },
+            "required": true,
+            "description": "The name of the entity that owns the settings to be retrieved"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The settings were retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/DataLakeKpiSettings"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "x-janis-namespace": "setting",
+        "x-janis-method": "update",
+        "x-janis-permissions": [
+          "data-lake:setting:write"
+        ],
+        "operationId": "updateSetting",
+        "tags": [
+          "Settings"
+        ],
+        "summary": "Update the setting of an entity",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "entity",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "example": "kpi"
+            },
+            "required": true,
+            "description": "The name of the entity that owns the settings to be updated"
+          }
+        ],
+        "requestBody": {
+          "description": "The settings configurations",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/DataLakeKpiSettings"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The settings were updated"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/shipping": {
+      "get": {
+        "x-janis-namespace": "shipping",
+        "x-janis-method": "list",
+        "x-janis-permissions": [],
+        "operationId": "shippingGetGraph",
+        "tags": [
+          "Shipping"
+        ],
+        "summary": "Shipping get Graph",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GenericSuccess"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/substitution-report": {
+      "get": {
+        "x-janis-namespace": "substitution-report",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "data-lake:substitution-report:read"
+        ],
+        "operationId": "listSubstitutionReport",
+        "tags": [
+          "Substitution Report"
+        ],
+        "summary": "List Substitution Report",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/SubstitutionReportFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Substitution Report listed",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubstitutionReportList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/listener/id/client/created": {
+      "post": {
+        "x-janis-namespace": "id-client",
+        "x-janis-method": "created-listener",
+        "tags": [
+          "Client",
+          "Event Listeners"
+        ],
+        "summary": "Client created event listener",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": []
+          }
+        ],
+        "description": "Client created event listener",
+        "operationId": "clientCreatedListener",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/listenerEvent"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GenericSuccess"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/listener/id/client/removed": {
+      "post": {
+        "x-janis-namespace": "id-client",
+        "x-janis-method": "removed-listener",
+        "tags": [
+          "Client"
+        ],
+        "summary": "Client removed event listener",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": []
+          }
+        ],
+        "description": "Client removed event listener",
+        "operationId": "clientRemovedListener",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/listenerEvent"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GenericSuccess"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/listener/oms/order/complete": {
+      "post": {
+        "x-janis-namespace": "oms-order",
+        "x-janis-method": "complete-listener",
+        "x-janis-permissions": [],
+        "operationId": "omsOrderCompleteListener",
+        "tags": [
+          "Event Listeners"
+        ],
+        "summary": "Oms Order Complete Event Listener",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "The event",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/listenerEvent"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GenericSuccess"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/run": {
+      "servers": [
+        {
+          "url": "",
+          "description": "The API server"
+        }
+      ],
+      "post": {
+        "tags": [
+          "DataWarehouse"
+        ],
+        "summary": "Query Table",
+        "description": "Runs a SQL query on the `curated` schema and returns the result set.",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "description": "Output format.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "JSONEachRow"
+              ]
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "sql"
+                ],
+                "properties": {
+                  "sql": {
+                    "type": "string",
+                    "description": "SQL query to execute."
+                  }
+                }
+              },
+              "examples": {
+                "orders": {
+                  "summary": "Query curated.orders",
+                  "value": {
+                    "sql": "SELECT * FROM curated.orders LIMIT 10"
+                  }
+                },
+                "order_items": {
+                  "summary": "Query curated.order_items",
+                  "value": {
+                    "sql": "SELECT * FROM curated.order_items LIMIT 10"
+                  }
+                },
+                "order_payments": {
+                  "summary": "Query curated.order_payments",
+                  "value": {
+                    "sql": "SELECT * FROM curated.order_payments LIMIT 10"
+                  }
+                },
+                "order_rma": {
+                  "summary": "Query curated.order_rma",
+                  "value": {
+                    "sql": "SELECT * FROM curated.order_rma LIMIT 10"
+                  }
+                },
+                "item_categories": {
+                  "summary": "Query curated.item_categories",
+                  "value": {
+                    "sql": "SELECT * FROM curated.item_categories LIMIT 10"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BasicAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The query was successfully executed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/item_categories"
+                    },
+                    {
+                      "$ref": "#/components/schemas/order_items"
+                    },
+                    {
+                      "$ref": "#/components/schemas/order_payments"
+                    },
+                    {
+                      "$ref": "#/components/schemas/order_rma"
+                    },
+                    {
+                      "$ref": "#/components/schemas/orders"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "description": "The request is unauthorized.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Unauthorized"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-key",
+        "description": "The API Key"
+      },
+      "ApiSecret": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-secret",
+        "description": "The API Secret"
+      },
+      "JanisClient": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-client",
+        "description": "The Client Code"
+      },
+      "BasicAuth": {
+        "type": "http",
+        "scheme": "basic",
+        "description": "Use HTTP Basic Auth.\n- `API_KEY`\n- `API_SECRET`\n"
+      }
+    },
+    "parameters": {
+      "id": {
+        "name": "id",
+        "in": "path",
+        "schema": {
+          "type": "string",
+          "example": "d555345345345as67a342a"
+        },
+        "required": true,
+        "description": "The unique identifier of the item"
+      },
+      "ListSortDirection": {
+        "name": "sortDirection",
+        "in": "query",
+        "description": "The direction to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
+        }
+      },
+      "ListPageNumber": {
+        "name": "x-janis-page",
+        "in": "header",
+        "description": "The page to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "default": 1
+        }
+      },
+      "ListPageSize": {
+        "name": "x-janis-page-size",
+        "in": "header",
+        "description": "The page size to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "default": 60
+        }
+      },
+      "JanisEntity": {
+        "name": "janis-entity",
+        "in": "header",
+        "description": "The entity name",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "DriverProductivitySortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "driverFullname",
+            "routeTime",
+            "routeTotalQuantity",
+            "shippingTotalQuantity",
+            "expectedTotalDistance"
+          ]
+        }
+      },
+      "DriverProductivityFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "driverId": {
+              "$ref": "#/components/schemas/DriverProductivity/properties/driverId"
+            },
+            "warehouseId": {
+              "$ref": "#/components/schemas/DriverProductivity/properties/warehouseId"
+            },
+            "dateRange": {
+              "type": "object",
+              "description": "Date range filter for driver productivity sessions",
+              "properties": {
+                "from": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Start date for the date range filter",
+                  "example": "2023-08-01T00:00:00.000Z"
+                },
+                "to": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "End date for the date range filter",
+                  "example": "2023-08-31T23:59:59.999Z"
+                }
+              },
+              "required": [
+                "from",
+                "to"
+              ]
+            }
+          }
+        }
+      },
+      "MissingItemSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "endPickingDate",
+            "noSubstitutedQuantity",
+            "substitutedQuantity",
+            "missingQuantity"
+          ]
+        }
+      },
+      "MissingItemFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "endPickingDate": {
+              "$ref": "#/components/schemas/MissingItem/properties/endPickingDate"
+            },
+            "warehouseName": {
+              "$ref": "#/components/schemas/MissingItem/properties/warehouseName"
+            },
+            "referenceName": {
+              "$ref": "#/components/schemas/MissingItem/properties/refName"
+            },
+            "referenceId": {
+              "$ref": "#/components/schemas/MissingItem/properties/refId"
+            },
+            "substitutedQuantity": {
+              "$ref": "#/components/schemas/MissingItem/properties/substitutedQuantity"
+            },
+            "noSusbtitutedQuantity": {
+              "$ref": "#/components/schemas/MissingItem/properties/noSubstitutedQuantity"
+            }
+          }
+        }
+      },
+      "MissingItemBySkuFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "endPickingDate": {
+              "$ref": "#/components/schemas/MissingItemBySku/properties/endPickingDate"
+            },
+            "warehouseId": {
+              "$ref": "#/components/schemas/MissingItemBySku/properties/warehouseId"
+            },
+            "referenceName": {
+              "$ref": "#/components/schemas/MissingItemBySku/properties/referenceName"
+            },
+            "referenceId": {
+              "$ref": "#/components/schemas/MissingItemBySku/properties/referenceId"
+            }
+          }
+        }
+      },
+      "MissingItemByWhFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "endPickingDate": {
+              "$ref": "#/components/schemas/MissingItemByWh/properties/endPickingDate"
+            },
+            "warehouseId": {
+              "$ref": "#/components/schemas/MissingItemByWh/properties/warehouseId"
+            }
+          }
+        }
+      },
+      "PickerProductivitySortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "pickerFullname",
+            "pickingTime",
+            "sessionTotalQuantity",
+            "ordersTotalQuantity",
+            "productTotalQuantity",
+            "itemTotalQuantity",
+            "foundRateAvg",
+            "fillRateAvg"
+          ]
+        }
+      },
+      "PickerProductivityFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "pickerId": {
+              "$ref": "#/components/schemas/PickerProductivity/properties/pickerId"
+            },
+            "warehouseId": {
+              "$ref": "#/components/schemas/PickerProductivity/properties/warehouseId"
+            },
+            "dateRange": {
+              "type": "object",
+              "description": "Date range filter for picking sessions",
+              "properties": {
+                "from": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Start date for the date range filter",
+                  "example": "2023-08-01T00:00:00.000Z"
+                },
+                "to": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "End date for the date range filter",
+                  "example": "2023-08-31T23:59:59.999Z"
+                }
+              },
+              "required": [
+                "from",
+                "to"
+              ]
+            }
+          }
+        }
+      },
+      "SubstitutionReportFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "endPickingDate": {
+              "$ref": "#/components/schemas/SubstitutionReport/properties/endPickingDate"
+            },
+            "warehouseId": {
+              "$ref": "#/components/schemas/SubstitutionReport/properties/warehouseId"
+            },
+            "orderId": {
+              "$ref": "#/components/schemas/SubstitutionReport/properties/orderId"
+            },
+            "skuId": {
+              "$ref": "#/components/schemas/SubstitutionReport/properties/refName"
+            },
+            "referenceId": {
+              "$ref": "#/components/schemas/SubstitutionReport/properties/refId"
+            }
+          }
+        }
+      }
+    },
+    "headers": {
+      "x-janis-total": {
+        "description": "The total amount of records in the list",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "responses": {
+      "SuccessCreateResponse": {
+        "description": "The item was created",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "SuccessUpdateResponse": {
+        "description": "The item was updated",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "GenericSuccess": {
+        "description": "Operation succeeded",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "BadRequest": {
+        "description": "A client error has ocurred.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Authentication missing or invalid",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Not authorized request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "InternalError": {
+        "description": "A server error has ocurred."
+      }
+    },
+    "schemas": {
+      "id": {
+        "description": "The unique identifier of the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "d555345345345as67a342a"
+      },
+      "status": {
+        "description": "The item status",
+        "type": "string",
+        "default": "active",
+        "enum": [
+          "active",
+          "inactive"
+        ],
+        "example": "active"
+      },
+      "dateCreated": {
+        "description": "The date of creation",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-12T19:00:00.000Z"
+      },
+      "dateModified": {
+        "description": "The date of the last modification",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-20T19:00:00.000Z"
+      },
+      "dateCreatedDay": {
+        "description": "The day of creation",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-08-07T16:00:00.000Z"
+      },
+      "dateModifiedDay": {
+        "description": "The day of last modification",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-08-07T16:00:00.000Z"
+      },
+      "userCreated": {
+        "description": "The ID of the user who created the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "6a1fc1eeb5b68406e0487a10"
+      },
+      "userModified": {
+        "description": "The ID of the user who last modified the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "7e1fc1eeb5b68406e048796"
+      },
+      "Clients": {
+        "description": "The new clients to create",
+        "type": "object",
+        "properties": {
+          "clients": {
+            "description": "The client codes array",
+            "type": "array",
+            "items": {
+              "description": "The client code",
+              "type": "string"
+            },
+            "readOnly": true
+          }
+        },
+        "example": {
+          "clients": [
+            "some-client",
+            "other-client"
+          ]
+        }
+      },
+      "DriverProductivity": {
+        "type": "object",
+        "description": "A driver stats",
+        "properties": {
+          "dateCreated": {
+            "type": "string",
+            "description": "The date where route was created",
+            "example": "2023-11-23T00:00:00.000Z"
+          },
+          "driverId": {
+            "type": "string",
+            "description": "The id of the driver",
+            "example": "5fd7b2c8d71fb1e2743bb64e"
+          },
+          "driverFullname": {
+            "type": "string",
+            "description": "The complete name of the driver",
+            "example": "Dominic Toretto"
+          },
+          "day": {
+            "type": "string",
+            "description": "The day where route was started",
+            "example": "2023-11-23"
+          },
+          "warehouseId": {
+            "type": "string",
+            "description": "The original warehouse of the route",
+            "example": "631fb04d48febc3f476b4836"
+          },
+          "activityTime": {
+            "type": "number",
+            "description": "Time in which the driver had active routes (in minutes)",
+            "example": 2015743
+          },
+          "expectedTotalDistance": {
+            "type": "number",
+            "description": "The sum of all routes distance in total time (in Km)",
+            "example": 8
+          },
+          "distanceAverage": {
+            "type": "number",
+            "description": "The avg distance of all the routes in total time (in Km)",
+            "example": 50
+          },
+          "routeTotalQuantity": {
+            "type": "number",
+            "description": "The route quantity in the total time",
+            "example": 8
+          },
+          "avgRouteTime": {
+            "type": "string",
+            "description": "The average of the route time in total time",
+            "example": "00:30"
+          },
+          "shippingTotalQuantity": {
+            "type": "number",
+            "description": "The shipping quantity in the total time",
+            "example": 10
+          },
+          "avgShippingTime": {
+            "type": "string",
+            "description": "The average of the shipping time per route",
+            "example": "00:30"
+          },
+          "otd": {
+            "type": "number",
+            "description": "The quantity of shippings deliered in delivery window",
+            "example": 10
+          },
+          "onTimeDelivery": {
+            "type": "number",
+            "description": "The quantity of shippings deliered in delivery window (in percent)",
+            "example": 25
+          }
+        }
+      },
+      "DriverProductivityList": {
+        "type": "array",
+        "description": "A list of Driver Productivity",
+        "items": {
+          "$ref": "#/components/schemas/DriverProductivityList"
+        }
+      },
+      "MissingItem": {
+        "type": "object",
+        "description": "An item that was missing after picking",
+        "properties": {
+          "orderId": {
+            "type": "string",
+            "description": "The id of the order with missing items",
+            "example": "65c65bfe5b6768d205e1903b"
+          },
+          "refName": {
+            "type": "string",
+            "description": "The reference name of the item that is missing",
+            "example": "Alfajor Havanna super dulce de leche"
+          },
+          "refId": {
+            "type": "string",
+            "description": "The reference ID of the item that is missing",
+            "example": "2015743"
+          },
+          "itemId": {
+            "type": "string",
+            "description": "The ID of the item that is missing",
+            "example": "20U1D5X7Z43"
+          },
+          "skuId": {
+            "type": "string",
+            "description": "The sku object id of the missing item",
+            "example": "65c65ca84f4eefa3d4785d85"
+          },
+          "ean": {
+            "type": "string",
+            "description": "The ean of the missing item",
+            "example": "1747513123923"
+          },
+          "commerceId": {
+            "type": "string",
+            "description": "Order commerce id",
+            "example": "AAA-11111-1AAA11"
+          },
+          "commerceProductId": {
+            "type": "string",
+            "description": "The commerce Id of the product",
+            "example": "987342350324"
+          },
+          "purchasedPrice": {
+            "type": "number",
+            "description": "The price of the item",
+            "example": 123.45
+          },
+          "sellingMeasurementUnit": {
+            "type": "string",
+            "description": "The mesaurement unit of the item",
+            "example": "un"
+          },
+          "sellingUnitMultiplier": {
+            "type": "number",
+            "description": "The unit multiplier of the item",
+            "example": 1
+          },
+          "missingQuantity": {
+            "type": "number",
+            "description": "The quantity of the item that was missing",
+            "example": 10
+          },
+          "substitutedQuantity": {
+            "type": "number",
+            "description": "The quantity of the item that was substituted",
+            "example": 4
+          },
+          "noSubstitutedQuantity": {
+            "type": "number",
+            "description": "The quantity of the item that was not substituted",
+            "example": 6
+          },
+          "warehouseId": {
+            "type": "string",
+            "description": "The id of the warehouse where the missing item was located",
+            "example": "65c675798587846bb02b3030"
+          },
+          "warehouseName": {
+            "type": "string",
+            "description": "The name of the warehouse where the missing item was located",
+            "example": "Belgrano"
+          },
+          "dateCreated": {
+            "type": "string",
+            "description": "The date and time when the picking of the item ended",
+            "example": "2023-06-15T14:56:04.469Z"
+          },
+          "dateModified": {
+            "type": "string",
+            "description": "The date and time when the picking of the item ended",
+            "example": "2023-06-15T15:56:04.469Z"
+          },
+          "endPickingDate": {
+            "type": "string",
+            "description": "The date and time when the picking of the item ended",
+            "example": "2023-06-15T17:56:04.469Z"
+          }
+        }
+      },
+      "MissingItemList": {
+        "type": "array",
+        "description": "A list of Missing Items",
+        "items": {
+          "$ref": "#/components/schemas/MissingItem"
+        }
+      },
+      "MissingItemBySku": {
+        "type": "object",
+        "description": "An item that was missing after picking",
+        "properties": {
+          "endPickingDate": {
+            "type": "string",
+            "description": "The date and time when the picking of the item ended",
+            "example": "2023-06-15T17:56:04.469Z"
+          },
+          "referenceName": {
+            "type": "string",
+            "description": "The name of the item that is missing",
+            "example": "Tonico para el cabello"
+          },
+          "referenceId": {
+            "type": "string",
+            "description": "The ID of the item that is missing",
+            "example": "2015743"
+          },
+          "warehouseId": {
+            "type": "string",
+            "description": "The ID of the picking warehouse",
+            "example": "6581c29fa0affbc0f8dd0c7d"
+          },
+          "orderCount": {
+            "type": "number",
+            "description": "Number of orders with missing item",
+            "example": 5
+          },
+          "warehouseCount": {
+            "type": "number",
+            "description": "Number of warehouses with missing item",
+            "example": 2
+          },
+          "purchasedPriceSum": {
+            "type": "number",
+            "description": "Total sales amount of the SKU",
+            "example": 1500
+          },
+          "totalPurchasedQuantity": {
+            "type": "number",
+            "description": "Total quantity purchased of the SKU",
+            "example": 50
+          },
+          "missingTotal": {
+            "type": "number",
+            "description": "Total missing quantity of the SKU",
+            "example": 30
+          },
+          "missingItemPercent": {
+            "type": "number",
+            "description": "Missing quantity percent of the SKU",
+            "example": 80
+          },
+          "totalAmountMissing": {
+            "type": "number",
+            "description": "Total amount missing of the SKU",
+            "example": 500
+          },
+          "substitutedTotal": {
+            "type": "number",
+            "description": "Total subsituted quantity of the SKU",
+            "example": 30
+          },
+          "substitutedItemPercent": {
+            "type": "number",
+            "description": "Substituted quantity percent of the SKU",
+            "example": 20
+          },
+          "totalAmountSubstituted": {
+            "type": "number",
+            "description": "Total amount substituted of the SKU",
+            "example": 80
+          }
+        }
+      },
+      "MissingItemBySkuList": {
+        "type": "array",
+        "description": "A list of Missing Items grouped by SKU",
+        "items": {
+          "$ref": "#/components/schemas/MissingItemBySkuList"
+        }
+      },
+      "MissingItemByWh": {
+        "type": "object",
+        "description": "Items that was missing after picking grouped by picking point",
+        "properties": {
+          "endPickingDate": {
+            "type": "string",
+            "description": "The date and time when the picking of the item ended",
+            "example": "2023-06-15T17:56:04.469Z"
+          },
+          "warehouseId": {
+            "type": "string",
+            "description": "The ID of the picking warehouse",
+            "example": "6581c29fa0affbc0f8dd0c7d"
+          },
+          "warehouseName": {
+            "type": "string",
+            "description": "The name of the picking warehouse",
+            "example": "Palermo"
+          },
+          "orderCount": {
+            "type": "number",
+            "description": "Number of orders with missing items",
+            "example": 5
+          },
+          "totalPickedSku": {
+            "type": "number",
+            "description": "Total quantity of picked sku in selected picking point",
+            "example": 5
+          },
+          "totalPickedQuantity": {
+            "type": "number",
+            "description": "Total quantity of picked items in selected picking point",
+            "example": 5
+          },
+          "skuPickedMissing": {
+            "type": "number",
+            "description": "Total quantity of picked sku with missing items in selected picking point",
+            "example": 5
+          },
+          "totalMissingQuantity": {
+            "type": "number",
+            "description": "Total quantity of items picked missing",
+            "example": 5
+          },
+          "missingItemPercent": {
+            "type": "number",
+            "description": "Percent of items picked missing from the total",
+            "example": 5
+          },
+          "skuPickedSubstituted": {
+            "type": "number",
+            "description": "Total quantity of skus picked substitued",
+            "example": 5
+          },
+          "totalSubstitutedQuantity": {
+            "type": "number",
+            "description": "Total quantity of items picked substitued",
+            "example": 5
+          },
+          "substitutedItemPercent": {
+            "type": "number",
+            "description": "Percent of items picked missing from the total",
+            "example": 5
+          }
+        }
+      },
+      "MissingItemByWhList": {
+        "type": "array",
+        "description": "A list of Missing Items grouped by warehouse",
+        "items": {
+          "$ref": "#/components/schemas/MissingItemByWhList"
+        }
+      },
+      "PickerProductivity": {
+        "type": "object",
+        "description": "A picker stats",
+        "properties": {
+          "pickerId": {
+            "type": "string",
+            "description": "The id of the picker",
+            "example": "5fd7b2c8d71fb1e2743bb64e"
+          },
+          "pickerFirstName": {
+            "type": "string",
+            "description": "The first name of the picker",
+            "example": "Anakin"
+          },
+          "pickerLastname": {
+            "type": "string",
+            "description": "The last name of the picker",
+            "example": "Skywalker"
+          },
+          "pickerFullname": {
+            "type": "string",
+            "description": "The complete name of the picker",
+            "example": "Anakin Skywalker"
+          },
+          "day": {
+            "type": "string",
+            "description": "The day where picking started",
+            "example": "2023-08-02T00:00:00.000Z"
+          },
+          "warehouseId": {
+            "type": "string",
+            "description": "The warehouse id of the session",
+            "example": "631fb04d48febc3f476b4836"
+          },
+          "pickingTime": {
+            "type": "number",
+            "description": "Time in which the picker had active sessions (in minutes)",
+            "example": 2015743
+          },
+          "sessionTotalQuantity": {
+            "type": "number",
+            "description": "The session quantity in the picking time",
+            "example": 8
+          },
+          "ordersTotalQuantity": {
+            "type": "number",
+            "description": "The order quantity in the picking time",
+            "example": 10
+          },
+          "productTotalQuantity": {
+            "type": "number",
+            "description": "The item quantity in the picking time",
+            "example": 50
+          },
+          "itemTotalQuantity": {
+            "type": "number",
+            "description": "The item quantity in the picking time",
+            "example": 50
+          },
+          "avgSessionPickingTime": {
+            "type": "string",
+            "description": "The average of the picking time per session",
+            "example": "01:02"
+          },
+          "avgOrderPickingTime": {
+            "type": "string",
+            "description": "The average of the picking time per order",
+            "example": "00:30"
+          },
+          "avgProductPickingTime": {
+            "type": "string",
+            "description": "The average of the picking time per product",
+            "example": "00:05"
+          },
+          "avgItemPickingTime": {
+            "type": "string",
+            "description": "The average of the picking time per item",
+            "example": "00:05"
+          },
+          "foundRateAvg": {
+            "type": "number",
+            "description": "The found rate average of the picking time",
+            "example": 100
+          },
+          "fillRateAvg": {
+            "type": "number",
+            "description": "The fill rate average of the picking time",
+            "example": 80
+          }
+        }
+      },
+      "PickerProductivityList": {
+        "type": "array",
+        "description": "A list of Picker Productivity",
+        "items": {
+          "$ref": "#/components/schemas/PickerProductivityList"
+        }
+      },
+      "DataLakeKpiSettings": {
+        "type": "object",
+        "description": "KPI settings",
+        "title": "KPI",
+        "properties": {
+          "shipping": {
+            "type": "boolean",
+            "description": "This setting will be used to determine if the client generates shipping KPIs",
+            "example": false,
+            "default": false
+          }
+        }
+      },
+      "SubstitutionReport": {
+        "type": "object",
+        "description": "A substituted items stats",
+        "properties": {
+          "endPickingDate": {
+            "type": "string",
+            "description": "The date and time when the item session was finished",
+            "example": "2023-06-15T17:56:04.469Z"
+          },
+          "warehouseId": {
+            "type": "string",
+            "description": "The object id of the warehouse where item was picked",
+            "example": "65a95fb61198872193f4263e"
+          },
+          "orderId": {
+            "type": "string",
+            "description": "The object id of the order",
+            "example": "65a95f7708afa7109a53ceaa"
+          },
+          "orderCount": {
+            "type": "number",
+            "description": "Quantity of the orders where this item was substituted",
+            "example": 2
+          },
+          "refName": {
+            "type": "string",
+            "description": "The reference name of the substituted item",
+            "example": "Coca Cola"
+          },
+          "refId": {
+            "type": "string",
+            "description": "The reference name of the substituted item",
+            "example": "12345"
+          },
+          "sbRefName": {
+            "type": "string",
+            "description": "The reference name of the substitute item",
+            "example": "Pepsi"
+          },
+          "sbRefId": {
+            "type": "string",
+            "description": "The reference name of the substitute item",
+            "example": "56789"
+          },
+          "sumMissingQuantity": {
+            "type": "number",
+            "description": "The sum of quantities of the original item was missing",
+            "example": 8
+          },
+          "sumSubstitutedQuantity": {
+            "type": "number",
+            "description": "The sum of quantities of the original item was substitued",
+            "example": 10
+          },
+          "generosityPercent": {
+            "type": "number",
+            "description": "The diference between item purchased price and item picked price expresed in percent",
+            "example": 25
+          }
+        }
+      },
+      "SubstitutionReportList": {
+        "type": "array",
+        "description": "A list of Substituted Items",
+        "items": {
+          "$ref": "#/components/schemas/SubstitutionReportList"
+        }
+      },
+      "listenerEvent": {
+        "description": "A JANIS Event object",
+        "type": "object",
+        "properties": {
+          "service": {
+            "description": "The source service name",
+            "type": "string",
+            "example": "id"
+          },
+          "entity": {
+            "description": "The event related entity",
+            "type": "string",
+            "example": "profile"
+          },
+          "event": {
+            "description": "The event name",
+            "type": "string",
+            "example": "created"
+          },
+          "client": {
+            "description": "The source event client",
+            "type": "string",
+            "example": "fizzmod"
+          },
+          "id": {
+            "description": "The event related entity ID",
+            "type": "string",
+            "example": "5d699c1ae8ebb95eaa24aca9"
+          }
+        },
+        "required": [
+          "service",
+          "entity",
+          "event"
+        ]
+      },
+      "item_categories": {
+        "type": "object",
+        "description": "OMS item categories normalized schema. Includes item/category linkage and timestamps.",
+        "properties": {
+          "category_uid": {
+            "type": "string",
+            "example": "688ff80383efbd95f3fe6eb1",
+            "description": "Deterministic category hash (derived from category IDs and platform name)."
+          },
+          "category_commerce_id": {
+            "type": "string",
+            "example": "3744",
+            "description": "External commerce category identifier"
+          },
+          "category_sequence": {
+            "type": "integer",
+            "example": 1,
+            "description": "Category sequence"
+          },
+          "client_code": {
+            "type": "string",
+            "example": "JanisCommerce",
+            "description": "Janis client code"
+          }
+        }
+      },
+      "order_items": {
+        "type": "object",
+        "description": "OMS order items (lines) normalized schema. Includes identifiers, pricing, product references and timestamps.",
+        "properties": {
+          "order_id": {
+            "type": "string",
+            "description": "OMS order identifier",
+            "example": "688ff80383efbd95f3fe6eb1"
+          },
+          "item_id": {
+            "type": "string",
+            "description": "OMS order line identifier",
+            "example": "0C5B0EAA30A04CE8A2DA395CC358CBB8"
+          },
+          "reference_id": {
+            "type": "string",
+            "description": "External item reference",
+            "example": "1234567890"
+          },
+          "product_commerce_id": {
+            "type": "string",
+            "description": "External commerce product identifier",
+            "example": "22562850"
+          },
+          "item_name": {
+            "type": "string",
+            "description": "Product name at purchase time",
+            "example": "Tomato, 1 kg"
+          },
+          "purchased_price": {
+            "type": "number",
+            "description": "Final unit price (order currency)",
+            "example": 1.23
+          },
+          "purchased_list_price": {
+            "type": "number",
+            "description": "List price at purchase (order currency)",
+            "example": 1.23
+          },
+          "purchased_price_per_measurement_unit": {
+            "type": "number",
+            "description": "Unit price per measurement unit",
+            "example": 1.23
+          },
+          "list_price_per_measurement_unit": {
+            "type": "number",
+            "description": "List price per measurement unit",
+            "example": 1.23
+          },
+          "purchased_quantity": {
+            "type": "number",
+            "description": "Purchased quantity (selling unit)",
+            "example": 1
+          },
+          "selling_measurement_unit": {
+            "type": "string",
+            "description": "Selling measurement unit",
+            "example": "un"
+          },
+          "selling_unit_multiplier": {
+            "type": "number",
+            "description": "Selling unit multiplier",
+            "example": 1
+          },
+          "shipping_price": {
+            "type": "number",
+            "description": "Shipping charge allocated to item",
+            "example": 1.23
+          },
+          "is_picked": {
+            "type": "boolean",
+            "description": "Flag indicating item was picked",
+            "example": true
+          },
+          "brand_id": {
+            "type": "string",
+            "description": "Brand identifier",
+            "example": "2000637"
+          },
+          "ean_code": {
+            "type": "string",
+            "description": "EAN/GTIN code",
+            "example": "7896036099988"
+          },
+          "sku_commerce_id": {
+            "type": "string",
+            "description": "External commerce SKU identifier",
+            "example": "321285769"
+          },
+          "location_id": {
+            "type": "string",
+            "description": "Warehouse location identifier",
+            "example": "66735804eb9a59b751a4444d"
+          },
+          "picking_point_id": {
+            "type": "string",
+            "description": "Picking point identifier",
+            "example": "66735805a975fdde9775326b"
+          },
+          "category_uid": {
+            "type": "string",
+            "description": "Deterministic category hash (derived from category IDs and platform name).",
+            "example": "d3269f0187557309f16a2431fb74e669"
+          },
+          "is_removed": {
+            "type": "boolean",
+            "description": "Flag indicating item was removed from order",
+            "example": true
+          },
+          "commerce_date_created": {
+            "type": "string",
+            "example": "2025-08-25 20:56:01",
+            "description": "Order commerce creation date"
+          },
+          "date_created": {
+            "type": "string",
+            "example": "2025-08-25 20:56:01",
+            "description": "Order creation timestamp (OMS)"
+          },
+          "date_modified": {
+            "type": "string",
+            "example": "2025-08-25 20:56:01",
+            "description": "Last update timestamp (OMS)"
+          },
+          "client_code": {
+            "type": "string",
+            "description": "Janis client code",
+            "example": "JanisCommerce"
+          }
+        }
+      },
+      "order_payments": {
+        "type": "object",
+        "description": "OMS order payments normalized schema. Includes payment identifiers, PSP metadata, amounts and timestamps.",
+        "properties": {
+          "order_id": {
+            "type": "string",
+            "description": "OMS order identifier",
+            "example": "688ff80383efbd95f3fe6eb1"
+          },
+          "payment_id": {
+            "type": "string",
+            "description": "OMS payment identifier",
+            "example": "4519921DA0A94207A95C33D5D2BE1D86"
+          },
+          "transaction_id": {
+            "type": "string",
+            "description": "PSP transaction identifier",
+            "example": "90608C15BAAA493994F3350A021F33E9"
+          },
+          "payment_group": {
+            "type": "string",
+            "description": "Payment group/method family",
+            "example": "CREDIT_CARD"
+          },
+          "payment_system_commerce_id": {
+            "type": "string",
+            "description": "PSP system identifier (commerce)",
+            "example": "688ff80383efbd95f3fe6eb1"
+          },
+          "payment_system_name": {
+            "type": "string",
+            "description": "Payment system name (PSP)",
+            "example": "VISA"
+          },
+          "payment_amount": {
+            "type": "number",
+            "description": "Captured/authorized amount (order currency)",
+            "example": 1.23
+          },
+          "amount_without_interests": {
+            "type": "number",
+            "description": "Amount net of interests/fees",
+            "example": 1.23
+          },
+          "installments": {
+            "type": "integer",
+            "description": "Installments count",
+            "example": 1
+          },
+          "payment_status": {
+            "type": "string",
+            "description": "Payment status (PSP/OMS)",
+            "example": "688ff80383efbd95f3fe6eb1"
+          },
+          "is_online_payment": {
+            "type": "boolean",
+            "description": "Online payment flag",
+            "example": true
+          },
+          "is_online_payment_upon_delivery": {
+            "type": "boolean",
+            "description": "Online payment upon delivery flag",
+            "example": true
+          },
+          "is_payment_upon_delivery": {
+            "type": "boolean",
+            "description": "Cash/card on delivery flag",
+            "example": true
+          },
+          "commerce_date_created": {
+            "type": "string",
+            "example": "2025-08-25 20:56:01",
+            "description": "Order commerce creation date"
+          },
+          "date_created": {
+            "type": "string",
+            "example": "2025-08-25 20:56:01",
+            "description": "Order creation timestamp (OMS)"
+          },
+          "date_modified": {
+            "type": "string",
+            "example": "2025-08-25 20:56:01",
+            "description": "Last update timestamp (OMS)"
+          },
+          "client_code": {
+            "type": "string",
+            "description": "Janis client code",
+            "example": "JanisCommerce"
+          }
+        }
+      },
+      "order_rma": {
+        "type": "object",
+        "description": "OMS returns (RMA) normalized schema. Includes return identifiers and timestamps.",
+        "properties": {
+          "order_id": {
+            "type": "string",
+            "description": "OMS order identifier",
+            "example": "688ff80383efbd95f3fe6eb1"
+          },
+          "rma_id": {
+            "type": "string",
+            "description": "OMS return identifier (RMA)",
+            "example": "6851b9647a86d06bb374885b0"
+          },
+          "rma_name": {
+            "type": "string",
+            "description": "Return/RMA name or reason label",
+            "example": "Address change"
+          },
+          "commerce_date_created": {
+            "type": "string",
+            "example": "2025-08-25 20:56:01",
+            "description": "Order commerce creation date"
+          },
+          "date_created": {
+            "type": "string",
+            "description": "Order creation timestamp (OMS)",
+            "example": "2025-08-25 20:56:01"
+          },
+          "date_modified": {
+            "type": "string",
+            "description": "Last update timestamp (OMS)",
+            "example": "2025-08-25 20:56:01"
+          },
+          "client_code": {
+            "type": "string",
+            "description": "Janis client code",
+            "example": "JanisCommerce"
+          }
+        }
+      },
+      "orders": {
+        "type": "object",
+        "description": "OMS orders normalized schema. Includes identifiers, channel, status, monetary totals and timestamps.",
+        "properties": {
+          "order_id": {
+            "type": "string",
+            "description": "Unique OMS order identifier",
+            "example": "688ff80383efbd95f3fe6eb1"
+          },
+          "order_commerce_id": {
+            "type": "string",
+            "description": "External commerce order identifier",
+            "example": "PFD-264869538-6172-01"
+          },
+          "order_group_id": {
+            "type": "string",
+            "description": "OMS order group identifier",
+            "example": "688ff80383efbd95f3fe6eb1"
+          },
+          "order_group_commerce_id": {
+            "type": "string",
+            "description": "External commerce order group identifier",
+            "example": "PFD-264869563-2792-01"
+          },
+          "customer_id": {
+            "type": "string",
+            "description": "Customer identifier (OMS)",
+            "example": "664686b877021807c0582751"
+          },
+          "seller_id": {
+            "type": "string",
+            "description": "Seller/merchant identifier (OMS)",
+            "example": "664e2094a96c2ade00d529a0"
+          },
+          "sales_channel_id": {
+            "type": "string",
+            "description": "OMS sales channel identifier",
+            "example": "646517bcc774af16a1ead5f4"
+          },
+          "sales_channel_reference_id": {
+            "type": "string",
+            "description": "External reference identifier of the sales channel",
+            "example": "janiscommerce-5"
+          },
+          "seller_sales_channel_id": {
+            "type": "string",
+            "description": "Seller sales channel identifier",
+            "example": "66732e341364e06ec7257549"
+          },
+          "seller_sales_channel_reference_id": {
+            "type": "string",
+            "description": "External seller sales channel reference identifier",
+            "example": "janiscommerce-5"
+          },
+          "skip_picking": {
+            "type": "boolean",
+            "description": "Flag to bypass picking in fulfillment",
+            "example": true
+          },
+          "external_payment_validation": {
+            "type": "boolean",
+            "description": "Flag indicating payment validation handled externally (PSP)",
+            "example": true
+          },
+          "automatic_capture_post_picking": {
+            "type": "boolean",
+            "description": "Flag to auto-capture payment after picking",
+            "example": true
+          },
+          "account_id": {
+            "type": "string",
+            "description": "Account/store identifier",
+            "example": "6372672b1ea615809423f4a8"
+          },
+          "platform_name": {
+            "type": "string",
+            "description": "Commerce platform name (e.g., VTEX, Shopify)",
+            "example": "VTEX"
+          },
+          "status_code": {
+            "type": "string",
+            "description": "OMS order status code",
+            "example": "688ff80383efbd95f3fe6eb1"
+          },
+          "total_amount": {
+            "type": "number",
+            "description": "Order total amount",
+            "example": 20.2
+          },
+          "original_amount": {
+            "type": "number",
+            "description": "Order original amount (pre-adjustments)",
+            "example": 68.4
+          },
+          "total_items_original_amount": {
+            "type": "number",
+            "description": "Items subtotal (original)",
+            "example": 68.4
+          },
+          "total_items_amount": {
+            "type": "number",
+            "description": "Items subtotal (final)",
+            "example": 68.2
+          },
+          "total_discounts_original_amount": {
+            "type": "number",
+            "description": "Discounts total (original)",
+            "example": -48.2
+          },
+          "total_discounts_amount": {
+            "type": "number",
+            "description": "Discounts total (final)",
+            "example": -48.2
+          },
+          "total_taxes_original_amount": {
+            "type": "number",
+            "description": "Taxes total (original)",
+            "example": 0
+          },
+          "total_taxes_amount": {
+            "type": "number",
+            "description": "Taxes total (final)",
+            "example": 0
+          },
+          "total_shipping_original_amount": {
+            "type": "number",
+            "description": "Shipping total (original)",
+            "example": 0
+          },
+          "total_shipping_amount": {
+            "type": "number",
+            "description": "Shipping total (final)",
+            "example": 0
+          },
+          "total_costs_original_amount": {
+            "type": "number",
+            "description": "Additional costs total (original)",
+            "example": 0
+          },
+          "total_costs_amount": {
+            "type": "number",
+            "description": "Additional costs total (final)",
+            "example": 0
+          },
+          "currency_code": {
+            "type": "string",
+            "description": "ISO 4217 currency code",
+            "example": "USD"
+          },
+          "date_created": {
+            "type": "string",
+            "description": "Order creation timestamp (OMS)",
+            "example": "2025-08-25 20:56:01"
+          },
+          "commerce_date_created": {
+            "type": "string",
+            "description": "Order creation timestamp (commerce platform)",
+            "example": "2025-08-25 20:56:01"
+          },
+          "date_modified": {
+            "type": "string",
+            "description": "Last update timestamp (OMS)",
+            "example": "2025-08-25 20:56:01"
+          },
+          "client_code": {
+            "type": "string",
+            "description": "Janis client code",
+            "example": "JanisCommerce"
+          }
+        }
+      }
+    }
+  }
+}

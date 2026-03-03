@@ -1,0 +1,6036 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Janis Economy and Finance Service",
+    "description": "Janis Economy and Finance Service\n\n **Last update**: 02 ene 26, 07:14 a. m.",
+    "version": "2.35.0",
+    "x-janis-keywords": [
+      "pos",
+      "point of sale",
+      "payment",
+      "bank",
+      "value transporter",
+      "transaction",
+      "shift",
+      "package",
+      "invoice",
+      "refund"
+    ],
+    "lastUpdate": "2026-01-02T10:14:36.458Z",
+    "x-logo": null
+  },
+  "x-tagGroups": [
+    {
+      "name": "Invoicing",
+      "tags": [
+        "Invoice",
+        "Invoice Form"
+      ]
+    },
+    {
+      "name": "Transactions",
+      "tags": [
+        "Bank Drop",
+        "Package",
+        "Package Movement",
+        "Payment Method",
+        "Payment Type",
+        "Point Of Sale",
+        "Shift",
+        "Transaction",
+        "Transaction Motive",
+        "Value Transporter"
+      ]
+    },
+    {
+      "name": "Refunding",
+      "tags": [
+        "Refund"
+      ]
+    },
+    {
+      "name": "Private",
+      "tags": [
+        "Event Listeners",
+        "Location",
+        "Functions"
+      ]
+    }
+  ],
+  "tags": [
+    {
+      "name": "Bank Drop",
+      "description": "For managing BankDrop"
+    },
+    {
+      "name": "Invoice",
+      "description": "For managing the invoicing process"
+    },
+    {
+      "name": "Invoice Form",
+      "description": "For managing the invoicing forms"
+    },
+    {
+      "name": "Location",
+      "description": "For managing Locations"
+    },
+    {
+      "name": "Package",
+      "description": "For managing Packages"
+    },
+    {
+      "name": "Package Movement",
+      "description": "For managing Packages Movements"
+    },
+    {
+      "name": "Payment Method",
+      "description": "For managing Payments Methods"
+    },
+    {
+      "name": "Payment Type",
+      "description": "For managing Payments Types"
+    },
+    {
+      "name": "Point Of Sale",
+      "description": "For managing Points of sale"
+    },
+    {
+      "name": "Shift",
+      "description": "For managing Shifts"
+    },
+    {
+      "name": "Transaction",
+      "description": "For managing Transactions"
+    },
+    {
+      "name": "Transaction Motive",
+      "description": "For managing Transactions Motives"
+    },
+    {
+      "name": "Value Transporter",
+      "description": "For managing Values Transporters"
+    },
+    {
+      "name": "Refund",
+      "description": "For managing Refunds"
+    }
+  ],
+  "servers": [
+    {
+      "url": "https://jef.janis.in/api",
+      "description": "The Prod API server",
+      "variables": {
+        "environment": {
+          "default": "prod"
+        }
+      }
+    },
+    {
+      "url": "https://jef.janisqa.in/api",
+      "description": "The QA API server",
+      "variables": {
+        "environment": {
+          "default": "qa"
+        }
+      }
+    },
+    {
+      "url": "https://jef.janisdev.in/api",
+      "description": "The Beta API server",
+      "variables": {
+        "environment": {
+          "default": "beta"
+        }
+      }
+    },
+    {
+      "url": "http://jef.janis.localhost:3047/api",
+      "description": "The Local API server",
+      "variables": {
+        "environment": {
+          "default": "local"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/bank-drop/{id}": {
+      "get": {
+        "x-janis-namespace": "bank-drop",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "jef:bank-drop:read"
+        ],
+        "operationId": "getBankDrop",
+        "tags": [
+          "Bank Drop"
+        ],
+        "summary": "Get a Bank Drop",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Bank Drop found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BankDrop"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/bank-drop": {
+      "get": {
+        "x-janis-namespace": "bank-drop",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "jef:bank-drop:read"
+        ],
+        "operationId": "listBankDrops",
+        "tags": [
+          "Bank Drop"
+        ],
+        "summary": "Bank Drop List",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/BankDropSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/BankDropFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Bank Drop list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BankDropList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "x-janis-namespace": "bank-drop",
+        "x-janis-method": "create",
+        "x-janis-permissions": [
+          "jef:bank-drop:write"
+        ],
+        "operationId": "createBankDrop",
+        "tags": [
+          "Bank Drop"
+        ],
+        "summary": "Create a Bank Drop",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "A Bank Drop",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BankDrop"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessCreateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/invoice/{id}": {
+      "get": {
+        "x-janis-namespace": "invoice",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "jef:invoice:read"
+        ],
+        "operationId": "getInvoice",
+        "tags": [
+          "Invoice"
+        ],
+        "summary": "Get an Invoice",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Invoice found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/InvoiceWithItems"
+                    },
+                    {
+                      "$ref": "#/components/schemas/InvoiceWithoutItems"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/invoice": {
+      "get": {
+        "x-janis-namespace": "invoice",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "jef:invoice:read"
+        ],
+        "operationId": "listInvoices",
+        "tags": [
+          "Invoice"
+        ],
+        "summary": "List Invoices",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/InvoiceSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/InvoiceFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Invoices listed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "x-janis-namespace": "invoice",
+        "x-janis-method": "create",
+        "x-janis-permissions": [
+          "jef:invoice:write"
+        ],
+        "operationId": "createInvoice",
+        "tags": [
+          "Invoice"
+        ],
+        "summary": "Create an Invoice",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "An Invoice",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/InvoiceWithItems"
+                  },
+                  {
+                    "$ref": "#/components/schemas/InvoiceWithOrderId"
+                  },
+                  {
+                    "$ref": "#/components/schemas/InvoiceWithOrderCommerceId"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessCreateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/invoice-failed/{orderId}": {
+      "post": {
+        "x-janis-namespace": "invoice-failed",
+        "x-janis-method": "post",
+        "x-janis-permissions": [
+          "jef:invoice:write"
+        ],
+        "operationId": "invoiceFailed",
+        "tags": [
+          "Invoice"
+        ],
+        "summary": "Notify Invoicing Failure",
+        "description": "Notify an Invoice failed for an Order, the order must be in status `readyForInvoice`.\n",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "description": "The Order ID from OMS Service",
+            "schema": {
+              "$ref": "#/components/schemas/orderId"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "contents": {
+                    "description": "Optional additional contents to save in operation log",
+                    "type": "object",
+                    "example": {
+                      "some": "data"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GenericSuccess"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/invoice-form/{id}": {
+      "get": {
+        "x-janis-namespace": "invoice-form",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "jef:invoice-form:read"
+        ],
+        "operationId": "getInvoiceForm",
+        "tags": [
+          "Invoice Form"
+        ],
+        "summary": "Get an Invoice form",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Invoice Form found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceForm"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/invoice-form": {
+      "get": {
+        "x-janis-namespace": "invoice-form",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "jef:invoice-form:read"
+        ],
+        "operationId": "listInvoiceForms",
+        "tags": [
+          "Invoice Form"
+        ],
+        "summary": "List Invoice Forms",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/InvoiceFormSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/InvoiceFormFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Invoice forms listed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvoiceFormList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/invoice-form/{id}/simulate": {
+      "get": {
+        "x-janis-namespace": "invoice-form",
+        "x-janis-method": "simulate",
+        "x-janis-permissions": [
+          "jef:invoice-form:read"
+        ],
+        "operationId": "simulateInvoiceForm",
+        "tags": [
+          "Invoice Form"
+        ],
+        "summary": "Get a simulation of the invoice form.",
+        "description": "Get a simulation of the invoice form. The `simulation` property in the response body of this API can be used as request body for the create invoice API.\n",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "example": "5dea9fc691240d00084083f8"
+            },
+            "required": true,
+            "description": "The Invoice Form ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Simulation fetched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "The simulation response",
+                  "properties": {
+                    "simulation": {
+                      "$ref": "#/components/schemas/InvoiceFormSimulation"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/location/{id}": {
+      "get": {
+        "x-janis-namespace": "location",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "jef:location:read"
+        ],
+        "operationId": "getLocation",
+        "tags": [
+          "Location"
+        ],
+        "summary": "Get a Location by identifier",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocationGet"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/location": {
+      "get": {
+        "x-janis-namespace": "location",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "jef:location:read"
+        ],
+        "operationId": "listLocations",
+        "tags": [
+          "Location"
+        ],
+        "summary": "List Locations",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/LocationSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/LocationFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Locations listed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocationList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/package/{id}": {
+      "get": {
+        "x-janis-namespace": "package",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "jef:package:read"
+        ],
+        "operationId": "getPackage",
+        "tags": [
+          "Package"
+        ],
+        "summary": "Get a Package by identifier",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Package"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "x-janis-namespace": "package",
+        "x-janis-method": "put",
+        "x-janis-permissions": [
+          "jef:package:write"
+        ],
+        "operationId": "updatePackage",
+        "tags": [
+          "Package"
+        ],
+        "summary": "Package update",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "requestBody": {
+          "description": "The package to update",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PackagePut"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessUpdateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/package": {
+      "get": {
+        "x-janis-namespace": "package",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "jef:package:read"
+        ],
+        "operationId": "listPackage",
+        "tags": [
+          "Package"
+        ],
+        "summary": "Get a list of Package",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PackageSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/PackageFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PackageList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "x-janis-namespace": "package",
+        "x-janis-method": "create",
+        "x-janis-permissions": [
+          "jef:package:write"
+        ],
+        "operationId": "createPackage",
+        "tags": [
+          "Package"
+        ],
+        "summary": "Create a new Package",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "The package to create",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Package"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessCreateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/package-movement": {
+      "get": {
+        "x-janis-namespace": "package-movement",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "jef:package-movement:read"
+        ],
+        "operationId": "listPackageMovement",
+        "tags": [
+          "Package Movement"
+        ],
+        "summary": "Get a list of package movement",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PackageMovementSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/PackageMovementFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "description": "A list of Pacakge Movements",
+                  "items": {
+                    "$ref": "#/components/schemas/PackageMovement"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/payment-method/{id}": {
+      "get": {
+        "x-janis-namespace": "payment-method",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "jef:payment-method:read"
+        ],
+        "operationId": "getPaymentMethod",
+        "tags": [
+          "Payment Method"
+        ],
+        "summary": "Get a Payment Method by identifier",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentMethod"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "x-janis-namespace": "payment-method",
+        "x-janis-method": "put",
+        "x-janis-permissions": [
+          "jef:payment-method:write"
+        ],
+        "operationId": "putPaymentMethod",
+        "tags": [
+          "Payment Method"
+        ],
+        "summary": "Payment Method update",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "requestBody": {
+          "description": "The payment method to update",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PaymentMethod"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessUpdateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/payment-method": {
+      "get": {
+        "x-janis-namespace": "payment-method",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "jef:payment-method:read"
+        ],
+        "operationId": "listPaymentMethod",
+        "tags": [
+          "Payment Method"
+        ],
+        "summary": "Get a list of Payment Methods",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PaymentMethodSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/PaymentMethodFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentMethodList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "x-janis-namespace": "payment-method",
+        "x-janis-method": "create",
+        "x-janis-permissions": [
+          "jef:payment-method:write"
+        ],
+        "operationId": "createPaymentMethod",
+        "tags": [
+          "Payment Method"
+        ],
+        "summary": "Create a new Payment Method",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "The payment-method and to create",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PaymentMethod"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessCreateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/payment-type/{id}": {
+      "get": {
+        "x-janis-namespace": "payment-type",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "jef:payment-type:read"
+        ],
+        "operationId": "getPaymentType",
+        "tags": [
+          "Payment Type"
+        ],
+        "summary": "Get a Payment Type by identifier",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentType"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "x-janis-namespace": "payment-type",
+        "x-janis-method": "put",
+        "x-janis-permissions": [
+          "jef:payment-type:write"
+        ],
+        "operationId": "putPaymentType",
+        "tags": [
+          "Payment Type"
+        ],
+        "summary": "Payment Type update",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "requestBody": {
+          "description": "The payment Type to update",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PaymentType"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessUpdateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/payment-type": {
+      "get": {
+        "x-janis-namespace": "payment-type",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "jef:payment-type:read"
+        ],
+        "operationId": "listPaymentType",
+        "tags": [
+          "Payment Type"
+        ],
+        "summary": "Get a list of Payment Types",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PaymentTypeSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/PaymentTypeFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentTypeList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "x-janis-namespace": "payment-type",
+        "x-janis-method": "create",
+        "x-janis-permissions": [
+          "jef:payment-type:write"
+        ],
+        "operationId": "createPaymentType",
+        "tags": [
+          "Payment Type"
+        ],
+        "summary": "Create a new Payment Type",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "The payment-type and to create",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PaymentType"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessCreateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/point-of-sale/{id}": {
+      "get": {
+        "x-janis-namespace": "point-of-sale",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "jef:point-of-sale:read"
+        ],
+        "operationId": "getPointOfSale",
+        "tags": [
+          "Point Of Sale"
+        ],
+        "summary": "Get a Point of sale by identifier",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PointOfSaleGet"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "x-janis-namespace": "point-of-sale",
+        "x-janis-method": "put",
+        "x-janis-permissions": [
+          "jef:point-of-sale:write"
+        ],
+        "operationId": "updatePointOfSale",
+        "tags": [
+          "Point Of Sale"
+        ],
+        "summary": "Update a Point of sale",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "requestBody": {
+          "description": "The point of sale to update",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PointOfSaleUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessUpdateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/point-of-sale": {
+      "get": {
+        "x-janis-namespace": "point-of-sale",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "jef:point-of-sale:read"
+        ],
+        "operationId": "listPointOfSale",
+        "tags": [
+          "Point Of Sale"
+        ],
+        "summary": "Get a list of Point of sale",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PointOfSaleSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/PointOfSaleFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PointOfSaleList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "x-janis-namespace": "point-of-sale",
+        "x-janis-method": "create",
+        "x-janis-permissions": [
+          "jef:point-of-sale:write"
+        ],
+        "operationId": "createPointOfSale",
+        "tags": [
+          "Point Of Sale"
+        ],
+        "summary": "Create a new Point of sale",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "The point of sale to create",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PointOfSale"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessCreateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/refund/{id}": {
+      "get": {
+        "x-janis-namespace": "refund",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "jef:refund:read"
+        ],
+        "operationId": "getRefund",
+        "tags": [
+          "Refund"
+        ],
+        "summary": "Get one",
+        "description": "Get a Refund by ID",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Refund found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Refund"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/refund": {
+      "get": {
+        "x-janis-namespace": "refund",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "jef:refund:read"
+        ],
+        "operationId": "listRefunds",
+        "tags": [
+          "Refund"
+        ],
+        "summary": "Get many",
+        "description": "Get a list of Refunds",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/RefundSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/RefundFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Refunds listed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RefundList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "x-janis-namespace": "refund",
+        "x-janis-method": "create",
+        "x-janis-permissions": [
+          "jef:refund:write"
+        ],
+        "operationId": "createRefund",
+        "tags": [
+          "Refund"
+        ],
+        "summary": "Create one",
+        "description": "Create a refund. A transaction will be created for this refund.",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "A Refund",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Refund"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessCreateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/setting/{entity}": {
+      "get": {
+        "x-janis-namespace": "setting",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "jef:setting:read"
+        ],
+        "operationId": "getSetting",
+        "tags": [
+          "Settings"
+        ],
+        "summary": "Get by entity",
+        "description": "Get the settings available for a given entity",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "entity",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "example": "transaction"
+            },
+            "required": true,
+            "description": "The name of the entity that owns the settings to be retrieved"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The settings were retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/TransactionSettings"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "x-janis-namespace": "setting",
+        "x-janis-method": "update",
+        "x-janis-permissions": [
+          "jef:setting:write"
+        ],
+        "operationId": "updateSetting",
+        "tags": [
+          "Settings"
+        ],
+        "summary": "Update by entity",
+        "description": "Update the settings available for a given entity",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "entity",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "example": "transaction"
+            },
+            "required": true,
+            "description": "The name of the entity that owns the settings to be updated"
+          }
+        ],
+        "requestBody": {
+          "description": "The settings configurations",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/TransactionSettings"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The settings were updated"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/shift/{id}": {
+      "get": {
+        "x-janis-namespace": "shift",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "jef:shift:read"
+        ],
+        "operationId": "getShift",
+        "tags": [
+          "Shift"
+        ],
+        "summary": "Get a Shift by identifier",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Shift"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "x-janis-namespace": "shift",
+        "x-janis-method": "put",
+        "x-janis-permissions": [
+          "jef:shift:write"
+        ],
+        "operationId": "endShift",
+        "tags": [
+          "Shift"
+        ],
+        "summary": "End a Shift",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "requestBody": {
+          "description": "The shift to update",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ShiftUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessUpdateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/shift": {
+      "get": {
+        "x-janis-namespace": "shift",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "jef:shift:read"
+        ],
+        "operationId": "listShift",
+        "tags": [
+          "Shift"
+        ],
+        "summary": "Get a list of Shifts",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ShiftSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ShiftFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShiftList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "x-janis-namespace": "shift",
+        "x-janis-method": "create",
+        "x-janis-permissions": [
+          "jef:shift:write"
+        ],
+        "operationId": "createShift",
+        "tags": [
+          "Shift"
+        ],
+        "summary": "Create a new Shift and start it",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "The shift to create",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ShiftCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessCreateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/transaction/{id}": {
+      "get": {
+        "x-janis-namespace": "transaction",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "jef:transaction:read"
+        ],
+        "operationId": "getTransaction",
+        "tags": [
+          "Transaction"
+        ],
+        "summary": "Get a Transaction by identifier",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Transaction"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/liquidate-order": {
+      "post": {
+        "x-janis-namespace": "transaction",
+        "x-janis-method": "liquidate-order",
+        "x-janis-permissions": [
+          "jef:transaction:write"
+        ],
+        "operationId": "liquidateOrder",
+        "tags": [
+          "Transaction"
+        ],
+        "summary": "Liquidate an order",
+        "description": "If the transactions are in the correct status \"processed\" and the corresponding order is in \"delivered\", it becomes \"liquidated\".",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "The order to liquidate",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "title": "By Order ID",
+                    "properties": {
+                      "orderId": {
+                        "description": "The unique identifier of the order from OMS Service",
+                        "type": "string",
+                        "example": "6669d10431285b11c9a37c79"
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "title": "By Order Commerce ID",
+                    "properties": {
+                      "orderCommerceId": {
+                        "description": "The transaction's related Order Commerce ID from OMS Service",
+                        "type": "string",
+                        "example": "1748925093285-01"
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "title": "By Order Commerce Sequential ID",
+                    "properties": {
+                      "orderCommerceSequentialId": {
+                        "description": "The transaction's related Order Commerce Sequential ID from OMS Service",
+                        "type": "string",
+                        "example": "530285"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GenericSuccess"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/transaction/{id}/liquidate": {
+      "post": {
+        "x-janis-namespace": "transaction",
+        "x-janis-method": "liquidate",
+        "x-janis-permissions": [
+          "jef:transaction:write"
+        ],
+        "operationId": "liquidateTransaction",
+        "tags": [
+          "Transaction"
+        ],
+        "summary": "Liquidate a transaction",
+        "description": "The transaction is advanced to \"liquidated\" if it is processed and the corresponding order is delivered.",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GenericSuccess"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/transaction": {
+      "get": {
+        "x-janis-namespace": "transaction",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "jef:transaction:read"
+        ],
+        "operationId": "listTransaction",
+        "tags": [
+          "Transaction"
+        ],
+        "summary": "Get a list of Transactions",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TransactionSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/TransactionFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransactionList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "x-janis-namespace": "transaction",
+        "x-janis-method": "create",
+        "x-janis-permissions": [
+          "jef:transaction:write"
+        ],
+        "operationId": "createTransaction",
+        "tags": [
+          "Transaction"
+        ],
+        "summary": "Create a new Transaction",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "The transaction to create",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Transaction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessCreateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/transaction-motive/{id}": {
+      "get": {
+        "x-janis-namespace": "transaction-motive",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "jef:transaction-motive:read"
+        ],
+        "operationId": "getTransactionMotive",
+        "tags": [
+          "Transaction Motive"
+        ],
+        "summary": "Get a Transaction Motive by identifier",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransactionMotive"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "x-janis-namespace": "transaction-motive",
+        "x-janis-method": "put",
+        "x-janis-permissions": [
+          "jef:transaction-motive:write"
+        ],
+        "operationId": "putTransactionMotive",
+        "tags": [
+          "Transaction Motive"
+        ],
+        "summary": "Transaction Motive update",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "requestBody": {
+          "description": "The transaction motive to update",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TransactionMotive"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessUpdateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/transaction-motive": {
+      "get": {
+        "x-janis-namespace": "transaction-motive",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "jef:transaction-motive:read"
+        ],
+        "operationId": "listTransactionMotive",
+        "tags": [
+          "Transaction Motive"
+        ],
+        "summary": "Get a list of Transaction Motives",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TransactionMotiveSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/TransactionMotiveFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransactionMotiveList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "x-janis-namespace": "transaction-motive",
+        "x-janis-method": "create",
+        "x-janis-permissions": [
+          "jef:transaction-motive:write"
+        ],
+        "operationId": "createTransactionMotive",
+        "tags": [
+          "Transaction Motive"
+        ],
+        "summary": "Create a new Transaction Motive",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "The transaction-motive and to create",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TransactionMotive"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessCreateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/value-transporter/{id}": {
+      "get": {
+        "x-janis-namespace": "value-transporter",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "jef:value-transporter:read"
+        ],
+        "operationId": "getValueTransporter",
+        "tags": [
+          "Value Transporter"
+        ],
+        "summary": "Get a value transporter",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "value transporter found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValueTransporter"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "x-janis-namespace": "value-transporter",
+        "x-janis-method": "update",
+        "x-janis-permissions": [
+          "jef:value-transporter:write"
+        ],
+        "operationId": "updateValueTransporter",
+        "tags": [
+          "Value Transporter"
+        ],
+        "summary": "Update a Value Transporter",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "requestBody": {
+          "description": "A Value Transporter",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ValueTransporter"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessUpdateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/value-transporter": {
+      "get": {
+        "x-janis-namespace": "value-transporter",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "jef:value-transporter:read"
+        ],
+        "operationId": "listValueTransporters",
+        "tags": [
+          "Value Transporter"
+        ],
+        "summary": "List Value Transporters",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ValueTransporterSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ValueTransporterFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Value Transporters listed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValueTransporterList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "x-janis-namespace": "value-transporter",
+        "x-janis-method": "create",
+        "x-janis-permissions": [
+          "jef:value-transporter:write"
+        ],
+        "operationId": "createValueTransporter",
+        "tags": [
+          "Value Transporter"
+        ],
+        "summary": "Create a Value Transporter",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "A Value Transporter",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ValueTransporterCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessCreateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "id": {
+        "description": "The unique identifier of the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "d555345345345as67a342a"
+      },
+      "status": {
+        "description": "The item status",
+        "type": "string",
+        "default": "active",
+        "enum": [
+          "active",
+          "inactive"
+        ],
+        "example": "active"
+      },
+      "dateCreated": {
+        "description": "The date of creation",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-12T19:00:00.000Z"
+      },
+      "dateModified": {
+        "description": "The date of the last modification",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-20T19:00:00.000Z"
+      },
+      "dateCreatedDay": {
+        "type": "object",
+        "description": "A range for creation day. It will filter from 00:00Hs to 23:59:59Hs of the given range",
+        "properties": {
+          "from": {
+            "type": "string",
+            "description": "The beginning of the range",
+            "format": "date-time",
+            "example": "2019-11-27T16:08:24.994Z"
+          },
+          "to": {
+            "type": "string",
+            "description": "The end of the range",
+            "format": "date-time",
+            "example": "2019-11-30T16:08:24.994Z"
+          }
+        }
+      },
+      "dateModifiedDay": {
+        "type": "object",
+        "description": "A range for creation day. It will filter from 00:00Hs to 23:59:59Hs of the given range",
+        "properties": {
+          "from": {
+            "type": "string",
+            "description": "The beginning of the range",
+            "format": "date-time",
+            "example": "2019-11-27T16:08:24.994Z"
+          },
+          "to": {
+            "type": "string",
+            "description": "The end of the range",
+            "format": "date-time",
+            "example": "2019-11-30T16:08:24.994Z"
+          }
+        }
+      },
+      "dateRangeFilter": {
+        "type": "object",
+        "description": "A range for date.",
+        "properties": {
+          "from": {
+            "type": "string",
+            "description": "The beginning of the range",
+            "format": "date-time",
+            "example": "2019-11-27T16:08:24.994Z"
+          },
+          "to": {
+            "type": "string",
+            "description": "The end of the range",
+            "format": "date-time",
+            "example": "2019-11-30T16:08:24.994Z"
+          }
+        }
+      },
+      "userCreated": {
+        "description": "The ID of the user who created the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "6a1fc1eeb5b68406e0487a10"
+      },
+      "userModified": {
+        "description": "The ID of the user who last modified the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "7e1fc1eeb5b68406e048796"
+      },
+      "pointOfSaleId": {
+        "type": "string",
+        "description": "The PointOfSale unique identifier. **PointOfSale** `id`",
+        "example": "5eb5dbc8cee59e9754bc1484"
+      },
+      "pointOfSaleReferenceId": {
+        "description": "The PointOfSale Reference ID. **PointOfSale** `referenceId`",
+        "type": "string",
+        "example": "value-transporter-01"
+      },
+      "packageId": {
+        "type": "string",
+        "description": "The Package unique identifier. **Package** `id`",
+        "example": "5e417784235dae6dfc60d102"
+      },
+      "packageReferenceId": {
+        "description": "The Package Reference ID. **Package** `referenceId`",
+        "type": "string",
+        "example": "package-a28"
+      },
+      "shiftId": {
+        "type": "string",
+        "description": "The Shift unique identifier. **Shift** `id`",
+        "example": "d555345345345as67a342a"
+      },
+      "locationId": {
+        "type": "string",
+        "description": "The Location unique identifier. **Location** `id`, this refet to **Janis Commerce Service**.",
+        "example": "5e417784235dae6dfc60d102"
+      },
+      "valueTransporterId": {
+        "type": "string",
+        "description": "The ValueTransporter unique identifier. **ValueTransporter** `id`",
+        "example": "5eb5dbc8cee59e9754bc1484"
+      },
+      "valueTransporterReferenceId": {
+        "description": "The ValueTransporter Reference ID. **ValueTransporter** `referenceId`",
+        "type": "string",
+        "example": "value-transporter-l32"
+      },
+      "paymentMethodId": {
+        "type": "string",
+        "description": "The PaymentMethod unique identifier. **PaymentMethod** `id`",
+        "example": "5eb5dbc8cee59e9754bc1484"
+      },
+      "paymentMethodReferenceId": {
+        "description": "The PaymentMethod Reference ID. **PaymentMethod** `referenceId`. This is required if the **PaymentMethod** `id` is not sent.",
+        "type": "string",
+        "example": "payment-method-e67",
+        "writeOnly": true
+      },
+      "paymentTid": {
+        "description": "The Payment Tid.",
+        "type": "string",
+        "example": "A-d0bfa807-bb52-4daa-a307-0f135374e41d",
+        "readOnly": true
+      },
+      "isOnline": {
+        "description": "Indicates if the payment type must be validated online.",
+        "type": "boolean",
+        "example": true,
+        "readOnly": true
+      },
+      "motiveId": {
+        "type": "string",
+        "description": "The Transaction Motive unique identifier. **TransactionMotive** `id`",
+        "example": "5eb5dbc8cee59e9754bc1484"
+      },
+      "motiveReferenceId": {
+        "description": "The Transaction Motive Reference ID. **TransactionMotive** `referenceId`. This is required if the **Motive** `id` is not sent.",
+        "type": "string",
+        "example": "transaction-motive-tm88"
+      },
+      "amountValue": {
+        "description": "The amount value",
+        "type": "number",
+        "example": 1400
+      },
+      "listAmounts": {
+        "description": "The amounts. The key is the PaymentMethod `id` and the value is the amount value\n",
+        "type": "object",
+        "additionalProperties": {
+          "type": "number",
+          "minimum": 0,
+          "exclusiveMinimum": true
+        },
+        "readOnly": true,
+        "example": {
+          "5e1c70ffab4942a0c4cf30be": 500
+        }
+      },
+      "listPackagedAmounts": {
+        "description": "The packaged amounts. The key is the PaymentMethod `id` and the value is the amount value\n",
+        "type": "object",
+        "additionalProperties": {
+          "type": "number",
+          "minimum": 0,
+          "exclusiveMinimum": true
+        },
+        "readOnly": true,
+        "example": {
+          "5e1c70ffab4942a0c4cf30be": 500
+        }
+      },
+      "amounts": {
+        "description": "The amounts",
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "paymentMethod": {
+              "$ref": "#/components/schemas/paymentMethodId"
+            },
+            "paymentMethodReferenceId": {
+              "$ref": "#/components/schemas/paymentMethodReferenceId"
+            },
+            "value": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/amountValue"
+                }
+              ],
+              "minimum": 0,
+              "exclusiveMinimum": true
+            }
+          },
+          "required": [
+            "value"
+          ]
+        }
+      },
+      "packagedAmounts": {
+        "description": "The packaged amounts",
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "paymentMethod": {
+              "$ref": "#/components/schemas/paymentMethodId"
+            },
+            "paymentMethodReferenceId": {
+              "$ref": "#/components/schemas/paymentMethodReferenceId"
+            },
+            "value": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/amountValue"
+                }
+              ],
+              "minimum": 0,
+              "exclusiveMinimum": true
+            }
+          },
+          "required": [
+            "value"
+          ]
+        }
+      },
+      "invoiceItem": {
+        "type": "object",
+        "description": "A item of an invoice detail.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The item ID",
+            "example": "5dea9fc691240d00084083f9"
+          },
+          "quantity": {
+            "type": "number",
+            "description": "The quantity of items invoiced",
+            "example": 5
+          },
+          "currency": {
+            "type": "string",
+            "description": "The ISO3 Code of the items's currency",
+            "example": "ARS",
+            "nullable": true,
+            "readOnly": true
+          },
+          "value": {
+            "type": "number",
+            "description": "The item price per unit",
+            "example": 20
+          },
+          "type": {
+            "type": "string",
+            "description": "The type of item",
+            "readOnly": true,
+            "enum": [
+              "shipping",
+              "product",
+              "tax",
+              "discount"
+            ],
+            "example": "product"
+          },
+          "referenceId": {
+            "type": "string",
+            "description": "The ID of the item inside the order in the OMS Service",
+            "readOnly": true,
+            "example": "S1234"
+          },
+          "ean": {
+            "type": "string",
+            "description": "The ean of the item",
+            "readOnly": true,
+            "example": "57465547546"
+          },
+          "isComplement": {
+            "type": "boolean",
+            "readOnly": true,
+            "description": "Indicates if the item is a complement",
+            "example": false
+          }
+        },
+        "required": [
+          "id",
+          "quantity",
+          "value"
+        ]
+      },
+      "creditNoteNumber": {
+        "description": "The transaction's Credit Note Number",
+        "type": "string",
+        "example": "NC92203"
+      },
+      "creditNoteUrl": {
+        "description": "The transaction's Credit Note URL",
+        "type": "string",
+        "example": "https://example.com/file.pdf"
+      },
+      "orderCommerceId": {
+        "description": "The eCommerce ID of the order. This is required if `items` and `orderId` are not sent.",
+        "type": "string",
+        "example": "d02d518a-6f11-4892-bdef-835baf5e5893",
+        "writeOnly": true
+      },
+      "orderCommerceSequentialId": {
+        "description": "The transaction's related Order Commerce Sequential ID from OMS Service",
+        "type": "string",
+        "example": "9X731"
+      },
+      "orderId": {
+        "description": "The Order ID from OMS Service",
+        "type": "string",
+        "example": "5d1fc1eeb5b68406e0487a06"
+      },
+      "BankDrop": {
+        "type": "object",
+        "description": "An BankDrop",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "valueTransporter": {
+            "$ref": "#/components/schemas/valueTransporterId"
+          },
+          "valueTransporterReferenceId": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/valueTransporterReferenceId"
+              }
+            ],
+            "writeOnly": true
+          },
+          "packages": {
+            "description": "Packages identifiers",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/packageId"
+            }
+          },
+          "packagesReferenceId": {
+            "description": "Package reference identifiers",
+            "type": "array",
+            "writeOnly": true,
+            "items": {
+              "$ref": "#/components/schemas/packageReferenceId"
+            }
+          },
+          "packingSlip": {
+            "description": "Packing Slip",
+            "type": "string",
+            "example": "0086-00034777871"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          }
+        }
+      },
+      "BankDropList": {
+        "type": "array",
+        "description": "Bank Drop List",
+        "items": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/BankDrop"
+            },
+            {
+              "properties": {
+                "packagesQuantity": {
+                  "description": "The packages quantity",
+                  "type": "number",
+                  "minimum": 0,
+                  "example": 2
+                }
+              }
+            }
+          ]
+        }
+      },
+      "listenerEvent": {
+        "description": "A JANIS Event object",
+        "type": "object",
+        "properties": {
+          "service": {
+            "description": "The source service name",
+            "type": "string",
+            "example": "id"
+          },
+          "entity": {
+            "description": "The event related entity",
+            "type": "string",
+            "example": "profile"
+          },
+          "event": {
+            "description": "The event name",
+            "type": "string",
+            "example": "created"
+          },
+          "client": {
+            "description": "The source event client",
+            "type": "string",
+            "example": "fizzmod"
+          },
+          "id": {
+            "description": "The event related entity ID",
+            "type": "string",
+            "example": "5d699c1ae8ebb95eaa24aca9"
+          }
+        },
+        "required": [
+          "service",
+          "entity",
+          "event"
+        ]
+      },
+      "FunctionError": {
+        "type": "object",
+        "properties": {
+          "errorMessage": {
+            "description": "The error message",
+            "type": "string",
+            "readOnly": true,
+            "example": "Database Failed"
+          }
+        }
+      },
+      "FunctionTotals": {
+        "type": "object",
+        "description": "The totals data. It is only available when `calculateTotals` parameter is active",
+        "properties": {
+          "total": {
+            "description": "The total items found in database applied filters",
+            "type": "number",
+            "readOnly": true,
+            "example": 2
+          },
+          "pages": {
+            "description": "The total pages for the filters applied",
+            "type": "number",
+            "readOnly": true,
+            "example": 1
+          },
+          "page": {
+            "description": "The actual page",
+            "type": "number",
+            "readOnly": true,
+            "example": 1
+          }
+        }
+      },
+      "InvoiceWithItems": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Invoice"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "items": {
+                "$ref": "#/components/schemas/items"
+              }
+            },
+            "required": [
+              "items"
+            ]
+          }
+        ]
+      },
+      "InvoiceWithoutItems": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Invoice"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "isPartialInvoice": {
+                "$ref": "#/components/schemas/isPartialInvoice"
+              }
+            }
+          }
+        ]
+      },
+      "InvoiceWithOrderId": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Invoice"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "orderId": {
+                "$ref": "#/components/schemas/invoiceOrderId"
+              },
+              "isPartialInvoice": {
+                "$ref": "#/components/schemas/isPartialInvoice"
+              }
+            },
+            "required": [
+              "orderId"
+            ]
+          }
+        ]
+      },
+      "InvoiceWithOrderCommerceId": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Invoice"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "orderCommerceId": {
+                "$ref": "#/components/schemas/orderCommerceId"
+              },
+              "isPartialInvoice": {
+                "$ref": "#/components/schemas/isPartialInvoice"
+              }
+            },
+            "required": [
+              "orderCommerceId"
+            ]
+          }
+        ]
+      },
+      "Invoice": {
+        "type": "object",
+        "description": "An Invoice",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "number": {
+            "type": "string",
+            "description": "The invoice number (as a string)",
+            "example": "F0454512102"
+          },
+          "electronicInvoiceAccessKey": {
+            "type": "string",
+            "description": "The access key for the electronic invoice. This field is for Brazil only.",
+            "nullable": true
+          },
+          "currency": {
+            "type": "string",
+            "description": "The ISO3 Code of the invoice's currency",
+            "example": "ARS",
+            "nullable": true,
+            "readOnly": true
+          },
+          "value": {
+            "type": "number",
+            "description": "The total amount of the invoice",
+            "example": 1000
+          },
+          "orderIds": {
+            "description": "The internal ID's of the Orders where the invoice is generated",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "readOnly": true,
+            "example": [
+              "60a460adc9b985e35498505f"
+            ]
+          },
+          "pointOfSaleId": {
+            "type": "string",
+            "description": "The internal ID of the Point of sale where the invoice is generated. This takes precedence over `pointOfSaleReferenceId` if it is also sent. The `pointOfSaleReferenceId` will be overriden with the actual POS `referenceId`.",
+            "example": "8dea9fc691240d00084083f9"
+          },
+          "pointOfSaleReferenceId": {
+            "type": "string",
+            "description": "The Reference ID of the Point of sale where the invoice is generated. If a point of sale with this `referenceId`` does not exist, it will be created.",
+            "example": "pos-ref-1"
+          },
+          "paymentMethodId": {
+            "type": "string",
+            "description": "The internal ID of the Payment method used to pay for the invoice. This takes precedence over `paymentMethodReferenceId` if it is also sent. The `paymentMethodReferenceId` will be overriden with the actual payment `referenceId`.",
+            "example": "bdea9fc691240d00084083f9"
+          },
+          "paymentMethodReferenceId": {
+            "description": "The Reference ID of the Payment method used to pay for the invoice.",
+            "type": "string",
+            "example": "pay-ref-1"
+          },
+          "shiftId": {
+            "type": "string",
+            "description": "The internal ID of the shift where the invoice is generated.",
+            "example": "9dea9fc691240d00084083f9",
+            "readOnly": true
+          },
+          "locationId": {
+            "type": "string",
+            "description": "The internal ID of the location used where the invoice was generated",
+            "example": "bdea9fc691240d00084083f9",
+            "readOnly": true
+          },
+          "issueDate": {
+            "type": "string",
+            "description": "The date when the invoice was issued",
+            "example": "2020-03-02T22:23:18.479Z",
+            "format": "date-time"
+          },
+          "url": {
+            "type": "string",
+            "description": "An URL of the electronic invoice document",
+            "example": "https://example.com/invoice/F0454512102.pdf"
+          },
+          "formId": {
+            "type": "string",
+            "description": "The ID of the invoice form that was used to fetch the items",
+            "example": "6dea9fc691240d00084083f8"
+          },
+          "operatorName": {
+            "type": "string",
+            "description": "The operator name that is billing",
+            "example": "John Doe"
+          },
+          "complements": {
+            "description": "Complements related to the invoice. The name of the property and its value must be specified",
+            "type": "object",
+            "example": {
+              "invoiceKey": "FD-1293776ASJ76"
+            }
+          },
+          "operatorNumber": {
+            "type": "string",
+            "description": "The operator number that is billing",
+            "example": "50"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          }
+        },
+        "required": [
+          "number",
+          "value",
+          "issueDate"
+        ]
+      },
+      "items": {
+        "type": "array",
+        "description": "The items of the invoice. This field take precedence over `orderId` and `orderCommerceId` if they are also sent.",
+        "items": {
+          "$ref": "#/components/schemas/invoiceItem"
+        },
+        "minItems": 1
+      },
+      "invoiceOrderId": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/orderId"
+          }
+        ],
+        "description": "The internal ID of the Order for which the invoice is or was generated. This is required if `items` is not sent and takes precedence over 'orderCommerceId' if it is also sent.",
+        "writeOnly": true
+      },
+      "isPartialInvoice": {
+        "description": "Indicates if this invoice is partial",
+        "type": "boolean",
+        "default": false,
+        "example": false
+      },
+      "InvoiceList": {
+        "type": "array",
+        "description": "A list of Invoices",
+        "items": {
+          "oneOf": [
+            {
+              "$ref": "#/components/schemas/InvoiceWithItems"
+            },
+            {
+              "$ref": "#/components/schemas/InvoiceWithoutItems"
+            }
+          ]
+        }
+      },
+      "InvoiceForm": {
+        "type": "object",
+        "description": "An Invoice Form",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "orderId": {
+            "type": "string",
+            "description": "The internal ID of the order from OMS",
+            "example": "6dea9fc691240d00084083f8",
+            "readOnly": true
+          },
+          "orderCommerceId": {
+            "type": "string",
+            "description": "The Commerce ID of the order",
+            "example": "4654654564-01",
+            "readOnly": true
+          },
+          "index": {
+            "type": "string",
+            "description": "The numeric index of the form for this order starting in 001 (left padded with zeroes until 3 characters)",
+            "example": "001",
+            "readOnly": true
+          },
+          "currency": {
+            "type": "string",
+            "description": "The ISO3 Code of the invoice form's currency",
+            "example": "ARS",
+            "nullable": true,
+            "readOnly": true
+          },
+          "value": {
+            "type": "number",
+            "description": "The total amount of the invoice form",
+            "example": 1000
+          },
+          "status": {
+            "$ref": "#/components/schemas/status"
+          },
+          "items": {
+            "type": "array",
+            "description": "The items included in this form",
+            "items": {
+              "$ref": "#/components/schemas/invoiceItem"
+            }
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          }
+        },
+        "required": [
+          "id",
+          "orderId",
+          "orderCommerceId",
+          "index",
+          "value",
+          "items",
+          "status",
+          "dateCreated",
+          "userCreated"
+        ]
+      },
+      "InvoiceFormList": {
+        "type": "array",
+        "description": "A list of Invoice forms",
+        "items": {
+          "$ref": "#/components/schemas/InvoiceForm"
+        }
+      },
+      "InvoiceFormSimulation": {
+        "type": "object",
+        "description": "An Invoice Form invoicing simulation",
+        "properties": {
+          "formId": {
+            "type": "string",
+            "description": "The Form ID",
+            "example": "5dea9fc691240d00084083f8"
+          },
+          "number": {
+            "type": "string",
+            "description": "The invoice number",
+            "example": "F5dea9fc691240d00084083f8"
+          },
+          "value": {
+            "type": "number",
+            "description": "The invoice amount",
+            "example": 300
+          },
+          "issueDate": {
+            "type": "string",
+            "description": "The invoice date",
+            "format": "date-time",
+            "example": "2020-03-02T22:23:18.479Z"
+          },
+          "items": {
+            "type": "array",
+            "description": "The items included in this form",
+            "items": {
+              "$ref": "#/components/schemas/InvoiceFormSimulationItem"
+            }
+          }
+        },
+        "required": [
+          "formId",
+          "number",
+          "value",
+          "issueDate",
+          "items"
+        ]
+      },
+      "InvoiceFormSimulationItem": {
+        "type": "object",
+        "description": "An item of the form invoicing simulation",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The Invoice Item ID",
+            "example": "5dea9fc691240d00084083f8",
+            "readOnly": true
+          },
+          "quantity": {
+            "type": "number",
+            "description": "The quantity of this item to invoice",
+            "example": 10
+          },
+          "value": {
+            "type": "string",
+            "description": "The item price per unit",
+            "example": 30
+          }
+        }
+      },
+      "LocationList": {
+        "description": "Location list",
+        "type": "array",
+        "items": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Location"
+            },
+            {
+              "properties": {
+                "amounts": {
+                  "$ref": "#/components/schemas/amounts"
+                },
+                "packagedAmounts": {
+                  "$ref": "#/components/schemas/packagedAmounts"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "LocationGet": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Location"
+          },
+          {
+            "properties": {
+              "amounts": {
+                "$ref": "#/components/schemas/amounts"
+              },
+              "packagedAmounts": {
+                "$ref": "#/components/schemas/packagedAmounts"
+              }
+            }
+          }
+        ]
+      },
+      "Location": {
+        "type": "object",
+        "description": "A Location",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "referenceId": {
+            "type": "string",
+            "description": "The location reference identifier",
+            "example": "ref-location-1"
+          },
+          "name": {
+            "type": "string",
+            "description": "The location name",
+            "example": "Palermo"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "status": {
+            "$ref": "#/components/schemas/status"
+          }
+        }
+      },
+      "PackagePut": {
+        "description": "The information to update a package",
+        "type": "object",
+        "properties": {
+          "pointOfSale": {
+            "$ref": "#/components/schemas/Package/properties/pointOfSale"
+          },
+          "pointOfSaleReferenceId": {
+            "$ref": "#/components/schemas/Package/properties/pointOfSaleReferenceId"
+          },
+          "note": {
+            "$ref": "#/components/schemas/Package/properties/note"
+          }
+        }
+      },
+      "PackageList": {
+        "description": "A package list",
+        "type": "array",
+        "items": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/Package"
+            }
+          ]
+        }
+      },
+      "Package": {
+        "description": "A Package",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "referenceId": {
+            "description": "The package's reference identifier",
+            "type": "string",
+            "example": "ref-01"
+          },
+          "pointOfSale": {
+            "$ref": "#/components/schemas/pointOfSaleId"
+          },
+          "pointOfSaleReferenceId": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/pointOfSaleReferenceId"
+              }
+            ],
+            "writeOnly": true
+          },
+          "packagedBy": {
+            "description": "The Package `id` that contains this Package",
+            "type": "string",
+            "readOnly": true,
+            "nullable": true,
+            "example": "ref-01"
+          },
+          "location": {
+            "$ref": "#/components/schemas/locationId"
+          },
+          "shift": {
+            "$ref": "#/components/schemas/shiftId"
+          },
+          "amounts": {
+            "$ref": "#/components/schemas/PackageAmounts"
+          },
+          "packages": {
+            "description": "The package's identifier",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/packageId"
+            }
+          },
+          "packagesReferenceId": {
+            "description": "The package's reference identifier",
+            "type": "array",
+            "writeOnly": true,
+            "items": {
+              "$ref": "#/components/schemas/packageReferenceId"
+            }
+          },
+          "note": {
+            "description": "The package's note",
+            "type": "string",
+            "example": "a package note"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          },
+          "status": {
+            "description": "The Package status",
+            "type": "string",
+            "readOnly": true,
+            "default": "active",
+            "enum": [
+              "active",
+              "delivered"
+            ],
+            "example": "active"
+          }
+        },
+        "required": [
+          "referenceId"
+        ]
+      },
+      "PackageAmounts": {
+        "description": "The package's amounts",
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "value": {
+              "$ref": "#/components/schemas/amountValue"
+            },
+            "paymentMethod": {
+              "$ref": "#/components/schemas/paymentMethodId"
+            },
+            "paymentMethodReferenceId": {
+              "$ref": "#/components/schemas/paymentMethodReferenceId"
+            }
+          },
+          "required": [
+            "value"
+          ]
+        }
+      },
+      "PackageMovement": {
+        "description": "A package movement",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "package": {
+            "description": "The package movement's package identifier",
+            "type": "string",
+            "example": "5e87ef0a81972aaab65defd7"
+          },
+          "note": {
+            "description": "The package movement's note",
+            "type": "string",
+            "example": "a package note"
+          },
+          "packagingAmounts": {
+            "description": "The package movement's packagingAmounts",
+            "type": "boolean",
+            "example": true
+          },
+          "previousPointOfSale": {
+            "description": "The package movement's previous point of sale identifier",
+            "type": "string",
+            "example": "5e87ebadcb0a3cdc5dfa0eab"
+          },
+          "currentPointOfSale": {
+            "description": "The package movement's current point of sale identifier",
+            "type": "string",
+            "example": "5e87ef147f7715dad5b8fbe7"
+          },
+          "previousShift": {
+            "description": "The package movement's previous shift identifier",
+            "type": "string",
+            "example": "5e87ef1055346d1c45fbbb57"
+          },
+          "currentShift": {
+            "description": "The package movement's current shift identifier",
+            "type": "string",
+            "example": "5e87ef19af1dfc24ab978d94"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "status": {
+            "description": "The Pacakge Movement status",
+            "type": "string",
+            "readOnly": true,
+            "default": "pending",
+            "enum": [
+              "pending",
+              "processed"
+            ],
+            "example": "processed"
+          }
+        }
+      },
+      "PaymentMethodList": {
+        "description": "Payment Method list",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/PaymentMethod"
+        }
+      },
+      "PaymentMethod": {
+        "description": "A payment method",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "referenceId": {
+            "description": "The payment method referenceId",
+            "type": "string",
+            "example": "pesos"
+          },
+          "name": {
+            "description": "The payment method name",
+            "type": "string",
+            "example": "Pesos"
+          },
+          "paymentType": {
+            "description": "The Payment type's `id` associated with the payment method. See [Payment Type](/v2/service/jef#tag/Payment-Type)",
+            "type": "string",
+            "example": "8e1fc1eeb5b68406eaaa000"
+          },
+          "allowUpselling": {
+            "description": "Indicates if the payment method allows upselling. Default value will be `true`.",
+            "type": "boolean",
+            "example": false,
+            "default": true
+          },
+          "upsellingThreshold": {
+            "description": "The upselling threshold for the payment method. Default value will be `0`.",
+            "type": "number",
+            "example": 10,
+            "default": 0
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          },
+          "status": {
+            "$ref": "#/components/schemas/status"
+          }
+        },
+        "required": [
+          "name",
+          "referenceId"
+        ]
+      },
+      "PaymentTypeList": {
+        "description": "Payment Type list",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/PaymentType"
+        }
+      },
+      "PaymentType": {
+        "description": "A Payment Type",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "referenceId": {
+            "description": "The payment Type referenceId",
+            "type": "string",
+            "example": "credit-card-ref"
+          },
+          "name": {
+            "description": "The payment Type name",
+            "type": "string",
+            "example": "Credit Card"
+          },
+          "isOnlinePayment": {
+            "description": "Indicates if the payment type must be validated online",
+            "type": "boolean",
+            "example": true
+          },
+          "isPaymentUponDelivery": {
+            "description": "Indicates if the payment type must be validated upon delivery",
+            "type": "boolean",
+            "example": false
+          },
+          "isOnlinePaymentUponDelivery": {
+            "description": "Indicates if the online payment type must be validated upon delivery",
+            "type": "boolean",
+            "example": false
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          },
+          "status": {
+            "$ref": "#/components/schemas/status"
+          }
+        },
+        "required": [
+          "name",
+          "referenceId",
+          "isOnlinePayment",
+          "isPaymentUponDelivery",
+          "isOnlinePaymentUponDelivery"
+        ]
+      },
+      "PointOfSaleUpdate": {
+        "description": "A point of sale",
+        "type": "object",
+        "properties": {
+          "referenceId": {
+            "$ref": "#/components/schemas/PointOfSale/properties/referenceId"
+          },
+          "name": {
+            "$ref": "#/components/schemas/PointOfSale/properties/name"
+          }
+        }
+      },
+      "PointOfSaleList": {
+        "description": "Point of salelist",
+        "type": "array",
+        "items": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/PointOfSale"
+            },
+            {
+              "properties": {
+                "amounts": {
+                  "$ref": "#/components/schemas/listAmounts"
+                },
+                "packagedAmounts": {
+                  "$ref": "#/components/schemas/listPackagedAmounts"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "PointOfSaleGet": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/PointOfSale"
+          },
+          {
+            "properties": {
+              "amounts": {
+                "$ref": "#/components/schemas/amounts"
+              },
+              "packagedAmounts": {
+                "$ref": "#/components/schemas/packagedAmounts"
+              }
+            }
+          }
+        ]
+      },
+      "PointOfSale": {
+        "description": "A point of sale",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "location": {
+            "$ref": "#/components/schemas/locationId"
+          },
+          "locationReferenceId": {
+            "description": "The point of sale location reference identifier",
+            "writeOnly": true,
+            "type": "string",
+            "example": "location-reference-01"
+          },
+          "referenceId": {
+            "description": "The point of sale reference identifier",
+            "type": "string",
+            "example": "pos-reference-01"
+          },
+          "name": {
+            "description": "The point of sale name",
+            "type": "string",
+            "example": "caja playa"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          },
+          "status": {
+            "description": "The Point of Sale status",
+            "type": "string",
+            "readOnly": true,
+            "default": "closed",
+            "enum": [
+              "closed",
+              "open",
+              "inactive"
+            ],
+            "example": "closed"
+          }
+        },
+        "required": [
+          "name",
+          "referenceId"
+        ]
+      },
+      "Refund": {
+        "description": "A Refund",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "creditNoteNumber": {
+            "$ref": "#/components/schemas/creditNoteNumber"
+          },
+          "orderCommerceId": {
+            "$ref": "#/components/schemas/orderCommerceId"
+          },
+          "orderCommerceSequentialId": {
+            "$ref": "#/components/schemas/orderCommerceSequentialId"
+          },
+          "rmaId": {
+            "description": "The ID of the RMA that requested the refund",
+            "type": "string",
+            "example": "66173564f0d2867ed99f2061"
+          },
+          "orderId": {
+            "$ref": "#/components/schemas/orderId"
+          },
+          "referenceId": {
+            "description": "Order's Refund ID",
+            "type": "string",
+            "example": "6617143048b9d60f580bfd8c"
+          },
+          "amount": {
+            "description": "The Refunded amount",
+            "type": "number",
+            "example": 1500
+          },
+          "date": {
+            "description": "The Refund Date",
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-04-04T04:44:44.444Z"
+          },
+          "isFullRefunded": {
+            "description": "Indicates if the refund is a full refund of the Order",
+            "type": "boolean",
+            "example": true
+          },
+          "motive": {
+            "description": "The motive of the refund",
+            "type": "string",
+            "example": "Order canceled"
+          },
+          "items": {
+            "$ref": "#/components/schemas/RefundItems"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          }
+        },
+        "required": [
+          "amount"
+        ]
+      },
+      "RefundItems": {
+        "description": "The Refunded Items",
+        "type": "array",
+        "items": {
+          "description": "The Refunded Item",
+          "type": "object",
+          "properties": {
+            "id": {
+              "description": "The Order's Item PickingResult ID",
+              "type": "string",
+              "example": "925D7EJAYDB64875A0B10C341E7JHD31B-01"
+            },
+            "quantity": {
+              "description": "The Item Quantity",
+              "type": "number",
+              "example": 1
+            },
+            "value": {
+              "description": "The Item Value",
+              "type": "number",
+              "example": 1500
+            }
+          }
+        }
+      },
+      "RefundList": {
+        "type": "array",
+        "description": "A list of Refunds",
+        "items": {
+          "$ref": "#/components/schemas/Refund"
+        }
+      },
+      "TransactionSettings": {
+        "type": "object",
+        "description": "Transaction Settings",
+        "title": "Transaction",
+        "properties": {
+          "useOrderPickingLocation": {
+            "type": "boolean",
+            "description": "Indicates if Transactions processed without Location should autocomplete it with the Order picking location",
+            "example": true,
+            "default": false
+          }
+        }
+      },
+      "ShiftCreate": {
+        "description": "A shift",
+        "type": "object",
+        "properties": {
+          "pointOfSale": {
+            "$ref": "#/components/schemas/pointOfSaleId"
+          },
+          "pointOfSaleReferenceId": {
+            "$ref": "#/components/schemas/pointOfSaleReferenceId"
+          }
+        }
+      },
+      "ShiftUpdate": {
+        "description": "A shift update",
+        "type": "object",
+        "properties": {
+          "amounts": {
+            "$ref": "#/components/schemas/amounts"
+          },
+          "confirmEndedShift": {
+            "description": "Required confirmation for ending the shift",
+            "type": "boolean",
+            "example": true
+          }
+        },
+        "required": [
+          "confirmEndedShift"
+        ]
+      },
+      "ShiftList": {
+        "description": "A shift list",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Shift"
+        }
+      },
+      "Shift": {
+        "description": "A shift",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "pointOfSale": {
+            "$ref": "#/components/schemas/pointOfSaleId"
+          },
+          "amounts": {
+            "$ref": "#/components/schemas/amounts"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          },
+          "status": {
+            "description": "The Shift status",
+            "type": "string",
+            "readOnly": true,
+            "enum": [
+              "started",
+              "ended"
+            ],
+            "example": "started"
+          }
+        }
+      },
+      "TransactionList": {
+        "description": "Transaction list",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Transaction"
+        }
+      },
+      "Transaction": {
+        "description": "A transaction",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "referenceId": {
+            "description": "The transaction's external identifier, for example the ID of the commerce platform",
+            "type": "string",
+            "example": "2FBFD32201074BAC9DDFDBD7575CD768"
+          },
+          "orderIds": {
+            "description": "The transaction's related order IDs from OMS Service",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/orderId"
+            }
+          },
+          "invoiceNumber": {
+            "$ref": "#/components/schemas/Invoice/properties/number"
+          },
+          "invoiceUrl": {
+            "$ref": "#/components/schemas/Invoice/properties/url"
+          },
+          "creditNoteNumber": {
+            "$ref": "#/components/schemas/creditNoteNumber"
+          },
+          "creditNoteUrl": {
+            "$ref": "#/components/schemas/creditNoteUrl"
+          },
+          "orderCommerceId": {
+            "$ref": "#/components/schemas/orderCommerceId"
+          },
+          "orderCommerceSequentialId": {
+            "$ref": "#/components/schemas/orderCommerceSequentialId"
+          },
+          "transactionType": {
+            "description": "The transaction type",
+            "type": "string",
+            "enum": [
+              "full-invoice",
+              "partial-invoice",
+              "full-refund",
+              "partial-refund"
+            ]
+          },
+          "pointOfSale": {
+            "$ref": "#/components/schemas/pointOfSaleId"
+          },
+          "pointOfSaleReferenceId": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/pointOfSaleReferenceId"
+              }
+            ],
+            "writeOnly": true
+          },
+          "shift": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/shiftId"
+              }
+            ],
+            "readOnly": true
+          },
+          "location": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/locationId"
+              }
+            ],
+            "readOnly": true
+          },
+          "package": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/packageId"
+              }
+            ],
+            "readOnly": true
+          },
+          "paymentMethod": {
+            "$ref": "#/components/schemas/paymentMethodId"
+          },
+          "paymentType": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PaymentType/properties/id"
+              }
+            ],
+            "readOnly": true
+          },
+          "paymentMethodReferenceId": {
+            "$ref": "#/components/schemas/paymentMethodReferenceId"
+          },
+          "paymentTid": {
+            "$ref": "#/components/schemas/paymentTid"
+          },
+          "isOnline": {
+            "$ref": "#/components/schemas/isOnline"
+          },
+          "amount": {
+            "$ref": "#/components/schemas/amountValue"
+          },
+          "motive": {
+            "$ref": "#/components/schemas/motiveId"
+          },
+          "motiveReferenceId": {
+            "$ref": "#/components/schemas/motiveReferenceId"
+          },
+          "refundMotive": {
+            "description": "The refund motive of the transaction (only for refund transaction types)",
+            "type": "string",
+            "example": "Order canceled"
+          },
+          "sector": {
+            "description": "The transaction's sector",
+            "type": "string",
+            "example": "playa"
+          },
+          "packagedAmount": {
+            "description": "Determines if the amount value is pacakged in a **Package**\n* If `true` the `id` of the **Package** can be found in field `package`\n",
+            "type": "boolean",
+            "readOnly": true,
+            "example": false
+          },
+          "client": {
+            "$ref": "#/components/schemas/TransactionClient"
+          },
+          "status": {
+            "description": "The status",
+            "type": "string",
+            "enum": [
+              "pending",
+              "processing",
+              "processed",
+              "liquidated"
+            ],
+            "example": "closed",
+            "readOnly": true
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          }
+        },
+        "required": [
+          "amount"
+        ]
+      },
+      "TransactionClient": {
+        "description": "The transaction's client",
+        "type": "object",
+        "properties": {
+          "firstname": {
+            "description": "The transaction's client firstname",
+            "type": "string",
+            "example": "John"
+          },
+          "lastname": {
+            "description": "The transaction's client lastname",
+            "type": "string",
+            "example": "Doe"
+          },
+          "document": {
+            "description": "The transaction's client document",
+            "type": "string",
+            "example": "31321456"
+          },
+          "phone": {
+            "description": "The transaction's client phone",
+            "type": "string",
+            "example": "1144778899"
+          },
+          "email": {
+            "description": "The transaction's client email",
+            "type": "string",
+            "example": "john.doe@email.com"
+          }
+        },
+        "required": [
+          "firstname",
+          "lastname",
+          "document"
+        ]
+      },
+      "TransactionMotiveList": {
+        "description": "Transaction Motive list",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/TransactionMotive"
+        }
+      },
+      "TransactionMotive": {
+        "description": "A transaction motive",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "referenceId": {
+            "description": "The transaction motive referenceId",
+            "type": "string",
+            "example": "sale"
+          },
+          "name": {
+            "description": "The transaction motive name",
+            "type": "string",
+            "example": "Venta"
+          },
+          "isInternal": {
+            "description": "The transaction motive is internal value",
+            "type": "boolean",
+            "readOnly": true,
+            "example": true
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          },
+          "status": {
+            "$ref": "#/components/schemas/status"
+          }
+        },
+        "required": [
+          "name",
+          "referenceId"
+        ]
+      },
+      "ValueTransporterCreate": {
+        "allOf": [
+          {
+            "properties": {
+              "referenceId": {
+                "$ref": "#/components/schemas/ValueTransporter/properties/referenceId"
+              },
+              "name": {
+                "$ref": "#/components/schemas/ValueTransporter/properties/name"
+              },
+              "title": {
+                "$ref": "#/components/schemas/ValueTransporter/properties/title"
+              },
+              "document": {
+                "$ref": "#/components/schemas/ValueTransporter/properties/document"
+              }
+            }
+          },
+          {
+            "required": [
+              "referenceId",
+              "name",
+              "title",
+              "document"
+            ]
+          }
+        ]
+      },
+      "ValueTransporter": {
+        "type": "object",
+        "description": "An ValueTransporter",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "referenceId": {
+            "type": "string",
+            "description": "The value transporter reference identifier",
+            "example": "ref-01"
+          },
+          "name": {
+            "type": "string",
+            "description": "The value transporter name",
+            "example": "Company S.A"
+          },
+          "title": {
+            "type": "string",
+            "description": "The value transporter title",
+            "example": "ValueTransporter Company"
+          },
+          "document": {
+            "type": "string",
+            "description": "The value transporter document",
+            "example": "20-874545328-1"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          },
+          "status": {
+            "$ref": "#/components/schemas/status"
+          }
+        }
+      },
+      "ValueTransporterList": {
+        "type": "array",
+        "description": "A list of Value Transporters",
+        "items": {
+          "$ref": "#/components/schemas/ValueTransporter"
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-key",
+        "description": "The API Key"
+      },
+      "ApiSecret": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-secret",
+        "description": "The API Secret"
+      },
+      "JanisClient": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-client",
+        "description": "The name of client"
+      }
+    },
+    "parameters": {
+      "id": {
+        "name": "id",
+        "in": "path",
+        "schema": {
+          "type": "string",
+          "example": "d555345345345as67a342a"
+        },
+        "required": true,
+        "description": "The unique identifier of the item"
+      },
+      "JanisEntity": {
+        "name": "janis-entity",
+        "in": "header",
+        "description": "The name of entity",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "ListSortDirection": {
+        "name": "sortDirection",
+        "in": "query",
+        "description": "The direction to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
+        }
+      },
+      "ListPageNumber": {
+        "name": "x-janis-page",
+        "in": "header",
+        "description": "The page to get",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "default": 1,
+          "minimum": 0,
+          "exclusiveMinimum": true
+        }
+      },
+      "ListPageSize": {
+        "name": "x-janis-page-size",
+        "in": "header",
+        "description": "The page size to get",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "default": 60,
+          "minimum": 0,
+          "exclusiveMinimum": true
+        }
+      },
+      "BankDropSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "valueTransporter",
+            "packages",
+            "packingSlip",
+            "dateCreated",
+            "userCreated"
+          ]
+        }
+      },
+      "BankDropFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The optionals filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/BankDrop/properties/id"
+            },
+            "valueTransporter": {
+              "$ref": "#/components/schemas/BankDrop/properties/valueTransporter"
+            },
+            "packingSlip": {
+              "$ref": "#/components/schemas/BankDrop/properties/packingSlip"
+            },
+            "dateCreatedDay": {
+              "$ref": "#/components/schemas/dateCreatedDay"
+            },
+            "userCreated": {
+              "$ref": "#/components/schemas/BankDrop/properties/userCreated"
+            }
+          }
+        }
+      },
+      "FunctionsFields": {
+        "name": "fields",
+        "in": "query",
+        "description": "Reduce the response to fields",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "example": [
+            "id",
+            "name",
+            "referenceId"
+          ]
+        }
+      },
+      "FunctionsFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the model",
+        "schema": {
+          "type": "object",
+          "description": "The filters to apply to the model",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "The id to filter",
+              "example": "d555345345345as67a342b"
+            }
+          }
+        }
+      },
+      "FunctionsCalculateTotals": {
+        "name": "calculateTotals",
+        "in": "query",
+        "description": "Indicates if the response must return the totals data applied filters. **Default** `false`",
+        "schema": {
+          "type": "boolean",
+          "example": true
+        }
+      },
+      "FunctionsAllItems": {
+        "name": "allItems",
+        "in": "query",
+        "description": "Indicates if the response must return all items. **Default** `false`",
+        "schema": {
+          "type": "boolean",
+          "example": true
+        }
+      },
+      "InvoiceSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "number",
+            "issueDate",
+            "dateCreated"
+          ]
+        }
+      },
+      "InvoiceFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/Invoice/properties/id"
+            },
+            "pointOfSaleId": {
+              "$ref": "#/components/schemas/Invoice/properties/pointOfSaleId"
+            },
+            "paymentMethodId": {
+              "$ref": "#/components/schemas/Invoice/properties/paymentMethodId"
+            },
+            "locationId": {
+              "$ref": "#/components/schemas/Invoice/properties/locationId"
+            },
+            "number": {
+              "$ref": "#/components/schemas/Invoice/properties/number"
+            },
+            "orderId": {
+              "$ref": "#/components/schemas/orderId"
+            },
+            "issueDateRange": {
+              "type": "object",
+              "description": "A range for issue date. It will filter from 00:00Hs to 23:59:59Hs of the given range",
+              "properties": {
+                "from": {
+                  "type": "string",
+                  "description": "The beginning of the range",
+                  "format": "date-time",
+                  "example": "2019-11-27T16:08:24.994Z"
+                },
+                "to": {
+                  "type": "string",
+                  "description": "The end of the range",
+                  "format": "date-time",
+                  "example": "2019-11-30T16:08:24.994Z"
+                }
+              }
+            },
+            "dateCreatedRange": {
+              "type": "object",
+              "description": "A range for date created. It will filter from 00:00Hs to 23:59:59Hs of the given range",
+              "properties": {
+                "from": {
+                  "type": "string",
+                  "description": "The beginning of the range",
+                  "format": "date-time",
+                  "example": "2019-11-27T16:08:24.994Z"
+                },
+                "to": {
+                  "type": "string",
+                  "description": "The end of the range",
+                  "format": "date-time",
+                  "example": "2019-11-30T16:08:24.994Z"
+                }
+              }
+            },
+            "userCreated": {
+              "$ref": "#/components/schemas/Invoice/properties/userCreated"
+            }
+          }
+        }
+      },
+      "InvoiceFormSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "orderCommerceId",
+            "index",
+            "dateCreated",
+            "dateModified"
+          ]
+        }
+      },
+      "InvoiceFormFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/InvoiceForm/properties/id"
+            },
+            "orderId": {
+              "$ref": "#/components/schemas/InvoiceForm/properties/orderId"
+            },
+            "orderCommerceId": {
+              "$ref": "#/components/schemas/InvoiceForm/properties/orderCommerceId"
+            },
+            "index": {
+              "$ref": "#/components/schemas/InvoiceForm/properties/index"
+            },
+            "status": {
+              "$ref": "#/components/schemas/InvoiceForm/properties/status"
+            }
+          }
+        }
+      },
+      "LocationSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "referenceId",
+            "name",
+            "status"
+          ]
+        }
+      },
+      "LocationFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/Location/properties/id"
+            },
+            "referenceId": {
+              "$ref": "#/components/schemas/Location/properties/referenceId"
+            },
+            "name": {
+              "$ref": "#/components/schemas/Location/properties/name"
+            },
+            "status": {
+              "$ref": "#/components/schemas/Location/properties/status"
+            }
+          }
+        }
+      },
+      "PackageSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "referenceId",
+            "pointOfSale",
+            "shift",
+            "location",
+            "dateCreated",
+            "dateModified",
+            "userCreated",
+            "userModified",
+            "status"
+          ]
+        }
+      },
+      "PackageFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/Package/properties/id"
+            },
+            "referenceId": {
+              "$ref": "#/components/schemas/Package/properties/referenceId"
+            },
+            "packagedBy": {
+              "$ref": "#/components/schemas/Package/properties/packagedBy"
+            },
+            "pointOfSale": {
+              "$ref": "#/components/schemas/Package/properties/pointOfSale"
+            },
+            "pointOfSaleReferenceId": {
+              "$ref": "#/components/schemas/Package/properties/pointOfSaleReferenceId"
+            },
+            "location": {
+              "$ref": "#/components/schemas/Package/properties/location"
+            },
+            "shift": {
+              "$ref": "#/components/schemas/Package/properties/shift"
+            },
+            "dateCreatedDay": {
+              "$ref": "#/components/schemas/dateCreatedDay"
+            },
+            "dateModifiedDay": {
+              "$ref": "#/components/schemas/dateModifiedDay"
+            },
+            "userCreated": {
+              "$ref": "#/components/schemas/Package/properties/userCreated"
+            },
+            "userModified": {
+              "$ref": "#/components/schemas/Package/properties/userModified"
+            },
+            "status": {
+              "$ref": "#/components/schemas/Package/properties/status"
+            }
+          }
+        }
+      },
+      "PackageMovementSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "previousPointOfSale",
+            "currentPointOfSale",
+            "package",
+            "dateCreated",
+            "userCreated",
+            "status"
+          ]
+        }
+      },
+      "PackageMovementFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/PackageMovement/properties/id"
+            },
+            "package": {
+              "$ref": "#/components/schemas/PackageMovement/properties/package"
+            },
+            "previousPointOfSale": {
+              "$ref": "#/components/schemas/PackageMovement/properties/previousPointOfSale"
+            },
+            "currentPointOfSale": {
+              "$ref": "#/components/schemas/PackageMovement/properties/currentPointOfSale"
+            },
+            "dateCreatedDay": {
+              "$ref": "#/components/schemas/dateCreatedDay"
+            },
+            "userCreated": {
+              "$ref": "#/components/schemas/PackageMovement/properties/userCreated"
+            },
+            "status": {
+              "$ref": "#/components/schemas/PackageMovement/properties/status"
+            }
+          }
+        }
+      },
+      "PaymentMethodSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "name",
+            "referenceId",
+            "userCreated",
+            "userModified",
+            "dateCreated",
+            "dateModified"
+          ]
+        }
+      },
+      "PaymentMethodFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/PaymentMethod/properties/id"
+            },
+            "referenceId": {
+              "$ref": "#/components/schemas/PaymentMethod/properties/referenceId"
+            },
+            "name": {
+              "$ref": "#/components/schemas/PaymentMethod/properties/name"
+            },
+            "allowUpselling": {
+              "description": "Indicates if the payment method allows upselling. Default value will be `true`.",
+              "type": "boolean",
+              "example": false
+            },
+            "dateCreatedDay": {
+              "$ref": "#/components/schemas/dateCreatedDay"
+            },
+            "dateModifiedDay": {
+              "$ref": "#/components/schemas/dateModifiedDay"
+            },
+            "userCreated": {
+              "$ref": "#/components/schemas/PaymentMethod/properties/userCreated"
+            },
+            "userModified": {
+              "$ref": "#/components/schemas/PaymentMethod/properties/userModified"
+            },
+            "status": {
+              "$ref": "#/components/schemas/PaymentMethod/properties/status"
+            }
+          }
+        }
+      },
+      "PaymentTypeSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "name",
+            "referenceId",
+            "userCreated",
+            "userModified",
+            "dateCreated",
+            "dateModified"
+          ]
+        }
+      },
+      "PaymentTypeFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/PaymentType/properties/id"
+            },
+            "referenceId": {
+              "$ref": "#/components/schemas/PaymentType/properties/referenceId"
+            },
+            "name": {
+              "$ref": "#/components/schemas/PaymentType/properties/name"
+            },
+            "isOnlinePayment": {
+              "$ref": "#/components/schemas/PaymentType/properties/isOnlinePayment"
+            },
+            "isPaymentUponDelivery": {
+              "$ref": "#/components/schemas/PaymentType/properties/isPaymentUponDelivery"
+            },
+            "isOnlinePaymentUponDelivery": {
+              "$ref": "#/components/schemas/PaymentType/properties/isOnlinePaymentUponDelivery"
+            },
+            "dateCreatedRange": {
+              "$ref": "#/components/schemas/dateRangeFilter"
+            },
+            "dateModifiedRange": {
+              "$ref": "#/components/schemas/dateRangeFilter"
+            },
+            "userCreated": {
+              "$ref": "#/components/schemas/PaymentType/properties/userCreated"
+            },
+            "userModified": {
+              "$ref": "#/components/schemas/PaymentType/properties/userModified"
+            },
+            "status": {
+              "$ref": "#/components/schemas/PaymentType/properties/status"
+            }
+          }
+        }
+      },
+      "PointOfSaleSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "location",
+            "referenceId",
+            "name",
+            "dateCreated",
+            "userCreated",
+            "status"
+          ]
+        }
+      },
+      "PointOfSaleFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/PointOfSale/properties/id"
+            },
+            "location": {
+              "$ref": "#/components/schemas/PointOfSale/properties/location"
+            },
+            "referenceId": {
+              "$ref": "#/components/schemas/PointOfSale/properties/referenceId"
+            },
+            "name": {
+              "$ref": "#/components/schemas/PointOfSale/properties/name"
+            },
+            "dateCreatedDay": {
+              "$ref": "#/components/schemas/dateCreatedDay"
+            },
+            "dateModifiedDay": {
+              "$ref": "#/components/schemas/dateModifiedDay"
+            },
+            "userCreated": {
+              "$ref": "#/components/schemas/PointOfSale/properties/userCreated"
+            },
+            "userModified": {
+              "$ref": "#/components/schemas/PointOfSale/properties/userModified"
+            },
+            "status": {
+              "$ref": "#/components/schemas/PointOfSale/properties/status"
+            }
+          }
+        }
+      },
+      "RefundSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "creditNoteNumber",
+            "amount",
+            "date",
+            "dateCreated"
+          ]
+        }
+      },
+      "RefundFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/Refund/properties/id"
+            },
+            "rmaId": {
+              "$ref": "#/components/schemas/Refund/properties/rmaId"
+            },
+            "orderId": {
+              "$ref": "#/components/schemas/Refund/properties/orderId"
+            },
+            "orderCommerceId": {
+              "$ref": "#/components/schemas/Refund/properties/orderCommerceId"
+            },
+            "orderCommerceSequentialId": {
+              "$ref": "#/components/schemas/Refund/properties/orderCommerceSequentialId"
+            },
+            "referenceId": {
+              "$ref": "#/components/schemas/Refund/properties/referenceId"
+            },
+            "amount": {
+              "$ref": "#/components/schemas/Refund/properties/amount"
+            },
+            "motive": {
+              "$ref": "#/components/schemas/Refund/properties/motive"
+            },
+            "creditNoteNumber": {
+              "$ref": "#/components/schemas/Refund/properties/creditNoteNumber"
+            },
+            "isFullRefunded": {
+              "$ref": "#/components/schemas/Refund/properties/isFullRefunded"
+            },
+            "date": {
+              "$ref": "#/components/schemas/Refund/properties/date"
+            },
+            "dateRange": {
+              "type": "object",
+              "description": "A range for refund date. It will filter from 00:00Hs to 23:59:59Hs of the given range",
+              "properties": {
+                "from": {
+                  "type": "string",
+                  "description": "The beginning of the range",
+                  "format": "date-time",
+                  "example": "2019-11-27T16:08:24.994Z"
+                },
+                "to": {
+                  "type": "string",
+                  "description": "The end of the range",
+                  "format": "date-time",
+                  "example": "2019-11-30T16:08:24.994Z"
+                }
+              }
+            },
+            "dateCreatedRange": {
+              "type": "object",
+              "description": "A range for date created. It will filter from 00:00Hs to 23:59:59Hs of the given range",
+              "properties": {
+                "from": {
+                  "type": "string",
+                  "description": "The beginning of the range",
+                  "format": "date-time",
+                  "example": "2019-11-27T16:08:24.994Z"
+                },
+                "to": {
+                  "type": "string",
+                  "description": "The end of the range",
+                  "format": "date-time",
+                  "example": "2019-11-30T16:08:24.994Z"
+                }
+              }
+            },
+            "userCreated": {
+              "$ref": "#/components/schemas/Refund/properties/userCreated"
+            }
+          }
+        }
+      },
+      "ShiftSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "pointOfSale",
+            "status",
+            "userCreated",
+            "dateCreated",
+            "userModified",
+            "dateModified"
+          ]
+        }
+      },
+      "ShiftFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/Shift/properties/id"
+            },
+            "pointOfSale": {
+              "$ref": "#/components/schemas/Shift/properties/pointOfSale"
+            },
+            "dateCreatedDay": {
+              "$ref": "#/components/schemas/dateCreatedDay"
+            },
+            "dateModifiedDay": {
+              "$ref": "#/components/schemas/dateModifiedDay"
+            },
+            "userCreated": {
+              "$ref": "#/components/schemas/Shift/properties/userCreated"
+            },
+            "userModified": {
+              "$ref": "#/components/schemas/Shift/properties/userModified"
+            },
+            "status": {
+              "$ref": "#/components/schemas/Shift/properties/status"
+            }
+          }
+        }
+      },
+      "TransactionSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "pointOfSale",
+            "paymentMethod",
+            "paymentType",
+            "amount",
+            "motive",
+            "refundMotive",
+            "package",
+            "sector",
+            "dateCreated",
+            "userCreated",
+            "location",
+            "status",
+            "packagedAmount",
+            "invoiceNumber",
+            "creditNoteNumber",
+            "orderCommerceId",
+            "orderCommerceSequentialId",
+            "transactionType"
+          ]
+        }
+      },
+      "TransactionFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/Transaction/properties/id"
+            },
+            "invoiceNumber": {
+              "$ref": "#/components/schemas/Transaction/properties/invoiceNumber"
+            },
+            "referenceId": {
+              "$ref": "#/components/schemas/Transaction/properties/referenceId"
+            },
+            "orderCommerceId": {
+              "$ref": "#/components/schemas/Transaction/properties/orderCommerceId"
+            },
+            "orderCommerceSequentialId": {
+              "$ref": "#/components/schemas/Transaction/properties/orderCommerceSequentialId"
+            },
+            "transactionType": {
+              "$ref": "#/components/schemas/Transaction/properties/transactionType"
+            },
+            "transaction": {
+              "description": "Allows to filter between Positive or Negative Transactions",
+              "type": "string",
+              "enum": [
+                "positive",
+                "negative"
+              ]
+            },
+            "orderId": {
+              "type": "string",
+              "description": "The transaction's related order ID from OMS Service",
+              "example": "5d1fc1eeb5b68406e0487a06"
+            },
+            "pointOfSale": {
+              "$ref": "#/components/schemas/Transaction/properties/pointOfSale"
+            },
+            "shift": {
+              "$ref": "#/components/schemas/Transaction/properties/shift"
+            },
+            "location": {
+              "$ref": "#/components/schemas/Transaction/properties/location"
+            },
+            "package": {
+              "$ref": "#/components/schemas/Transaction/properties/package"
+            },
+            "paymentMethod": {
+              "$ref": "#/components/schemas/Transaction/properties/paymentMethod"
+            },
+            "paymentType": {
+              "$ref": "#/components/schemas/Transaction/properties/paymentType"
+            },
+            "isOnline": {
+              "$ref": "#/components/schemas/Transaction/properties/isOnline"
+            },
+            "amount": {
+              "$ref": "#/components/schemas/Transaction/properties/amount"
+            },
+            "motive": {
+              "$ref": "#/components/schemas/Transaction/properties/motive"
+            },
+            "refundMotive": {
+              "$ref": "#/components/schemas/Transaction/properties/refundMotive"
+            },
+            "sector": {
+              "$ref": "#/components/schemas/Transaction/properties/sector"
+            },
+            "packagedAmount": {
+              "$ref": "#/components/schemas/Transaction/properties/packagedAmount"
+            },
+            "dateCreatedDay": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/dateCreatedDay"
+                }
+              ],
+              "description": "A range for creation day. It will filter from 00:00Hs to 23:59:59Hs of the given range.\n\nIf this filter is not sent, by default the results are limited to one month from the current date.\n"
+            },
+            "userCreated": {
+              "$ref": "#/components/schemas/Transaction/properties/userCreated"
+            },
+            "status": {
+              "$ref": "#/components/schemas/Transaction/properties/status"
+            }
+          }
+        }
+      },
+      "TransactionMotiveSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "name",
+            "referenceId",
+            "userCreated",
+            "userModified",
+            "dateCreated",
+            "dateModified"
+          ]
+        }
+      },
+      "TransactionMotiveFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/TransactionMotive/properties/id"
+            },
+            "referenceId": {
+              "$ref": "#/components/schemas/TransactionMotive/properties/referenceId"
+            },
+            "name": {
+              "$ref": "#/components/schemas/TransactionMotive/properties/name"
+            },
+            "isInternal": {
+              "$ref": "#/components/schemas/TransactionMotive/properties/isInternal"
+            },
+            "dateCreatedDay": {
+              "$ref": "#/components/schemas/dateCreatedDay"
+            },
+            "dateModifiedDay": {
+              "$ref": "#/components/schemas/dateModifiedDay"
+            },
+            "userCreated": {
+              "$ref": "#/components/schemas/TransactionMotive/properties/userCreated"
+            },
+            "userModified": {
+              "$ref": "#/components/schemas/TransactionMotive/properties/userModified"
+            },
+            "status": {
+              "$ref": "#/components/schemas/TransactionMotive/properties/status"
+            }
+          }
+        }
+      },
+      "ValueTransporterSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "referenceId",
+            "name",
+            "title",
+            "document",
+            "status",
+            "dateCreated",
+            "userCreated",
+            "dateModified",
+            "userModified"
+          ]
+        }
+      },
+      "ValueTransporterFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/ValueTransporter/properties/id"
+            },
+            "referenceId": {
+              "$ref": "#/components/schemas/ValueTransporter/properties/referenceId"
+            },
+            "name": {
+              "$ref": "#/components/schemas/ValueTransporter/properties/name"
+            },
+            "title": {
+              "$ref": "#/components/schemas/ValueTransporter/properties/title"
+            },
+            "document": {
+              "$ref": "#/components/schemas/ValueTransporter/properties/document"
+            },
+            "dateCreatedDay": {
+              "$ref": "#/components/schemas/dateCreatedDay"
+            },
+            "dateModifiedDay": {
+              "$ref": "#/components/schemas/dateModifiedDay"
+            },
+            "userCreated": {
+              "$ref": "#/components/schemas/ValueTransporter/properties/userCreated"
+            },
+            "userModified": {
+              "$ref": "#/components/schemas/ValueTransporter/properties/userModified"
+            },
+            "status": {
+              "$ref": "#/components/schemas/ValueTransporter/properties/status"
+            }
+          }
+        }
+      }
+    },
+    "headers": {
+      "x-janis-total": {
+        "description": "The total amount of records in the list",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "responses": {
+      "GenericSuccess": {
+        "description": "Operation succeeded",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "SuccessResponse": {
+        "description": "A general success response (200)",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "description": "A message for success response",
+                  "example": "Success response"
+                }
+              }
+            }
+          }
+        }
+      },
+      "SuccessCreateResponse": {
+        "description": "The item was created",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "SuccessUpdateResponse": {
+        "description": "The item was updated",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "BadRequest": {
+        "description": "A client error has ocurred.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Authentication missing or invalid",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Not authorized request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Conflict": {
+        "description": "The request can not be satisfied because the current state is incompatible with what is required",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "InternalError": {
+        "description": "A server error has ocurred."
+      }
+    }
+  }
+}

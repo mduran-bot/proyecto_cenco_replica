@@ -1,0 +1,93 @@
+[
+  {
+    "metadata_sucursal":"Sucursal Centro",
+    "estado":"completado",
+    "total_monto":15281.79,
+    "promedio_monto":5093.93,
+    "min_monto":280.0,
+    "max_monto":12500.99,
+    "num_registros":3,
+    "_quality_valid":true,
+    "_quality_issues":"",
+    "_error_handled":false,
+    "_processing_timestamp":"2026-02-19T16:13:21.079622"
+  },
+  {
+    "metadata_sucursal":"Sucursal Centro",
+    "estado":"pendiente",
+    "total_monto":350.0,
+    "promedio_monto":350.0,
+    "min_monto":350.0,
+    "max_monto":350.0,
+    "num_registros":1,
+    "_quality_valid":true,
+    "_quality_issues":"",
+    "_error_handled":false,
+    "_processing_timestamp":"2026-02-19T16:13:21.079622"
+  },
+  {
+    "metadata_sucursal":"Sucursal Norte",
+    "estado":"cancelado",
+    "total_monto":450.0,
+    "promedio_monto":450.0,
+    "min_monto":450.0,
+    "max_monto":450.0,
+    "num_registros":1,
+    "_quality_valid":true,
+    "_quality_issues":"",
+    "_error_handled":false,
+    "_processing_timestamp":"2026-02-19T16:13:21.079622"
+  },
+  {
+    "metadata_sucursal":"Sucursal Norte",
+    "estado":"completado",
+    "total_monto":850.5,
+    "promedio_monto":850.5,
+    "min_monto":850.5,
+    "max_monto":850.5,
+    "num_registros":1,
+    "_quality_valid":true,
+    "_quality_issues":"",
+    "_error_handled":false,
+    "_processing_timestamp":"2026-02-19T16:13:21.079622"
+  },
+  {
+    "metadata_sucursal":"Sucursal Norte",
+    "estado":"pendiente",
+    "total_monto":1200.0,
+    "promedio_monto":1200.0,
+    "min_monto":1200.0,
+    "max_monto":1200.0,
+    "num_registros":1,
+    "_quality_valid":true,
+    "_quality_issues":"",
+    "_error_handled":false,
+    "_processing_timestamp":"2026-02-19T16:13:21.079622"
+  },
+  {
+    "metadata_sucursal":"Sucursal Sur",
+    "estado":"completado",
+    "total_monto":8800.0,
+    "promedio_monto":4400.0,
+    "min_monto":3200.0,
+    "max_monto":5600.0,
+    "num_registros":2,
+    "_quality_valid":true,
+    "_quality_issues":"",
+    "_error_handled":false,
+    "_processing_timestamp":"2026-02-19T16:13:21.079622"
+  },
+  {
+    "metadata_sucursal":"Sucursal Sur",
+    "estado":"rechazado",
+    "total_monto":890.0,
+    "promedio_monto":890.0,
+    "min_monto":890.0,
+    "max_monto":890.0,
+    "num_registros":1,
+    "_quality_valid":true,
+    "_quality_issues":"",
+    "_error_handled":false,
+    "_processing_timestamp":"2026-02-19T16:13:21.079622"
+  }
+]

@@ -1,0 +1,2214 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Control Service",
+    "description": "Control Service\n\n **Last update**: 10 dic 25, 02:28 p. m.",
+    "version": "1.10.0",
+    "x-logo": null,
+    "x-janis-keywords": [
+      "control"
+    ],
+    "lastUpdate": "2025-12-10T17:28:56.478Z"
+  },
+  "tags": [
+    {
+      "name": "Control",
+      "description": "The control registry management"
+    },
+    {
+      "name": "Webhooks",
+      "description": "This section documents the webhook events triggered by control.\n\nTo learn more about Webhooks configuration, see the [Webhooks Documentation](https://docs.janis.im/docs/webhook)\n"
+    }
+  ],
+  "servers": [
+    {
+      "url": "https://control.janis.in/api",
+      "description": "The Prod API server",
+      "variables": {
+        "environment": {
+          "default": "prod"
+        }
+      }
+    },
+    {
+      "url": "https://control.janisqa.in/api",
+      "description": "The QA API server",
+      "variables": {
+        "environment": {
+          "default": "qa"
+        }
+      }
+    },
+    {
+      "url": "https://control.janisdev.in/api",
+      "description": "The Beta API server",
+      "variables": {
+        "environment": {
+          "default": "beta"
+        }
+      }
+    },
+    {
+      "url": "http://control.janis.localhost:3106/api",
+      "description": "The Local API server",
+      "variables": {
+        "environment": {
+          "default": "local"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/control/{id}": {
+      "get": {
+        "x-janis-namespace": "control",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "control:control:read"
+        ],
+        "x-janis-roles": [
+          "pickingControl"
+        ],
+        "operationId": "getControl",
+        "tags": [
+          "Control"
+        ],
+        "summary": "Get a Control registry",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A Control was found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ControlGet"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "x-janis-namespace": "control",
+        "x-janis-method": "update",
+        "x-janis-permissions": [
+          "control:control:write"
+        ],
+        "operationId": "updateControl",
+        "tags": [
+          "Control"
+        ],
+        "summary": "Update a Control registry",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "requestBody": {
+          "description": "A Control",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ControlToUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessUpdateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/control": {
+      "get": {
+        "x-janis-namespace": "control",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "control:control:read"
+        ],
+        "x-janis-roles": [
+          "pickingControl"
+        ],
+        "operationId": "listControls",
+        "tags": [
+          "Control"
+        ],
+        "summary": "List the Controls registries",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ControlSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ControlFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Controls registries listed",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ControlList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "x-janis-namespace": "control",
+        "x-janis-method": "create",
+        "x-janis-permissions": [
+          "control:control:write"
+        ],
+        "x-janis-roles": [
+          "pickingControl"
+        ],
+        "operationId": "createControl",
+        "tags": [
+          "Control"
+        ],
+        "summary": "Create a Control registry",
+        "description": "This creates the Control registry and start the process like complete data, and check content.\n\n**DISCLAIMER** At the moment, any entity is going to be processed, only creates the registries.\n",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "A Control registry",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BaseControl"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessCreateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/control/{id}/end": {
+      "post": {
+        "x-janis-namespace": "control",
+        "x-janis-method": "end",
+        "x-janis-permissions": [
+          "control:control:write"
+        ],
+        "x-janis-roles": [
+          "pickingControl"
+        ],
+        "operationId": "controlEnd",
+        "tags": [
+          "Control"
+        ],
+        "summary": "Finish a control",
+        "description": "Perform the last validations to finalize the control\n",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "example": "631fb04c8fe08f51a8ee5949"
+            },
+            "description": "The control id",
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "description": "The content to validate the control",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EndControl"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The control ended"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/control/{id}/start": {
+      "post": {
+        "x-janis-namespace": "control",
+        "x-janis-method": "start",
+        "x-janis-permissions": [
+          "control:control:write"
+        ],
+        "x-janis-roles": [
+          "pickingControl"
+        ],
+        "operationId": "controlStart",
+        "tags": [
+          "Control"
+        ],
+        "summary": "Start a control",
+        "description": "Determines the start of a control.\n\nThe returned token must be used at the [end of the control](#operation/controlEnd).\n",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "631fb04c8fe08f51a8ee5949"
+            },
+            "description": "The control id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Control started",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string",
+                      "description": "The control token",
+                      "example": "f1e012bf-ec7c-433b-b67b-9d94d95db6ca"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/control-rule/{id}": {
+      "get": {
+        "x-janis-namespace": "control-rule",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "control:control-rule:read"
+        ],
+        "operationId": "getControlRule",
+        "tags": [
+          "Control Rules"
+        ],
+        "summary": "Get one",
+        "description": "Get a Control Rule by ID",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A Control Rule was found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/OrderControlRule"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "x-janis-namespace": "control-rule",
+        "x-janis-method": "update",
+        "x-janis-permissions": [
+          "control:control-rule:write"
+        ],
+        "operationId": "updateControlRule",
+        "tags": [
+          "Control Rules"
+        ],
+        "summary": "Update one",
+        "description": "Update a Control Rule by ID",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "requestBody": {
+          "description": "The Control Rule data",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ControlRuleRequestBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The Control Rule was updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "$ref": "#/components/schemas/BaseControlRule/properties/id"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/control-rule": {
+      "get": {
+        "x-janis-namespace": "control-rule",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "control:control-rule:read"
+        ],
+        "operationId": "listControlRule",
+        "tags": [
+          "Control Rules"
+        ],
+        "summary": "Get many",
+        "description": "Get a list of Control Rules",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ControlRulesSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ControlRulesFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The Control Rule list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ControlRuleList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "x-janis-namespace": "control-rule",
+        "x-janis-method": "create",
+        "x-janis-permissions": [
+          "control:control-rule:write"
+        ],
+        "operationId": "createControlRule",
+        "tags": [
+          "Control Rule"
+        ],
+        "summary": "Create a Control Rule",
+        "description": "This creates the Control Rule.\n",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "The Control Rule data",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ControlRuleRequestBody"
+              },
+              "examples": {
+                "Control rule for order": {
+                  "value": {
+                    "description": "The order must have a total amount greater than or equal to 10000",
+                    "entity": "order",
+                    "validators": [
+                      {
+                        "name": "totalAmountGreaterThanOrEqual",
+                        "value": 10000
+                      }
+                    ],
+                    "status": "active"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessCreateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/control-rule-validator": {
+      "get": {
+        "x-janis-namespace": "control-rule-validator",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "control:control-rule-validator:read"
+        ],
+        "operationId": "getControlRuleValidatorSchema",
+        "tags": [
+          "Control Rule"
+        ],
+        "summary": "Get a Control Rule Validator schema",
+        "description": "This returns the schema of the validator for the given entity and validator name.\n",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ControlRuleEntity"
+          },
+          {
+            "$ref": "#/components/parameters/ControlRuleValidatorName"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GenericSuccess"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/order-control": {
+      "post": {
+        "x-janis-namespace": "order",
+        "x-janis-method": "control",
+        "x-janis-permissions": [],
+        "operationId": "orderControl",
+        "tags": [
+          "Order Hooks"
+        ],
+        "summary": "OMS orderControl hook",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "The order hook notification",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OMSOrderHookNotification"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GenericSuccess"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/setting/{entity}": {
+      "get": {
+        "x-janis-namespace": "setting",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "control:setting:read"
+        ],
+        "operationId": "getSetting",
+        "tags": [
+          "Settings"
+        ],
+        "summary": "Get by entity",
+        "description": "Get the settings available for a given entity",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "entity",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "example": "order"
+            },
+            "required": true,
+            "description": "The name of the entity that owns the settings to be retrieved"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The settings were retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/OrderControlSettings"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "x-janis-namespace": "setting",
+        "x-janis-method": "update",
+        "x-janis-permissions": [
+          "control:setting:write"
+        ],
+        "operationId": "updateSetting",
+        "tags": [
+          "Settings"
+        ],
+        "summary": "Update by entity",
+        "description": "Update the settings available for a given entity",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "entity",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "example": "order"
+            },
+            "required": true,
+            "description": "The name of the entity that owns the settings to be updated"
+          }
+        ],
+        "requestBody": {
+          "description": "The settings configurations",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/OrderControlSettings"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The settings were updated"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-key",
+        "description": "The API Key"
+      },
+      "ApiSecret": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-secret",
+        "description": "The API Secret"
+      },
+      "JanisClient": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-client",
+        "description": "The Client Code"
+      }
+    },
+    "parameters": {
+      "id": {
+        "name": "id",
+        "in": "path",
+        "schema": {
+          "type": "string",
+          "example": "d555345345345as67a342a"
+        },
+        "required": true,
+        "description": "The unique identifier of the item"
+      },
+      "ListSortDirection": {
+        "name": "sortDirection",
+        "in": "query",
+        "description": "The direction to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
+        }
+      },
+      "ListPageNumber": {
+        "name": "x-janis-page",
+        "in": "header",
+        "description": "The page to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "default": 1
+        }
+      },
+      "ListPageSize": {
+        "name": "x-janis-page-size",
+        "in": "header",
+        "description": "The page size to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "default": 60
+        }
+      },
+      "JanisEntity": {
+        "name": "janis-entity",
+        "in": "header",
+        "description": "The entity name",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "ControlSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "warehouseId",
+            "dateModified",
+            "status"
+          ]
+        }
+      },
+      "ControlFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/BaseControl/properties/id"
+            },
+            "displayId": {
+              "$ref": "#/components/schemas/BaseControl/properties/displayId"
+            },
+            "entity": {
+              "$ref": "#/components/schemas/BaseControl/properties/entity"
+            },
+            "entityId": {
+              "$ref": "#/components/schemas/BaseControl/properties/entityId"
+            },
+            "entityReferenceId": {
+              "$ref": "#/components/schemas/BaseControl/properties/entityId"
+            },
+            "warehouseId": {
+              "$ref": "#/components/schemas/BaseControl/properties/warehouseId"
+            },
+            "controllerId": {
+              "$ref": "#/components/schemas/BaseControl/properties/controllerId"
+            },
+            "status": {
+              "$ref": "#/components/schemas/status"
+            }
+          }
+        }
+      },
+      "ControlRulesSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "entity",
+            "status",
+            "dateCreated"
+          ]
+        }
+      },
+      "ControlRulesFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/BaseControlRule/properties/id"
+            },
+            "entity": {
+              "description": "This represent the entity to be controlled.\n\n- [**order**](/v2/service/oms#tag/Orders)\n",
+              "type": "string",
+              "enum": [
+                "order"
+              ],
+              "example": "order"
+            },
+            "status": {
+              "$ref": "#/components/schemas/BaseControlRule/properties/status"
+            },
+            "dateCreatedRange": {
+              "type": "object",
+              "description": "A range for creation day",
+              "properties": {
+                "from": {
+                  "type": "string",
+                  "description": "The beginning of the range",
+                  "format": "date-time",
+                  "example": "2019-11-27T16:08:24.994Z"
+                },
+                "to": {
+                  "type": "string",
+                  "description": "The end of the range",
+                  "format": "date-time",
+                  "example": "2019-11-30T16:08:24.994Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ControlRuleEntity": {
+        "in": "query",
+        "name": "entity",
+        "description": "The entity to validate",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "order"
+          ],
+          "example": "order"
+        }
+      },
+      "ControlRuleValidatorName": {
+        "in": "query",
+        "name": "validator",
+        "description": "The validator name",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "totalAmountGreaterThanOrEqual"
+          ],
+          "example": "totalAmountGreaterThanOrEqual"
+        }
+      }
+    },
+    "headers": {
+      "x-janis-total": {
+        "description": "The total amount of records in the list",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "responses": {
+      "SuccessCreateResponse": {
+        "description": "The item was created",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "SuccessUpdateResponse": {
+        "description": "The item was updated",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "GenericSuccess": {
+        "description": "Operation succeeded",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "BadRequest": {
+        "description": "A client error has ocurred.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Authentication missing or invalid",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Not authorized request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "InternalError": {
+        "description": "A server error has ocurred."
+      }
+    },
+    "schemas": {
+      "id": {
+        "description": "The unique identifier of the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "d555345345345as67a342a"
+      },
+      "status": {
+        "description": "The item status",
+        "type": "string",
+        "default": "active",
+        "enum": [
+          "active",
+          "inactive"
+        ],
+        "example": "active"
+      },
+      "dateCreated": {
+        "description": "The date of creation",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-12T19:00:00.000Z"
+      },
+      "dateModified": {
+        "description": "The date of the last modification",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-20T19:00:00.000Z"
+      },
+      "dateCreatedDay": {
+        "description": "The day of creation",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-08-07T16:00:00.000Z"
+      },
+      "dateModifiedDay": {
+        "description": "The day of last modification",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-08-07T16:00:00.000Z"
+      },
+      "userCreated": {
+        "description": "The ID of the user who created the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "6a1fc1eeb5b68406e0487a10"
+      },
+      "userModified": {
+        "description": "The ID of the user who last modified the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "7e1fc1eeb5b68406e048796"
+      },
+      "BaseControl": {
+        "type": "object",
+        "description": "A Control registry",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "displayId": {
+            "description": "A Display ID",
+            "type": "string",
+            "readOnly": true,
+            "example": "221125-XQZCP8"
+          },
+          "entity": {
+            "description": "This represent the entity to be controlled.\n\n- [**order**](/v2/service/oms#tag/Orders)\n",
+            "type": "string",
+            "enum": [
+              "order",
+              "session",
+              "package",
+              "route"
+            ],
+            "example": "order"
+          },
+          "entityId": {
+            "description": "The entity's id",
+            "type": "string",
+            "example": "62f2ae6f45ce8027d2a3226e"
+          },
+          "entityReferenceId": {
+            "description": "The entity alternative ID, for `order` is `commerceId`",
+            "type": "string",
+            "example": "AHJ-2001",
+            "readOnly": true
+          },
+          "packageCount": {
+            "description": "The quantity of the packages in the content",
+            "type": "number",
+            "example": 2,
+            "readOnly": true
+          },
+          "positions": {
+            "description": "Item positions",
+            "type": "array",
+            "readOnly": true,
+            "items": {
+              "type": "string",
+              "example": "AHJ-20"
+            }
+          },
+          "warehouseId": {
+            "description": "This represent the `id` from the [Warehouse](/v2/service/wms#tag/Warehouses) where the control take place",
+            "type": "string",
+            "example": "62f2c2bba6e7d9ccf1b7faa2"
+          },
+          "warehouseName": {
+            "description": "This represent the `name` from the [Warehouse](/v2/service/wms#tag/Warehouses) where the control take place",
+            "type": "string",
+            "example": "Central Depot",
+            "readOnly": true
+          },
+          "controllerId": {
+            "description": "This represent the `id` of the **Controller**",
+            "type": "string",
+            "example": "62f2c3db93a9aa236c4fd9ba"
+          },
+          "results": {
+            "$ref": "#/components/schemas/ControlResult"
+          },
+          "previousResults": {
+            "description": "The results of previous process",
+            "type": "array",
+            "readOnly": true,
+            "items": {
+              "$ref": "#/components/schemas/ControlResults"
+            }
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "status": {
+            "description": "The control auditory status.\n\n- **processingContent**: When the control is created and his content is being processed\n- **pending**: The control has been processed and is pending to begin\n- **inProgress**: The control is in progress\n- **processingResults**: When the control is processing the results\n- **pendingToFix**: When the control finish to process the results but there are content that needs to be fixed\n- **finished**: The control is finished and the results are the expected\n- **error**: When the control cannot be completed or processed\n",
+            "type": "string",
+            "readOnly": true,
+            "enum": [
+              "processingContent",
+              "pending",
+              "inProgress",
+              "processingResults",
+              "pendingToFix",
+              "finished"
+            ],
+            "default": "processingContent",
+            "example": "finished"
+          }
+        },
+        "required": [
+          "id",
+          "entity",
+          "entityId",
+          "warehouseId"
+        ]
+      },
+      "ControlGet": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseControl"
+          },
+          {
+            "properties": {
+              "content": {
+                "type": "array",
+                "readOnly": true,
+                "items": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ControlItemContent"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ControlPackageContent"
+                    }
+                  ]
+                }
+              },
+              "contentToValidate": {
+                "type": "array",
+                "readOnly": true,
+                "items": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/OrderContentToValidate"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        ]
+      },
+      "ControlItemContent": {
+        "type": "object",
+        "description": "A item picked",
+        "properties": {
+          "type": {
+            "description": "The type of content",
+            "type": "string",
+            "enum": [
+              "item"
+            ],
+            "example": "item"
+          },
+          "orderId": {
+            "description": "This refers to the `id` of the **Order** in Janis OMS Service. See [Order](v2/service/oms#tag/Order)",
+            "type": "string",
+            "example": "5e0b50a01bed69bea7a7e6c8"
+          },
+          "id": {
+            "type": "string",
+            "description": "A unique identifier for the current picking result item. This will be always autogenerated based on the purchased item id.",
+            "example": "590BFDDC88AC4006B7A6A841192A8D91-0",
+            "readOnly": true
+          },
+          "isSubstitute": {
+            "type": "boolean",
+            "description": "Indicates if the picked item is a substitute for the original order item",
+            "example": false,
+            "readOnly": true
+          },
+          "ean": {
+            "type": "string",
+            "description": "The order item picked **EAN**",
+            "example": "7002454588878"
+          },
+          "isCandidate": {
+            "type": "boolean",
+            "description": "Indicates if an item is a candidate for the customer's final choice",
+            "example": true
+          },
+          "eanCount": {
+            "type": "number",
+            "description": "The amount of items with the same EAN that were picked",
+            "example": 2
+          },
+          "quantityPerEan": {
+            "type": "number",
+            "description": "The quantity of the current picked item for each picked EAN (the measurement unit of this field is the one in `measurementUnit`)",
+            "example": 1,
+            "readOnly": true
+          },
+          "totalQuantity": {
+            "type": "number",
+            "description": "The total amount quantity of the current picked item (the measurement unit of this field is the one in `measurementUnit`)",
+            "example": 1,
+            "readOnly": true
+          },
+          "pickerId": {
+            "type": "string",
+            "description": "The ID of the picker that performed the picking process",
+            "example": "5e163e457c1e2000083be886"
+          },
+          "price": {
+            "type": "number",
+            "description": "The price of each quantity of `sellingMeasurementUnit`s of the picked item. If this is not sent, will be autocompleted from Pricing prices.",
+            "example": 78.5
+          },
+          "name": {
+            "type": "string",
+            "description": "The item name",
+            "example": "Coca Cola 1.5L",
+            "nullable": true
+          },
+          "refId": {
+            "type": "string",
+            "description": "The picked product reference ID. If this is not sent, will be autocompleted from Catalog products.",
+            "example": "54987145487"
+          },
+          "sellingMeasurementUnit": {
+            "type": "string",
+            "description": "The item **Measurement Unit** that is used for selling the product. If this is not sent, will be autocompleted from Catalog products.",
+            "example": "un",
+            "nullable": true
+          },
+          "sellingUnitMultiplier": {
+            "type": "number",
+            "description": "The item **Unit Multiplier** that is used for selling the product. If this is not sent, will be autocompleted from Catalog products.",
+            "example": 1,
+            "nullable": true
+          },
+          "measurementUnit": {
+            "type": "string",
+            "description": "The item **Measurement Unit** of the product. This will be used for invoice process later. If this is not sent, will be autocompleted from Catalog products.",
+            "example": "un",
+            "nullable": true
+          },
+          "unitMultiplier": {
+            "type": "number",
+            "description": "The item **Unit Multiplier** of the product. This will be used for invoice process later. If this is not sent, will be autocompleted from Catalog products.",
+            "example": 1,
+            "nullable": true
+          },
+          "imageUrl": {
+            "type": "string",
+            "description": "The item image URL. If this is not sent, will be autocompleted from Catalog products.",
+            "example": "https://s3-eu-west-1.amazonaws.com/images.linnlive.com/b4cd1a0cb6423a903a87b5635027e08b/f40c553b-33a5-460f-9962-a4e660c7ef02.jpg",
+            "nullable": true
+          },
+          "productGroups": {
+            "type": "array",
+            "description": "A **Product Groups**. See [Product Groups](/v2/service/catalog#tag/Product-Group)",
+            "readOnly": true,
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "The **Product Groups** `id` in Janis Catalog Service",
+                  "example": "5f7f49d58c0b53000729e51d"
+                },
+                "name": {
+                  "type": "string",
+                  "description": "The **Product Groups** `name` in Janis Catalog Service",
+                  "example": "Promotion"
+                },
+                "referenceId": {
+                  "type": "string",
+                  "description": "The **Product Groups** `referenceId` in Janis Catalog Service",
+                  "example": "promo"
+                },
+                "icon": {
+                  "type": "string",
+                  "description": "The **Product Groups** `icon` in Janis Catalog Service",
+                  "example": "gift"
+                }
+              }
+            }
+          },
+          "time": {
+            "type": "number",
+            "description": "The time in seconds spent in the picking process of this item",
+            "example": 10
+          },
+          "locations": {
+            "type": "array",
+            "description": "A list of locations related to the picked item",
+            "items": {
+              "type": "object",
+              "description": "The location related to the picked item",
+              "properties": {
+                "warehouseId": {
+                  "type": "string",
+                  "description": "This refers to the `id` of an **Warehouse**. See [Warehouse](/v2/service/wms#operation/getWarehouse)",
+                  "example": "d555345345345as67a342a"
+                },
+                "positionKey": {
+                  "type": "string",
+                  "description": "Item location in warehouse",
+                  "example": "d555345345345as67a342a"
+                },
+                "quantity": {
+                  "type": "number",
+                  "description": "Item quantity of the related location",
+                  "example": 1
+                }
+              }
+            }
+          },
+          "packageId": {
+            "type": "string",
+            "description": "The ID of the package where it belongs",
+            "example": "61d6d46bf62ab2000918118e",
+            "nullable": true
+          },
+          "isAdditional": {
+            "$ref": "#/components/schemas/ControlIsAdditional"
+          },
+          "needFix": {
+            "$ref": "#/components/schemas/ControlNeedsFix"
+          },
+          "fixed": {
+            "$ref": "#/components/schemas/ControlFixed"
+          },
+          "controlResult": {
+            "$ref": "#/components/schemas/ControlItemResult"
+          },
+          "controlResultByPackage": {
+            "$ref": "#/components/schemas/ControlItemResultByPackage"
+          }
+        }
+      },
+      "ControlItemResult": {
+        "type": "object",
+        "description": "The results of the Control",
+        "readOnly": true,
+        "properties": {
+          "expectedQuantity": {
+            "description": "The expected quantity to be picked",
+            "type": "number",
+            "example": 1
+          },
+          "foundQuantity": {
+            "description": "The found quantity to be picked",
+            "type": "number",
+            "example": 1
+          },
+          "missingQuantity": {
+            "description": "The missing quantity to be picked",
+            "type": "number",
+            "example": 0
+          },
+          "additionalQuantity": {
+            "description": "The additional quantity to be picked",
+            "type": "number",
+            "example": 0
+          }
+        }
+      },
+      "ControlItemResultByPackage": {
+        "type": "object",
+        "description": "The results by Packages.\n\nAn object with the `packageId` as keys.\n",
+        "additionalProperties": {
+          "$ref": "#/components/schemas/ControlItemResult"
+        }
+      },
+      "ControlPackageContent": {
+        "type": "object",
+        "description": "A picked **Package**",
+        "properties": {
+          "type": {
+            "description": "The type of content",
+            "type": "string",
+            "enum": [
+              "package"
+            ]
+          },
+          "ean": {
+            "type": "string",
+            "description": "Package identification code.\n\nIt is required if `packageTypeId` is not passed.\n",
+            "example": "PLC-1234"
+          },
+          "packageTypeId": {
+            "type": "string",
+            "description": "This refers to the `id` of an **Package Type**. See [Package Type](/v2/service/packing#operation/listPackageType)\n\nIt is required if `ean` is not passed.\n",
+            "example": "5d1fc1eeb5b68406e0487a07"
+          },
+          "referenceId": {
+            "type": "string",
+            "description": "This refers to the `referenceId` of the **Package**.\n",
+            "nullable": true,
+            "example": "package-reference"
+          },
+          "location": {
+            "type": "object",
+            "description": "A location **Package**",
+            "properties": {
+              "warehouseId": {
+                "type": "string",
+                "description": "This refers to the `id` in the **Warehouse** Entity. See [Warehouse](/v2/service/wms#tag/Warehouse).\n\nIt is required in location.\n",
+                "example": "6b8bdac48ba45b0011913909"
+              },
+              "position": {
+                "type": "string",
+                "description": "Package location in warehouse.",
+                "example": "PLC-1234"
+              }
+            }
+          },
+          "orderItems": {
+            "type": "array",
+            "description": "A list of order items picked and assigned to the package.",
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "The pickingResult id",
+                      "example": "5d1fc1eeb5b68406e0487a09"
+                    },
+                    "quantity": {
+                      "type": "integer",
+                      "description": "The item quantity",
+                      "example": 1
+                    }
+                  }
+                },
+                {
+                  "type": "string",
+                  "deprecated": true,
+                  "description": "The item id. **Deprecated**",
+                  "example": "5d1fc1eeb5b68406e0487a09"
+                }
+              ]
+            }
+          },
+          "isAdditional": {
+            "$ref": "#/components/schemas/ControlIsAdditional"
+          },
+          "needFix": {
+            "$ref": "#/components/schemas/ControlNeedsFix"
+          },
+          "fixed": {
+            "$ref": "#/components/schemas/ControlFixed"
+          },
+          "controlResult": {
+            "$ref": "#/components/schemas/ControlItemResult"
+          }
+        }
+      },
+      "ControlResult": {
+        "type": "object",
+        "description": "The results of the Control",
+        "readOnly": true,
+        "properties": {
+          "expected": {
+            "description": "The expected quantity to be picked",
+            "type": "number",
+            "example": 1
+          },
+          "found": {
+            "description": "The found quantity to be picked",
+            "type": "number",
+            "example": 1
+          },
+          "missing": {
+            "description": "The missing quantity to be picked",
+            "type": "number",
+            "example": 0
+          },
+          "additional": {
+            "description": "The additional quantity to be picked",
+            "type": "number",
+            "example": 0
+          },
+          "fixed": {
+            "description": "The fixed content",
+            "type": "number",
+            "example": 0
+          }
+        }
+      },
+      "PackageItemsControlResult": {
+        "type": "object",
+        "description": "The Package Items results of the Control",
+        "readOnly": true,
+        "properties": {
+          "expected": {
+            "description": "The expected quantity of items to be found in packages",
+            "type": "number",
+            "example": 1
+          },
+          "found": {
+            "description": "The found quantity of items in packages",
+            "type": "number",
+            "example": 1
+          },
+          "missing": {
+            "description": "The missing quantity of items in packages",
+            "type": "number",
+            "example": 0
+          },
+          "additional": {
+            "description": "The quantity of items that does not belong to any package but were found in packages",
+            "type": "number",
+            "example": 1
+          },
+          "wrong": {
+            "description": "The quantity of items that belongs to a package but were found in a different package (misplaced)",
+            "type": "number",
+            "example": 0
+          }
+        }
+      },
+      "ControlResults": {
+        "description": "The results when the Control is finished",
+        "type": "object",
+        "readOnly": true,
+        "properties": {
+          "items": {
+            "$ref": "#/components/schemas/ControlResult"
+          },
+          "packages": {
+            "$ref": "#/components/schemas/ControlResult"
+          },
+          "packageItems": {
+            "$ref": "#/components/schemas/PackageItemsControlResult"
+          },
+          "unknowns": {
+            "$ref": "#/components/schemas/ControlResult"
+          }
+        }
+      },
+      "ControlIsAdditional": {
+        "type": "boolean",
+        "description": "Indicate if the content is not expected.",
+        "readOnly": true,
+        "example": false
+      },
+      "ControlNeedsFix": {
+        "type": "boolean",
+        "description": "Indicate if the content needs to be fixed. The found quantity is higher or lower than the expected one.",
+        "readOnly": true,
+        "example": false
+      },
+      "ControlFixed": {
+        "type": "boolean",
+        "description": "Indicate if the content was fixed. The found quantity were higher or lower than the expected one but now it is correct.",
+        "readOnly": true,
+        "example": false
+      },
+      "ControlList": {
+        "type": "array",
+        "description": "A list of Controls registries",
+        "items": {
+          "$ref": "#/components/schemas/BaseControl"
+        }
+      },
+      "ControlToUpdate": {
+        "type": "object",
+        "description": "A Control registry to be updated",
+        "properties": {
+          "controllerId": {
+            "$ref": "#/components/schemas/BaseControl/properties/controllerId"
+          }
+        }
+      },
+      "EndControl": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/OrderEndControl"
+          }
+        ]
+      },
+      "EndControlToken": {
+        "description": "The token of the control",
+        "type": "string",
+        "example": "7f2ba1ce6c94f2f9bbd21260efc778fa"
+      },
+      "OrderEndControl": {
+        "type": "object",
+        "description": "The content to validate a Control of an Order",
+        "properties": {
+          "token": {
+            "$ref": "#/components/schemas/EndControlToken"
+          },
+          "productGroups": {
+            "$ref": "#/components/schemas/ControlItemContent/properties/productGroups"
+          },
+          "content": {
+            "description": "The content to validate",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderContentToValidate"
+            }
+          }
+        },
+        "required": [
+          "token",
+          "content"
+        ]
+      },
+      "OrderContentToValidate": {
+        "type": "object",
+        "description": "The content to validate for a Control's Order type",
+        "properties": {
+          "ean": {
+            "$ref": "#/components/schemas/ControlItemContent/properties/ean"
+          },
+          "type": {
+            "$ref": "#/components/schemas/ControlItemContent/properties/type"
+          },
+          "price": {
+            "$ref": "#/components/schemas/ControlItemContent/properties/price"
+          },
+          "name": {
+            "$ref": "#/components/schemas/ControlItemContent/properties/name"
+          },
+          "refId": {
+            "$ref": "#/components/schemas/ControlItemContent/properties/refId"
+          },
+          "sellingMeasurementUnit": {
+            "$ref": "#/components/schemas/ControlItemContent/properties/sellingMeasurementUnit"
+          },
+          "sellingUnitMultiplier": {
+            "$ref": "#/components/schemas/ControlItemContent/properties/sellingUnitMultiplier"
+          },
+          "imageUrl": {
+            "$ref": "#/components/schemas/ControlItemContent/properties/imageUrl"
+          },
+          "packageId": {
+            "$ref": "#/components/schemas/ControlItemContent/properties/packageId"
+          },
+          "productGroupIds": {
+            "type": "array",
+            "description": "The **Product Groups** IDs.",
+            "items": {
+              "type": "string",
+              "example": "7e0b50a01bed69bea7a7e6c9"
+            }
+          },
+          "controlResult": {
+            "type": "object",
+            "description": "The results of the Control. `foundQuantity` represents the `eanCount` (or how many times the same `ean` is repeated)",
+            "properties": {
+              "foundQuantity": {
+                "$ref": "#/components/schemas/ControlItemResult/properties/foundQuantity"
+              }
+            }
+          }
+        },
+        "required": [
+          "ean",
+          "controlResult"
+        ]
+      },
+      "BaseControlRule": {
+        "type": "object",
+        "description": "A Control Rule",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "description": {
+            "description": "A human readable description of the rule",
+            "type": "string",
+            "default": "",
+            "example": "The order must have a total amount greater than or equal to 100"
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/status"
+              }
+            ],
+            "default": "active"
+          }
+        }
+      },
+      "OrderControlRule": {
+        "title": "For Order",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseControlRule"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "entity": {
+                "description": "The entity to be validated. [**Order**](/v2/service/oms#tag/Orders)",
+                "type": "string",
+                "enum": [
+                  "order"
+                ],
+                "example": "order"
+              },
+              "validators": {
+                "type": "array",
+                "description": "The validators to be applied to the entity",
+                "items": {
+                  "type": "object",
+                  "description": "A validator to be applied to the entity",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "description": "The name of the validator",
+                      "enum": [
+                        "totalAmountGreaterThanOrEqual",
+                        "hasPaymentMethod",
+                        "itemHasCategory",
+                        "itemHasPickingWarehouse",
+                        "customerHasCluster"
+                      ],
+                      "example": "totalAmountGreaterThanOrEqual"
+                    },
+                    "value": {
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/OrderRuleValidatorNumberValue"
+                        },
+                        {
+                          "$ref": "#/components/schemas/OrderRuleValidatorCategoryValue"
+                        },
+                        {
+                          "$ref": "#/components/schemas/OrderRuleValidatorWarehouseValue"
+                        },
+                        {
+                          "$ref": "#/components/schemas/OrderRuleValidatorCustomerClusterValue"
+                        },
+                        {
+                          "$ref": "#/components/schemas/OrderRuleValidatorPaymentMethodValue"
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "value"
+                  ]
+                }
+              }
+            }
+          }
+        ]
+      },
+      "OrderRuleValidatorNumberValue": {
+        "title": "Number value",
+        "type": "number",
+        "description": "A value to check against.\n\n**It's required for validators:**\n  - `totalAmountGreaterThanOrEqual`\n",
+        "example": 10000
+      },
+      "OrderRuleValidatorCategoryValue": {
+        "title": "Catalog Category IDs",
+        "type": "array",
+        "items": {
+          "type": "string",
+          "description": "A list of `id` for [**Category**](/v2/service/catalog#tag/Category) in **Janis Catalog Service** to check against.\n\n**It's required for validator:**\n- `itemHasCategory`\n",
+          "example": "673d01b79e56387d3f1de082"
+        }
+      },
+      "OrderRuleValidatorWarehouseValue": {
+        "title": "WMS Warehouse IDs",
+        "type": "array",
+        "items": {
+          "type": "string",
+          "description": "A list of `id` for [**Warehouse**](/v2/service/wms#tag/Warehouse) in **Janis WMS Service** to check against.\n\n**It's required for validator:**\n- `itemHasPickingWarehouse`\n",
+          "example": "673d01b79e56387d3f1de130"
+        }
+      },
+      "OrderRuleValidatorCustomerClusterValue": {
+        "title": "CRM Customer Cluster IDs",
+        "type": "array",
+        "items": {
+          "type": "string",
+          "description": "A list of `id` for [**Cluster**](/v2/service/crm#tag/Cluster) in **Janis CRM Service** to check against.\n\n**It's required for validator:**\n- `customerHasCluster`\n",
+          "example": "5dd7f163c736de0011204175"
+        }
+      },
+      "OrderRuleValidatorPaymentMethodValue": {
+        "title": "Payment Method IDs",
+        "type": "array",
+        "items": {
+          "type": "string",
+          "description": "A list of `id` for [**Payment Method**](/v2/service/jef#tag/Payment-Method) in **Janis JEF Service** to check against.\n\n**It's required for validator:**\n- `hasPaymentMethod`\n",
+          "example": "673d01b79e56387d3f1de130"
+        }
+      },
+      "ControlRuleRequestBody": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/OrderControlRule"
+          }
+        ]
+      },
+      "ControlRuleList": {
+        "type": "array",
+        "description": "A list of Control Rules",
+        "items": {
+          "$ref": "#/components/schemas/OrderControlRule"
+        }
+      },
+      "OMSOrderHookNotification": {
+        "type": "object",
+        "description": "A notification for an Order Hook from Janis OMS",
+        "properties": {
+          "order": {
+            "type": "object",
+            "description": "An [OMS Order](/v2/service/oms#operation/getOrder). See full example there",
+            "example": {
+              "id": "672548af7b67d9a23f9a15d2"
+            }
+          },
+          "token": {
+            "type": "string",
+            "description": "A token to notify when task succeeds or fails"
+          }
+        }
+      },
+      "OrderControlSettings": {
+        "type": "object",
+        "description": "Order settings",
+        "title": "Order",
+        "properties": {
+          "allowControl": {
+            "type": "boolean",
+            "description": "This setting allows to control the orders",
+            "example": true,
+            "default": false
+          },
+          "orderControlCheckpoint": {
+            "type": "string",
+            "description": "This setting indicates the control check point",
+            "example": "beforeInvoice",
+            "enum": [
+              "beforeInvoice",
+              "afterInvoice"
+            ],
+            "default": null
+          }
+        }
+      },
+      "ControlWebhookService": {
+        "description": "The service that sends the message",
+        "type": "string",
+        "example": "webhook",
+        "enum": [
+          "webhook"
+        ]
+      },
+      "ControlWebhookEntity": {
+        "description": "The entity related to the event",
+        "type": "string",
+        "example": "control",
+        "enum": [
+          "control"
+        ]
+      },
+      "ControlWebhookMetadata": {
+        "description": "The control metadata",
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "The `id` of the [Control](#tag/Control) in Janis",
+            "type": "string",
+            "example": "d555345345345as67a342a"
+          },
+          "displayId": {
+            "description": "A Display ID. See [Control](/v2/service/control#operation/getControl)",
+            "type": "string",
+            "example": "221125-XQZCP8"
+          },
+          "entity": {
+            "description": "This represent the entity to be controlled. See [Control](/v2/service/control#operation/getControl)",
+            "type": "string",
+            "example": "order"
+          },
+          "entityId": {
+            "description": "The entity's id",
+            "type": "string",
+            "example": "62f2ae6f45ce8027d2a3226e"
+          },
+          "entityReferenceId": {
+            "description": "The entity alternative ID, for `order` is `commerceId`. See [Control](/v2/service/control#operation/getControl)",
+            "type": "string",
+            "example": "AHJ-2001"
+          },
+          "warehouseId": {
+            "description": "This represent the `id` from the [Warehouse](/v2/service/wms#tag/Warehouses) where the control take place",
+            "type": "string",
+            "example": "62f2c2bba6e7d9ccf1b7faa2"
+          },
+          "warehouseName": {
+            "description": "This represent the `name` from the [Warehouse](/v2/service/wms#tag/Warehouses) where the control take place",
+            "type": "string",
+            "example": "Central Depot"
+          }
+        }
+      }
+    }
+  },
+  "x-webhooks": {
+    "start": {
+      "post": {
+        "operationId": "controlStartWebhook",
+        "tags": [
+          "Webhooks"
+        ],
+        "summary": "The control started",
+        "description": "The control started",
+        "requestBody": {
+          "description": "The information about the event",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "service": {
+                    "$ref": "#/components/schemas/ControlWebhookService"
+                  },
+                  "entity": {
+                    "$ref": "#/components/schemas/ControlWebhookEntity"
+                  },
+                  "eventName": {
+                    "description": "The name of the event",
+                    "type": "string",
+                    "example": "started",
+                    "enum": [
+                      "started"
+                    ]
+                  },
+                  "metadata": {
+                    "$ref": "#/components/schemas/ControlWebhookMetadata"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GenericSuccess"
+          }
+        }
+      }
+    }
+  }
+}

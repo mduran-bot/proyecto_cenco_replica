@@ -1,0 +1,2002 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "description": "Conversation Service\n\n **Last update**: 08 ene 26, 12:30 p. m.",
+    "title": "Conversation Service",
+    "version": "1.13.1",
+    "lastUpdate": "2026-01-08T15:30:02.549Z",
+    "x-logo": null
+  },
+  "tags": [
+    {
+      "name": "Message",
+      "description": "For managing Messages"
+    },
+    {
+      "name": "Render",
+      "description": "For managing renders resources"
+    },
+    {
+      "name": "Template",
+      "description": "For managing templates resources"
+    },
+    {
+      "name": "Thread",
+      "description": "The following endpoints are used to create and fetch threads and their messages."
+    }
+  ],
+  "servers": [
+    {
+      "url": "https://conversation.janis.in/api",
+      "description": "The Prod API server",
+      "variables": {
+        "environment": {
+          "default": "prod"
+        }
+      }
+    },
+    {
+      "url": "https://conversation.janisqa.in/api",
+      "description": "The QA API server",
+      "variables": {
+        "environment": {
+          "default": "qa"
+        }
+      }
+    },
+    {
+      "url": "https://conversation.janisdev.in/api",
+      "description": "The Beta API server",
+      "variables": {
+        "environment": {
+          "default": "beta"
+        }
+      }
+    },
+    {
+      "url": "http://conversation.janis.localhost:3061/api",
+      "description": "The Local API server",
+      "variables": {
+        "environment": {
+          "default": "local"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/message/{id}": {
+      "get": {
+        "x-janis-namespace": "message",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "conversation:message:read"
+        ],
+        "operationId": "getMessage",
+        "tags": [
+          "Message"
+        ],
+        "summary": "Get a Message by ID",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "example": "d555345345345as67a342a"
+            },
+            "required": true,
+            "description": "The Message ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Message"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/message": {
+      "get": {
+        "x-janis-namespace": "message",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "conversation:message:read"
+        ],
+        "operationId": "listMessages",
+        "tags": [
+          "Message"
+        ],
+        "summary": "Get a list of messages",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/MessageSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/MessageFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "x-janis-namespace": "message",
+        "x-janis-method": "create",
+        "x-janis-permissions": [
+          "conversation:message:write"
+        ],
+        "operationId": "createMessage",
+        "tags": [
+          "Message"
+        ],
+        "summary": "Create a new message",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "A Message",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Message"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The message was created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "number",
+                      "description": "The message id",
+                      "example": "5d1fc1eeb5b68406e0487a06"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/render": {
+      "post": {
+        "x-janis-namespace": "render",
+        "x-janis-method": "render",
+        "x-janis-permissions": [
+          "conversation:template:read"
+        ],
+        "operationId": "renderTemplate",
+        "tags": [
+          "Render"
+        ],
+        "summary": "Render a template",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": []
+          }
+        ],
+        "requestBody": {
+          "description": "A Render",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Render"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The Render was created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "rendered": {
+                      "type": "string",
+                      "description": "The template rendered",
+                      "example": "Name: Jhon"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/template/{id}": {
+      "get": {
+        "x-janis-namespace": "template",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "conversation:template:read"
+        ],
+        "operationId": "getTemplate",
+        "tags": [
+          "Template"
+        ],
+        "summary": "Get a Template",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Template found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Template"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "x-janis-namespace": "template",
+        "x-janis-method": "update",
+        "x-janis-permissions": [
+          "conversation:template:write"
+        ],
+        "operationId": "updateTemplate",
+        "tags": [
+          "Template"
+        ],
+        "summary": "Update a Template",
+        "description": "\n**IMPORTANT**: If any property except `smtpId`, `phoneId` or `status` are updated, `canBeUpdated` property will\nbe saved as **false** regardless of whether in the same request is sent as **true**\n",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "example": "d555345345345as67a342a"
+            },
+            "required": true,
+            "description": "The Template ID"
+          }
+        ],
+        "requestBody": {
+          "description": "A Template",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Template"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The Template was updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "$ref": "#/components/schemas/BaseTemplate/properties/id"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/template": {
+      "get": {
+        "x-janis-namespace": "template",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "conversation:template:read"
+        ],
+        "operationId": "listTemplates",
+        "tags": [
+          "Template"
+        ],
+        "summary": "List Templates",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TemplateSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/TemplateFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Templates listed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TemplateList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/thread/{id}": {
+      "get": {
+        "x-janis-namespace": "thread",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "conversation:thread:read"
+        ],
+        "operationId": "getThread",
+        "tags": [
+          "Thread"
+        ],
+        "summary": "Get a Thread",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "example": "d555345345345as67a342a"
+            },
+            "required": true,
+            "description": "The Thread ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Thread found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Thread"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/thread": {
+      "get": {
+        "x-janis-namespace": "thread",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "conversation:thread:read"
+        ],
+        "operationId": "listThreads",
+        "tags": [
+          "Thread"
+        ],
+        "summary": "List Threads",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ThreadSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ThreadFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Threads listed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ThreadList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "x-janis-namespace": "thread",
+        "x-janis-method": "create",
+        "x-janis-permissions": [
+          "conversation:thread:write"
+        ],
+        "operationId": "createThread",
+        "tags": [
+          "Thread"
+        ],
+        "summary": "Create a Thread",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "A Thread with a message",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Thread"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The Thread was created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "$ref": "#/components/schemas/Thread/properties/id"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/thread/{id}/message/{messageId}": {
+      "patch": {
+        "x-janis-namespace": "thread",
+        "x-janis-method": "patch-message",
+        "x-janis-permissions": [
+          "conversation:thread:highlight-messages"
+        ],
+        "operationId": "threadMessagePatch",
+        "tags": [
+          "Thread"
+        ],
+        "summary": "Highlight or remove highlight from a message",
+        "description": "Change the `highlighted` status of a thread message.\n",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The Thread ID"
+          },
+          {
+            "in": "path",
+            "name": "messageId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The Thread Message ID"
+          }
+        ],
+        "requestBody": {
+          "description": "The values to set to the message",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "highlighted": {
+                    "description": "Indicates if the message is highlighted or not",
+                    "type": "boolean",
+                    "example": true
+                  }
+                },
+                "required": [
+                  "highlighted"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GenericSuccess"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/thread/{id}/message": {
+      "post": {
+        "x-janis-namespace": "thread",
+        "x-janis-method": "add-message",
+        "x-janis-permissions": [
+          "conversation:thread:write"
+        ],
+        "operationId": "addMessageThread",
+        "tags": [
+          "Thread"
+        ],
+        "summary": "Post a message to a thread",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "example": "5dea9fc691240d00084083f8"
+            },
+            "required": true,
+            "description": "The thread ID"
+          }
+        ],
+        "requestBody": {
+          "description": "The message to post. Sender object is only required for external senders, not for Janis users.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ThreadMessage"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GenericSuccess"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "id": {
+        "description": "The unique identifier of the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "d555345345345as67a342a"
+      },
+      "status": {
+        "description": "The item status",
+        "type": "string",
+        "default": "active",
+        "enum": [
+          "active",
+          "inactive"
+        ],
+        "example": "active"
+      },
+      "dateCreated": {
+        "description": "The date of creation",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-12T19:59:51.801Z"
+      },
+      "dateModified": {
+        "description": "The date of the last modification",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-20T19:59:51.801Z"
+      },
+      "userCreated": {
+        "description": "The ID of the user who created the item. This refer to the `id` of the **User** Entity of **Janis ID Service**. See [User](/v2/service/id#tag/User).",
+        "type": "string",
+        "readOnly": true,
+        "example": "6a1fc1eeb5b68406e0487a10"
+      },
+      "userModified": {
+        "description": "The ID of the user who last modified the item. This refer to the `id` of the **User** Entity of **Janis ID Service**. See [User](/v2/service/id#tag/User).",
+        "type": "string",
+        "readOnly": true,
+        "example": "7e1fc1eeb5b68406e048796"
+      },
+      "DefaultTemplate": {
+        "description": "A default template",
+        "type": "object",
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/EmailDefaultTemplate"
+          },
+          {
+            "$ref": "#/components/schemas/PhoneDefaultTemplate"
+          }
+        ]
+      },
+      "BaseDefaultTemplate": {
+        "description": "A default template",
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "The id of the default template",
+            "type": "string",
+            "readOnly": true,
+            "example": "5d1fc1eeb5b68406e0487a06"
+          },
+          "type": {
+            "description": "The template type",
+            "type": "string",
+            "enum": [
+              "email",
+              "whatsapp"
+            ],
+            "example": "email"
+          },
+          "topic": {
+            "description": "The topic of the default template",
+            "type": "string",
+            "example": "reset-password"
+          },
+          "sampleData": {
+            "description": "The information which will be used to replace in the body of the template",
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "dateCreated": {
+            "description": "The default template creation date",
+            "type": "string",
+            "readOnly": true,
+            "example": "2019-02-22T21:30:59.000Z"
+          },
+          "userCreated": {
+            "description": "The default template user creator id",
+            "type": "number",
+            "readOnly": true,
+            "example": "5d1fce2341eeb5b68406e0487a06a"
+          },
+          "dateModified": {
+            "description": "The default template modification date",
+            "type": "string",
+            "nullable": true,
+            "readOnly": true,
+            "example": "2019-06-26T21:06:04.000Z"
+          },
+          "userModified": {
+            "description": "The default template user modifier id",
+            "type": "number",
+            "nullable": true,
+            "readOnly": true,
+            "example": "5d1fce2341eeb5b68406e0487a06a"
+          },
+          "isInternal": {
+            "description": "Indicates if the default template is internal",
+            "type": "boolean",
+            "example": false
+          },
+          "status": {
+            "description": "The default template status",
+            "type": "string",
+            "enum": [
+              "active",
+              "inactive"
+            ],
+            "example": "active"
+          }
+        }
+      },
+      "EmailDefaultTemplate": {
+        "title": "Email",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseDefaultTemplate"
+          },
+          {
+            "properties": {
+              "subject": {
+                "description": "The subject of the default template",
+                "type": "string",
+                "example": "Reset your password!"
+              },
+              "to": {
+                "description": "The recipient of the default template",
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "example": "example@example.com"
+                }
+              },
+              "cc": {
+                "description": "The cc of the default template",
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "example": "example@example.com"
+                }
+              },
+              "bcc": {
+                "description": "The bcc of the default template",
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "example": "example@example.com"
+                }
+              },
+              "body": {
+                "description": "The body of the default template",
+                "type": "string",
+                "example": "<html><head><style>body{margin: none;padding: none;}</style></head><body><h1>Email Title!</h1></body></html>"
+              }
+            },
+            "required": [
+              "id",
+              "topic",
+              "type",
+              "to",
+              "subject",
+              "body"
+            ]
+          }
+        ]
+      },
+      "PhoneDefaultTemplate": {
+        "title": "Whatsapp",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseDefaultTemplate"
+          },
+          {
+            "properties": {
+              "to": {
+                "description": "The recipient of the default template",
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "example": "1123950128"
+                }
+              },
+              "header": {
+                "type": "string",
+                "description": "The header of the default template",
+                "example": "Welcome to Janis"
+              },
+              "body": {
+                "type": "string",
+                "description": "The body of the default template",
+                "example": "Congratulations {{name}} you are now part of Janis"
+              },
+              "footer": {
+                "type": "string",
+                "description": "The footer of the default template",
+                "example": "This is a footer"
+              }
+            },
+            "required": [
+              "id",
+              "topic",
+              "type",
+              "to",
+              "body"
+            ]
+          }
+        ]
+      },
+      "DefaultTemplateList": {
+        "description": "The list of the default template",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/DefaultTemplate"
+        }
+      },
+      "Message": {
+        "type": "object",
+        "description": "A Message",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "topic": {
+            "type": "string",
+            "description": "The topic of the message",
+            "example": "reset-password"
+          },
+          "entity": {
+            "type": "string",
+            "description": "The entity associated with the message",
+            "example": "product"
+          },
+          "entityId": {
+            "type": "string",
+            "description": "The entity id associated with the email",
+            "example": "5d1fce2341eeb5b68406e0487a06a"
+          },
+          "service": {
+            "type": "string",
+            "description": "The source service name",
+            "example": "catalog"
+          },
+          "content": {
+            "type": "string",
+            "description": "The content of the message\n* Is required when **topic** is empty\n",
+            "example": "<html><head><style>body{margin: none;padding: none;}</style></head><body><h1>You need to reset your password!</h1></body></html>"
+          },
+          "data": {
+            "type": "object",
+            "description": "The information which will be used to replace in the content of the message",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "useInternalTemplate": {
+            "type": "boolean",
+            "description": "Indicates if the message was created using an internal template. If true, some fields will not be returned in the response",
+            "readOnly": true,
+            "example": false
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "status": {
+            "type": "string",
+            "description": "The message status name",
+            "readOnly": true,
+            "enum": [
+              "pending",
+              "sendingInProgress",
+              "sent",
+              "partiallySent",
+              "templateError",
+              "error"
+            ],
+            "default": "pending",
+            "example": "pending"
+          }
+        }
+      },
+      "updateNotification": {
+        "type": "object",
+        "description": "Notification update",
+        "properties": {
+          "id": {
+            "description": "The notification id",
+            "type": "string",
+            "example": "62d6a019127ccb3894ca54a9"
+          },
+          "type": {
+            "type": "string",
+            "description": "The notification type",
+            "example": "email",
+            "enum": [
+              "email",
+              "whatsapp"
+            ]
+          },
+          "dateSent": {
+            "type": "string",
+            "description": "The date of the notification was sent",
+            "format": "date-time",
+            "example": "2019-07-20T19:59:51.801Z"
+          },
+          "errorMessage": {
+            "type": "string",
+            "description": "Information about the error if the notification failed to send",
+            "example": "Unauthorized"
+          },
+          "status": {
+            "type": "string",
+            "description": "The notification status name",
+            "enum": [
+              "pending",
+              "sent",
+              "error"
+            ],
+            "example": "sent"
+          },
+          "notificationStatus": {
+            "type": "string",
+            "description": "The notification status name",
+            "enum": [
+              "pending",
+              "sent",
+              "sentError",
+              "maxTriesError",
+              "templateError",
+              "smtpError"
+            ],
+            "example": "sent"
+          }
+        },
+        "required": [
+          "type",
+          "status",
+          "notificationStatus"
+        ]
+      },
+      "sendNotification": {
+        "type": "object",
+        "description": "A list of channels to send the notification",
+        "properties": {
+          "channels": {
+            "type": "array",
+            "description": "A list of channels",
+            "items": {
+              "type": "string",
+              "description": "The channel to send the notification",
+              "enum": [
+                "email",
+                "whatsapp"
+              ],
+              "example": "email"
+            },
+            "example": [
+              "email",
+              "whatsapp"
+            ]
+          }
+        }
+      },
+      "MessageList": {
+        "type": "array",
+        "description": "A list of messages",
+        "items": {
+          "$ref": "#/components/schemas/Message"
+        }
+      },
+      "Render": {
+        "type": "object",
+        "description": "A Render",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/RenderData"
+          },
+          "template": {
+            "description": "The template that will be compiled",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/StringTemplate"
+              },
+              {
+                "$ref": "#/components/schemas/ArrayTemplate"
+              }
+            ]
+          }
+        },
+        "required": [
+          "data",
+          "template"
+        ]
+      },
+      "StringTemplate": {
+        "description": "A string that will be rendered",
+        "type": "string",
+        "example": "Name: {{name}}"
+      },
+      "ArrayTemplate": {
+        "description": "An array of strings that will be rendered",
+        "type": "array",
+        "items": {
+          "type": "string",
+          "example": [
+            "{{name}}",
+            "{{lastname}}"
+          ]
+        }
+      },
+      "RenderData": {
+        "description": "The data which will be used to replace in the template\n\nIf you need to send a property of type **QR** the name of the same has to start with `qr_`\n\nIf you need to send a property of type **Barcode128** the name of the same has to start with `barcode128_`\n",
+        "type": "object",
+        "additionalProperties": {
+          "type": "string"
+        }
+      },
+      "Template": {
+        "description": "A Template",
+        "type": "object",
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/EmailTemplate"
+          },
+          {
+            "$ref": "#/components/schemas/PhoneTemplate"
+          }
+        ]
+      },
+      "BaseTemplate": {
+        "description": "A Template",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "type": {
+            "description": "The template type",
+            "type": "string",
+            "readOnly": true,
+            "enum": [
+              "email",
+              "sms",
+              "whatsapp"
+            ],
+            "example": "email"
+          },
+          "topic": {
+            "type": "string",
+            "readOnly": true,
+            "description": "The topic of the template",
+            "example": "reset-password"
+          },
+          "sampleData": {
+            "type": "object",
+            "readOnly": true,
+            "description": "The information which will be used to replace in the body of the template",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "canBeUpdated": {
+            "description": "The indicator of whether the template can be updated automatically, if it is not provided is saved as `true`.",
+            "type": "boolean",
+            "default": true,
+            "example": true
+          },
+          "isInternal": {
+            "description": "Indicates if the template is internal",
+            "readOnly": true,
+            "type": "boolean",
+            "example": false
+          },
+          "status": {
+            "description": "The template status",
+            "type": "string",
+            "enum": [
+              "active",
+              "inactive"
+            ],
+            "example": "active"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          }
+        }
+      },
+      "EmailTemplate": {
+        "title": "Email",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseTemplate"
+          },
+          {
+            "properties": {
+              "smtpId": {
+                "$ref": "#/components/schemas/smtpId"
+              },
+              "subject": {
+                "$ref": "#/components/schemas/subject"
+              },
+              "to": {
+                "description": "The to of the template",
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "example": "example@example.com"
+                }
+              },
+              "cc": {
+                "description": "The cc of the template",
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "example": "example@example.com"
+                }
+              },
+              "bcc": {
+                "description": "The bcc of the template",
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "example": "example@example.com"
+                }
+              },
+              "replyTo": {
+                "description": "The reply to of the template",
+                "type": "string",
+                "example": "example@example.com"
+              },
+              "body": {
+                "description": "The body of the template",
+                "type": "string",
+                "example": "<html><head><style>body{margin: none;padding: none;}</style></head><body><h1>Email Title!</h1></body></html>"
+              }
+            },
+            "required": [
+              "topic",
+              "to",
+              "subject",
+              "body",
+              "type",
+              "status"
+            ]
+          }
+        ]
+      },
+      "PhoneTemplate": {
+        "title": "Whatsapp",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseTemplate"
+          },
+          {
+            "properties": {
+              "phoneId": {
+                "description": "The Phone Id of the template. This refer to the `id` of the **Phone** Entity of **Janis Conversation-Whatsapp Service**. See [Phone](v2/service/conversation-whatsapp#tag/Phone)",
+                "type": "string",
+                "example": "645a3af1c731b0e761e5beab"
+              },
+              "to": {
+                "description": "The recipient of the template",
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "example": "1123950128"
+                }
+              },
+              "header": {
+                "type": "string",
+                "description": "The header of the template",
+                "example": "Welcome to Janis"
+              },
+              "body": {
+                "type": "string",
+                "description": "The body of the template",
+                "example": "Congratulations {{name}} you are now part of Janis"
+              },
+              "footer": {
+                "type": "string",
+                "description": "The footer of the template",
+                "example": "This is a footer"
+              }
+            },
+            "required": [
+              "topic",
+              "type",
+              "to",
+              "body",
+              "phoneId",
+              "status"
+            ]
+          }
+        ]
+      },
+      "smtpId": {
+        "type": "string",
+        "description": "The SMTP id of the template",
+        "example": "5dd442172d71c20011851b92"
+      },
+      "subject": {
+        "description": "The subject of the template",
+        "type": "string",
+        "example": "Reset your password!"
+      },
+      "TemplateList": {
+        "type": "array",
+        "description": "A list of Templates",
+        "items": {
+          "$ref": "#/components/schemas/Template"
+        }
+      },
+      "InternalSender": {
+        "type": "object",
+        "description": "A Janis user that sent a message in a thread",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "description": "The internal sender kind.",
+            "enum": [
+              "internal"
+            ],
+            "example": "internal",
+            "readOnly": true
+          },
+          "userId": {
+            "type": "string",
+            "description": "The ID of the user",
+            "example": "5dea9fc691240d00084083f9",
+            "readOnly": true
+          },
+          "dateCreated": {
+            "type": "string",
+            "description": "The creation date",
+            "example": "2020-08-13T21:27:49.971Z",
+            "format": "date-time",
+            "readOnly": true
+          }
+        },
+        "required": [
+          "kind",
+          "userId",
+          "dateCreated"
+        ]
+      },
+      "ExternalSender": {
+        "type": "object",
+        "description": "A person that's not a Janis user that sent a message in a thread",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "description": "The external sender kind.",
+            "enum": [
+              "external"
+            ],
+            "example": "external",
+            "readOnly": true
+          },
+          "firstName": {
+            "type": "string",
+            "description": "The person's first name",
+            "example": "John"
+          },
+          "lastName": {
+            "type": "string",
+            "description": "The person's last name",
+            "example": "Doe"
+          },
+          "dateCreated": {
+            "type": "string",
+            "description": "The creation date",
+            "example": "2020-08-13T21:27:49.971Z",
+            "format": "date-time",
+            "readOnly": true
+          }
+        },
+        "required": [
+          "kind",
+          "firstName",
+          "lastName",
+          "dateCreated"
+        ]
+      },
+      "ThreadMessage": {
+        "type": "object",
+        "description": "A Thread message",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The message ID",
+            "example": "e7123290-034e-4f23-880e-78e44738b31a",
+            "readOnly": true
+          },
+          "highlighted": {
+            "type": "boolean",
+            "description": "Determines if the message is highlighted, services can use this to increase the visibility of the highlighted messages",
+            "example": false
+          },
+          "sender": {
+            "type": "object",
+            "description": "The message sender data.",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ExternalSender"
+              },
+              {
+                "$ref": "#/components/schemas/InternalSender"
+              }
+            ],
+            "discriminator": {
+              "propertyName": "kind",
+              "mapping": {
+                "external": "#/components/schemas/ExternalSender",
+                "internal": "#/components/schemas/InternalSender"
+              }
+            }
+          },
+          "isPrivate": {
+            "type": "boolean",
+            "description": "Indicates whether the message is private (only visible to Janis users) or not (visible by the customer, if there is one related to the thread)",
+            "example": false
+          },
+          "content": {
+            "type": "string",
+            "description": "The message content",
+            "example": "Welcome to Janis! Your order will be ready by tomorrow."
+          },
+          "dateCreated": {
+            "type": "string",
+            "description": "The message creation date",
+            "example": "2020-08-13T21:27:49.971Z",
+            "format": "date-time",
+            "readOnly": true
+          }
+        }
+      },
+      "Thread": {
+        "type": "object",
+        "description": "A Thread",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The Thread ID",
+            "example": "5dea9fc691240d00084083f8",
+            "readOnly": true
+          },
+          "service": {
+            "type": "string",
+            "description": "The service code related to this thread",
+            "example": "oms"
+          },
+          "entity": {
+            "type": "string",
+            "description": "The entity related to this thread",
+            "example": "order"
+          },
+          "entityId": {
+            "type": "string",
+            "description": "The entity ID related to this thread",
+            "example": "6dea9fc691240d00084083f8"
+          },
+          "messages": {
+            "type": "array",
+            "description": "The messaged contained in the thread",
+            "readOnly": true,
+            "items": {
+              "$ref": "#/components/schemas/ThreadMessage"
+            }
+          },
+          "message": {
+            "allOf": [
+              {
+                "type": "object",
+                "description": "The first message when creating a thread. Sender object is only required for external senders, not for Janis users.",
+                "writeOnly": true
+              },
+              {
+                "$ref": "#/components/schemas/ThreadMessage"
+              }
+            ]
+          },
+          "userCreated": {
+            "type": "string",
+            "description": "The creation user ID",
+            "example": "5dea9fc691240d00084083f9",
+            "readOnly": true
+          },
+          "dateCreated": {
+            "type": "string",
+            "description": "The creation date",
+            "example": "2020-08-13T21:27:49.971Z",
+            "format": "date-time",
+            "readOnly": true
+          },
+          "userModified": {
+            "type": "string",
+            "description": "The last modification user ID",
+            "example": "5dea9fc691240d0008408301",
+            "readOnly": true
+          },
+          "dateModified": {
+            "type": "string",
+            "description": "The last modification date",
+            "example": "2020-08-13T21:27:49.971Z",
+            "format": "date-time",
+            "readOnly": true
+          }
+        },
+        "required": [
+          "id",
+          "service",
+          "entity",
+          "entityId",
+          "messages",
+          "message",
+          "userCreated",
+          "dateCreated"
+        ]
+      },
+      "ThreadList": {
+        "type": "array",
+        "description": "A list of Threads",
+        "items": {
+          "$ref": "#/components/schemas/Thread"
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-key",
+        "description": "The API Key"
+      },
+      "ApiSecret": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-secret",
+        "description": "The API Secret"
+      },
+      "JanisClient": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-client",
+        "description": "The Client Code"
+      }
+    },
+    "parameters": {
+      "id": {
+        "name": "id",
+        "in": "path",
+        "schema": {
+          "type": "string",
+          "example": "5dd442172d71c20011851b92"
+        },
+        "required": true,
+        "description": "The unique identifier of the item"
+      },
+      "ListSortDirection": {
+        "name": "sortDirection",
+        "in": "query",
+        "description": "The direction to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
+        }
+      },
+      "ListPageNumber": {
+        "name": "x-janis-page",
+        "in": "header",
+        "description": "The page to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "default": 1
+        }
+      },
+      "ListPageSize": {
+        "name": "x-janis-page-size",
+        "in": "header",
+        "description": "The page size to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "default": 60
+        }
+      },
+      "DefaultTemplatesSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "topic",
+            "dateCreated",
+            "dateModified"
+          ]
+        }
+      },
+      "DefaultTemplatesFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/BaseTemplate/properties/id"
+            },
+            "topic": {
+              "$ref": "#/components/schemas/BaseTemplate/properties/topic"
+            },
+            "status": {
+              "$ref": "#/components/schemas/BaseTemplate/properties/status"
+            },
+            "isInternal": {
+              "$ref": "#/components/schemas/BaseTemplate/properties/isInternal"
+            }
+          }
+        }
+      },
+      "MessageSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "topic",
+            "entity",
+            "service",
+            "dateCreated",
+            "dateModified",
+            "status"
+          ]
+        }
+      },
+      "MessageFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "topic": {
+              "$ref": "#/components/schemas/Message/properties/topic"
+            },
+            "entity": {
+              "$ref": "#/components/schemas/Message/properties/entity"
+            },
+            "entityId": {
+              "$ref": "#/components/schemas/Message/properties/entityId"
+            },
+            "service": {
+              "$ref": "#/components/schemas/Message/properties/service"
+            },
+            "notifications.type": {
+              "description": "The message notification type",
+              "type": "string",
+              "example": "email",
+              "enum": [
+                "email",
+                "whatsapp"
+              ]
+            },
+            "status": {
+              "$ref": "#/components/schemas/status"
+            }
+          }
+        }
+      },
+      "TemplateSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "topic",
+            "type",
+            "smtpId",
+            "status",
+            "dateCreated",
+            "dateModified"
+          ]
+        }
+      },
+      "TemplateFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/BaseTemplate/properties/id"
+            },
+            "topic": {
+              "$ref": "#/components/schemas/BaseTemplate/properties/topic"
+            },
+            "smtpId": {
+              "$ref": "#/components/schemas/smtpId"
+            },
+            "subject": {
+              "$ref": "#/components/schemas/subject"
+            },
+            "status": {
+              "$ref": "#/components/schemas/status"
+            },
+            "isInternal": {
+              "$ref": "#/components/schemas/BaseTemplate/properties/isInternal"
+            }
+          }
+        }
+      },
+      "ThreadSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "dateCreated",
+            "dateModified"
+          ]
+        }
+      },
+      "ThreadFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "The Thread ID"
+            },
+            "service": {
+              "type": "string",
+              "description": "The service code related to this thread"
+            },
+            "entity": {
+              "type": "string",
+              "description": "The entity related to this thread"
+            },
+            "entityId": {
+              "type": "string",
+              "description": "The entity ID related to this thread"
+            }
+          }
+        }
+      }
+    },
+    "responses": {
+      "GenericSuccess": {
+        "description": "Operation succeeded",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "BadRequest": {
+        "description": "A client error has ocurred.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Authentication missing or invalid",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Not authorized request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "InternalError": {
+        "description": "A server error has ocurred."
+      },
+      "SuccessLambdaResponse": {
+        "description": "OK",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "statusCode": {
+                  "description": "Status code",
+                  "type": "number",
+                  "example": 200
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

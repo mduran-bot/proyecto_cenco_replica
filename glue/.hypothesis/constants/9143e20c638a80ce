@@ -1,0 +1,4 @@
+# file: C:\Users\vicen\OneDrive\Documentos\3HTP\Cencosud\Proyecto Final Cenco\glue\modules\iceberg_manager.py
+# hypothesis_version: 6.151.9
+
+[128, 1000, 1024, ', ', '100', '3', 'col_name', 'data_type', 'false', 'glue_catalog', 'gzip', 'parquet', 'partition_by', 'snappy', 'true', 'write.format.default']

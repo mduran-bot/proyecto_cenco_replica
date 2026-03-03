@@ -1,0 +1,32 @@
+@echo off
+cd /d %~dp0
+terraform plan ^
+  -var="aws_region=us-east-1" ^
+  -var="aws_account_id=000000000000" ^
+  -var="project_name=janis-cencosud-integration" ^
+  -var="environment=development" ^
+  -var="owner=dev-team" ^
+  -var="cost_center=engineering" ^
+  -var="vpc_cidr=10.0.0.0/16" ^
+  -var="public_subnet_a_cidr=10.0.1.0/24" ^
+  -var="private_subnet_1a_cidr=10.0.10.0/24" ^
+  -var="private_subnet_2a_cidr=10.0.20.0/24" ^
+  -var="enable_multi_az=false" ^
+  -var="existing_redshift_cluster_id=localstack-redshift-test" ^
+  -var="existing_redshift_sg_id=sg-localstack-redshift" ^
+  -var="waf_rate_limit=2000" ^
+  -var="enable_vpc_flow_logs=false" ^
+  -var="enable_dns_query_logging=false" ^
+  -var="enable_s3_endpoint=false" ^
+  -var="enable_glue_endpoint=false" ^
+  -var="enable_secrets_manager_endpoint=false" ^
+  -var="enable_logs_endpoint=false" ^
+  -var="enable_kms_endpoint=false" ^
+  -var="enable_sts_endpoint=false" ^
+  -var="enable_events_endpoint=false" ^
+  -var="order_polling_rate_minutes=5" ^
+  -var="product_polling_rate_minutes=60" ^
+  -var="stock_polling_rate_minutes=10" ^
+  -var="price_polling_rate_minutes=30" ^
+  -var="store_polling_rate_minutes=1440" ^
+  -var="mwaa_environment_arn="

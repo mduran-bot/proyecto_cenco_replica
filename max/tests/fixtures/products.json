@@ -1,0 +1,96 @@
+[
+  {
+    "id": "prod_001",
+    "name": "Product A",
+    "description": "High quality electronic device",
+    "brandId": "brand_001",
+    "brandName": "BrandA",
+    "categoryId": "cat_001",
+    "categoryName": "Electronics",
+    "active": 1,
+    "dateCreated": 1706025600,
+    "dateModified": 1706029200,
+    "images": [
+      {
+        "url": "https://example.com/product-a-1.jpg",
+        "alt": "Product A main"
+      },
+      {
+        "url": "https://example.com/product-a-2.jpg",
+        "alt": "Product A side"
+      }
+    ],
+    "specifications": {
+      "color": "Black",
+      "size": "Medium",
+      "material": "Plastic"
+    },
+    "cart_limit": null,
+    "min_stock": null
+  },
+  {
+    "id": "prod_002",
+    "name": "Product B",
+    "description": "Home decoration item",
+    "brandId": "brand_002",
+    "brandName": "BrandB",
+    "categoryId": "cat_002",
+    "categoryName": "Home",
+    "active": 1,
+    "dateCreated": 1706025700,
+    "dateModified": 1706029300,
+    "images": [
+      {
+        "url": "https://example.com/product-b.jpg",
+        "alt": "Product B"
+      }
+    ],
+    "specifications": {
+      "color": "White",
+      "material": "Ceramic"
+    },
+    "cart_limit": 10,
+    "min_stock": 5
+  },
+  {
+    "id": "prod_003",
+    "name": "Product C",
+    "description": null,
+    "brandId": null,
+    "brandName": null,
+    "categoryId": "cat_003",
+    "categoryName": "Other",
+    "active": 0,
+    "dateCreated": 1706025800,
+    "dateModified": null,
+    "images": [],
+    "specifications": {},
+    "cart_limit": null,
+    "min_stock": null
+  },
+  {
+    "id": "prod_001",
+    "name": "Product A Updated",
+    "description": "High quality electronic device - Updated",
+    "brandId": "brand_001",
+    "brandName": "BrandA",
+    "categoryId": "cat_001",
+    "categoryName": "Electronics",
+    "active": 1,
+    "dateCreated": 1706025600,
+    "dateModified": 1706030000,
+    "images": [
+      {
+        "url": "https://example.com/product-a-1.jpg",
+        "alt": "Product A main"
+      }
+    ],
+    "specifications": {
+      "color": "Black",
+      "size": "Large",
+      "material": "Metal"
+    },
+    "cart_limit": null,
+    "min_stock": null
+  }
+]

@@ -1,0 +1,4 @@
+# file: C:\Users\maxim\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\pyspark\errors\utils.py
+# hypothesis_version: 6.151.9
+
+['.', '<([^<>]*)>', '<([a-zA-Z0-9_-]+)>', '<>', 'FuncT', 'PYSPARK_PIN_THREAD', 'T', '__bool__', '__init__', '__iter__', '__name__', '__new__', '__nonzero__', '__repr__', 'breaking_change_info', 'call_site', 'fragment', 'message', 'migration_message', 'sub_class', 'true', '{}']

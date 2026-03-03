@@ -1,0 +1,625 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Trace Service",
+    "description": "Manage the Janis Services logs operations\n\n **Last update**: 12 feb 26, 01:08 p. m.",
+    "version": "2.2.1",
+    "x-logo": null,
+    "x-janis-keywords": [
+      "Log",
+      "Logs"
+    ],
+    "lastUpdate": "2026-02-12T16:08:19.896Z"
+  },
+  "tags": [
+    {
+      "name": "Log",
+      "description": "For managing Logs"
+    },
+    {
+      "name": "Log Import",
+      "description": "For managing expired logs importation"
+    }
+  ],
+  "servers": [
+    {
+      "url": "https://trace.janis.in/api",
+      "description": "The Prod API server",
+      "variables": {
+        "environment": {
+          "default": "prod"
+        }
+      }
+    },
+    {
+      "url": "https://trace.janisqa.in/api",
+      "description": "The QA API server",
+      "variables": {
+        "environment": {
+          "default": "qa"
+        }
+      }
+    },
+    {
+      "url": "https://trace.janisdev.in/api",
+      "description": "The Beta API server",
+      "variables": {
+        "environment": {
+          "default": "beta"
+        }
+      }
+    },
+    {
+      "url": "http://trace.janis.localhost:3025/api",
+      "description": "The Local API server",
+      "variables": {
+        "environment": {
+          "default": "local"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/log/{id}": {
+      "get": {
+        "x-janis-namespace": "log",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "trace:log:read"
+        ],
+        "operationId": "getLog",
+        "tags": [
+          "Log"
+        ],
+        "summary": "Get a log by token",
+        "description": "Get a log by token",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "example": "NmY1ZTdiNzItZTkwMC00NmUyLWI4MjMtYmZiMGYyNmJmMDMzfGNhdGFsb2d8MjAyNDExMDU="
+            },
+            "required": true,
+            "description": "For this Api the parameter `id` is the token of the log. The `token` field is an encoded `base64` with the format {id}|{service}|{date}.\n"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Log"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/section-log": {
+      "get": {
+        "x-janis-namespace": "section-log",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "trace:log:read"
+        ],
+        "operationId": "listSectionLog",
+        "tags": [
+          "Log"
+        ],
+        "summary": "Get a list of Section logs",
+        "description": "Get a list of Section logs",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/SectionLogSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/SectionLogFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SectionLogList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-key",
+        "description": "The API Key"
+      },
+      "ApiSecret": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-secret",
+        "description": "The API Secret"
+      },
+      "JanisClient": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-client",
+        "description": "Janis Client"
+      }
+    },
+    "parameters": {
+      "id": {
+        "name": "id",
+        "in": "path",
+        "schema": {
+          "type": "string",
+          "example": "d555345345345as67a342a"
+        },
+        "required": true,
+        "description": "The unique identifier of the item"
+      },
+      "ListSortDirection": {
+        "name": "sortDirection",
+        "in": "query",
+        "description": "The direction to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
+        }
+      },
+      "ListPageNumber": {
+        "name": "x-janis-page",
+        "in": "header",
+        "description": "The page to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "default": 1
+        }
+      },
+      "ListPageSize": {
+        "name": "x-janis-page-size",
+        "in": "header",
+        "description": "The page size to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "default": 60
+        }
+      },
+      "LogSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "id",
+            "service",
+            "entity",
+            "entityId",
+            "type",
+            "message",
+            "dateCreated",
+            "userCreated"
+          ]
+        }
+      },
+      "LogFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/Log/properties/id"
+            },
+            "service": {
+              "$ref": "#/components/schemas/Log/properties/service"
+            },
+            "entity": {
+              "$ref": "#/components/schemas/Log/properties/entity"
+            },
+            "entityId": {
+              "$ref": "#/components/schemas/Log/properties/entityId"
+            },
+            "type": {
+              "$ref": "#/components/schemas/Log/properties/type"
+            },
+            "message": {
+              "$ref": "#/components/schemas/Log/properties/message"
+            },
+            "dateCreatedDay": {
+              "$ref": "#/components/schemas/dateCreatedDay"
+            },
+            "dateCreatedFrom": {
+              "description": "The log creation date from (combine with dateCreatedTo for date range filter)",
+              "type": "string",
+              "format": "date-time",
+              "example": "2019-08-07T16:03:52.000Z"
+            },
+            "dateCreatedTo": {
+              "description": "The log creation date to (combine with dateCreatedFrom for date range filter)",
+              "type": "string",
+              "format": "date-time",
+              "example": "2019-08-07T16:03:52.000Z"
+            },
+            "userCreated": {
+              "$ref": "#/components/schemas/Log/properties/userCreated"
+            }
+          }
+        }
+      },
+      "SectionLogSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "dateCreated"
+          ]
+        }
+      },
+      "SectionLogFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "service": {
+              "$ref": "#/components/schemas/Log/properties/service"
+            },
+            "entity": {
+              "$ref": "#/components/schemas/Log/properties/entity"
+            },
+            "entityId": {
+              "$ref": "#/components/schemas/Log/properties/entityId"
+            }
+          },
+          "required": [
+            "service",
+            "entity",
+            "entityId"
+          ]
+        }
+      }
+    },
+    "headers": {
+      "x-janis-total": {
+        "description": "The total amount of records in the list",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "responses": {
+      "GenericSuccess": {
+        "description": "Operation succeeded",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "BadRequest": {
+        "description": "A client error has ocurred.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Authentication missing or invalid",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Not authorized request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "InternalError": {
+        "description": "A server error has ocurred."
+      }
+    },
+    "schemas": {
+      "id": {
+        "description": "The unique identifier of the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "d555345345345as67a342a"
+      },
+      "dateCreated": {
+        "description": "The date of creation",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-12T19:59:51.801Z"
+      },
+      "userCreated": {
+        "description": "The ID of the user who created the item. This refer to the `id` of the **User** Entity of **Janis ID Service**. See [User](/v2/service/id#tag/User).",
+        "type": "string",
+        "readOnly": true,
+        "example": "6a1fc1eeb5b68406e0487a10"
+      },
+      "serviceCreated": {
+        "description": "The Janis Service Name who created the item.",
+        "type": "string",
+        "readOnly": true,
+        "nullable": true,
+        "example": "pricing"
+      },
+      "dateCreatedDay": {
+        "description": "The date of creation",
+        "type": "string",
+        "format": "date-time",
+        "example": "2019-07-12T19:59:51.801Z"
+      },
+      "Log": {
+        "description": "A log",
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "The log ID (uuid format)",
+            "type": "string",
+            "example": "efe33996-37a2-458e-83ad-98ba1596b858"
+          },
+          "service": {
+            "description": "The service where the log comes from",
+            "type": "string",
+            "example": "catalog"
+          },
+          "entity": {
+            "description": "The entity of the service who created the log",
+            "type": "string",
+            "example": "product"
+          },
+          "entityId": {
+            "description": "The entity ID (if exists)",
+            "type": "string",
+            "nullable": true,
+            "example": "5f6b98ba1df718850eb64b9f"
+          },
+          "type": {
+            "description": "The type of the log",
+            "type": "string",
+            "example": "created"
+          },
+          "message": {
+            "description": "The log message",
+            "type": "string",
+            "nullable": true,
+            "example": "The product was successfully created"
+          },
+          "log": {
+            "description": "The log details (object when is a valid JSON, string otherwise)",
+            "oneOf": [
+              {
+                "description": "The log details (when is a valid/parsable JSON string)",
+                "type": "object",
+                "example": {
+                  "some": "data"
+                }
+              },
+              {
+                "description": "The log details (when is not a valid/parsable JSON string)",
+                "type": "string",
+                "example": "{'some':'data'}, {'broken': 'json'"
+              }
+            ]
+          },
+          "expirationDate": {
+            "description": "The date of the expiration of the log",
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true,
+            "example": "2020-09-07T16:03:52.000Z"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "serviceCreated": {
+            "$ref": "#/components/schemas/serviceCreated"
+          },
+          "insertDelay": {
+            "description": "Represents the delay in **seconds** between the log creation date and its insertion date in the database.\n",
+            "type": "number",
+            "readOnly": true,
+            "minimum": 0,
+            "example": 80
+          }
+        },
+        "required": [
+          "service",
+          "entity",
+          "type"
+        ]
+      },
+      "LogList": {
+        "description": "A list of logs",
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/Log/properties/id"
+            },
+            "service": {
+              "$ref": "#/components/schemas/Log/properties/service"
+            },
+            "entity": {
+              "$ref": "#/components/schemas/Log/properties/entity"
+            },
+            "entityId": {
+              "$ref": "#/components/schemas/Log/properties/entityId"
+            },
+            "type": {
+              "$ref": "#/components/schemas/Log/properties/type"
+            },
+            "message": {
+              "$ref": "#/components/schemas/Log/properties/message"
+            },
+            "expirationDate": {
+              "$ref": "#/components/schemas/Log/properties/expirationDate"
+            },
+            "dateCreated": {
+              "$ref": "#/components/schemas/Log/properties/dateCreated"
+            },
+            "userCreated": {
+              "$ref": "#/components/schemas/Log/properties/userCreated"
+            },
+            "serviceCreated": {
+              "$ref": "#/components/schemas/Log/properties/serviceCreated"
+            }
+          }
+        }
+      },
+      "SectionLogList": {
+        "description": "A list of Section logs",
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/Log/properties/id"
+            },
+            "service": {
+              "$ref": "#/components/schemas/Log/properties/service"
+            },
+            "entity": {
+              "$ref": "#/components/schemas/Log/properties/entity"
+            },
+            "entityId": {
+              "$ref": "#/components/schemas/Log/properties/entityId"
+            },
+            "type": {
+              "$ref": "#/components/schemas/Log/properties/type"
+            },
+            "message": {
+              "$ref": "#/components/schemas/Log/properties/message"
+            },
+            "dateCreated": {
+              "$ref": "#/components/schemas/Log/properties/dateCreated"
+            },
+            "userCreated": {
+              "$ref": "#/components/schemas/Log/properties/userCreated"
+            }
+          }
+        }
+      }
+    }
+  }
+}

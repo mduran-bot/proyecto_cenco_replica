@@ -1,0 +1,1417 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Glovo Service",
+    "description": "Glovo Service\n\n **Last update**: 22 sept 25, 03:58 p. m.",
+    "version": "1.6.0",
+    "x-logo": null,
+    "x-janis-keywords": [
+      "glovo",
+      "Ecommerce integration"
+    ],
+    "lastUpdate": "2025-09-22T18:58:01.556Z"
+  },
+  "tags": [
+    {
+      "name": "Client",
+      "description": "For managing Clients"
+    },
+    {
+      "name": "Account",
+      "description": "For managing Accounts"
+    },
+    {
+      "name": "Order",
+      "description": "For managing Orders"
+    },
+    {
+      "name": "Order Status Change",
+      "description": "For managing Order Status Changes"
+    }
+  ],
+  "servers": [
+    {
+      "url": "https://glovo.janis.in/api",
+      "description": "The Prod API server",
+      "variables": {
+        "environment": {
+          "default": "prod"
+        }
+      }
+    },
+    {
+      "url": "https://glovo.janisqa.in/api",
+      "description": "The QA API server",
+      "variables": {
+        "environment": {
+          "default": "qa"
+        }
+      }
+    },
+    {
+      "url": "https://glovo.janisdev.in/api",
+      "description": "The Beta API server",
+      "variables": {
+        "environment": {
+          "default": "beta"
+        }
+      }
+    },
+    {
+      "url": "http://glovo.janis.localhost:3140/api",
+      "description": "The Local API server",
+      "variables": {
+        "environment": {
+          "default": "local"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/account/{id}": {
+      "get": {
+        "x-janis-namespace": "account",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "commerce:account:read"
+        ],
+        "operationId": "getAccount",
+        "tags": [
+          "Account"
+        ],
+        "summary": "Get an Account",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Account found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Account"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/account": {
+      "get": {
+        "x-janis-namespace": "account",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "commerce:account:read"
+        ],
+        "operationId": "listAccounts",
+        "tags": [
+          "Account"
+        ],
+        "summary": "List Accounts",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AccountSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/AccountFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Accounts listed",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "x-janis-namespace": "account",
+        "x-janis-method": "save",
+        "x-janis-permissions": [
+          "commerce:account:write"
+        ],
+        "operationId": "saveAccount",
+        "tags": [
+          "Account"
+        ],
+        "summary": "Create or update an Account",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "An Account",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountPostRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The Account was saved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "$ref": "#/components/schemas/Account/properties/id"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/order/{id}": {
+      "get": {
+        "x-janis-namespace": "order",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "glovo:order:read"
+        ],
+        "operationId": "getOrder",
+        "tags": [
+          "Order"
+        ],
+        "summary": "Get an Order",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/order": {
+      "get": {
+        "x-janis-namespace": "order",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "glovo:order:read"
+        ],
+        "operationId": "listOrder",
+        "tags": [
+          "Order"
+        ],
+        "summary": "List Orders",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/OrderSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/OrderFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order listed",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/order-status-change/{id}": {
+      "get": {
+        "x-janis-namespace": "order-status-change",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "glovo:order-status-change:read"
+        ],
+        "operationId": "getOrderStatusChange",
+        "tags": [
+          "Order Status Change"
+        ],
+        "summary": "Get an Order Status Change",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order Status Change found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderStatusChange"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/order-status-change": {
+      "get": {
+        "x-janis-namespace": "order-status-change",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "glovo:order-status-change:read"
+        ],
+        "operationId": "listOrderStatusChanges",
+        "tags": [
+          "Order Status Change"
+        ],
+        "summary": "List Order Status Changes",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/OrderStatusChangeSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/OrderStatusChangeFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order Status Changes listed",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderStatusChangeList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/order-status-change/{id}/retry": {
+      "post": {
+        "x-janis-namespace": "order-status-change",
+        "x-janis-method": "retryOrderStatusChange",
+        "x-janis-permissions": [
+          "glovo:order-status-change:retry"
+        ],
+        "operationId": "retryOrderStatusChange",
+        "tags": [
+          "Order Status Change"
+        ],
+        "summary": "Retry a Order Status Change",
+        "description": "It's the action to retry a order status change.\n",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "example": "631fb04c8fe08f51a8ee5949"
+            },
+            "description": "The order status change id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The order status change retried"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/listener/commerce/account/saved": {
+      "post": {
+        "x-janis-namespace": "commerce-account",
+        "x-janis-method": "saved-listener",
+        "tags": [
+          "Event Listeners"
+        ],
+        "summary": "Commerce account saved listener",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "description": "Commerce account saved listener",
+        "operationId": "commerceAccountSavedListener",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/listenerEvent"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GenericSuccess"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/listener/commerce/location/saved": {
+      "post": {
+        "x-janis-namespace": "commerce-location",
+        "x-janis-method": "saved-listener",
+        "tags": [
+          "Event Listeners"
+        ],
+        "summary": "Commerce location saved event listener",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": []
+          }
+        ],
+        "description": "Commerce location saved event listener",
+        "operationId": "commerceLocationSavedListener",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/listenerEvent"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GenericSuccess"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/listener/commerce/sales-channel/saved": {
+      "post": {
+        "x-janis-namespace": "commerce-sales-channel",
+        "x-janis-method": "saved-listener",
+        "tags": [
+          "Event Listeners"
+        ],
+        "summary": "Commerce sales channel saved listener",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "description": "Commerce sales channel saved listener",
+        "operationId": "commerceSalesChannelSavedListener",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/listenerEvent"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GenericSuccess"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/listener/wms/warehouse/saved": {
+      "post": {
+        "x-janis-namespace": "wms-warehouse",
+        "x-janis-method": "saved-listener",
+        "tags": [
+          "Private"
+        ],
+        "summary": "Warehouse saved event listener",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "description": "Warehouse saved event listener",
+        "operationId": "warehouseSavedListener",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/listenerEvent"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GenericSuccess"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-key",
+        "description": "The API Key"
+      },
+      "ApiSecret": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-secret",
+        "description": "The API Secret"
+      },
+      "JanisClient": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-client",
+        "description": "The Client Code"
+      }
+    },
+    "parameters": {
+      "id": {
+        "name": "id",
+        "in": "path",
+        "schema": {
+          "type": "string",
+          "example": "631fb04c8fe08f51a8ee5949"
+        },
+        "required": true,
+        "description": "The unique identifier of the item"
+      },
+      "ListSortDirection": {
+        "name": "sortDirection",
+        "in": "query",
+        "description": "The direction to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
+        }
+      },
+      "ListPageNumber": {
+        "name": "x-janis-page",
+        "in": "header",
+        "description": "The page to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "default": 1
+        }
+      },
+      "ListPageSize": {
+        "name": "x-janis-page-size",
+        "in": "header",
+        "description": "The page size to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "default": 60
+        }
+      },
+      "JanisEntity": {
+        "name": "janis-entity",
+        "in": "header",
+        "description": "The entity name",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "AccountSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "userCreated'",
+            "userModified",
+            "dateCreated",
+            "status"
+          ]
+        }
+      },
+      "AccountFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/Account/properties/id"
+            },
+            "referenceId": {
+              "$ref": "#/components/schemas/Account/properties/referenceId"
+            },
+            "userCreated": {
+              "$ref": "#/components/schemas/Account/properties/userCreated"
+            },
+            "userModified": {
+              "$ref": "#/components/schemas/Account/properties/userModified"
+            },
+            "dateCreated": {
+              "$ref": "#/components/schemas/Account/properties/dateCreated"
+            },
+            "status": {
+              "$ref": "#/components/schemas/Account/properties/status"
+            }
+          }
+        }
+      },
+      "OrderSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "dateCreated",
+            "dateModified"
+          ]
+        }
+      },
+      "OrderFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/Order/properties/id"
+            },
+            "integrationOrderId": {
+              "$ref": "#/components/schemas/Order/properties/integrationOrderId"
+            },
+            "accountId": {
+              "$ref": "#/components/schemas/Order/properties/accountId"
+            },
+            "status": {
+              "$ref": "#/components/schemas/Order/properties/status"
+            },
+            "dateCreatedRange": {
+              "$ref": "#/components/schemas/dateCreatedRange"
+            }
+          }
+        }
+      },
+      "OrderStatusChangeSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "dateCreated",
+            "dateModified"
+          ]
+        }
+      },
+      "OrderStatusChangeFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/OrderStatusChange/properties/id"
+            },
+            "source": {
+              "$ref": "#/components/schemas/OrderStatusChange/properties/source"
+            },
+            "orderId": {
+              "$ref": "#/components/schemas/OrderStatusChange/properties/orderId"
+            },
+            "storeId": {
+              "type": "string",
+              "description": "The store id of the order",
+              "example": "123456"
+            },
+            "pickUpCode": {
+              "type": "string",
+              "description": "The pick up code of the order",
+              "example": "043"
+            },
+            "orderCode": {
+              "type": "string",
+              "description": "The order code of the order",
+              "example": "BC6BLNR5"
+            },
+            "eventType": {
+              "$ref": "#/components/schemas/OrderStatusChange/properties/eventType"
+            },
+            "accountName": {
+              "$ref": "#/components/schemas/OrderStatusChange/properties/accountName"
+            },
+            "clientCode": {
+              "$ref": "#/components/schemas/OrderStatusChange/properties/clientCode"
+            },
+            "status": {
+              "$ref": "#/components/schemas/OrderStatusChange/properties/status"
+            },
+            "dateCreatedRange": {
+              "$ref": "#/components/schemas/dateCreatedRange"
+            }
+          }
+        }
+      }
+    },
+    "headers": {
+      "x-janis-total": {
+        "description": "The total amount of records in the list",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "responses": {
+      "SuccessCreateResponse": {
+        "description": "The item was created",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "SuccessUpdateResponse": {
+        "description": "The item was updated",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "GenericSuccess": {
+        "description": "Operation succeeded",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "BadRequest": {
+        "description": "A client error has ocurred.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Authentication missing or invalid",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Not authorized request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "InternalError": {
+        "description": "A server error has ocurred."
+      }
+    },
+    "schemas": {
+      "id": {
+        "description": "The unique identifier of the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "631fb04c8fe08f51a8ee5949"
+      },
+      "status": {
+        "description": "The item status",
+        "type": "string",
+        "default": "active",
+        "enum": [
+          "active",
+          "inactive"
+        ],
+        "example": "active"
+      },
+      "dateCreated": {
+        "description": "The date of creation",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-12T19:00:00.000Z"
+      },
+      "dateModified": {
+        "description": "The date of the last modification",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-20T19:00:00.000Z"
+      },
+      "dateCreatedDay": {
+        "description": "The day of creation",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-08-07T16:00:00.000Z"
+      },
+      "dateCreatedRange": {
+        "description": "Creation date range",
+        "type": "object",
+        "properties": {
+          "from": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/dateCreated"
+              }
+            ],
+            "description": "Date range from"
+          },
+          "to": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/dateCreated"
+              }
+            ],
+            "description": "Date range to"
+          }
+        }
+      },
+      "dateModifiedDay": {
+        "description": "The day of last modification",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-08-07T16:00:00.000Z"
+      },
+      "userCreated": {
+        "description": "The ID of the user who created the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "6a1fc1eeb5b68406e0487a10"
+      },
+      "userModified": {
+        "description": "The ID of the user who last modified the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "7e1fc1eeb5b68406e048796"
+      },
+      "Account": {
+        "description": "An Account",
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "The unique identifier of the item",
+            "type": "string",
+            "example": "d555345345345as67a342a"
+          },
+          "referenceId": {
+            "description": "The Account's reference Id",
+            "type": "string",
+            "example": "r-00001"
+          },
+          "name": {
+            "description": "The Account's name",
+            "type": "string",
+            "example": "Sample Account"
+          },
+          "status": {
+            "$ref": "#/components/schemas/status"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          }
+        }
+      },
+      "AccountList": {
+        "type": "array",
+        "description": "A list of Accounts",
+        "items": {
+          "$ref": "#/components/schemas/Account"
+        }
+      },
+      "AccountPostRequest": {
+        "type": "object",
+        "description": "Create or update an Account",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/Account/properties/id"
+          },
+          "name": {
+            "$ref": "#/components/schemas/Account/properties/name"
+          },
+          "referenceId": {
+            "$ref": "#/components/schemas/Account/properties/referenceId"
+          },
+          "status": {
+            "$ref": "#/components/schemas/Account/properties/status"
+          },
+          "configByIntegrationStore": {
+            "type": "array",
+            "description": "Indicates which store ids will be associated to one sales channel and warehouse (If the property **importOrders** is **true** this array is **required**)",
+            "items": {
+              "type": "object",
+              "properties": {
+                "warehouseId": {
+                  "description": "This refers to the `id` of the **warehouse** Entity. See [Wms](/v2/service/wms#tag/Warehouse).",
+                  "type": "string",
+                  "example": "221111b11111da22dca2ec2b"
+                },
+                "storeId": {
+                  "description": "The store id",
+                  "type": "string",
+                  "example": "store-1"
+                },
+                "salesChannelCommerceId": {
+                  "description": "This refers to the `id` of the **sale channel** Entity. See [Commerce](/v2/service/commerce#tag/Sales-Channel)",
+                  "type": "string",
+                  "example": "331111b11111da33dca3ec3b"
+                }
+              },
+              "required": [
+                "warehouseId",
+                "storeId",
+                "salesChannelCommerceId"
+              ]
+            }
+          },
+          "integrationClientSecret": {
+            "type": "string",
+            "description": "The client secret of integration",
+            "example": "secret123"
+          },
+          "importOrders": {
+            "type": "boolean",
+            "description": "Indicates if the account import orders",
+            "default": false,
+            "example": true
+          },
+          "importCatalog": {
+            "type": "boolean",
+            "description": "Indicates if the account import catalog",
+            "default": false,
+            "example": true
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "Order": {
+        "type": "object",
+        "description": "An order",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "integrationOrderId": {
+            "type": "string",
+            "description": "The integration order id",
+            "example": "V1StGXR8Z5jdHi6B"
+          },
+          "accountId": {
+            "type": "string",
+            "description": "The id of the account associated with the order",
+            "example": "672cdadd1849404bde3d0c70"
+          },
+          "deliveryId": {
+            "type": "string",
+            "description": "The id associated with order shipping",
+            "example": "672cdadd1849404bde3d0c80"
+          },
+          "accountName": {
+            "type": "string",
+            "description": "The name of the account associated with the order",
+            "example": "fizzmodarg"
+          },
+          "status": {
+            "description": "The order status",
+            "type": "string",
+            "enum": [
+              "accepted",
+              "cancelled"
+            ],
+            "example": "accepted"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          }
+        },
+        "required": [
+          "id",
+          "integrationOrderId",
+          "accountId",
+          "accountName",
+          "status"
+        ]
+      },
+      "OrderList": {
+        "type": "array",
+        "description": "A list of orders",
+        "items": {
+          "$ref": "#/components/schemas/Order"
+        }
+      },
+      "OrderStatusChange": {
+        "type": "object",
+        "description": "An Order Status Change",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "source": {
+            "type": "string",
+            "description": "The source of the status change",
+            "enum": [
+              "glovo",
+              "oms"
+            ],
+            "example": "glovo"
+          },
+          "orderId": {
+            "type": "string",
+            "description": "The glovo id of the order",
+            "example": "V1StGXR8Z5jdHi6B"
+          },
+          "accountId": {
+            "type": "string",
+            "description": "The id of the account that originated the status change",
+            "example": "672cdadd1849404bde3d0c70"
+          },
+          "accountName": {
+            "type": "string",
+            "description": "The name of the account that originated the status change",
+            "example": "fizzmod"
+          },
+          "clientCode": {
+            "type": "string",
+            "description": "The client code of the order",
+            "example": "defaultClient"
+          },
+          "loggingData": {
+            "type": "array",
+            "description": "A list of logging information of the status change process",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "Saved status change in DB"
+            ]
+          },
+          "rawEvent": {
+            "type": "object",
+            "description": "The raw event of the order received from glovo"
+          },
+          "eventType": {
+            "type": "string",
+            "description": "The event type of the status order",
+            "enum": [
+              "created",
+              "cancelled"
+            ],
+            "example": "created"
+          },
+          "status": {
+            "description": "The order status change processing status",
+            "type": "string",
+            "default": "pending",
+            "enum": [
+              "pending",
+              "processing",
+              "processed",
+              "skipped",
+              "error"
+            ],
+            "example": "pending"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          }
+        },
+        "required": [
+          "id",
+          "source",
+          "orderId",
+          "accountId",
+          "accountName",
+          "clientCode",
+          "eventType",
+          "status"
+        ]
+      },
+      "OrderStatusChangeList": {
+        "type": "array",
+        "description": "A list of Order Status Changes",
+        "items": {
+          "$ref": "#/components/schemas/OrderStatusChange"
+        }
+      },
+      "listenerEvent": {
+        "description": "A JANIS Event object",
+        "type": "object",
+        "properties": {
+          "service": {
+            "description": "The source service name",
+            "type": "string",
+            "example": "id"
+          },
+          "entity": {
+            "description": "The event related entity",
+            "type": "string",
+            "example": "profile"
+          },
+          "event": {
+            "description": "The event name",
+            "type": "string",
+            "example": "created"
+          },
+          "client": {
+            "description": "The source event client",
+            "type": "string",
+            "example": "fizzmod"
+          },
+          "id": {
+            "description": "The event related entity ID",
+            "type": "string",
+            "example": "5d699c1ae8ebb95eaa24aca9"
+          }
+        },
+        "required": [
+          "service",
+          "entity",
+          "event"
+        ]
+      }
+    }
+  }
+}

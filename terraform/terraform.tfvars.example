@@ -1,0 +1,129 @@
+# ============================================================================
+# PLANTILLA DE CONFIGURACIÓN PARA EL CLIENTE
+# ============================================================================
+# Copiar este archivo a terraform.tfvars y completar con valores reales
+# NUNCA commitear terraform.tfvars con valores reales a Git
+# ============================================================================
+
+# ============================================================================
+# AWS Configuration
+# ============================================================================
+
+aws_region     = "us-east-1"
+aws_account_id = "123456789012" # REEMPLAZAR con Account ID real
+
+# ============================================================================
+# Network Configuration
+# ============================================================================
+
+# IMPORTANTE: Verificar que este CIDR no conflictúe con redes corporativas
+vpc_cidr = "10.0.0.0/16"
+
+# Subnets activas (Single-AZ en us-east-1a)
+public_subnet_a_cidr    = "10.0.1.0/24"
+private_subnet_1a_cidr  = "10.0.10.0/24"
+private_subnet_2a_cidr  = "10.0.20.0/24"
+
+# Multi-AZ: Cambiar a true cuando se requiera alta disponibilidad
+enable_multi_az = false
+
+# Subnets reservadas para futura expansión Multi-AZ (us-east-1b)
+public_subnet_b_cidr    = "10.0.2.0/24"
+private_subnet_1b_cidr  = "10.0.11.0/24"
+private_subnet_2b_cidr  = "10.0.21.0/24"
+
+# ============================================================================
+# Existing Infrastructure Integration
+# ============================================================================
+
+# Redshift Cluster Existente
+existing_redshift_cluster_id = "cencosud-redshift-prod" # REEMPLAZAR
+existing_redshift_sg_id      = "sg-0123456789abcdef0"   # REEMPLAZAR
+
+# Sistemas BI Existentes
+existing_bi_security_groups = [
+  "sg-powerbi-123456",  # REEMPLAZAR con SG real de Power BI
+  "sg-tableau-789012",  # REEMPLAZAR con SG real de Tableau
+]
+
+existing_bi_ip_ranges = [
+  "192.168.1.0/24",  # REEMPLAZAR con rangos IP reales de BI
+  "192.168.2.0/24",
+]
+
+# Pipeline MySQL→Redshift actual (temporal durante migración)
+# Dejar vacío si ya no existe
+existing_mysql_pipeline_sg_id = "" # "sg-mysql-pipeline-123"
+
+# ============================================================================
+# Tagging Strategy (Estándares Corporativos)
+# ============================================================================
+
+project_name = "janis-cencosud-integration"
+environment  = "production" # development | staging | production
+owner        = "data-engineering-team"
+cost_center  = "CC-12345" # REEMPLAZAR con código real de cost center
+
+# Tags adicionales según políticas corporativas de Cencosud
+additional_tags = {
+  DataClassification = "Confidential"
+  BackupPolicy       = "daily"
+  ComplianceLevel    = "SOC2"
+  BusinessUnit       = "Data & Analytics"
+  # Agregar más tags según sea necesario
+}
+
+# ============================================================================
+# Security Configuration
+# ============================================================================
+
+# IPs permitidas para webhooks de Janis
+# IMPORTANTE: Reemplazar 0.0.0.0/0 con rangos IP reales de Janis
+allowed_janis_ip_ranges = [
+  "0.0.0.0/0", # REEMPLAZAR con IPs reales de Janis
+]
+
+# WAF Configuration
+waf_rate_limit       = 2000  # Requests por IP en 5 minutos
+waf_allowed_countries = ["PE"] # Solo Perú (agregar más si es necesario)
+
+# ============================================================================
+# Monitoring Configuration
+# ============================================================================
+
+vpc_flow_logs_retention_days = 90
+dns_logs_retention_days      = 90
+
+# SNS Topic para alertas de CloudWatch
+# Crear el topic primero o dejar vacío para crear después
+alarm_sns_topic_arn = "" # "arn:aws:sns:us-east-1:123456789012:infrastructure-alerts"
+
+enable_vpc_flow_logs      = true
+enable_dns_query_logging  = true
+
+# ============================================================================
+# EventBridge Polling Configuration
+# ============================================================================
+
+# Frecuencias de polling (ajustar según necesidades del negocio)
+order_polling_rate_minutes   = 5     # Órdenes: cada 5 minutos
+product_polling_rate_minutes = 60    # Productos: cada hora
+stock_polling_rate_minutes   = 10    # Inventario: cada 10 minutos
+price_polling_rate_minutes   = 30    # Precios: cada 30 minutos
+store_polling_rate_minutes   = 1440  # Tiendas: una vez al día
+
+# ARN del ambiente MWAA (dejar vacío si aún no está creado)
+mwaa_environment_arn = "" # "arn:aws:airflow:us-east-1:123456789012:environment/cencosud-mwaa"
+
+# ============================================================================
+# VPC Endpoints Configuration
+# ============================================================================
+
+# Habilitar/deshabilitar endpoints según necesidades
+enable_s3_endpoint              = true
+enable_glue_endpoint            = true
+enable_secrets_manager_endpoint = true
+enable_logs_endpoint            = true
+enable_kms_endpoint             = true
+enable_sts_endpoint             = true
+enable_events_endpoint          = true

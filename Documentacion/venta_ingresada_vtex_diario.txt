@@ -1,0 +1,417 @@
+-- DROP PROCEDURE dl_sp_dashboards_ecommerce.venta_ingresada_vtex_diario();
+
+CREATE OR REPLACE PROCEDURE dl_sp_dashboards_ecommerce.venta_ingresada_vtex_diario()
+	LANGUAGE plpgsql
+AS $$
+		
+
+begin
+
+drop table if exists #vtex_diariofecha_dims_Timestamp;
+WITH tmp_variables AS (
+SELECT 
+cast(to_char(dateadd(day,-36,convert_timezone('GMT','GMT+5',getdate())),'yyyymmdd') as int) AS var_fecha_ini,
+cast(to_char(dateadd(day,-1,convert_timezone('GMT','GMT+5',getdate())),'yyyymmdd') as int)AS var_fecha_fin,
+TO_TIMESTAMP(to_char(dateadd(day,-36,convert_timezone('GMT','GMT+5',getdate())),'yyyy-mm-dd') ,'YYYY-MM-DD') as var_fecha_ini_timestamp,
+TO_TIMESTAMP(to_char(dateadd(day,-0,convert_timezone('GMT','GMT+5',getdate())),'yyyy-mm-dd') ,'YYYY-MM-DD') as var_fecha_fin_timestamp
+)
+
+select * into #vtex_diariofecha_dims_Timestamp  from  tmp_variables;
+
+--drop table if exists #vtex_diarioTabla_fechas;
+
+--CREATE TABLE IF NOT EXISTS #vtex_diarioTabla_fechas
+--(
+--	var_fecha_ini INTEGER
+--	,var_fecha_fin INTEGER  
+--	,var_fecha_ini_timestamp TIMESTAMP
+--	,var_fecha_fin_timestamp TIMESTAMP
+--);
+
+--insert into #vtex_diarioTabla_fechas
+--select * from #vtex_diariofecha_dims_Timestamp;
+
+
+--drop table if exists #vtex_diarioeco_oms_total;
+--select * into #vtex_diarioeco_oms_total from stg_ecommerce_vtex.eco_oms a
+--where creationdate >=(select var_fecha_ini_timestamp from #vtex_diarioTabla_fechas ) and creationdate<(select var_fecha_fin_timestamp from #vtex_diarioTabla_fechas );
+
+drop table if exists #vtex_diarioeco_oms_total;
+select * into #vtex_diarioeco_oms_total from stg_ecommerce_vtex.eco_oms a
+where creationdate >= (select var_fecha_ini_timestamp from #vtex_diariofecha_dims_Timestamp ) 
+and creationdate < (select var_fecha_fin_timestamp from #vtex_diariofecha_dims_Timestamp );
+
+--drop table if exists #vtex_diarioeco_oms_total;
+--select * into #vtex_diarioeco_oms_total from stg_ecommerce_vtex.eco_oms a
+--where creationdate >='2024-07-19 00:00:00.000 -0500' and creationdate<'2024-08-19 00:00:00.000 -0500';
+
+drop table if exists #vtex_diariofecha_dim;
+select SK_DIA as codfecha,sk_Semana Semana,desc_abrv_dia_sem as NOM_DIA into #vtex_diariofecha_dim from dl_sp_maestras.dim_dia
+where SK_DIA>=(select var_fecha_ini from #vtex_diariofecha_dims_Timestamp ) and SK_DIA<=(select var_fecha_fin from #vtex_diariofecha_dims_Timestamp );
+
+
+--Extraer Pedidos desde Vtex 
+drop table if exists #vtex_diarioPedidos_Vtex;
+select  to_char(CreationDate,'YYYYMM')MES
+        ,SEMANA
+        ,to_char(CreationDate,'YYYYMMDD')DIA 
+        , ClientDocument DNI
+        , ReferenceCode COD_MAT
+        , right('000000000000000000' + ReferenceCode,18)COD_MATERIAL
+        , ordernum VTEX_ID
+        ,SKUName MATERIAL 
+        , DiscountsNames 
+        , StatusOrder ESTADO
+        ,SUM (Quantity_SKU) Q_SKU
+        , SKUTotalPrice as SELLING_PRICE
+        , SUM(SKUTotalPrice * Quantity_SKU)VENTA_BRUTA
+        ,CASE WHEN  (SellerName in ('wongfood','metrofood','app','appmetro')or SellerName like '%wongiot%' or SellerName like '%metroios%' or SellerName like '%metroioh%')
+         then 'TIENDA' else 'ALMACEN' end as OPERACION
+        ,CASE WHEN (SellerName NOT IN ('wongfood','metrofood','appmetro','app') AND SellerName NOT like '%wongiot%' AND SellerName NOT like '%metroios%' AND  SellerName NOT like '%metroioh%') AND (HOST LIKE '%metro%' or HOST='appmetro')  THEN 'S129' 
+         WHEN (SellerName NOT IN ('wongfood','metrofood','appmetro','app') AND SellerName NOT like '%wongiot%' AND SellerName NOT like '%metroios%' AND  SellerName NOT like '%metroioh%')AND (HOST LIKE '%wong%' OR HOST='app') THEN 'T129'
+         WHEN SUBSTRING(COURRIER,1,4) = 'TH12' THEN 'W101' 
+         ELSE SUBSTRING (COURRIER,1,4) END COD_TIENDA
+        ,CASE WHEN  UtmSource like '%AppMetro%' or UtmSource like '%AppWong%' THEN 'APP' ELSE 'WEB' END CANAL_ECO
+        ,CASE WHEN  COURRIER LIKE '%REC%' OR COURRIER LIKE '%RETIRO%' OR  COURRIER LIKE '%AUTO%' THEN 'RETIRO EN TIENDA' ELSE 'DELIVERY' END DESPACHO
+        ,prime_order
+        ,status_janis Estado_Janis
+        ,sellerorderid
+into #vtex_diarioPedidos_Vtex
+from #vtex_diarioeco_oms_total  a
+inner join #vtex_diariofecha_dim b on to_char(CreationDate,'YYYYMMDD') = b.codfecha
+and StatusOrder not in ('',' ') 
+WHERE quantity_sku<>0 AND  Courrier not in ('Transportadora Donación','Transportadora Donacion') 
+group by to_char(CreationDate,'YYYYMM')
+        ,SEMANA
+        ,to_char(CreationDate,'YYYYMMDD') 
+         , ClientDocument 
+        , ReferenceCode 
+        , right('000000000000000000' + ReferenceCode,18)
+        , ordernum 
+        ,SKUName  
+        , DiscountsNames 
+        , StatusOrder 
+        , SKUTotalPrice 
+        ,CASE WHEN  (SellerName in ('wongfood','metrofood','app','appmetro')or SellerName like '%wongiot%' or SellerName like '%metroios%' or SellerName like '%metroioh%')
+         then 'TIENDA' else 'ALMACEN' end
+        ,CASE WHEN (SellerName NOT IN ('wongfood','metrofood','appmetro','app') AND SellerName NOT like '%wongiot%' AND SellerName NOT like '%metroios%' AND  SellerName NOT like '%metroioh%') AND (HOST LIKE '%metro%' or HOST='appmetro')  THEN 'S129' 
+         WHEN (SellerName NOT IN ('wongfood','metrofood','appmetro','app') AND SellerName NOT like '%wongiot%' AND SellerName NOT like '%metroios%' AND  SellerName NOT like '%metroioh%')AND (HOST LIKE '%wong%' OR HOST='app') THEN 'T129'
+         WHEN SUBSTRING(COURRIER,1,4) = 'TH12' THEN 'W101' 
+         ELSE SUBSTRING (COURRIER,1,4) END 
+        ,CASE WHEN  UtmSource like '%AppMetro%' or UtmSource like '%AppWong%' THEN 'APP' ELSE 'WEB' END  
+        ,CASE WHEN  COURRIER LIKE '%REC%' OR COURRIER LIKE '%RETIRO%' OR  COURRIER LIKE '%AUTO%' THEN 'RETIRO EN TIENDA' ELSE 'DELIVERY' END
+        ,prime_order
+        ,status_janis
+        ,sellerorderid;
+ 
+       
+drop table if exists #vtex_diariojanis_pime;
+select
+from_unixtime_janis(o.date_created)				as fechapedido
+,o.seq_id										as op
+,o.vtex_id										as vtex_id
+,seller_ecom_id                                 as Seller
+,o.status                                       AS statusOrder
+,from_unixtime_janis(shi.shipping_window_start) as fechaprogramada	 
+into #vtex_diariojanis_pime
+from stg_ecommerce_janis_legacy.wms_orders o
+left join stg_ecommerce_janis_legacy.wms_order_shipping shi on (shi.order_id=o.id)
+left join 	(
+			select
+			order_id
+			, max(id) as id
+			from stg_ecommerce_janis_legacy.wms_order_shipping
+			group by
+			order_id
+			) shi_max on (shi_max.order_id=shi.order_id and shi_max.id=shi.id)
+where to_char(from_unixtime_janis(o.date_created)	,'yyyymmdd')>=(select var_fecha_ini from #vtex_diariofecha_dims_Timestamp )
+and to_char(from_unixtime_janis(o.date_created)	,'yyyymmdd')<=(select var_fecha_fin from #vtex_diariofecha_dims_Timestamp )
+union all
+select
+from_unixtime_janis(o.date_created)				as fechapedido
+,o.seq_id										as op
+,o.vtex_id										as vtex_id
+,seller_ecom_id                                 as Seller
+,o.status                                       AS statusOrder
+,from_unixtime_janis(shi.shipping_window_start) as fechaprogramada	 
+from stg_ecommerce_janis_wongio.wms_orders o
+left join stg_ecommerce_janis_wongio.wms_order_shipping shi on (shi.order_id=o.id)
+left join 	(
+			select
+			order_id
+			, max(id) as id
+			from stg_ecommerce_janis_wongio.wms_order_shipping
+			group by
+			order_id
+			) shi_max on (shi_max.order_id=shi.order_id and shi_max.id=shi.id)
+where to_char(from_unixtime_janis(o.date_created)	,'yyyymmdd')>=(select var_fecha_ini from #vtex_diariofecha_dims_Timestamp )
+and to_char(from_unixtime_janis(o.date_created)	,'yyyymmdd')<=(select var_fecha_fin from #vtex_diariofecha_dims_Timestamp )
+union all
+select
+from_unixtime_janis(o.date_created)				as fechapedido
+,o.seq_id										as op
+,o.vtex_id										as vtex_id
+,seller_ecom_id                                 as Seller
+,o.status                                       AS statusOrder
+,from_unixtime_janis(shi.shipping_window_start) as fechaprogramada	 
+from stg_ecommerce_janis_metroio.wms_orders o
+left join stg_ecommerce_janis_metroio.wms_order_shipping shi on (shi.order_id=o.id)
+left join 	(
+			select
+			order_id
+			, max(id) as id
+			from stg_ecommerce_janis_metroio.wms_order_shipping
+			group by
+			order_id
+			) shi_max on (shi_max.order_id=shi.order_id and shi_max.id=shi.id)
+where to_char(from_unixtime_janis(o.date_created)	,'yyyymmdd')>=(select var_fecha_ini from #vtex_diariofecha_dims_Timestamp )
+and to_char(from_unixtime_janis(o.date_created)	,'yyyymmdd')<=(select var_fecha_fin from #vtex_diariofecha_dims_Timestamp );
+			
+			
+ALTER TABLE #vtex_diariojanis_pime
+ADD DESC_ESTADO_ORDEN_ONLINE_AGRUPADO VARCHAR(200);
+ 
+UPDATE #vtex_diariojanis_pime
+SET DESC_ESTADO_ORDEN_ONLINE_AGRUPADO=B.DESC_ESTADO_ORDEN_ONLINE_AGRUPADO            
+FROM  #vtex_diariojanis_pime A INNER JOIN   dl_sp_maestras.dim_estado_orden_online B  ON A.statusOrder = B.ID_ESTADO_ORDEN_ONLINE;
+
+
+drop table if exists #vtex_diarioPEDIDOS_T129_prime;
+SELECT DISTINCT N_Ped_eCommerce Seller
+	,SUBSTRING(N_Ped_eCommerce,5,21)VTEX_ID
+	,ESTADO
+	,Fec_Pedido FECHA_PEDIDO
+	, DESC_ESTADO_ORDEN_ONLINE_AGRUPADO
+	, primera_fecha 
+INTO #vtex_diarioPEDIDOS_T129_prime	
+FROM per_super_pd_int.transacciones_nonfood A
+    INNER JOIN #vtex_diariofecha_dim C ON A.Fec_Pedido=C.CODFECHA
+	LEFT JOIN  dl_sp_maestras.dim_estado_orden_online B ON UPPER(A.ESTADO) = B.DESC_ESTADO_ORDEN_ONLINE
+WHERE COD_MATERIAL <> 'FLETE ECOMMERCE' ;
+
+drop table if exists #vtex_diarioPRIME_ESTADOS_ORIGEN_PRIME;
+SELECT DISTINCT SELLER,VTEX_ID,DESC_ESTADO_ORDEN_ONLINE_AGRUPADO INTO #vtex_diarioPRIME_ESTADOS_ORIGEN_PRIME FROM #vtex_diariojanis_pime
+UNION ALL
+SELECT DISTINCT SELLER,VTEX_ID, DESC_ESTADO_ORDEN_ONLINE_AGRUPADO FROM #vtex_diarioPEDIDOS_T129_prime;
+ 
+ALTER TABLE #vtex_diarioPedidos_Vtex
+ADD ESTADO_AGRUPADO_2 VARCHAR(100);
+
+UPDATE #vtex_diarioPedidos_Vtex
+SET ESTADO_AGRUPADO_2=DESC_ESTADO_ORDEN_ONLINE_AGRUPADO
+FROM  #vtex_diarioPedidos_Vtex A INNER JOIN #vtex_diarioPRIME_ESTADOS_ORIGEN_PRIME B ON A.VTEX_ID=B.VTEX_ID;
+       
+drop table if exists #vtex_diarioMATERIALES_UNIDO_1;
+
+SELECT ID_MATERIAL,ID_EAN_PRINCIPAL,A.SK_DIA_CREACION_MATERIAL,DESC_MATERIAL,DESC_MARCA,ID_UM_BASE,ID_PROVEEDOR,DESC_PROVEEDOR,
+ID_GRUPO_ARTICULO,DESC_GRUPO_ARTICULO,ID_CATEGORIA,DESC_CATEGORIA,DESC_JEFE_CATEGORIA,DESC_JEFE_CATEGORIA_MP,DESC_JEFE_CATEGORIA_IMP,ID_SUB_CATEGORIA,DESC_SUB_CATEGORIA,ID_SECCION,DESC_SECCION,ID_DEPARTAMENTO,DESC_DEPARTAMENTO,ID_AREA,DESC_AREA,ID_GERENCIA_COMERCIAL,DESC_GERENCIA_COMERCIAL,ID_GERENTE,DESC_GERENTE,
+DESC_UNIDAD_NEGOCIO,E.SK_CATEGORIA,A.SK_MATERIAL,B.SK_MARCA,ID_TIPO_IGV
+INTO #vtex_diarioMATERIALES_UNIDO_1 FROM dl_sp_capa_semantica.dw_cencofcic_dim_material A
+INNER JOIN dl_sp_capa_semantica.dw_cencofcic_dim_marca B ON A.SK_MARCA=B.SK_MARCA
+INNER JOIN dl_sp_capa_semantica.dw_cencofcic_dim_proveedor C ON A.SK_PROVEEDOR=C.SK_PROVEEDOR
+INNER JOIN dl_sp_maestras.dim_grupo_articulo D ON A.SK_GRUPO_ARTICULO=D.SK_GRUPO_ARTICULO
+INNER JOIN dl_sp_maestras.dim_categoria E ON D.SK_CATEGORIA=E.SK_CATEGORIA
+INNER JOIN dl_sp_maestras.dim_jefe_categoria F ON D.SK_JEFE_CATEGORIA=F.SK_JEFE_CATEGORIA
+INNER JOIN dl_sp_maestras.dim_jefe_categoria_mp G ON D.SK_JEFE_CATEGORIA_MP=G.SK_JEFE_CATEGORIA_MP
+INNER JOIN dl_sp_maestras.dim_jefe_categoria_imp H ON D.SK_JEFE_CATEGORIA_IMP=H.SK_JEFE_CATEGORIA_IMP
+INNER JOIN dl_sp_maestras.dim_sub_categoria I ON D.SK_SUB_CATEGORIA=I.SK_SUB_CATEGORIA
+INNER JOIN dl_sp_maestras.dim_seccion J ON D.SK_SECCION=J.SK_SECCION
+INNER join dl_sp_maestras.dim_departamento K ON D.SK_DEPARTAMENTO=K.SK_DEPARTAMENTO
+INNER JOIN dl_sp_maestras.dim_area L ON D.SK_AREA=L.SK_AREA
+INNER JOIN dl_sp_maestras.dim_gerencia_comercial M ON D.SK_GERENCIA_COMERCIAL=M.SK_GERENCIA_COMERCIAL
+INNER JOIN dl_sp_maestras.dim_gerente N ON D.SK_GERENTE=N.SK_GERENTE;
+
+drop table if exists #vtex_diarioMATERIAL_1;
+SELECT id_material as "COD_MATERIAL",ID_EAN_PRINCIPAL as "EAN",SK_DIA_CREACION_MATERIAL as "FECHA_CREACION",DESC_MATERIAL,DESC_MARCA as "MARCA"
+,ID_UM_BASE as "UMB",ID_PROVEEDOR as "COD_PROVEEDOR",DESC_PROVEEDOR,ID_GRUPO_ARTICULO as "COD_GA",DESC_GRUPO_ARTICULO as"GRUPO_ARTICULO",
+ID_CATEGORIA as "COD_CATEGORIA",DESC_CATEGORIA as "CATEGORIA",DESC_JEFE_CATEGORIA"JEFE_CATEGORIA"
+,DESC_JEFE_CATEGORIA_MP"JEFE_CATEGORIA_MP",DESC_JEFE_CATEGORIA_IMP"JEFE_CATEGORIA_IMP",
+ID_SUB_CATEGORIA"COD_SUB_CATEGORIA",DESC_SUB_CATEGORIA"SUB_CATEGORIA",ID_SECCION"COD_SECCION",DESC_SECCION"SECCION",
+ID_DEPARTAMENTO"COD_DEPARTAMENTO",DESC_DEPARTAMENTO"DEPARTAMENTO",ID_AREA"COD_AREA",DESC_AREA"AREA",ID_GERENCIA_COMERCIAL"COD_GERENCIA",
+DESC_GERENCIA_COMERCIAL"GERENCIA_COMERCIAL",ID_GERENTE"COD_GERENTE", DESC_GERENTE"GERENTE",DESC_UNIDAD_NEGOCIO UNIDAD_NEGOCIO,SK_CATEGORIA,SK_MATERIAL,SK_MARCA,ID_TIPO_IGV
+INTO #vtex_diarioMATERIAL_1 FROM #vtex_diarioMATERIALES_UNIDO_1;
+
+drop table if exists #vtex_diarioPEDIDO_MAT_PRIME;
+SELECT a.*,CASE when ID_TIPO_IGV IN (0,3,4,5) THEN VENTA_BRUTA ELSE VENTA_BRUTA/1.18  END as VENTA_NETA,
+CASE WHEN SK_CADENA=1 THEN 'WONG' WHEN SK_CADENA=2 THEN 'METRO' END CADENA,marca,sk_categoria,categoria,sk_material,sk_cadena,sk_marca
+INTO #vtex_diarioPEDIDO_MAT_PRIME  FROM #vtex_diarioPedidos_Vtex a
+INNER JOIN #vtex_diarioMATERIAL_1 M ON a.COD_MATERIAL=M."COD_MATERIAL"
+LEFT JOIN dl_sp_maestras.dim_tienda B ON a.COD_TIENDA=B.ID_TIENDA;
+
+alter table  #vtex_diarioPEDIDO_MAT_PRIME add Prime varchar(2);
+
+update  #vtex_diarioPEDIDO_MAT_PRIME
+set prime= case when prime_order is true then 'SI' else 'NO' end;
+
+update #vtex_diarioPEDIDO_MAT_PRIME set estado_agrupado_2='ANULADO Y DEVOLUCIONES'
+where estado_agrupado_2='ANULADO';
+
+update #vtex_diarioPEDIDO_MAT_PRIME set estado_agrupado_2='POR IDENTIFICAR' 
+where estado_agrupado_2 is null;
+
+drop table if exists #vtex_diariofinal_vtex;
+select cadena,canal_eco canal,mes,dia,semana,prime,sum(venta_bruta)venta_bruta,sum(venta_neta)venta_neta
+,count(distinct vtex_id)trx,
+estado_agrupado_2 estado_agrupado,convert_timezone('GMT','GMT+5',getdate()) Hora_Actualización,to_date(dia, 'yyyymmdd')	Fecha_Compra																						
+into  #vtex_diariofinal_vtex  from #vtex_diarioPEDIDO_MAT_PRIME
+group by cadena,canal_eco,mes,dia,semana,prime,estado_agrupado_2;
+
+delete from dl_sp_dashboards_ecommerce.venta_diaria_vtex 
+where dia>=(select var_fecha_ini from #vtex_diariofecha_dims_Timestamp ) and dia<=(select var_fecha_fin from #vtex_diariofecha_dims_Timestamp );
+
+insert into dl_sp_dashboards_ecommerce.venta_diaria_vtex (cadena,canal,mes,dia,semana,prime,venta_bruta,venta_neta,trx,estado_agrupado,Hora_Actualización,Fecha_Compra)
+select * from #vtex_diariofinal_vtex;
+
+update dl_sp_dashboards_ecommerce.venta_diaria_vtex  set Hora_Actualización=convert_timezone('GMT','GMT+5',getdate()) ;
+
+
+----------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------Pedidos Ecommerce Programados por Tienda DAD----------------------------- 
+----------------------------------------------------------------------------------------------------------------------------
+
+drop table if exists #variables;
+
+WITH tmp_variables_eco AS (
+SELECT 
+
+   --'20240101' AS Fecha_Inicial_Forecast, --to_char(getdate()-15,'YYYYMMDD')
+   --'20250702' AS   Fecha_Final_Forecast
+
+     to_char(dateadd(day,0,convert_timezone('GMT','GMT+5',getdate()-28)),'yyyymmdd') AS Fecha_Inicial_Forecast, --to_char(getdate()-15,'YYYYMMDD')
+     to_char(dateadd(day,0,convert_timezone('GMT','GMT+5',getdate()-1)),'yyyymmdd') AS   Fecha_Final_Forecast
+
+)
+
+select * into #variables  from  tmp_variables_eco;
+
+drop table if exists #data_programados_consolidado_legacy;--7 seg
+select
+o.seq_id 																																		as Pedido
+,from_unixtime_janis(shi.shipping_window_start)																									as Fecha_Programada
+,to_char(from_unixtime_janis(shi.shipping_window_start),'yyyymmdd')																		        as Dia_Programado
+,convert(varchar(20),'LEGACY')																													as origen
+,s.title																																		as title
+,c."type"                                                                                                                                       as tipo
+,from_unixtime_janis(o.invoice_date)																									        as Fecha_Factura
+,to_char(from_unixtime_janis(o.invoice_date),'yyyymmdd')																		                as Dia_Factura
+,o.status 
+into #data_programados_consolidado_legacy
+from stg_ecommerce_janis_legacy.wms_orders o
+left join stg_ecommerce_janis_legacy.wms_stores s on (s.id=o.store)
+left join stg_ecommerce_janis_legacy.wms_order_shipping shi on (shi.order_id=o.id)
+inner join 	(
+			select
+			order_id
+			, min(id) as id
+			from stg_ecommerce_janis_legacy.wms_order_shipping
+			group by
+			order_id
+			) shi_max on (shi_max.order_id=shi.order_id and shi_max.id=shi.id)
+left join stg_ecommerce_janis_legacy.wms_logistic_carriers c on (c.ref_id=shi.carrier_id)
+where to_char(from_unixtime_janis(o.invoice_date),'yyyymmdd')>=(select distinct Fecha_Inicial_Forecast  from #variables) and 
+to_char(from_unixtime_janis(o.invoice_date),'yyyymmdd')<=(select distinct Fecha_Final_Forecast  from #variables)
+and shi_max.id is not null;
+
+
+-- Janis Metro IO
+drop table if exists #data_programados_consolidado_metro;--4 seg
+select
+o.seq_id 																																		as Pedido
+,from_unixtime_janis(shi.shipping_window_start)																									as Fecha_Programada
+,to_char(from_unixtime_janis(shi.shipping_window_start),'yyyymmdd')																		        as Dia_Programado
+,convert(varchar(20),'METRO_IO')																												as origen
+,s.title																																		as title
+,c."type"                                                                                                                                       as tipo
+,from_unixtime_janis(o.invoice_date)																									        as Fecha_Factura
+,to_char(from_unixtime_janis(o.invoice_date),'yyyymmdd')																		                as Dia_Factura
+,o.status 
+into #data_programados_consolidado_metro
+from stg_ecommerce_janis_metroio.wms_orders o
+left join stg_ecommerce_janis_metroio.wms_stores s on (s.id=o.store)
+left join stg_ecommerce_janis_metroio.wms_order_shipping shi on (shi.order_id=o.id)
+inner join 	(
+			select
+			order_id
+			, min(id) as id
+			from stg_ecommerce_janis_metroio.wms_order_shipping
+			group by
+			order_id
+			) shi_max on (shi_max.order_id=shi.order_id and shi_max.id=shi.id)
+left join stg_ecommerce_janis_metroio.wms_logistic_carriers c on (c.ref_id=shi.carrier_id)
+where to_char(from_unixtime_janis(o.invoice_date),'yyyymmdd')>=(select distinct Fecha_Inicial_Forecast  from #variables) and 
+to_char(from_unixtime_janis(o.invoice_date),'yyyymmdd')<=(select distinct Fecha_Final_Forecast  from #variables)
+and shi_max.id is not null;
+
+-- Janis Wong IO
+drop table if exists #data_programados_consolidado_wong;--4 seg
+select
+o.seq_id 																																	    as Pedido
+,from_unixtime_janis(shi.shipping_window_start)																									as Fecha_Programada
+,to_char(from_unixtime_janis(shi.shipping_window_start),'yyyymmdd')																		        as Dia_Programado
+,convert(varchar(20),'WONG_IO')																													as origen
+,s.title																																		as title
+,c."type"                                                                                                                                       as tipo
+,from_unixtime_janis(o.invoice_date)																									        as Fecha_Factura
+,to_char(from_unixtime_janis(o.invoice_date),'yyyymmdd')																		                as Dia_Factura
+,o.status 
+into #data_programados_consolidado_wong
+from stg_ecommerce_janis_wongio.wms_orders o
+left join stg_ecommerce_janis_wongio.wms_stores s on (s.id=o.store)
+left join stg_ecommerce_janis_wongio.wms_order_shipping shi on (shi.order_id=o.id)
+inner join 	(
+			select
+			order_id
+			, min(id) as id
+			from stg_ecommerce_janis_wongio.wms_order_shipping
+			group by
+			order_id
+			) shi_max on (shi_max.order_id=shi.order_id and shi_max.id=shi.id)
+left join stg_ecommerce_janis_wongio.wms_logistic_carriers c on (c.ref_id=shi.carrier_id)
+where to_char(from_unixtime_janis(o.invoice_date),'yyyymmdd')>=(select distinct Fecha_Inicial_Forecast  from #variables) and 
+to_char(from_unixtime_janis(o.invoice_date),'yyyymmdd')<=(select distinct Fecha_Final_Forecast  from #variables)
+and shi_max.id is not null;
+
+drop table if exists #data_programados_consolidado;
+select * ,substring(title,1,4)Cod_Tienda,to_date(Dia_Programado, 'yyyymmdd')Fecha_Programado,to_date(Dia_Factura, 'yyyymmdd')Fecha_Factura_Date,substring(Dia_Factura,1,6)Mes_Factura
+into #data_programados_consolidado from #data_programados_consolidado_legacy
+union all
+select * ,substring(title,1,4)Cod_Tienda,to_date(Dia_Programado, 'yyyymmdd')Fecha_Programado,to_date(Dia_Factura, 'yyyymmdd')Fecha_Factura_Date,substring(Dia_Factura,1,6)Mes_Factura 
+from #data_programados_consolidado_metro
+union all
+select *,substring(title,1,4)Cod_Tienda,to_date(Dia_Programado, 'yyyymmdd')Fecha_Programado,to_date(Dia_Factura, 'yyyymmdd')Fecha_Factura_Date,substring(Dia_Factura,1,6)Mes_Factura
+from #data_programados_consolidado_wong;
+
+alter table  #data_programados_consolidado  ADD ESTADO_AGRUPADO VARCHAR(200);
+
+UPDATE #data_programados_consolidado
+SET ESTADO_AGRUPADO=B.DESC_ESTADO_ORDEN_ONLINE_AGRUPADO            
+FROM  #data_programados_consolidado A INNER JOIN   dl_sp_maestras.dim_estado_orden_online B  ON A.status = B.ID_ESTADO_ORDEN_ONLINE;
+
+drop table if exists #data_programados_consolidado_cadena;
+SELECT a.*,sk_semana semana,initcap(b.desc_abrv1_tienda) Tienda,r.desc_region_agrupada,
+CASE WHEN Sk_cadena=1 THEN 'Wong' WHEN Sk_cadena=2 THEN 'Metro' END Cadena
+INTO #data_programados_consolidado_cadena  FROM #data_programados_consolidado a 
+LEFT JOIN dl_sp_maestras.dim_tienda b ON a.Cod_Tienda=b.id_tienda
+LEFT JOIN dl_sp_maestras.dim_dia  c ON c.SK_DIA=a.Dia_Programado
+LEFT JOIN dl_sp_maestras.dim_region r ON b.sk_region=r.sk_region ;
+
+delete from dl_sp_dashboards_ecommerce.pedidos_eco_programados_facturados
+where Dia_Factura in (select distinct Dia_Factura from #data_programados_consolidado_cadena);
+
+insert into dl_sp_dashboards_ecommerce.pedidos_eco_programados_facturados
+select distinct cadena,cod_tienda,Dia_Programado,Fecha_Programado,Dia_Factura,Fecha_Factura_Date,desc_region_agrupada region
+,count(distinct pedido)Pedidos,convert_timezone('GMT','GMT+5',getdate()) Hora_Actualización,Mes_Factura
+from #data_programados_consolidado_cadena
+where ESTADO_AGRUPADO not in ('ANULADO Y DEVOLUCIONES') and (tipo like '%Despacho%' or tipo like '%delivery%' or tipo like '%Delivery%')
+group by cadena,cod_tienda,Dia_Programado,Fecha_Programado,Dia_Factura,Fecha_Factura_Date,desc_region_agrupada,Mes_Factura;
+
+
+
+
+end
+
+
+
+$$
+;
+

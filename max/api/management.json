@@ -1,0 +1,1076 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Management Service",
+    "description": "Management Service\n\n **Last update**: 23 ene 26, 07:07 a. m.",
+    "version": "1.7.0",
+    "x-logo": null,
+    "x-janis-keywords": [
+      "management",
+      "motive",
+      "reason"
+    ],
+    "lastUpdate": "2026-01-23T10:07:24.357Z"
+  },
+  "tags": [
+    {
+      "name": "Motive",
+      "description": "Manage motives for different service actions."
+    }
+  ],
+  "servers": [
+    {
+      "url": "https://management.janis.in/api",
+      "description": "The Prod API server",
+      "variables": {
+        "environment": {
+          "default": "prod"
+        }
+      }
+    },
+    {
+      "url": "https://management.janisqa.in/api",
+      "description": "The QA API server",
+      "variables": {
+        "environment": {
+          "default": "qa"
+        }
+      }
+    },
+    {
+      "url": "https://management.janisdev.in/api",
+      "description": "The Beta API server",
+      "variables": {
+        "environment": {
+          "default": "beta"
+        }
+      }
+    },
+    {
+      "url": "http://management.janis.localhost:3126/api",
+      "description": "The Local API server",
+      "variables": {
+        "environment": {
+          "default": "local"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/motive/{id}": {
+      "get": {
+        "x-janis-namespace": "motive",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "management:motive:get"
+        ],
+        "operationId": "getMotive",
+        "tags": [
+          "Motive"
+        ],
+        "summary": "Get a Motive",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The Motive",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Motive"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "x-janis-namespace": "motive",
+        "x-janis-method": "update",
+        "x-janis-permissions": [
+          "management:motive:save"
+        ],
+        "operationId": "updateMotive",
+        "tags": [
+          "Motive"
+        ],
+        "summary": "Update a Motive",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "requestBody": {
+          "description": "A Motive",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Motive"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The Motive was updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "$ref": "#/components/schemas/Motive/properties/id"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/motive": {
+      "get": {
+        "x-janis-namespace": "motive",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "management:motive:get"
+        ],
+        "x-janis-roles": [
+          "wmsProductMovement"
+        ],
+        "operationId": "listMotives",
+        "tags": [
+          "Motive"
+        ],
+        "summary": "List Motives",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/MotiveSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/MotiveFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The Motive list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MotiveList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "x-janis-namespace": "motive",
+        "x-janis-method": "create",
+        "x-janis-permissions": [
+          "management:motive:save"
+        ],
+        "operationId": "createMotive",
+        "tags": [
+          "Motive"
+        ],
+        "summary": "Create a Motive",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "A motive",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Motive"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The Motive was created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "$ref": "#/components/schemas/Motive/properties/id"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/motive-setting": {
+      "get": {
+        "x-janis-namespace": "motive-setting",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "management:motive-setting:read"
+        ],
+        "operationId": "getMotiveSetting",
+        "tags": [
+          "Motive"
+        ],
+        "summary": "Get the setting of a motive action key",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "service",
+            "in": "query",
+            "description": "The name of the service",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "oms"
+            }
+          },
+          {
+            "name": "module",
+            "in": "query",
+            "description": "The name of the module of the service",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "order-refund"
+            }
+          },
+          {
+            "name": "action",
+            "in": "query",
+            "description": "The name of the action of the service module",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "refund-amount"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The settings were retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MotiveSetting"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/setting/{entity}": {
+      "get": {
+        "x-janis-namespace": "setting",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "management:setting:get"
+        ],
+        "operationId": "getSetting",
+        "tags": [
+          "Settings"
+        ],
+        "summary": "Get the setting of an entity",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "entity",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "example": "motive"
+            },
+            "required": true,
+            "description": "The name of the entity that owns the settings to be retrieved"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The settings were retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/MotiveSettings"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "x-janis-namespace": "setting",
+        "x-janis-method": "update",
+        "x-janis-permissions": [
+          "management:setting:write"
+        ],
+        "operationId": "updateSetting",
+        "tags": [
+          "Settings"
+        ],
+        "summary": "Update by entity",
+        "description": "Update the settings available for a given entity",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "entity",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "example": "motive"
+            },
+            "required": true,
+            "description": "The name of the entity that owns the settings to be updated"
+          }
+        ],
+        "requestBody": {
+          "description": "The settings configurations",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/MotiveSettings"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The settings were updated"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-key",
+        "description": "The API Key"
+      },
+      "ApiSecret": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-secret",
+        "description": "The API Secret"
+      },
+      "JanisClient": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-client",
+        "description": "The Client Code"
+      }
+    },
+    "parameters": {
+      "id": {
+        "name": "id",
+        "in": "path",
+        "schema": {
+          "type": "string",
+          "example": "631fb04c8fe08f51a8ee5949"
+        },
+        "required": true,
+        "description": "The unique identifier of the item"
+      },
+      "ListSortDirection": {
+        "name": "sortDirection",
+        "in": "query",
+        "description": "The direction to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
+        }
+      },
+      "ListPageNumber": {
+        "name": "x-janis-page",
+        "in": "header",
+        "description": "The page to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "default": 1
+        }
+      },
+      "ListPageSize": {
+        "name": "x-janis-page-size",
+        "in": "header",
+        "description": "The page size to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "default": 60
+        }
+      },
+      "JanisEntity": {
+        "name": "janis-entity",
+        "in": "header",
+        "description": "The entity name",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "MotiveSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "name",
+            "status",
+            "internalName",
+            "dateCreated",
+            "dateModified"
+          ]
+        }
+      },
+      "MotiveFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/Motive/properties/id"
+            },
+            "service": {
+              "$ref": "#/components/schemas/Motive/properties/service"
+            },
+            "module": {
+              "$ref": "#/components/schemas/Motive/properties/module"
+            },
+            "action": {
+              "$ref": "#/components/schemas/Motive/properties/action"
+            },
+            "refId": {
+              "$ref": "#/components/schemas/Motive/properties/refId"
+            },
+            "name": {
+              "$ref": "#/components/schemas/Motive/properties/name"
+            },
+            "internalName": {
+              "$ref": "#/components/schemas/Motive/properties/internalName"
+            },
+            "status": {
+              "$ref": "#/components/schemas/Motive/properties/status"
+            },
+            "allowComment": {
+              "$ref": "#/components/schemas/Motive/properties/allowComment"
+            }
+          }
+        }
+      },
+      "FunctionsFields": {
+        "name": "fields",
+        "in": "query",
+        "description": "Reduce the response to fields",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "example": [
+            "id",
+            "name",
+            "referenceId"
+          ]
+        }
+      },
+      "FunctionsFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the model",
+        "schema": {
+          "type": "object",
+          "description": "The filters to apply to the model",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "The id to filter",
+              "example": "d555345345345as67a342b"
+            }
+          }
+        }
+      },
+      "FunctionsCalculateTotals": {
+        "name": "calculateTotals",
+        "in": "query",
+        "description": "Indicates if the response must return the totals data applied filters. **Default** `false`",
+        "schema": {
+          "type": "boolean",
+          "example": true
+        }
+      },
+      "FunctionsAllItems": {
+        "name": "allItems",
+        "in": "query",
+        "description": "Indicates if the response must return all items. **Default** `false`",
+        "schema": {
+          "type": "boolean",
+          "example": true
+        }
+      }
+    },
+    "headers": {
+      "x-janis-total": {
+        "description": "The total amount of records in the list",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "responses": {
+      "SuccessCreateResponse": {
+        "description": "The item was created",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "SuccessUpdateResponse": {
+        "description": "The item was updated",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "GenericSuccess": {
+        "description": "Operation succeeded",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "BadRequest": {
+        "description": "A client error has ocurred.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Authentication missing or invalid",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Not authorized request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "InternalError": {
+        "description": "A server error has ocurred."
+      },
+      "NotFound": {
+        "description": "Item is not found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string",
+                  "example": "common.message.notFound"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "id": {
+        "description": "The unique identifier of the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "631fb04c8fe08f51a8ee5949"
+      },
+      "status": {
+        "description": "The item status",
+        "type": "string",
+        "default": "active",
+        "enum": [
+          "active",
+          "inactive"
+        ],
+        "example": "active"
+      },
+      "dateCreated": {
+        "description": "The date of creation",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-12T19:00:00.000Z"
+      },
+      "dateModified": {
+        "description": "The date of the last modification",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-20T19:00:00.000Z"
+      },
+      "dateCreatedDay": {
+        "description": "The day of creation",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-08-07T16:00:00.000Z"
+      },
+      "dateModifiedDay": {
+        "description": "The day of last modification",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-08-07T16:00:00.000Z"
+      },
+      "userCreated": {
+        "description": "The ID of the user who created the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "6a1fc1eeb5b68406e0487a10"
+      },
+      "userModified": {
+        "description": "The ID of the user who last modified the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "7e1fc1eeb5b68406e048796"
+      },
+      "MotiveList": {
+        "description": "Motive list",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Motive"
+        }
+      },
+      "Motive": {
+        "description": "A Motive",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "refId": {
+            "description": "The motive reference id",
+            "type": "string",
+            "example": "2FBFD3"
+          },
+          "name": {
+            "description": "The motive name",
+            "type": "string",
+            "example": "Motive name"
+          },
+          "internalName": {
+            "description": "The motive internal name",
+            "type": "string",
+            "example": "Motive internal name"
+          },
+          "allowComment": {
+            "description": "Indicates if the motive allows a comment.",
+            "type": "boolean",
+            "default": false,
+            "example": true
+          },
+          "target": {
+            "description": "The motive target",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "oms:order-rescheduling:reschedule",
+              "oms:order-audit:approve"
+            ]
+          },
+          "service": {
+            "description": "The motive target service availables",
+            "readOnly": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "oms"
+            ]
+          },
+          "module": {
+            "description": "The motive target module availables",
+            "readOnly": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "order-rescheduling",
+              "order-audit"
+            ]
+          },
+          "action": {
+            "description": "The motive target action availables",
+            "readOnly": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "reschedule",
+              "approve"
+            ]
+          },
+          "createMovementWithRemainingQuantity": {
+            "type": "boolean",
+            "description": "Whether to create a new movement with the remaining quantity. Only available when `target` is `service: wms` + `module: movement` + `action: reduce-quantity`\n",
+            "default": false,
+            "example": true
+          },
+          "status": {
+            "description": "The motive status",
+            "type": "string",
+            "enum": [
+              "active",
+              "inactive"
+            ],
+            "example": "active"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          }
+        },
+        "required": [
+          "name",
+          "target"
+        ]
+      },
+      "MotiveSetting": {
+        "type": "object",
+        "description": "Motive settings for a specific key of service module and action names\nExample of key: `oms:order-refund:refund-amount`\n",
+        "properties": {
+          "required": {
+            "type": "boolean",
+            "description": "Determines if the Motive is required for this action key",
+            "example": true
+          }
+        }
+      },
+      "MotiveSettings": {
+        "type": "object",
+        "description": "Motive settings",
+        "title": "Motive",
+        "properties": {
+          "required": {
+            "type": "array",
+            "description": "This setting will be used to determine which Actions will need not optional Motive",
+            "items": {
+              "type": "string",
+              "description": "The action in {service}:{module}:{action} format",
+              "example": "oms:order-refund:refund-items"
+            },
+            "example": [
+              "oms:order-refund:refund-amount",
+              "oms:order-refund:refund-items"
+            ],
+            "default": []
+          }
+        }
+      },
+      "listenerEvent": {
+        "description": "A JANIS Event object",
+        "type": "object",
+        "properties": {
+          "service": {
+            "description": "The source service name",
+            "type": "string",
+            "example": "id"
+          },
+          "entity": {
+            "description": "The event related entity",
+            "type": "string",
+            "example": "profile"
+          },
+          "event": {
+            "description": "The event name",
+            "type": "string",
+            "example": "created"
+          },
+          "client": {
+            "description": "The source event client",
+            "type": "string",
+            "example": "fizzmod"
+          },
+          "id": {
+            "description": "The event related entity ID",
+            "type": "string",
+            "example": "5d699c1ae8ebb95eaa24aca9"
+          }
+        },
+        "required": [
+          "service",
+          "entity",
+          "event"
+        ]
+      },
+      "FunctionError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "description": "The error message",
+            "type": "string",
+            "readOnly": true,
+            "example": "Database Failed"
+          }
+        }
+      },
+      "FunctionTotals": {
+        "type": "object",
+        "description": "The totals data. It is only available when `calculateTotals` parameter is active",
+        "properties": {
+          "total": {
+            "description": "The total items found in database applied filters",
+            "type": "number",
+            "readOnly": true,
+            "example": 2
+          },
+          "pages": {
+            "description": "The total pages for the filters applied",
+            "type": "number",
+            "readOnly": true,
+            "example": 1
+          },
+          "page": {
+            "description": "The actual page",
+            "type": "number",
+            "readOnly": true,
+            "example": 1
+          }
+        }
+      }
+    }
+  }
+}

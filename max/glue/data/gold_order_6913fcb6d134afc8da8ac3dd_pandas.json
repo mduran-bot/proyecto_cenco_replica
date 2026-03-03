@@ -1,0 +1,14 @@
+[
+  {
+    "metadata_sucursal":"Sucursal API",
+    "estado":"readyForDelivery",
+    "total_monto":23.95,
+    "promedio_monto":23.95,
+    "min_monto":23.95,
+    "max_monto":23.95,
+    "num_registros":1,
+    "_quality_valid":true,
+    "_quality_issues":"",
+    "_processing_timestamp":"2026-02-19T16:17:11.557994"
+  }
+]

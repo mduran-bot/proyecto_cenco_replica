@@ -1,0 +1,2825 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "UberEats Service",
+    "description": "UberEats Service\n\n **Last update**: 29 ene 26, 05:07 p. m.",
+    "version": "1.11.1",
+    "x-logo": null,
+    "x-janis-keywords": [
+      "uber-eats"
+    ],
+    "lastUpdate": "2026-01-29T20:07:19.377Z"
+  },
+  "tags": [
+    {
+      "name": "Account",
+      "description": "For managing Accounts"
+    },
+    {
+      "name": "Location",
+      "description": "For managing Locations"
+    },
+    {
+      "name": "Order",
+      "description": "To handle Order management"
+    },
+    {
+      "name": "Product",
+      "description": "For managing Product"
+    },
+    {
+      "name": "Sku",
+      "description": "For managing Sku"
+    }
+  ],
+  "servers": [
+    {
+      "url": "https://uber-eats.janis.in/api",
+      "description": "The Prod API server",
+      "variables": {
+        "environment": {
+          "default": "prod"
+        }
+      }
+    },
+    {
+      "url": "https://uber-eats.janisqa.in/api",
+      "description": "The QA API server",
+      "variables": {
+        "environment": {
+          "default": "qa"
+        }
+      }
+    },
+    {
+      "url": "https://uber-eats.janisdev.in/api",
+      "description": "The Beta API server",
+      "variables": {
+        "environment": {
+          "default": "beta"
+        }
+      }
+    },
+    {
+      "url": "http://uber-eats.janis.localhost:3129/api",
+      "description": "The Local API server",
+      "variables": {
+        "environment": {
+          "default": "local"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/account/{id}": {
+      "get": {
+        "x-janis-namespace": "account",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "commerce:account:read"
+        ],
+        "operationId": "getAccount",
+        "tags": [
+          "Account"
+        ],
+        "summary": "Get an Account",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Account found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FormattedAccount"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/account": {
+      "post": {
+        "x-janis-namespace": "account",
+        "x-janis-method": "save",
+        "x-janis-permissions": [
+          "commerce:account:write"
+        ],
+        "operationId": "saveAccount",
+        "tags": [
+          "Account"
+        ],
+        "summary": "Create or update an Account",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "An Account",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Account"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The Account was saved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "$ref": "#/components/schemas/Account/properties/id"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/integration-order": {
+      "get": {
+        "x-janis-namespace": "integration-order",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "uber-eats:order:read"
+        ],
+        "operationId": "getIntegrationOrder",
+        "tags": [
+          "Order"
+        ],
+        "summary": "Get order from integration",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "uberId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The Integration Order ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Integration order found"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/integration-store": {
+      "get": {
+        "x-janis-namespace": "integration-store",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "uber-eats:location:read"
+        ],
+        "operationId": "getIntegrationStoreById",
+        "tags": [
+          "Location"
+        ],
+        "summary": "Get store from integration",
+        "description": "Retrieve a specific Uber Eats store record from the integration platform",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "integrationId",
+            "in": "query",
+            "required": true,
+            "description": "The Uber Eats store ID",
+            "schema": {
+              "type": "string"
+            },
+            "example": "9d9ddca4-1e8a-49e6-b798-eae6aa9c6698"
+          },
+          {
+            "name": "accountId",
+            "in": "query",
+            "required": true,
+            "description": "The account ID",
+            "schema": {
+              "type": "string"
+            },
+            "example": "123a51aabc11cb1e12e123f"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Integration store found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationStore"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/location/{id}": {
+      "get": {
+        "x-janis-namespace": "location",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "uber-eats:location:read"
+        ],
+        "operationId": "getLocation",
+        "tags": [
+          "Location"
+        ],
+        "summary": "Get a Location",
+        "description": "Retrieves a specific location by its ID",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Location found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Location"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "x-janis-namespace": "location",
+        "x-janis-method": "update",
+        "x-janis-permissions": [
+          "uber-eats:location:write"
+        ],
+        "operationId": "updateLocation",
+        "tags": [
+          "Location"
+        ],
+        "summary": "Update a Location",
+        "description": "Updates the warehouse information for a specific location",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "warehouseId": {
+                    "type": "string",
+                    "description": "The warehouse ID"
+                  },
+                  "salesChannelId": {
+                    "type": "string",
+                    "description": "The sales channel ID"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "The updated location ID"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/location": {
+      "get": {
+        "x-janis-namespace": "location",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "uber-eats:location:read"
+        ],
+        "operationId": "listLocation",
+        "tags": [
+          "Location"
+        ],
+        "summary": "List Locations",
+        "description": "Retrieve a paginated list of location records",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/LocationSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/LocationFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Location listed",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocationList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "x-janis-namespace": "location",
+        "x-janis-method": "create",
+        "x-janis-permissions": [
+          "uber-eats:location:write"
+        ],
+        "operationId": "createLocation",
+        "tags": [
+          "Location"
+        ],
+        "summary": "Create a Location",
+        "description": "Creates a new location",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "warehouseId": {
+                    "type": "string",
+                    "description": "The warehouse ID"
+                  },
+                  "salesChannelId": {
+                    "type": "string",
+                    "description": "The sales channel ID"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "The updated location ID"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/location-import": {
+      "post": {
+        "x-janis-namespace": "location-import",
+        "x-janis-method": "post",
+        "x-janis-permissions": [
+          "mercadolibre:location:write"
+        ],
+        "operationId": "importLocations",
+        "tags": [
+          "Location"
+        ],
+        "summary": "Import locations for an account",
+        "description": "Import locations for an account",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "Account ID for location import",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "accountId"
+                ],
+                "properties": {
+                  "accountId": {
+                    "type": "string",
+                    "description": "The account ID to import locations for",
+                    "example": "5e9f1b3b1c9d440001f7b3b3"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Location import process started successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "A message about the import process status",
+                      "example": "Location import process started"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/order/{id}": {
+      "get": {
+        "x-janis-namespace": "order",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "uber-eats:order:read"
+        ],
+        "operationId": "getOrder",
+        "tags": [
+          "Order"
+        ],
+        "summary": "Get an Order",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/order": {
+      "get": {
+        "x-janis-namespace": "order",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "uber-eats:order:read"
+        ],
+        "operationId": "listOrder",
+        "tags": [
+          "Order"
+        ],
+        "summary": "List Orders",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/OrderSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/OrderFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order listed",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/order-status-change/{id}": {
+      "get": {
+        "x-janis-namespace": "order-status-change",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "uber-eats:order-status-change:read"
+        ],
+        "operationId": "getOrderStatusChange",
+        "tags": [
+          "Order"
+        ],
+        "summary": "Get an Order Status Change",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order Status Change found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderStatusChange"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/order-status-change": {
+      "get": {
+        "x-janis-namespace": "order-status-change",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "uber-eats:order-status-change:read"
+        ],
+        "operationId": "listOrderStatusChanges",
+        "tags": [
+          "Order"
+        ],
+        "summary": "List Order Status Changes",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/OrderStatusChangeSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/OrderStatusChangeFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order Status Changes listed",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderStatusChangeList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/order-status-change/{id}/retry": {
+      "post": {
+        "x-janis-namespace": "order-status-change",
+        "x-janis-method": "retryOrderStatusChange",
+        "x-janis-permissions": [
+          "uber-eats:order-status-change:retry"
+        ],
+        "operationId": "retryOrderStatusChange",
+        "tags": [
+          "Order Status Change"
+        ],
+        "summary": "Retry an Order Status Change",
+        "description": "Retry an Order Status Change",
+        "security": [
+          {
+            "ApiKey": []
+          },
+          {
+            "ApiSecret": []
+          },
+          {
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "69764393a27ed68e280b49b4"
+            },
+            "description": "The unique identifier of the Order Status Change"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order Status Change retried"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/product/{id}": {
+      "get": {
+        "x-janis-namespace": "product",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "uber-eats:product:read"
+        ],
+        "operationId": "getProduct",
+        "tags": [
+          "Product"
+        ],
+        "summary": "Get a Product",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Product found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Product"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/product": {
+      "get": {
+        "x-janis-namespace": "product",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "uber-eats:product:read"
+        ],
+        "operationId": "listProducts",
+        "tags": [
+          "Product"
+        ],
+        "summary": "List Products",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ProductSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ProductFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Products listed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/sku/{id}": {
+      "get": {
+        "x-janis-namespace": "sku",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "uber-eats:sku:read"
+        ],
+        "operationId": "getSku",
+        "tags": [
+          "Sku"
+        ],
+        "summary": "Get a Sku",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sku found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Sku"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/sku": {
+      "get": {
+        "x-janis-namespace": "sku",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "uber-eats:sku:read"
+        ],
+        "operationId": "listSkus",
+        "tags": [
+          "Sku"
+        ],
+        "summary": "List Skus",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/SkuSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/SkuFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Skus listed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SkuList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-key",
+        "description": "The API Key"
+      },
+      "ApiSecret": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-secret",
+        "description": "The API Secret"
+      },
+      "JanisClient": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-client",
+        "description": "The Client Code"
+      }
+    },
+    "parameters": {
+      "id": {
+        "name": "id",
+        "in": "path",
+        "schema": {
+          "type": "string",
+          "example": "631fb04c8fe08f51a8ee5949"
+        },
+        "required": true,
+        "description": "The unique identifier of the item"
+      },
+      "ListSortDirection": {
+        "name": "sortDirection",
+        "in": "query",
+        "description": "The direction to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
+        }
+      },
+      "ListPageNumber": {
+        "name": "x-janis-page",
+        "in": "header",
+        "description": "The page to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "default": 1
+        }
+      },
+      "ListPageSize": {
+        "name": "x-janis-page-size",
+        "in": "header",
+        "description": "The page size to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "default": 60
+        }
+      },
+      "LocationSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "name",
+            "accountId",
+            "integrationId",
+            "warehouseId",
+            "status",
+            "userModified",
+            "dateCreated",
+            "dateModified"
+          ]
+        }
+      },
+      "LocationFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/Location/properties/id"
+            },
+            "integrationId": {
+              "$ref": "#/components/schemas/Location/properties/integrationId"
+            },
+            "name": {
+              "$ref": "#/components/schemas/Location/properties/name"
+            },
+            "accountId": {
+              "$ref": "#/components/schemas/Location/properties/accountId"
+            },
+            "warehouseId": {
+              "$ref": "#/components/schemas/Location/properties/warehouseId"
+            },
+            "status": {
+              "$ref": "#/components/schemas/Location/properties/status"
+            },
+            "userModified": {
+              "$ref": "#/components/schemas/Location/properties/userModified"
+            },
+            "dateCreatedRange": {
+              "$ref": "#/components/schemas/dateCreatedRange"
+            },
+            "dateModifiedRange": {
+              "$ref": "#/components/schemas/dateModifiedRange"
+            }
+          }
+        }
+      },
+      "OrderSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "dateCreated",
+            "dateModified"
+          ]
+        }
+      },
+      "OrderFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/Order/properties/id"
+            },
+            "integrationOrderId": {
+              "$ref": "#/components/schemas/Order/properties/integrationOrderId"
+            },
+            "accountId": {
+              "$ref": "#/components/schemas/Order/properties/accountId"
+            },
+            "status": {
+              "$ref": "#/components/schemas/Order/properties/status"
+            },
+            "dateCreatedRange": {
+              "$ref": "#/components/schemas/dateCreatedRange"
+            }
+          }
+        }
+      },
+      "OrderStatusChangeSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "integrationOrderId",
+            "status",
+            "eventType",
+            "dateCreated",
+            "dateModified"
+          ]
+        }
+      },
+      "OrderStatusChangeFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/OrderStatusChange/properties/id"
+            },
+            "source": {
+              "$ref": "#/components/schemas/OrderStatusChange/properties/source"
+            },
+            "integrationOrderId": {
+              "$ref": "#/components/schemas/OrderStatusChange/properties/integrationOrderId"
+            },
+            "eventType": {
+              "$ref": "#/components/schemas/OrderStatusChange/properties/eventType"
+            },
+            "account": {
+              "$ref": "#/components/schemas/OrderStatusChange/properties/account"
+            },
+            "storeId": {
+              "$ref": "#/components/schemas/OrderStatusChange/properties/storeId"
+            },
+            "clientId": {
+              "$ref": "#/components/schemas/OrderStatusChange/properties/clientId"
+            },
+            "status": {
+              "$ref": "#/components/schemas/OrderStatusChange/properties/status"
+            },
+            "dateCreatedRange": {
+              "$ref": "#/components/schemas/dateCreatedRange"
+            },
+            "dateModifiedRange": {
+              "$ref": "#/components/schemas/dateModifiedRange"
+            }
+          }
+        }
+      },
+      "ProductSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "name",
+            "dateCreated",
+            "dateModified"
+          ]
+        }
+      },
+      "ProductFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/Product/properties/id"
+            },
+            "name": {
+              "$ref": "#/components/schemas/Product/properties/name"
+            },
+            "brandId": {
+              "$ref": "#/components/schemas/Product/properties/brandId"
+            },
+            "categoryId": {
+              "$ref": "#/components/schemas/Product/properties/categoryId"
+            },
+            "dateCreated": {
+              "$ref": "#/components/schemas/Product/properties/dateCreated"
+            }
+          }
+        }
+      },
+      "SkuSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "name",
+            "referenceId",
+            "dateCreated",
+            "publish.status",
+            "publishInventory.status"
+          ]
+        }
+      },
+      "SkuFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/Sku/properties/id"
+            },
+            "name": {
+              "$ref": "#/components/schemas/Sku/properties/name"
+            },
+            "referenceId": {
+              "$ref": "#/components/schemas/Sku/properties/referenceId"
+            },
+            "accounts": {
+              "$ref": "#/components/schemas/Sku/properties/accounts"
+            },
+            "dateCreated": {
+              "$ref": "#/components/schemas/Sku/properties/dateCreated"
+            },
+            "publishCatalog.status": {
+              "$ref": "#/components/schemas/Sku/properties/publishCatalog"
+            },
+            "publishInventory.status": {
+              "$ref": "#/components/schemas/Sku/properties/publishInventory"
+            }
+          }
+        }
+      }
+    },
+    "headers": {
+      "x-janis-total": {
+        "description": "The total amount of records in the list",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "responses": {
+      "GenericSuccess": {
+        "description": "Operation succeeded",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "BadRequest": {
+        "description": "A client error has ocurred.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Authentication missing or invalid",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Not authorized request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "InternalError": {
+        "description": "A server error has ocurred."
+      },
+      "NotFound": {
+        "description": "Record not found."
+      }
+    },
+    "schemas": {
+      "id": {
+        "description": "The unique identifier of the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "631fb04c8fe08f51a8ee5949"
+      },
+      "status": {
+        "description": "The item status",
+        "type": "string",
+        "default": "active",
+        "enum": [
+          "active",
+          "inactive"
+        ],
+        "example": "active"
+      },
+      "dateCreated": {
+        "description": "The date of creation",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-12T19:00:00.000Z"
+      },
+      "dateModified": {
+        "description": "The date of the last modification",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-20T19:00:00.000Z"
+      },
+      "dateCreatedDay": {
+        "description": "The day of creation",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-08-07T16:00:00.000Z"
+      },
+      "dateModifiedDay": {
+        "description": "The day of last modification",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-08-07T16:00:00.000Z"
+      },
+      "userCreated": {
+        "description": "The ID of the user who created the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "6a1fc1eeb5b68406e0487a10"
+      },
+      "userModified": {
+        "description": "The ID of the user who last modified the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "7e1fc1eeb5b68406e048796"
+      },
+      "dateCreatedRange": {
+        "description": "Creation date range",
+        "type": "object",
+        "properties": {
+          "from": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/dateCreated"
+              }
+            ],
+            "description": "Date range from"
+          },
+          "to": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/dateCreated"
+              }
+            ],
+            "description": "Date range to"
+          }
+        }
+      },
+      "dateModifiedRange": {
+        "description": "Modification date range",
+        "type": "object",
+        "properties": {
+          "from": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/dateModified"
+              }
+            ],
+            "description": "Date range from"
+          },
+          "to": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/dateModified"
+              }
+            ],
+            "description": "Date range to"
+          }
+        }
+      },
+      "publish": {
+        "type": "object",
+        "description": "The Item's publish properties",
+        "properties": {
+          "status": {
+            "description": "The Item's publish status",
+            "readOnly": true,
+            "type": "string",
+            "enum": [
+              "readyForPublish",
+              "notModified",
+              "publishError",
+              "published"
+            ],
+            "example": "published"
+          },
+          "startDate": {
+            "description": "The Item's publish start date",
+            "readOnly": true,
+            "type": "string",
+            "format": "date-time",
+            "example": "2020-12-09T17:44:50.637Z"
+          },
+          "endDate": {
+            "description": "The Item's publish end date",
+            "readOnly": true,
+            "type": "string",
+            "format": "date-time",
+            "example": "2020-12-09T18:44:50.637Z"
+          },
+          "message": {
+            "description": "A message about the publish",
+            "type": "string",
+            "readOnly": true,
+            "example": "Ok but some changes are required"
+          },
+          "errorMessage": {
+            "description": "A message about the publish",
+            "type": "string",
+            "readOnly": true,
+            "example": "Fails because ..."
+          }
+        }
+      },
+      "Account": {
+        "description": "An Account",
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "The unique identifier of the item",
+            "type": "string",
+            "example": "d555345345345as67a342a"
+          },
+          "referenceId": {
+            "description": "The Account's reference Id",
+            "type": "string",
+            "example": "r-00001"
+          },
+          "paymentSystemId": {
+            "description": "Id of the `Payment System` related to the account. See [Payment Method](v2/service/jef#tag/Payment-Method)\nIf the account has importOrders enabled, this field is required.\n",
+            "type": "string",
+            "example": "8e1fc1eeb5b68406eaaa001"
+          },
+          "salesChannels": {
+            "description": "Sales Channels related to the account. See [Sales Channel](v2/service/commerce#tag/Sales-Channel)\nIf the account has importOrders enabled, this field is required.\n",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "commerceId": {
+                  "description": "Id of the `Sales Channel` in Janis Commerce Service. See [Sales Channel](v2/service/commerce#tag/Sales-Channel)",
+                  "type": "string",
+                  "example": "8e1fc1eeb5b68406eaaa001"
+                },
+                "uberStoreId": {
+                  "description": "The id of the uber store related with the Sales Channel.",
+                  "type": "string",
+                  "example": "sc-9437"
+                }
+              }
+            }
+          },
+          "applicationId": {
+            "description": "The Account's key",
+            "type": "string",
+            "example": "someAccount"
+          },
+          "applicationSecret": {
+            "description": "The Account's password",
+            "type": "string",
+            "example": "s0m3Aw3s0m3p4ssw0rd"
+          },
+          "publishCatalog": {
+            "description": "Setting that indicates if the account has catalog publishing enabled",
+            "type": "boolean",
+            "example": true
+          },
+          "enableComposedOrderCommerceId": {
+            "description": "Setting that allows us to use a composite identifier for Uber orders",
+            "type": "boolean",
+            "example": true
+          },
+          "status": {
+            "$ref": "#/components/schemas/status"
+          }
+        }
+      },
+      "FormattedAccount": {
+        "description": "An Account",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/Account/properties/id"
+          },
+          "referenceId": {
+            "$ref": "#/components/schemas/Account/properties/referenceId"
+          },
+          "paymentSystemId": {
+            "$ref": "#/components/schemas/Account/properties/paymentSystemId"
+          },
+          "salesChannels": {
+            "$ref": "#/components/schemas/FormattedSalesChannels"
+          },
+          "applicationId": {
+            "$ref": "#/components/schemas/Account/properties/applicationId"
+          },
+          "applicationSecret": {
+            "$ref": "#/components/schemas/Account/properties/applicationSecret"
+          },
+          "publishCatalog": {
+            "$ref": "#/components/schemas/Account/properties/publishCatalog"
+          },
+          "enableComposedOrderCommerceId": {
+            "$ref": "#/components/schemas/Account/properties/enableComposedOrderCommerceId"
+          },
+          "status": {
+            "$ref": "#/components/schemas/status"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          }
+        }
+      },
+      "FormattedSalesChannels": {
+        "description": "Sales Channels related to the account. See [Sales Channel](v2/service/commerce#tag/Sales-Channel)",
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "commerceId": {
+              "description": "Id of the `Sales Channel` in Janis Commerce Service. See [Sales Channel](v2/service/commerce#tag/Sales-Channel)",
+              "type": "string",
+              "example": "8e1fc1eeb5b68406eaaa001"
+            },
+            "uberStoreId": {
+              "description": "The id of the uber store related with the Sales Channel.",
+              "type": "string",
+              "example": "sc-9437"
+            },
+            "referenceId": {
+              "description": "The Sales Channel's reference ID.",
+              "type": "string",
+              "example": "sc-9437"
+            },
+            "name": {
+              "description": "The Sales Channel's name",
+              "type": "string",
+              "example": "Sales Channel 9437"
+            },
+            "location": {
+              "$ref": "#/components/schemas/SalesChannelLocation"
+            }
+          }
+        }
+      },
+      "SalesChannelLocation": {
+        "type": "object",
+        "description": "The location of the uber store.",
+        "properties": {
+          "address": {
+            "type": "string",
+            "description": "Complete address",
+            "example": "Avenida Santa Fe 3253,Buenos Aires, 1425, Argentina",
+            "readOnly": true
+          },
+          "city": {
+            "type": "string",
+            "description": "Uber store ciy",
+            "example": "Ciudad Autonoma de Buenos Aires",
+            "readOnly": true
+          },
+          "country": {
+            "type": "string",
+            "description": "Uber store country code",
+            "example": "AR",
+            "readOnly": true
+          },
+          "postal_code": {
+            "type": "string",
+            "description": "Uber store postal code",
+            "example": "7600",
+            "readOnly": true
+          },
+          "state": {
+            "type": "string",
+            "description": "Uber store state",
+            "example": "Ciudad Autonoma de Buenos Aires",
+            "readOnly": true
+          },
+          "latitude": {
+            "type": "number",
+            "description": "Uber store latitude",
+            "example": -34.588321,
+            "readOnly": true
+          },
+          "longitude": {
+            "type": "number",
+            "description": "Uber store latitude",
+            "example": -58.410757,
+            "readOnly": true
+          }
+        }
+      },
+      "IntegrationStore": {
+        "type": "object",
+        "description": "Store object from Uber Eats integration",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The store ID",
+            "example": "ba1c3601-df3a-4d4c-a1a5-b122231f1ff6"
+          },
+          "name": {
+            "type": "string",
+            "description": "The store name",
+            "example": "Test Store La sirena 1"
+          },
+          "contact": {
+            "type": "object",
+            "description": "Contact information",
+            "properties": {
+              "email": {
+                "type": "string",
+                "description": "Contact email",
+                "example": "valeria.molina+test+store+lasirena+1@uber.com"
+              },
+              "name": {
+                "type": "string",
+                "description": "Contact name",
+                "example": "La Sirena"
+              },
+              "phone_number": {
+                "type": "string",
+                "description": "Contact phone number",
+                "example": "+13830386428"
+              }
+            }
+          },
+          "location": {
+            "type": "object",
+            "description": "Store location information",
+            "properties": {
+              "latitude": {
+                "type": "number",
+                "description": "Latitude coordinate",
+                "example": 40.4812125
+              },
+              "longitude": {
+                "type": "number",
+                "description": "Longitude coordinate",
+                "example": -3.666627
+              },
+              "street_address_line_one": {
+                "type": "string",
+                "description": "Street address line one",
+                "example": "C. de Arturo Soria, 333 Madrid, Spain"
+              },
+              "city": {
+                "type": "string",
+                "description": "City name",
+                "example": "Madrid"
+              },
+              "country": {
+                "type": "string",
+                "description": "Country code",
+                "example": "ES"
+              },
+              "postal_code": {
+                "type": "string",
+                "description": "Postal code",
+                "example": "28033"
+              }
+            }
+          },
+          "pickup_instructions": {
+            "type": "string",
+            "description": "Pickup instructions",
+            "example": "acercarse a la puerta"
+          },
+          "timezone": {
+            "type": "string",
+            "description": "Timezone",
+            "example": "Europe/Madrid"
+          },
+          "fulfillment_type_availability": {
+            "type": "object",
+            "description": "Fulfillment type availability",
+            "additionalProperties": {
+              "type": "boolean"
+            },
+            "example": {
+              "DELIVERY": true,
+              "DELIVERY_API": true,
+              "DELIVERY_OVER_THE_TOP": true,
+              "DELIVERY_OVER_THE_TOP_ORDER_AHEAD": true,
+              "DELIVERY_THIRD_PARTY": true,
+              "DINE_IN": true,
+              "PICKUP": true
+            }
+          },
+          "prep_times": {
+            "type": "object",
+            "description": "Preparation times configuration",
+            "properties": {
+              "default_value": {
+                "type": "integer",
+                "description": "Default preparation time in seconds",
+                "example": 900
+              },
+              "delay": {
+                "type": "object",
+                "description": "Delay configuration",
+                "properties": {
+                  "status": {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "description": "Delay status type",
+                        "example": "NORMAL"
+                      }
+                    }
+                  },
+                  "allowed": {
+                    "type": "boolean",
+                    "description": "Whether delay is allowed",
+                    "example": true
+                  }
+                }
+              }
+            }
+          },
+          "delivery_settings": {
+            "type": "object",
+            "description": "Delivery settings",
+            "properties": {
+              "enable_uber_delivery": {
+                "type": "boolean",
+                "description": "Enable Uber delivery",
+                "example": false
+              },
+              "enable_uber_delivery_extended": {
+                "type": "boolean",
+                "description": "Enable Uber delivery extended",
+                "example": false
+              }
+            }
+          },
+          "onboarding_status": {
+            "type": "string",
+            "description": "Onboarding status",
+            "example": "ACTIVE"
+          },
+          "auto_accept": {
+            "type": "boolean",
+            "description": "Auto accept orders",
+            "example": false
+          },
+          "ooi_config": {
+            "type": "object",
+            "description": "Order optimization and intelligence configuration",
+            "properties": {
+              "is_substitute_item_enabled": {
+                "type": "boolean",
+                "description": "Enable substitute items",
+                "example": true
+              },
+              "is_store_replace_item_enabled": {
+                "type": "boolean",
+                "description": "Enable store replace items",
+                "example": true
+              },
+              "is_cancel_order_enabled": {
+                "type": "boolean",
+                "description": "Enable cancel order",
+                "example": false
+              },
+              "is_remove_item_enabled": {
+                "type": "boolean",
+                "description": "Enable remove items",
+                "example": true
+              },
+              "ooi_eligibility": {
+                "type": "object",
+                "description": "OOI eligibility configuration",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean",
+                    "description": "OOI eligibility enabled",
+                    "example": true
+                  }
+                }
+              }
+            }
+          },
+          "orderability": {
+            "type": "object",
+            "description": "Orderability information",
+            "properties": {
+              "status": {
+                "type": "string",
+                "description": "Order status",
+                "example": "ONLINE"
+              },
+              "offline_reason": {
+                "type": "string",
+                "description": "Offline reason",
+                "example": "UNKNOWN"
+              },
+              "is_visible": {
+                "type": "boolean",
+                "description": "Is store visible",
+                "example": true
+              },
+              "is_orderable": {
+                "type": "boolean",
+                "description": "Is store orderable",
+                "example": true
+              },
+              "next_close_time": {
+                "type": "string",
+                "format": "date-time",
+                "description": "Next close time",
+                "example": "2025-11-28T23:59:00+01:00"
+              },
+              "menu_hours": {
+                "type": "object",
+                "description": "Menu hours configuration",
+                "additionalProperties": true
+              }
+            }
+          },
+          "max_delivery_partners_allowed": {
+            "type": "integer",
+            "description": "Maximum delivery partners allowed",
+            "example": 4
+          },
+          "support_number": {
+            "type": "string",
+            "description": "Support phone number",
+            "example": "+34 911 23 21 86"
+          },
+          "adjustment_config": {
+            "type": "object",
+            "description": "Price adjustment configuration",
+            "properties": {
+              "is_price_adjustment_enabled": {
+                "type": "boolean",
+                "description": "Enable price adjustment",
+                "example": true
+              },
+              "maximum_price_adjustment": {
+                "type": "integer",
+                "description": "Maximum price adjustment",
+                "example": 3
+              },
+              "requires_tax_rate_for_adjustment": {
+                "type": "boolean",
+                "description": "Requires tax rate for adjustment",
+                "example": true
+              },
+              "is_tax_inclusive": {
+                "type": "boolean",
+                "description": "Is tax inclusive",
+                "example": true
+              },
+              "positive_price_adjustment_reasons": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Positive price adjustment reasons",
+                "example": [
+                  "REQUESTED_ADD_ONS",
+                  "BIGGER_SIZE",
+                  "NEW_ITEM_ADDED",
+                  "OTHER"
+                ]
+              },
+              "negative_price_adjustment_reasons": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Negative price adjustment reasons",
+                "example": [
+                  "ITEM_SOLD_OUT",
+                  "REMOVED_ITEM",
+                  "ADD_ON_UNAVAILABLE",
+                  "OTHER"
+                ]
+              }
+            }
+          },
+          "partner_identifiers": {
+            "type": "array",
+            "description": "Partner identifiers",
+            "items": {
+              "type": "object",
+              "properties": {
+                "value": {
+                  "type": "string",
+                  "description": "Identifier value",
+                  "example": "xr0ZnzkjzFJ1Tw-UlZn4OYNt4F47tkEj"
+                },
+                "type": {
+                  "type": "string",
+                  "description": "Identifier type",
+                  "example": "ORDER_MANAGER_CLIENT_ID"
+                }
+              }
+            }
+          },
+          "uber_merchant_type": {
+            "type": "object",
+            "description": "Uber merchant type",
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "Merchant type",
+                "example": "MERCHANT_TYPE_GROCERY"
+              }
+            }
+          },
+          "pickup_instructions_map": {
+            "type": "object",
+            "description": "Pickup instructions map",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "example": {
+              "DELIVERY_PARTNER": "acercarse a la puerta"
+            }
+          }
+        }
+      },
+      "Location": {
+        "type": "object",
+        "description": "A location",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "accountId": {
+            "type": "string",
+            "description": "This refer to the `id` of the **Account** Entity. See [Account](/v2/service/commerce#tag/Account).",
+            "example": "123a51aabc11cb1e12e123f"
+          },
+          "integrationId": {
+            "type": "string",
+            "description": "The integration store ID from Uber Eats",
+            "example": "9d9ddca4-1e8a-49e6-b798-eae6aa9c6698"
+          },
+          "name": {
+            "type": "string",
+            "description": "The location/store name",
+            "example": "My Restaurant"
+          },
+          "status": {
+            "type": "string",
+            "description": "The location status",
+            "enum": [
+              "active",
+              "inactive",
+              "deleted"
+            ],
+            "example": "active"
+          },
+          "prepTimes": {
+            "type": "object",
+            "description": "Preparation times information",
+            "additionalProperties": true
+          },
+          "contact": {
+            "type": "object",
+            "description": "Contact information",
+            "additionalProperties": true
+          },
+          "timezone": {
+            "type": "string",
+            "description": "The timezone",
+            "example": "America/Argentina/Buenos_Aires"
+          },
+          "partnerIdentifiers": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "description": "Partner identifiers"
+          },
+          "pickupInstructionsMap": {
+            "type": "object",
+            "description": "Pickup instructions map",
+            "additionalProperties": true
+          },
+          "uberMerchantType": {
+            "type": "object",
+            "description": "Uber merchant type information",
+            "additionalProperties": true
+          },
+          "onboardingStatus": {
+            "type": "string",
+            "description": "Onboarding status",
+            "example": "completed"
+          },
+          "location": {
+            "type": "object",
+            "description": "The location address",
+            "properties": {
+              "address": {
+                "type": "string",
+                "description": "The street address",
+                "example": "Sanabria 1342"
+              },
+              "city": {
+                "type": "string",
+                "description": "The city name",
+                "example": "Buenos Aires"
+              },
+              "country": {
+                "type": "string",
+                "description": "The country name",
+                "example": "Argentina"
+              },
+              "latitude": {
+                "type": "number",
+                "nullable": true,
+                "description": "The latitude coordinate",
+                "example": -34.6237154
+              },
+              "longitude": {
+                "type": "number",
+                "nullable": true,
+                "description": "The longitude coordinate",
+                "example": -58.4934526
+              }
+            }
+          },
+          "warehouseId": {
+            "type": "string",
+            "description": "The warehouse ID associated with this location",
+            "example": "68767601416402a18aff2f20"
+          },
+          "salesChannelId": {
+            "type": "string",
+            "description": "The sales channel ID associated with this location",
+            "example": "68767601416402a18aff2f21"
+          },
+          "accountAvailableSalesChannels": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of sales channel IDs available for the account",
+            "example": [
+              "68767601416402a18aff2f20",
+              "68767601416402a18aff2f21"
+            ]
+          },
+          "import": {
+            "type": "object",
+            "description": "The import status information",
+            "properties": {
+              "status": {
+                "type": "string",
+                "description": "The import status",
+                "enum": [
+                  "pendingWarehouseRelation",
+                  "imported",
+                  "error"
+                ],
+                "example": "pendingWarehouseRelation"
+              }
+            }
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          }
+        }
+      },
+      "LocationList": {
+        "type": "array",
+        "description": "A list of locations",
+        "items": {
+          "$ref": "#/components/schemas/Location"
+        }
+      },
+      "Order": {
+        "type": "object",
+        "description": "An order",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "integrationOrderId": {
+            "type": "string",
+            "description": "The integration order id",
+            "example": "V1StGXR8Z5jdHi6B"
+          },
+          "accountId": {
+            "type": "string",
+            "description": "The id of the account associated with the order",
+            "example": "672cdadd1849404bde3d0c70"
+          },
+          "deliveryId": {
+            "type": "string",
+            "description": "The id associated with order shipping",
+            "example": "672cdadd1849404bde3d0c80"
+          },
+          "accountName": {
+            "type": "string",
+            "description": "The name of the account associated with the order",
+            "example": "Account Name"
+          },
+          "status": {
+            "description": "The order status",
+            "type": "string",
+            "enum": [
+              "accepted",
+              "cancelled"
+            ],
+            "example": "accepted"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          }
+        },
+        "required": [
+          "id",
+          "integrationOrderId",
+          "accountId",
+          "accountName",
+          "status"
+        ]
+      },
+      "OrderList": {
+        "type": "array",
+        "description": "A list of orders",
+        "items": {
+          "$ref": "#/components/schemas/Order"
+        }
+      },
+      "OrderStatusChange": {
+        "type": "object",
+        "description": "An Order Status Change",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "source": {
+            "type": "string",
+            "description": "The source of the status change",
+            "enum": [
+              "uberEats",
+              "oms"
+            ],
+            "example": "uberEats"
+          },
+          "eventType": {
+            "type": "string",
+            "description": "The event type of the status order",
+            "enum": [
+              "notification",
+              "cancel"
+            ],
+            "example": "notification"
+          },
+          "integrationOrderId": {
+            "type": "string",
+            "description": "The Uber ID of the order",
+            "example": "46546546544-01"
+          },
+          "storeId": {
+            "type": "string",
+            "description": "The user_id of the order. This is the equivalent of store_id for Uber",
+            "example": "46546546544-02"
+          },
+          "clientId": {
+            "type": "string",
+            "description": "The client id of the order",
+            "example": "46546546544-04"
+          },
+          "account": {
+            "type": "string",
+            "description": "The name of the account that originated the status change",
+            "example": "fizzmod"
+          },
+          "loggingData": {
+            "type": "array",
+            "description": "A list of logging information of the status change process",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "Saved status change in DB"
+            ]
+          },
+          "status": {
+            "description": "The order status change processing status",
+            "type": "string",
+            "default": "pending",
+            "enum": [
+              "pending",
+              "processing",
+              "processed",
+              "skipped",
+              "error"
+            ],
+            "example": "pending"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          }
+        },
+        "required": [
+          "id",
+          "source",
+          "integrationOrderId",
+          "clientId",
+          "storeId",
+          "eventType",
+          "account",
+          "loggingData",
+          "status",
+          "dateCreated"
+        ]
+      },
+      "OrderStatusChangeList": {
+        "type": "array",
+        "description": "A list of Order Status Changes",
+        "items": {
+          "$ref": "#/components/schemas/OrderStatusChange"
+        }
+      },
+      "Product": {
+        "type": "object",
+        "description": "A Product from UBER EATS",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "name": {
+            "type": "string",
+            "description": "The product's name",
+            "example": "A product name"
+          },
+          "brandId": {
+            "type": "string",
+            "description": "The product's brand's ID",
+            "example": "507f191e810c19729de860ea"
+          },
+          "categoryId": {
+            "type": "string",
+            "description": "The product's category ID",
+            "example": "607f191e810c19729de860ea"
+          },
+          "subCategoryId": {
+            "type": "string",
+            "description": "The product's sub-category ID",
+            "example": "607f191e810c19729de860ea"
+          },
+          "salesChannels": {
+            "type": "array",
+            "description": "The product's sales channels",
+            "items": {
+              "type": "string",
+              "description": "A sales channel ID",
+              "example": "407f191e810c19729de860ea"
+            }
+          },
+          "salesChannelsDetails": {
+            "type": "array",
+            "description": "The product's sales channels details",
+            "items": {
+              "type": "object",
+              "description": "A sales channel detail",
+              "properties": {
+                "salesChannelId": {
+                  "type": "string",
+                  "description": "A sales channel ID",
+                  "example": "607f191e810c19729de860ea"
+                },
+                "salesChannelName": {
+                  "type": "string",
+                  "description": "The sales channel name",
+                  "example": "A sales channel name"
+                }
+              }
+            }
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          }
+        }
+      },
+      "ProductList": {
+        "type": "array",
+        "description": "A list of Products",
+        "items": {
+          "$ref": "#/components/schemas/Product"
+        }
+      },
+      "Sku": {
+        "type": "object",
+        "description": "A Sku from UBER EATS",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "referenceId": {
+            "type": "string",
+            "description": "The sku's referenceId",
+            "example": "a-sku-ref-id"
+          },
+          "name": {
+            "type": "string",
+            "description": "The sku's name",
+            "example": "A sku name"
+          },
+          "description": {
+            "type": "string",
+            "description": "The sku's description",
+            "example": "A sku description"
+          },
+          "brandId": {
+            "type": "string",
+            "description": "The product's brand's ID",
+            "example": "507f191e810c19729de860ea"
+          },
+          "brandName": {
+            "type": "string",
+            "description": "The sku's brand name",
+            "example": "Coke"
+          },
+          "categoryId": {
+            "type": "string",
+            "description": "The sku's main category ID",
+            "example": "607f191e810c19729de860ea"
+          },
+          "categoryName": {
+            "type": "string",
+            "description": "The sku's main category name",
+            "example": "Soda"
+          },
+          "subCategoryId": {
+            "type": "string",
+            "description": "The sku's sub-category ID",
+            "example": "607f191e810c19729de860ea"
+          },
+          "subCategoryName": {
+            "type": "string",
+            "description": "The sku's sub-category name",
+            "example": "Soda"
+          },
+          "product": {
+            "type": "string",
+            "description": "The sku's product ID",
+            "example": "507f191e810c19729de860ea"
+          },
+          "ean": {
+            "type": "string",
+            "description": "The main ean code",
+            "example": "a-1"
+          },
+          "accounts": {
+            "type": "array",
+            "description": "The sku's accounts IDs",
+            "items": {
+              "type": "string",
+              "description": "An account ID",
+              "example": "607f191e810c19729de860ea"
+            }
+          },
+          "imageUrl": {
+            "type": "string",
+            "description": "The sku's main image URL",
+            "example": "sku-image-url"
+          },
+          "publishCatalog": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/publish"
+              }
+            ],
+            "properties": {
+              "status": {
+                "description": "The sku's publish catalog status",
+                "readOnly": true,
+                "type": "string",
+                "enum": [
+                  "readyForPublish",
+                  "notModified",
+                  "waitingForFiles",
+                  "publishError",
+                  "published"
+                ],
+                "example": "published"
+              }
+            }
+          },
+          "publishInventory": {
+            "type": "object",
+            "description": "The sku's publish inventory status",
+            "properties": {
+              "status": {
+                "type": "string",
+                "description": "A publish inventory status",
+                "example": "status-publish-inventory"
+              }
+            }
+          },
+          "price": {
+            "type": "object",
+            "description": "The sku's prices",
+            "properties": {
+              "productId": {
+                "type": "object",
+                "description": "A sku price and base price",
+                "properties": {
+                  "price": {
+                    "type": "number",
+                    "description": "A sku price",
+                    "example": 100
+                  },
+                  "basePrice": {
+                    "type": "number",
+                    "description": "A sku base price",
+                    "example": 50
+                  }
+                }
+              }
+            }
+          },
+          "priceBySalesChannel": {
+            "type": "array",
+            "description": "The sku's price for each sales channel",
+            "items": {
+              "type": "object",
+              "description": "A sales channel price",
+              "properties": {
+                "salesChannelId": {
+                  "type": "string",
+                  "description": "A sales channel ID",
+                  "example": "607f191e810c19729de860ea"
+                },
+                "salesChannelName": {
+                  "type": "string",
+                  "description": "The sales channel name",
+                  "example": "A sales channel name"
+                },
+                "price": {
+                  "type": "number",
+                  "description": "The sales channel price",
+                  "example": 100
+                },
+                "basePrice": {
+                  "type": "number",
+                  "description": "The sales channel base price",
+                  "example": 50
+                }
+              }
+            }
+          },
+          "stock": {
+            "type": "object",
+            "description": "The sku's stock",
+            "properties": {
+              "productId": {
+                "type": "number",
+                "description": "A sku stock",
+                "example": 100
+              }
+            }
+          },
+          "stockBySalesChannel": {
+            "type": "array",
+            "description": "The sku's stock for each sales channel",
+            "items": {
+              "type": "object",
+              "description": "A sales channel stock",
+              "properties": {
+                "salesChannelId": {
+                  "type": "string",
+                  "description": "A sales channel ID",
+                  "example": "607f191e810c19729de860ea"
+                },
+                "salesChannelName": {
+                  "type": "string",
+                  "description": "The sales channel name",
+                  "example": "A sales channel name"
+                },
+                "stock": {
+                  "type": "number",
+                  "description": "The sales channel stock",
+                  "example": 100
+                }
+              }
+            }
+          },
+          "measurementUnit": {
+            "type": "string",
+            "description": "The sku's measurement unit",
+            "example": "measurement-unit"
+          },
+          "sellingMeasurementUnit": {
+            "type": "string",
+            "description": "The sku's selling measurement unit",
+            "example": "selling-measurement-unit"
+          },
+          "sellingUnitMultiplier": {
+            "type": "number",
+            "description": "The sku's selling unit multiplier",
+            "example": 1
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          }
+        }
+      },
+      "SkuList": {
+        "type": "array",
+        "description": "A list of Skus",
+        "items": {
+          "$ref": "#/components/schemas/Sku"
+        }
+      }
+    }
+  }
+}

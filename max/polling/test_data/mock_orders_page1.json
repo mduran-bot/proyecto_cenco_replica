@@ -1,0 +1,291 @@
+{
+  "data": [
+    {
+      "id": "mock001order123456789abc",
+      "commerceId": "SLR-v11209816test-01",
+      "orderGroupId": "mock001group123456789",
+      "commerceSequentialId": "513001",
+      "commerceDateCreated": "2024-02-24T10:00:00.000Z",
+      "dateCreated": "2024-02-24T10:00:05.042Z",
+      "dateModified": "2024-02-24T10:30:00.000Z",
+      "status": "readyForDelivery",
+      "totalAmount": 45.50,
+      "rawTotalAmount": 45.38,
+      "originalAmount": 45.38,
+      "currency": "PEN",
+      "seller": {
+        "id": "seller001metro",
+        "name": "Metro",
+        "externalIds": {
+          "account": "account001metro",
+          "vtex": "1"
+        }
+      },
+      "account": {
+        "id": "account001metro",
+        "name": "metro",
+        "ecommerceName": "metro",
+        "referenceId": "metro",
+        "platform": "vtex"
+      },
+      "salesChannelId": "channel001",
+      "salesChannelName": "metro-Metro",
+      "salesChannelPrefix": "",
+      "customer": {
+        "id": "customer001",
+        "firstName": "Juan",
+        "lastName": "Pérez",
+        "email": "juan.perez@example.com",
+        "documentType": "DNI",
+        "documentNumber": "12345678",
+        "phone": "+51987654321",
+        "isCorporate": false,
+        "isFirstOrder": false
+      },
+      "items": [
+        {
+          "id": "item001sku001",
+          "commerceSkuId": "1001",
+          "commerceProductId": "1001",
+          "name": "Leche Entera Gloria Caja 1L",
+          "refId": "100001",
+          "ean": "7750670000011",
+          "purchasedPrice": 4.50,
+          "purchasedListPrice": 5.00,
+          "purchasedQuantity": 6,
+          "sellingMeasurementUnit": "un",
+          "sellingUnitMultiplier": 1,
+          "measurementUnit": "un",
+          "unitMultiplier": 1,
+          "brandId": "101",
+          "brandName": "Gloria",
+          "imageUrl": "https://example.com/images/leche-gloria.jpg",
+          "isGift": false,
+          "isPicked": true,
+          "isPickingFulfilled": true
+        },
+        {
+          "id": "item002sku002",
+          "commerceSkuId": "2001",
+          "commerceProductId": "2001",
+          "name": "Pan Integral Bimbo 500g",
+          "refId": "200001",
+          "ean": "7501000100002",
+          "purchasedPrice": 5.90,
+          "purchasedListPrice": 6.50,
+          "purchasedQuantity": 2,
+          "sellingMeasurementUnit": "un",
+          "sellingUnitMultiplier": 1,
+          "measurementUnit": "un",
+          "unitMultiplier": 1,
+          "brandId": "201",
+          "brandName": "Bimbo",
+          "imageUrl": "https://example.com/images/pan-bimbo.jpg",
+          "isGift": false,
+          "isPicked": true,
+          "isPickingFulfilled": true
+        },
+        {
+          "id": "item003sku003",
+          "commerceSkuId": "3001",
+          "commerceProductId": "3001",
+          "name": "Arroz Extra Superior Costeño 1kg",
+          "refId": "300001",
+          "ean": "7750670000028",
+          "purchasedPrice": 3.99,
+          "purchasedListPrice": 4.50,
+          "purchasedQuantity": 5,
+          "sellingMeasurementUnit": "un",
+          "sellingUnitMultiplier": 1,
+          "measurementUnit": "un",
+          "unitMultiplier": 1,
+          "brandId": "301",
+          "brandName": "Costeño",
+          "imageUrl": "https://example.com/images/arroz-costeno.jpg",
+          "isGift": false,
+          "isPicked": true,
+          "isPickingFulfilled": true
+        }
+      ],
+      "shippings": [
+        {
+          "id": "shipping001",
+          "status": "pending",
+          "type": "delivery",
+          "carrierId": "carrier001",
+          "price": 0,
+          "deliveryEstimateDate": "2024-02-25T18:00:00.000Z",
+          "items": [
+            {"id": "item001sku001", "quantity": 6},
+            {"id": "item002sku002", "quantity": 2},
+            {"id": "item003sku003", "quantity": 5}
+          ]
+        }
+      ],
+      "addresses": [
+        {
+          "commerceId": "addr001",
+          "type": "residential",
+          "countryCode": "PER",
+          "state": "Lima",
+          "city": "Lima",
+          "neighborhood": "Miraflores",
+          "postalCode": "15074",
+          "streetName": "Av. Larco",
+          "streetNumber": "1234",
+          "receiverName": "Juan Pérez"
+        }
+      ],
+      "totals": {
+        "items": {"originalAmount": 45.38, "amount": 45.38},
+        "discounts": {"originalAmount": 0, "amount": 0},
+        "taxes": {"originalAmount": 0, "amount": 0},
+        "shipping": {"originalAmount": 0, "amount": 0},
+        "costs": {"originalAmount": 0, "amount": 0},
+        "invoice": {"amount": 45.50}
+      },
+      "steps": {
+        "new": {"status": "finished", "dateStart": "2024-02-24T10:00:05.000Z", "dateEnd": "2024-02-24T10:05:00.000Z"},
+        "picking": {"status": "finished", "dateStart": "2024-02-24T10:10:00.000Z", "dateEnd": "2024-02-24T10:20:00.000Z"},
+        "invoice": {"status": "finished", "dateStart": "2024-02-24T10:25:00.000Z", "dateEnd": "2024-02-24T10:30:00.000Z"}
+      },
+      "payments": []
+    },
+    {
+      "id": "mock002order987654321xyz",
+      "commerceId": "SLR-v11209817test-02",
+      "orderGroupId": "mock002group987654321",
+      "commerceSequentialId": "513002",
+      "commerceDateCreated": "2024-02-24T10:15:00.000Z",
+      "dateCreated": "2024-02-24T10:15:10.123Z",
+      "dateModified": "2024-02-24T10:45:00.000Z",
+      "status": "picking",
+      "totalAmount": 78.90,
+      "rawTotalAmount": 78.75,
+      "originalAmount": 78.75,
+      "currency": "PEN",
+      "seller": {
+        "id": "seller001metro",
+        "name": "Metro",
+        "externalIds": {
+          "account": "account001metro",
+          "vtex": "1"
+        }
+      },
+      "account": {
+        "id": "account001metro",
+        "name": "metro",
+        "ecommerceName": "metro",
+        "referenceId": "metro",
+        "platform": "vtex"
+      },
+      "salesChannelId": "channel001",
+      "salesChannelName": "metro-Metro",
+      "salesChannelPrefix": "",
+      "customer": {
+        "id": "customer002",
+        "firstName": "María",
+        "lastName": "González",
+        "email": "maria.gonzalez@example.com",
+        "documentType": "DNI",
+        "documentNumber": "87654321",
+        "phone": "+51912345678",
+        "isCorporate": false,
+        "isFirstOrder": true
+      },
+      "items": [
+        {
+          "id": "item004sku004",
+          "commerceSkuId": "4001",
+          "commerceProductId": "4001",
+          "name": "Aceite Vegetal Primor 1L",
+          "refId": "400001",
+          "ean": "7750670000035",
+          "purchasedPrice": 12.90,
+          "purchasedListPrice": 14.00,
+          "purchasedQuantity": 3,
+          "sellingMeasurementUnit": "un",
+          "sellingUnitMultiplier": 1,
+          "measurementUnit": "un",
+          "unitMultiplier": 1,
+          "brandId": "401",
+          "brandName": "Primor",
+          "imageUrl": "https://example.com/images/aceite-primor.jpg",
+          "isGift": false,
+          "isPicked": false,
+          "isPickingFulfilled": false
+        },
+        {
+          "id": "item005sku005",
+          "commerceSkuId": "5001",
+          "commerceProductId": "5001",
+          "name": "Azúcar Blanca Cartavio 1kg",
+          "refId": "500001",
+          "ean": "7750670000042",
+          "purchasedPrice": 3.50,
+          "purchasedListPrice": 4.00,
+          "purchasedQuantity": 10,
+          "sellingMeasurementUnit": "un",
+          "sellingUnitMultiplier": 1,
+          "measurementUnit": "un",
+          "unitMultiplier": 1,
+          "brandId": "501",
+          "brandName": "Cartavio",
+          "imageUrl": "https://example.com/images/azucar-cartavio.jpg",
+          "isGift": false,
+          "isPicked": false,
+          "isPickingFulfilled": false
+        }
+      ],
+      "shippings": [
+        {
+          "id": "shipping002",
+          "status": "pending",
+          "type": "store_pickup",
+          "carrierId": "carrier002",
+          "price": 0,
+          "deliveryEstimateDate": "2024-02-24T19:00:00.000Z",
+          "isPickup": true,
+          "items": [
+            {"id": "item004sku004", "quantity": 3},
+            {"id": "item005sku005", "quantity": 10}
+          ]
+        }
+      ],
+      "addresses": [
+        {
+          "commerceId": "pickup001",
+          "type": "pickup",
+          "countryCode": "PER",
+          "state": "Lima",
+          "city": "Lima",
+          "neighborhood": "San Isidro",
+          "postalCode": "15073",
+          "streetName": "Av. Javier Prado",
+          "streetNumber": "5678",
+          "receiverName": "María González"
+        }
+      ],
+      "totals": {
+        "items": {"originalAmount": 73.70, "amount": 73.70},
+        "discounts": {"originalAmount": 0, "amount": 0},
+        "taxes": {"originalAmount": 0, "amount": 0},
+        "shipping": {"originalAmount": 0, "amount": 0},
+        "costs": {"originalAmount": 5.05, "amount": 5.05},
+        "invoice": {"amount": 78.90}
+      },
+      "steps": {
+        "new": {"status": "finished", "dateStart": "2024-02-24T10:15:10.000Z", "dateEnd": "2024-02-24T10:20:00.000Z"},
+        "picking": {"status": "in_progress", "dateStart": "2024-02-24T10:40:00.000Z"}
+      },
+      "payments": []
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "pageSize": 100,
+    "totalPages": 2,
+    "totalItems": 150,
+    "hasNextPage": true
+  }
+}

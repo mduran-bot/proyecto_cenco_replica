@@ -1,0 +1,835 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Fulfillment Service",
+    "description": "Fulfillment Service\n\n **Last update**: 25 jul 25, 04:59 a. m.",
+    "version": "0.12.0",
+    "x-logo": null,
+    "x-janis-keywords": [
+      "fulfillment"
+    ],
+    "lastUpdate": "2025-07-25T08:59:55.560Z"
+  },
+  "tags": [
+    {
+      "name": "Fulfillment Product Demand",
+      "description": "For managing Fulfillment Product Demand"
+    }
+  ],
+  "servers": [
+    {
+      "url": "https://fulfillment.janis.in/api",
+      "description": "The Prod API server",
+      "variables": {
+        "environment": {
+          "default": "prod"
+        }
+      }
+    },
+    {
+      "url": "https://fulfillment.janisqa.in/api",
+      "description": "The QA API server",
+      "variables": {
+        "environment": {
+          "default": "qa"
+        }
+      }
+    },
+    {
+      "url": "https://fulfillment.janisdev.in/api",
+      "description": "The Beta API server",
+      "variables": {
+        "environment": {
+          "default": "beta"
+        }
+      }
+    },
+    {
+      "url": "http://fulfillment.janis.localhost:3125/api",
+      "description": "The Local API server",
+      "variables": {
+        "environment": {
+          "default": "local"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/product-demand": {
+      "get": {
+        "x-janis-namespace": "product-demand",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "fulfillment:product-demand:read"
+        ],
+        "operationId": "listProductDemand",
+        "tags": [
+          "Fulfillment Product Demand"
+        ],
+        "summary": "Get a list of Product Demand",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ProductDemandFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ProductDemandSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of Product Demand",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductDemandList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/listener/oms/order/cancelled": {
+      "post": {
+        "x-janis-namespace": "oms-order",
+        "x-janis-method": "cancelled-listener",
+        "x-janis-permissions": [],
+        "operationId": "omsOrderCancelledListener",
+        "tags": [
+          "Event Listeners"
+        ],
+        "summary": "Oms Order Cancelled Event Listener",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "The event",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/listenerEvent"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GenericSuccess"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/listener/oms/order/fulfilled": {
+      "post": {
+        "x-janis-namespace": "oms-order",
+        "x-janis-method": "fulfilled-listener",
+        "x-janis-permissions": [],
+        "operationId": "omsOrderFulfilledListener",
+        "tags": [
+          "Event Listeners"
+        ],
+        "summary": "Oms Order Fulfilled Event Listener",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "The event",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/listenerEvent"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GenericSuccess"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/listener/oms/order/fulfillment-updated": {
+      "post": {
+        "x-janis-namespace": "oms-order",
+        "x-janis-method": "fulfillment-updated-listener",
+        "operationId": "omsOrderFulfillmentUpdatedListener",
+        "tags": [
+          "Event Listeners"
+        ],
+        "summary": "OMS Order Fulfillment Updated Event Listener",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "The event",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/listenerEvent"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GenericSuccess"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/listener/oms/order/picked": {
+      "post": {
+        "x-janis-namespace": "oms-order",
+        "x-janis-method": "picked-listener",
+        "x-janis-permissions": [],
+        "operationId": "omsOrderPickedListener",
+        "tags": [
+          "Event Listeners"
+        ],
+        "summary": "Oms Order Picked Event Listener",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "The event",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/listenerEvent"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GenericSuccess"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/listener/oms/order/shipping-updated": {
+      "post": {
+        "x-janis-namespace": "oms-order",
+        "x-janis-method": "shipping-updated-listener",
+        "operationId": "omsOrderShippingUpdatedListener",
+        "tags": [
+          "Event Listeners"
+        ],
+        "summary": "OMS Order Shipping Updated Event Listener",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "The event",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/listenerEvent"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GenericSuccess"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-key",
+        "description": "The API Key"
+      },
+      "ApiSecret": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-secret",
+        "description": "The API Secret"
+      },
+      "JanisClient": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-client",
+        "description": "The Client Code"
+      }
+    },
+    "parameters": {
+      "id": {
+        "name": "id",
+        "in": "path",
+        "schema": {
+          "type": "string",
+          "example": "631fb04c8fe08f51a8ee5949"
+        },
+        "required": true,
+        "description": "The unique identifier of the item"
+      },
+      "ListSortDirection": {
+        "name": "sortDirection",
+        "in": "query",
+        "description": "The direction to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
+        }
+      },
+      "ListPageNumber": {
+        "name": "x-janis-page",
+        "in": "header",
+        "description": "The page to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "default": 1
+        }
+      },
+      "ListPageSize": {
+        "name": "x-janis-page-size",
+        "in": "header",
+        "description": "The page size to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "default": 60
+        }
+      },
+      "JanisEntity": {
+        "name": "janis-entity",
+        "in": "header",
+        "description": "The entity name",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "ProductDemandFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "deliveryDateRange": {
+              "type": "object",
+              "description": "A range for order delivery date.",
+              "properties": {
+                "from": {
+                  "type": "string",
+                  "description": "The beginning of the range",
+                  "format": "date-time",
+                  "example": "2019-11-27T16:08:24.994Z"
+                },
+                "to": {
+                  "type": "string",
+                  "description": "The end of the range",
+                  "format": "date-time",
+                  "example": "2019-11-30T16:08:24.994Z"
+                }
+              }
+            },
+            "orderCreationDateRange": {
+              "type": "object",
+              "description": "A range for order creation date.",
+              "properties": {
+                "from": {
+                  "type": "string",
+                  "description": "The beginning of the range",
+                  "format": "date-time",
+                  "example": "2019-11-27T16:08:24.994Z"
+                },
+                "to": {
+                  "type": "string",
+                  "description": "The end of the range",
+                  "format": "date-time",
+                  "example": "2019-11-30T16:08:24.994Z"
+                }
+              }
+            },
+            "deliveryWindowDateRange": {
+              "type": "object",
+              "description": "A range for order shipping delivery window",
+              "properties": {
+                "from": {
+                  "type": "string",
+                  "description": "The order delivery window initial date",
+                  "format": "date-time",
+                  "example": "2019-11-27T16:08:24.994Z"
+                },
+                "to": {
+                  "type": "string",
+                  "description": "The order delivery window final date",
+                  "format": "date-time",
+                  "example": "2019-11-30T16:08:24.994Z"
+                }
+              }
+            },
+            "warehouseId": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/id"
+                },
+                {
+                  "description": "A warehouse Id to filter"
+                }
+              ]
+            },
+            "salesChannelId": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/id"
+                },
+                {
+                  "description": "The Order Sales Channel ID of Product Demand"
+                }
+              ]
+            },
+            "deliveryCarrierId": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/id"
+                },
+                {
+                  "description": "The Delivery Shipping Carrier ID of Product Demand"
+                }
+              ]
+            },
+            "ean": {
+              "type": "string",
+              "description": "A product ean to filter",
+              "example": "A44775588"
+            },
+            "name": {
+              "type": "string",
+              "description": "A product name to filter",
+              "example": "A44775588"
+            },
+            "refId": {
+              "type": "string",
+              "description": "A product refId to filter",
+              "example": "AAA12345"
+            },
+            "categoriesIds": {
+              "type": "array",
+              "description": "A product categories Ids to filter",
+              "items": {
+                "type": "string"
+              },
+              "example": [
+                "631fb04c8fe08f51a8ee5949"
+              ]
+            }
+          }
+        }
+      },
+      "ProductDemandSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "quantity"
+          ]
+        }
+      }
+    },
+    "headers": {
+      "x-janis-total": {
+        "description": "The total amount of records in the list",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "responses": {
+      "SuccessCreateResponse": {
+        "description": "The item was created",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "SuccessUpdateResponse": {
+        "description": "The item was updated",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "GenericSuccess": {
+        "description": "Operation succeeded",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "BadRequest": {
+        "description": "A client error has ocurred.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Authentication missing or invalid",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Not authorized request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "InternalError": {
+        "description": "A server error has ocurred."
+      }
+    },
+    "schemas": {
+      "id": {
+        "description": "The unique identifier of the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "631fb04c8fe08f51a8ee5949"
+      },
+      "status": {
+        "description": "The item status",
+        "type": "string",
+        "default": "active",
+        "enum": [
+          "active",
+          "inactive"
+        ],
+        "example": "active"
+      },
+      "dateCreated": {
+        "description": "The date of creation",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-12T19:00:00.000Z"
+      },
+      "dateModified": {
+        "description": "The date of the last modification",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-20T19:00:00.000Z"
+      },
+      "dateCreatedDay": {
+        "description": "The day of creation",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-08-07T16:00:00.000Z"
+      },
+      "dateModifiedDay": {
+        "description": "The day of last modification",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-08-07T16:00:00.000Z"
+      },
+      "userCreated": {
+        "description": "The ID of the user who created the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "6a1fc1eeb5b68406e0487a10"
+      },
+      "userModified": {
+        "description": "The ID of the user who last modified the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "7e1fc1eeb5b68406e048796"
+      },
+      "ProductDemandList": {
+        "type": "array",
+        "description": "A list of Product Demand",
+        "items": {
+          "$ref": "#/components/schemas/ProductDemand"
+        }
+      },
+      "ProductDemand": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/id"
+              },
+              {
+                "description": "The id of Product Demand"
+              }
+            ]
+          },
+          "warehouseId": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/id"
+              },
+              {
+                "description": "The warehouse id of Product Demand"
+              }
+            ]
+          },
+          "ean": {
+            "type": "string",
+            "description": "The ean of Product Demand",
+            "example": "A44775588"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of Product Demand",
+            "example": "Product name"
+          },
+          "refId": {
+            "type": "string",
+            "description": "The reference id of Product Demand",
+            "example": "AAA12345"
+          },
+          "quantity": {
+            "type": "number",
+            "description": "The total quantity of Product Demand",
+            "example": 10
+          },
+          "remainingQuantity": {
+            "type": "number",
+            "description": "The remaining to pick quantity of Product Demand"
+          },
+          "categoriesIds": {
+            "type": "array",
+            "description": "The total quantity of Product Demand",
+            "items": {
+              "$ref": "#/components/schemas/id"
+            }
+          },
+          "unitMultiplier": {
+            "type": "number",
+            "description": "The unit multiplier of Product Demand",
+            "example": 1
+          },
+          "measurementUnit": {
+            "type": "string",
+            "description": "The measurement unit of Product Demand",
+            "example": "un"
+          }
+        }
+      },
+      "listenerEvent": {
+        "description": "A JANIS Event object",
+        "type": "object",
+        "properties": {
+          "service": {
+            "description": "The source service name",
+            "type": "string",
+            "example": "id"
+          },
+          "entity": {
+            "description": "The event related entity",
+            "type": "string",
+            "example": "profile"
+          },
+          "event": {
+            "description": "The event name",
+            "type": "string",
+            "example": "created"
+          },
+          "client": {
+            "description": "The source event client",
+            "type": "string",
+            "example": "fizzmod"
+          },
+          "id": {
+            "description": "The event related entity ID",
+            "type": "string",
+            "example": "5d699c1ae8ebb95eaa24aca9"
+          }
+        },
+        "required": [
+          "service",
+          "entity",
+          "event"
+        ]
+      }
+    }
+  }
+}

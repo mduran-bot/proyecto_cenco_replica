@@ -1,0 +1,4 @@
+# file: C:\Users\maxim\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\pyspark\sql\pandas\serializers.py
+# hypothesis_version: 6.151.9
+
+['_%d', '_0', '__arrow_array__', 'actual', 'arrow_type', 'col_name', 'col_type', 'concat_batches', 'dataCount', 'dataframes_in_group', 'date_as_object', 'dict', 'error_msg', 'expected', 'func_name', 'i', 'initState', 'inputData', 'isLastChunk', 'keyRowAsUnsafe', 'numRows', 'object', 'oldTimeoutTimestamp', 'optionalValue', 'pa.StructType', 'pd.DataFrame', 'properties', 'row', 'startOffset', 'stateCount', 'u', 'utf-8']

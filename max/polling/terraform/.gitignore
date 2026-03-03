@@ -1,0 +1,25 @@
+# Terraform
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.tfplan.*
+.terraform/
+.terraform.lock.hcl
+
+# Credenciales (NUNCA commitear)
+terraform.tfvars
+credentials.tfvars
+*.pem
+*.key
+
+# Logs
+terraform.log
+*.log
+
+# Backups locales
+backups/
+*.backup
+
+# OS
+.DS_Store
+Thumbs.db

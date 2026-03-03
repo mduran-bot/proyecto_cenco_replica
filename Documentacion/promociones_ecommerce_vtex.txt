@@ -1,0 +1,881 @@
+-- DROP PROCEDURE dl_sp_dashboards_ecommerce.promociones_ecommerce_vtex();
+
+CREATE OR REPLACE PROCEDURE dl_sp_dashboards_ecommerce.promociones_ecommerce_vtex()
+	LANGUAGE plpgsql
+AS $$
+	
+	
+	
+BEGIN
+
+
+DROP TABLE IF EXISTS #fechas_promo;
+CREATE TEMPORARY TABLE #fechas_promo AS
+SELECT 
+    TO_CHAR(CURRENT_DATE - INTERVAL '45 day', 'YYYYMMDD') AS fechaini,
+    TO_CHAR(CURRENT_DATE, 'YYYYMMDD') AS fechafin,
+    TO_CHAR(CURRENT_DATE - INTERVAL '75 day', 'YYYYMMDD') AS fechaini_promo, 
+    (CURRENT_DATE - INTERVAL '45 day')::timestamp AS fecha_ini_timestamp,
+    DATEADD(second, -1, DATEADD(day, 1, CURRENT_DATE)) AS fecha_fin_timestamp,
+    (CURRENT_DATE - INTERVAL '75 day')::timestamp AS fechaini_promo_timestamp;
+
+
+drop table if exists fecha;
+CREATE TEMPORARY TABLE fecha AS
+SELECT
+    sk_dia AS codfecha,
+    sk_semana AS semana,
+    desc_abrv_dia_sem AS nom_dia
+FROM
+    dl_sp_maestras.dim_dia
+WHERE
+    sk_dia >= (select fechaini from #fechas_promo)
+    AND sk_dia <= (select fechafin from #fechas_promo);
+
+
+drop table if exists #eco_oms;
+	select * into #eco_oms from stg_ecommerce_vtex.eco_oms	
+	where creationdate >= (select fecha_ini_timestamp from #fechas_promo)
+	and creationdate <= (select fecha_fin_timestamp from #fechas_promo);
+	 
+
+drop table if exists pedidos_eco_oms_sku;
+CREATE TEMPORARY TABLE pedidos_eco_oms_sku AS
+SELECT
+    SUBSTRING(TO_CHAR(creationdate, 'YYYYMMDD'), 1, 8) AS dia,
+    ordernum AS vtex_id,
+    LPAD(referencecode, 18, '0') AS cod_material,
+    skutotalprice * quantity_sku AS venta_bruta,
+    quantity_sku AS q_sku
+FROM
+    #eco_oms
+WHERE
+    quantity_sku <> 0
+    AND lower(courrier) not in ('transportadora donación','transportadora donacion')
+    AND statusorder NOT IN ('', ' ');
+   
+   
+   -- Crear una tabla temporal con los datos de ventas
+   
+drop table if exists #MATERIALES_UNIDO;
+SELECT ID_MATERIAL,ID_EAN_PRINCIPAL,A.SK_DIA_CREACION_MATERIAL,DESC_MATERIAL,DESC_MARCA,ID_UM_BASE,ID_PROVEEDOR,DESC_PROVEEDOR,
+ID_GRUPO_ARTICULO,DESC_GRUPO_ARTICULO,ID_CATEGORIA,DESC_CATEGORIA,DESC_JEFE_CATEGORIA,DESC_JEFE_CATEGORIA_MP,DESC_JEFE_CATEGORIA_IMP,ID_SUB_CATEGORIA,DESC_SUB_CATEGORIA,ID_SECCION,DESC_SECCION,ID_DEPARTAMENTO,DESC_DEPARTAMENTO,ID_AREA,DESC_AREA,ID_GERENCIA_COMERCIAL,DESC_GERENCIA_COMERCIAL,ID_GERENTE,DESC_GERENTE,
+DESC_UNIDAD_NEGOCIO,E.SK_CATEGORIA,A.SK_MATERIAL,B.SK_MARCA,ID_TIPO_IGV
+INTO #MATERIALES_UNIDO FROM dl_sp_capa_semantica.dw_cencofcic_dim_material A
+INNER JOIN dl_sp_capa_semantica.dw_cencofcic_dim_marca B ON A.SK_MARCA=B.SK_MARCA
+INNER JOIN dl_sp_capa_semantica.dw_cencofcic_dim_proveedor C ON A.SK_PROVEEDOR=C.SK_PROVEEDOR
+INNER JOIN dl_sp_maestras.dim_grupo_articulo D ON A.SK_GRUPO_ARTICULO=D.SK_GRUPO_ARTICULO
+INNER JOIN dl_sp_maestras.dim_categoria E ON D.SK_CATEGORIA=E.SK_CATEGORIA
+INNER JOIN dl_sp_maestras.dim_jefe_categoria F ON D.SK_JEFE_CATEGORIA=F.SK_JEFE_CATEGORIA
+INNER JOIN dl_sp_maestras.dim_jefe_categoria_mp G ON D.SK_JEFE_CATEGORIA_MP=G.SK_JEFE_CATEGORIA_MP
+INNER JOIN dl_sp_maestras.dim_jefe_categoria_imp H ON D.SK_JEFE_CATEGORIA_IMP=H.SK_JEFE_CATEGORIA_IMP
+INNER JOIN dl_sp_maestras.dim_sub_categoria I ON D.SK_SUB_CATEGORIA=I.SK_SUB_CATEGORIA
+INNER JOIN dl_sp_maestras.dim_seccion J ON D.SK_SECCION=J.SK_SECCION
+INNER join dl_sp_maestras.dim_departamento K ON D.SK_DEPARTAMENTO=K.SK_DEPARTAMENTO
+INNER JOIN dl_sp_maestras.dim_area L ON D.SK_AREA=L.SK_AREA
+INNER JOIN dl_sp_maestras.dim_gerencia_comercial M ON D.SK_GERENCIA_COMERCIAL=M.SK_GERENCIA_COMERCIAL
+INNER JOIN dl_sp_maestras.dim_gerente N ON D.SK_GERENTE=N.SK_GERENTE;
+
+drop table if exists #MATERIAL;
+SELECT id_material as "COD_MATERIAL",ID_EAN_PRINCIPAL as "EAN",SK_DIA_CREACION_MATERIAL as "FECHA_CREACION",DESC_MATERIAL,DESC_MARCA as "MARCA"
+,ID_UM_BASE as "UMB",ID_PROVEEDOR as "COD_PROVEEDOR",DESC_PROVEEDOR,ID_GRUPO_ARTICULO as "COD_GA",DESC_GRUPO_ARTICULO as"GRUPO_ARTICULO",
+ID_CATEGORIA as "COD_CATEGORIA",DESC_CATEGORIA as "CATEGORIA",DESC_JEFE_CATEGORIA"JEFE_CATEGORIA"
+,DESC_JEFE_CATEGORIA_MP"JEFE_CATEGORIA_MP",DESC_JEFE_CATEGORIA_IMP"JEFE_CATEGORIA_IMP",
+ID_SUB_CATEGORIA"COD_SUB_CATEGORIA",DESC_SUB_CATEGORIA"SUB_CATEGORIA",ID_SECCION"COD_SECCION",DESC_SECCION"SECCION",
+ID_DEPARTAMENTO"COD_DEPARTAMENTO",DESC_DEPARTAMENTO"DEPARTAMENTO",ID_AREA"COD_AREA",DESC_AREA"AREA",ID_GERENCIA_COMERCIAL"COD_GERENCIA",
+DESC_GERENCIA_COMERCIAL"GERENCIA_COMERCIAL",ID_GERENTE"COD_GERENTE", DESC_GERENTE"GERENTE",DESC_UNIDAD_NEGOCIO UNIDAD_NEGOCIO,SK_CATEGORIA,SK_MATERIAL,SK_MARCA,ID_TIPO_IGV
+INTO #MATERIAL FROM #MATERIALES_UNIDO;
+   
+drop table if exists pedidos_eco_oms_mat;
+CREATE TEMPORARY TABLE pedidos_eco_oms_mat AS
+SELECT
+    e.*,
+    m.id_tipo_igv,
+    CASE
+        WHEN 
+        m.id_tipo_igv  
+        IN (0, 3, 4, 5) 
+        THEN venta_bruta
+        ELSE round(venta_bruta/1.18,5) 
+    END AS venta_neta
+FROM
+    pedidos_eco_oms_sku e
+INNER JOIN
+   #MATERIAL m ON e.cod_material = m.cod_material;
+
+  
+  
+drop table if exists pedido_sku_venta;
+-- Crear una tabla temporal con las sumas de ventas por producto
+CREATE TEMPORARY TABLE pedido_sku_venta AS
+SELECT
+    DISTINCT vtex_id,
+    cod_material,
+    SUM(venta_bruta) AS venta_bruta,
+    SUM(venta_neta) AS venta_neta,
+    SUM(q_sku) AS q_sku
+FROM
+    pedidos_eco_oms_mat
+GROUP BY
+    vtex_id,
+    cod_material;
+   
+--------------------------------------------------------------------
+---------------------- TIEMPO ALTO ---------------------------------
+--------------------------------------------------------------------
+   drop table if exists promo_vtex;
+   create temporary table promo_vtex as
+        select
+	rowid,
+	refid,
+	tagname,
+	value,
+	ispercentual,
+	identifier,
+	f_fech_regi,
+	f_fech_modi,
+	name
+from
+	stg_ecommerce_vtex.eco_oms_promotions
+where
+	f_fech_regi >= (select fechaini_promo_timestamp from #fechas_promo)
+	and f_fech_regi <= (select fecha_fin_timestamp from #fechas_promo);
+
+--------------------------------------------------------------------
+--------------------------------------------------------------------
+--------------------------------------------------------------------
+--------------------------------------------------------------------
+
+-- Crear la tabla temporal #pedidos
+drop table if exists pedidos ;
+--- 1 MIN
+CREATE TEMPORARY TABLE pedidos AS
+SELECT
+    SUBSTRING(TO_CHAR(creationdate, 'YYYYMMDD'), 1, 6) AS mes,
+    semana,
+    SUBSTRING(TO_CHAR(creationdate, 'YYYYMMDD'), 1, 8) AS dia,
+    clientdocument AS dni,
+    RIGHT('000000000000000000' || referencecode, 18) AS cod_material,
+    ordernum AS vtex_id,
+    skuname AS material,
+    statusorder AS estado,
+    quantity_sku AS q_sku,
+    skutotalprice AS selling_price,
+    SUM(skutotalprice * quantity_sku) AS venta_bruta,
+    CASE
+        WHEN (
+                sellername IN ('wongfood', 'metrofood', 'app', 'appmetro')
+                OR sellername LIKE '%wongiot%'
+                OR sellername LIKE '%metroios%'
+                OR sellername LIKE '%metroioh%'
+            ) THEN 'TIENDA'
+        ELSE 'ALMACEN'
+    END AS operacion,
+    CASE
+        WHEN (
+                sellername NOT IN ('wongfood', 'metrofood', 'appmetro', 'app')
+                AND sellername NOT LIKE '%wongiot%'
+                AND sellername NOT LIKE '%metroios%'
+                AND sellername NOT LIKE '%metroioh%'
+            )
+            AND (
+                host LIKE '%metro%' OR host = 'appmetro'
+            ) THEN 'S129'
+        WHEN (
+                sellername NOT IN ('wongfood', 'metrofood', 'appmetro', 'app')
+                AND sellername NOT LIKE '%wongiot%'
+                AND sellername NOT LIKE '%metroios%'
+                AND sellername NOT LIKE '%metroioh%'
+            )
+            AND (
+                host LIKE '%wong%' OR host = 'app'
+            ) THEN 'T129'
+        WHEN SUBSTRING(courrier, 1, 4) = 'TH12' THEN 'W101'
+        ELSE SUBSTRING(courrier, 1, 4)
+    END AS cod_tienda,
+    CASE
+        WHEN utmsource LIKE '%AppMetro%'
+             OR utmsource LIKE '%AppWong%' THEN 'APP'
+        ELSE 'WEB'
+    END AS canal_eco,
+    value AS dscto,
+    totalvalue AS total_tkt,
+    a.name AS promocion,
+    cardfirstdigits AS bin,
+    invoice_date,
+    cardlastdigits AS ult_digits,
+    coupon AS cupon,
+    prime_order,
+    identificator,
+    corporatedocument,
+    discountsnames,
+    SUBSTRING(TO_CHAR(creationdate, 'HH24'), 1, 2) AS hora,
+    sellerorderid
+FROM
+    promo_vtex a
+INNER JOIN
+    #eco_oms c ON c.identificator = a.rowid
+INNER JOIN
+    fecha b ON TO_CHAR(c.creationdate, 'YYYYMMDD') = b.codfecha
+WHERE
+    statusorder NOT IN ('', ' ')
+    AND lower(courrier)  NOT IN ('transportadora donación', 'transportadora donacion')
+    AND quantity_sku <> 0
+GROUP BY
+    SUBSTRING(TO_CHAR(creationdate, 'YYYYMMDD'), 1, 6),
+    semana,
+    SUBSTRING(TO_CHAR(creationdate, 'YYYYMMDD'), 1, 8),
+    clientdocument,
+    RIGHT('000000000000000000' || referencecode, 18),
+    ordernum,
+    skuname,
+    statusorder,
+    quantity_sku,
+    skutotalprice,
+    CASE
+        WHEN (
+                sellername IN ('wongfood', 'metrofood', 'app', 'appmetro')
+                OR sellername LIKE '%wongiot%'
+                OR sellername LIKE '%metroios%'
+                OR sellername LIKE '%metroioh%'
+            ) THEN 'TIENDA'
+        ELSE 'ALMACEN'
+    END,
+    CASE
+        WHEN (
+                sellername NOT IN ('wongfood', 'metrofood', 'appmetro', 'app')
+                AND sellername NOT LIKE '%wongiot%'
+                AND sellername NOT LIKE '%metroios%'
+                AND sellername NOT LIKE '%metroioh%'
+            )
+            AND (
+                host LIKE '%metro%' OR host = 'appmetro'
+            ) THEN 'S129'
+        WHEN (
+                sellername NOT IN ('wongfood', 'metrofood', 'appmetro', 'app')
+                AND sellername NOT LIKE '%wongiot%'
+                AND sellername NOT LIKE '%metroios%'
+                AND sellername NOT LIKE '%metroioh%'
+            )
+            AND (
+                host LIKE '%wong%' OR host = 'app'
+            ) THEN 'T129'
+        WHEN SUBSTRING(courrier, 1, 4) = 'TH12' THEN 'W101'
+        ELSE SUBSTRING(courrier, 1, 4)
+    END,
+    CASE
+        WHEN utmsource LIKE '%AppMetro%'
+             OR utmsource LIKE '%AppWong%' THEN 'APP'
+        ELSE 'WEB'
+    END,
+    value,
+    totalvalue,
+    a.name,
+    cardfirstdigits,
+    invoice_date,
+    cardlastdigits,
+    coupon,
+    prime_order,
+    identificator,
+    corporatedocument,
+    discountsnames,
+    SUBSTRING(TO_CHAR(creationdate, 'HH24'), 1, 2),
+    sellerorderid;
+  
+ 
+--------------------------------------------
+--------------------------------------------
+   --------------------------------------------
+   --------------------------------------------
+
+CREATE TEMPORARY TABLE estados_promo_legado_sql AS
+SELECT
+TO_CHAR(CONVERT_TIMEZONE('GMT', '+05:00', DATEADD(SECOND,CAST(COALESCE( O.date_created) AS BIGINT ) , '1970-01-01 00:00:00')), 'YYYYMMDD') as fecha_pedido,
+O.seq_id AS Pedido,
+O.vtex_id AS vtex_id,
+seller_ecom_id AS Seller,
+O.status AS statusOrder
+FROM stg_ecommerce_janis_legacy.wms_orders O
+WHERE TO_CHAR(CONVERT_TIMEZONE('GMT', '+05:00', DATEADD(SECOND,CAST(COALESCE( O.date_created) AS BIGINT ) , '1970-01-01 00:00:00')), 'YYYYMMDD')
+>= (select fechaini from #fechas_promo)
+AND TO_CHAR(CONVERT_TIMEZONE('GMT', '+05:00', DATEADD(SECOND,CAST(COALESCE( O.date_created) AS BIGINT ) , '1970-01-01 00:00:00')), 'YYYYMMDD') <= (select fechafin from #fechas_promo);
+
+
+CREATE TEMPORARY TABLE estados_promo_legado_wong_io_sql AS
+SELECT
+TO_CHAR(CONVERT_TIMEZONE('GMT', '+05:00', DATEADD(SECOND,CAST(COALESCE( O.date_created) AS BIGINT ) , '1970-01-01 00:00:00')), 'YYYYMMDD') as fecha_pedido,
+O.seq_id AS Pedido,
+O.vtex_id AS vtex_id,
+seller_ecom_id AS Seller,
+O.status AS statusOrder
+FROM stg_ecommerce_janis_wongio.wms_orders O
+WHERE TO_CHAR(CONVERT_TIMEZONE('GMT', '+05:00', DATEADD(SECOND,CAST(COALESCE( O.date_created) AS BIGINT ) , '1970-01-01 00:00:00')), 'YYYYMMDD')>= (select fechaini from #fechas_promo)
+AND TO_CHAR(CONVERT_TIMEZONE('GMT', '+05:00', DATEADD(SECOND,CAST(COALESCE( O.date_created) AS BIGINT ) , '1970-01-01 00:00:00')), 'YYYYMMDD') <= (select fechafin from #fechas_promo);
+
+
+CREATE TEMPORARY TABLE estados_promo_legado_metro_io_sql AS
+SELECT
+TO_CHAR(CONVERT_TIMEZONE('GMT', '+05:00', DATEADD(SECOND,CAST(COALESCE( O.date_created) AS BIGINT ) , '1970-01-01 00:00:00')), 'YYYYMMDD') as fecha_pedido,
+O.seq_id AS Pedido,
+O.vtex_id AS vtex_id,
+seller_ecom_id AS Seller,
+O.status AS statusOrder
+FROM stg_ecommerce_janis_metroio.wms_orders O
+WHERE TO_CHAR(CONVERT_TIMEZONE('GMT', '+05:00', DATEADD(SECOND,CAST(COALESCE( O.date_created) AS BIGINT ) , '1970-01-01 00:00:00')), 'YYYYMMDD') >= (select fechaini from #fechas_promo)
+AND TO_CHAR(CONVERT_TIMEZONE('GMT', '+05:00', DATEADD(SECOND,CAST(COALESCE( O.date_created) AS BIGINT ) , '1970-01-01 00:00:00')), 'YYYYMMDD') <= (select fechafin from #fechas_promo);
+ 
+    CREATE TEMPORARY TABLE data_janis AS
+    SELECT
+        *
+    FROM estados_promo_legado_sql
+    UNION ALL
+    SELECT
+        *
+    FROM estados_promo_legado_wong_io_sql
+    UNION ALL
+    SELECT
+        *
+    FROM estados_promo_legado_metro_io_sql;
+
+    ALTER TABLE data_janis ADD COLUMN desc_estado_orden_online_agrupado VARCHAR(200);
+
+    UPDATE data_janis
+    SET desc_estado_orden_online_agrupado = B.desc_estado_orden_online_agrupado
+    FROM data_janis A
+    INNER JOIN dl_sp_maestras.dim_estado_orden_online B ON A.statusorder = B.sk_estado_orden_online;
+
+
+
+    CREATE TEMPORARY TABLE pedidos_t129 AS
+    SELECT
+    DISTINCT n_ped_ecommerce seller,
+    SUBSTRING(n_ped_ecommerce, 5, 21) vtex_id,
+    estado,
+    fec_pedido fecha_pedido,
+    desc_estado_orden_online_agrupado
+    FROM per_super_pd_int.transacciones_nonfood a 
+    INNER JOIN fecha C ON A.fec_pedido = C.codfecha
+    LEFT JOIN dl_sp_maestras.dim_estado_orden_online B ON upper(A.estado) = B.desc_estado_orden_online
+    WHERE UPPER(cod_material) <> 'FLETE ECOMMERCE';
+
+
+        CREATE TEMPORARY TABLE estados_origen AS
+        select 
+        a.fecha_pedido,
+        a.seller,
+        a.vtex_id,
+        a.desc_estado_orden_online_agrupado
+        from ( 
+        select a.* , row_number()over(partition by vtex_id 
+        order by prioridad desc ) rank from (
+        SELECT
+        DISTINCT fecha_pedido,
+        seller,
+        vtex_id,
+        desc_estado_orden_online_agrupado,
+        1 as prioridad 
+        FROM
+        data_janis
+        UNION ALL
+        SELECT
+        DISTINCT fecha_pedido,
+        seller,
+        vtex_id,
+        desc_estado_orden_online_agrupado,
+        0 as prioridad 
+        FROM
+        pedidos_t129
+
+        ) A 
+        ) a 
+        where 
+        a.rank = 1 ;
+
+
+    ALTER TABLE pedidos ADD COLUMN estado_agrupado VARCHAR(100);
+
+    UPDATE pedidos
+    SET estado_agrupado = desc_estado_orden_online_agrupado
+    FROM pedidos A
+    INNER JOIN estados_origen B ON A.vtex_id = B.vtex_id;
+
+
+   
+   
+   --------------------------------------------
+   --------------------------------------------
+   --------------------------------------------
+   --------------------------------------------
+    CREATE TEMPORARY TABLE pedido_mat AS
+    SELECT
+        E.*,
+        M.desc_material,
+        M.marca,
+        M.grupo_articulo,
+        M.categoria,
+        m.gerente,
+        M.unidad_negocio,
+        M.seccion,
+        M.departamento,
+        M.gerencia_comercial,
+        m.desc_proveedor,
+        m.id_tipo_igv,
+        b.desc_abrv2_tienda as desc_tienda_abrv2,
+        CASE
+            WHEN sk_cadena = 1 THEN 'WONG'
+            WHEN sk_cadena = 2 THEN 'METRO'
+        END AS cadena
+    FROM pedidos E
+    INNER JOIN #MATERIAL M ON E.cod_material = M.cod_material
+    LEFT JOIN dl_sp_maestras.dim_tienda B ON E.cod_tienda = B.id_tienda;
+
+   
+drop table if exists dscto_neto;
+CREATE TEMPORARY TABLE dscto_neto AS 
+SELECT
+        *,
+        CASE
+                WHEN id_tipo_igv IN (0, 3, 4, 5) THEN venta_bruta
+                ELSE round(venta_bruta/1.18,5) 
+        END AS venta_neta,
+        CASE
+                WHEN id_tipo_igv IN (0, 3, 4, 5) THEN dscto
+                ELSE round(dscto/1.18,5)
+        END AS dscto_neto,
+        CASE
+                WHEN id_tipo_igv IN (0, 3, 4, 5) THEN venta_bruta
+                ELSE round(venta_bruta/1.18,5)
+        END AS venta_neta_2
+FROM pedido_mat;
+
+
+
+DELETE FROM
+        dscto_neto
+WHERE
+        estado_agrupado NOT IN (
+                'ENTREGADO',
+                'EN PROCESO',
+                'PENDIENTE DE PICKING'
+        )
+        OR estado_agrupado IS NULL;
+
+       
+UPDATE
+        dscto_neto
+SET
+        dni = corporatedocument
+WHERE
+        dni IS NULL;
+
+
+CREATE TEMPORARY TABLE clientes AS 
+SELECT
+        DISTINCT dni,
+        COUNT(DISTINCT vtex_id) AS trx
+FROM dscto_neto
+GROUP BY dni;
+
+
+
+CREATE TEMPORARY TABLE clientes_sk_cliente AS 
+SELECT
+        DISTINCT dni,
+        trx,
+        ROW_NUMBER() OVER(ORDER BY dni) AS sk_cliente
+FROM clientes;
+
+
+ALTER TABLE
+        dscto_neto
+ADD
+        cod_cliente VARCHAR(50);
+
+ALTER TABLE
+        dscto_neto
+ADD
+        id_cliente VARCHAR(50);
+
+       
+UPDATE
+        dscto_neto
+SET
+        id_cliente = b.sk_cliente
+FROM
+        dscto_neto a
+INNER JOIN clientes_sk_cliente b ON a.dni = b.dni;
+
+
+DROP TABLE IF EXISTS clientes_bonus;
+
+CREATE TEMPORARY TABLE clientes_bonus AS
+SELECT DISTINCT
+       a.dni,
+       b.id_cliente AS cod_cliente
+FROM   clientes a
+LEFT JOIN dl_sp_capa_semantica.dw_cencofcic_dim_cliente b
+       ON a.dni = RTRIM(LTRIM(b.num_documento));
+
+DELETE FROM
+        clientes_bonus
+WHERE
+        dni = '99999999';
+
+UPDATE
+        dscto_neto
+SET
+        cod_cliente = b.cod_cliente
+FROM
+        dscto_neto a
+INNER JOIN clientes_bonus b ON a.dni = b.dni;
+
+
+ALTER TABLE
+        dscto_neto
+ADD
+        sk_cliente VARCHAR(50);
+
+       
+UPDATE
+        dscto_neto
+SET
+       sk_cliente = b.sk_cliente
+FROM
+        dscto_neto a
+INNER JOIN dl_sp_capa_semantica.dw_cencofcic_dim_cliente b ON a.dni = RTRIM(LTRIM(b.NUM_DOCUMENTO)); 
+
+
+DELETE FROM dl_sp_dashboards_ecommerce.promociones_ecommerce_dlv;
+INSERT INTO dl_sp_dashboards_ecommerce.promociones_ecommerce_dlv
+SELECT
+        DISTINCT mes,
+        semana,
+        dia,
+        cadena,
+        cod_tienda,
+        desc_tienda_abrv2 AS desc_tienda,
+        operacion,
+        canal_eco,
+        cod_cliente,
+        promocion,
+        cupon,
+        hora,
+        vtex_id,
+        discountsnames AS promociones_concatenadas,
+        cod_material,
+        material AS desc_material,
+        SUM(q_sku) AS cantidad_unidades,
+        SUM(venta_neta) AS venta_neta,
+        SUM(venta_bruta) AS venta_bruta,
+        SUM(dscto) AS dscto,
+        gerencia_comercial AS desc_gerencia_comercial,
+        unidad_negocio,
+        gerente AS desc_gerente,
+        categoria AS desc_categoria,
+        grupo_articulo AS desc_grupo_articulo,
+        estado_agrupado,
+        prime_order,
+        GETDATE() AS fecha_act
+FROM
+        dscto_neto
+WHERE
+        estado_agrupado IN (
+                'ENTREGADO',
+                'EN PROCESO',
+                'PENDIENTE DE PICKING'
+        )
+        AND lower(promocion) LIKE '%deliver%'
+GROUP BY
+        mes,
+        semana,
+        dia,
+        cadena,
+        cod_tienda,
+        desc_tienda_abrv2,
+        operacion,
+        canal_eco,
+        cod_cliente,
+        promocion,
+        cupon,
+        hora,
+        vtex_id,
+        discountsnames,
+        cod_material,
+        material,
+        gerencia_comercial,
+        unidad_negocio,
+        gerente,
+        categoria,
+        grupo_articulo,
+        estado_agrupado,
+        prime_order;
+
+       
+       
+DELETE FROM
+        dscto_neto
+WHERE
+        lower(promocion) LIKE '%deliver%';
+
+
+CREATE TEMPORARY TABLE promocional_cab_folio AS 
+SELECT sk_folio_online, cod_ticket_vtex 
+FROM dl_sp_capa_semantica.dw_cencofcic_dim_folio_online 
+WHERE sk_dia >=  (select fechaini from #fechas_promo) AND sk_dia <=  (select fechafin from #fechas_promo) ;
+
+
+
+CREATE TEMPORARY TABLE promocional_det_folio AS
+SELECT sk_folio_online, sk_dia, sk_material, mto_margen_online 
+FROM dl_sp_capa_semantica.dw_cencofcic_fact_pedido_cliente_promocion_online_mat 
+WHERE sk_dia >= (select fechaini from #fechas_promo)  AND sk_dia <= (select fechafin from #fechas_promo) ;
+
+
+CREATE TEMPORARY TABLE folio AS 
+SELECT
+        DISTINCT vtex_id,
+        sk_folio_online,
+        sellerorderid
+FROM
+        dscto_neto a
+LEFT JOIN promocional_cab_folio b ON a.sellerorderid = b.cod_ticket_vtex;
+
+
+/*
+select * from dl_sp_temporal.vw_details_material_tmp limit 10;
+select * from promocional_det_folio limit 10;
+select * from per_super_pd_stg.jerarquia_materiales limit 10;
+*/
+
+CREATE TEMPORARY TABLE margen_pedido_detalle AS
+SELECT
+        DISTINCT vtex_id,
+        a.sk_folio_online,
+        sellerorderid,
+        b.sk_material,
+        cod_material,
+        SUM(mto_margen_online) AS margen
+from folio a
+LEFT JOIN promocional_det_folio b ON a.sk_folio_online = b.sk_folio_online
+LEFT JOIN per_super_pd_stg.jerarquia_materiales c ON b.sk_material = c.sk_material
+GROUP BY
+        vtex_id,
+        a.sk_folio_online,
+        sellerorderid,
+        b.sk_material,
+        cod_material;
+
+ALTER TABLE
+        pedido_sku_venta
+ADD margen NUMERIC(14,2);
+
+
+UPDATE
+        pedido_sku_venta
+SET
+        margen = b.margen
+FROM
+        pedido_sku_venta a
+INNER JOIN margen_pedido_detalle b ON a.vtex_id = b.vtex_id 
+AND a.cod_material = b.cod_material;
+
+
+ALTER TABLE dscto_neto ADD margen_total NUMERIC(14,3);
+ALTER TABLE dscto_neto ADD venta_bruta_total NUMERIC(14,2);
+ALTER TABLE dscto_neto ADD venta_neta_total NUMERIC(14,2);
+
+
+UPDATE
+        dscto_neto
+SET
+        margen_total = b.margen,
+        venta_bruta_total = b.venta_bruta,
+        venta_neta_total = b.venta_neta
+FROM
+        dscto_neto a
+INNER JOIN pedido_sku_venta b ON a.vtex_id = b.vtex_id AND a.cod_material = b.cod_material;
+
+
+ALTER TABLE
+        dscto_neto
+ADD q_sku_total NUMERIC(14,2);
+
+UPDATE
+        dscto_neto
+SET
+        q_sku_total = b.q_sku
+FROM
+        dscto_neto a
+INNER JOIN pedido_sku_venta b ON a.vtex_id = b.vtex_id 
+AND a.cod_material = b.cod_material;
+
+UPDATE
+        dscto_neto
+SET
+        q_sku_total = b.q_sku
+FROM
+        dscto_neto a
+INNER JOIN pedido_sku_venta b ON a.vtex_id = b.vtex_id
+ AND a.cod_material = b.cod_material;
+
+
+CREATE TEMPORARY TABLE pedidos_sku_promo AS
+SELECT
+    DISTINCT vtex_id,
+    cod_material,
+    SUM(dscto) AS dscto,
+    ABS(SUM(dscto)) AS dscto_abs,
+    margen_total
+FROM dscto_neto
+GROUP BY
+    vtex_id,
+    cod_material,
+    margen_total;
+
+
+-- Agregar columnas a la tabla temporal
+ALTER TABLE dscto_neto ADD COLUMN dscto_total_sku_mat_promo NUMERIC(14, 2);
+ALTER TABLE dscto_neto ADD COLUMN dscto_abs NUMERIC(14, 2);
+
+-- Actualizar la columna dscto_total_sku_mat_promo
+UPDATE dscto_neto
+SET dscto_total_sku_mat_promo = b.dscto_abs
+FROM dscto_neto a
+INNER JOIN pedidos_sku_promo b
+ON a.vtex_id = b.vtex_id
+   AND a.cod_material = b.cod_material;
+
+-- Actualizar la columna dscto_abs
+UPDATE dscto_neto
+SET dscto_abs = ABS(dscto);
+
+-- Agregar más columnas
+ALTER TABLE dscto_neto ADD COLUMN part_dscto NUMERIC(14, 2);
+ALTER TABLE dscto_neto ADD COLUMN margen_promocional NUMERIC(14, 2);
+
+-- Calcular part_dscto
+UPDATE dscto_neto
+SET part_dscto = ROUND(COALESCE(
+    dscto_abs / NULLIF(dscto_total_sku_mat_promo, 0),
+    1
+),2);
+
+-- Calcular margen_promocional
+UPDATE dscto_neto
+SET margen_promocional = ROUND(margen_total*part_dscto,2);
+
+-- Ajustar margen_promocional según las condiciones
+UPDATE dscto_neto
+SET margen_promocional = (margen_promocional / q_sku_total) * q_sku
+WHERE q_sku_total > q_sku
+  AND margen_promocional > venta_neta;
+
+--select * from dscto_neto where vtex_id = 'v4498781mofp-01';
+
+-- Eliminar la tabla temporal si ya existe
+
+DELETE FROM dl_sp_dashboards_ecommerce.promociones_ecommerce;
+ 
+
+-- Insertar datos a la tabla final
+INSERT INTO dl_sp_dashboards_ecommerce.promociones_ecommerce 
+SELECT
+    DISTINCT 
+    mes,
+    semana,
+    dia,
+    cadena,
+    cod_tienda,
+    desc_tienda_abrv2 AS desc_tienda,
+    operacion,
+    canal_eco,
+    sk_cliente,
+    cod_cliente,
+    promocion,
+    cupon,
+    hora,
+    vtex_id,
+    discountsnames AS promociones_concatenadas,
+    cod_material,
+    material AS desc_material,
+    SUM(q_sku) AS cantidad_unidades,
+    SUM(venta_neta) AS venta_neta,
+    SUM(venta_bruta) AS venta_bruta,
+    SUM(dscto) AS dscto,
+    SUM(margen_promocional) AS margen_promocional,
+    gerencia_comercial AS desc_gerencia_comercial,
+    unidad_negocio,
+    gerente AS desc_gerente,
+    categoria AS desc_categoria,
+    grupo_articulo AS desc_grupo_articulo,
+    marca,
+    departamento,
+    desc_proveedor,
+    estado_agrupado,
+    prime_order,
+    current_timestamp AS fecha_act
+FROM dscto_neto
+WHERE estado_agrupado IN (
+    'ENTREGADO',
+    'EN PROCESO',
+    'PENDIENTE DE PICKING'
+)
+GROUP BY
+    mes,
+    semana,
+    dia,
+    cadena,
+    cod_tienda,
+    desc_tienda_abrv2,
+    operacion,
+    canal_eco,
+    sk_cliente,
+    cod_cliente,
+    promocion,
+    cupon,
+    hora,
+    vtex_id,
+    discountsnames,
+    cod_material,
+    material,
+    gerencia_comercial,
+    unidad_negocio,
+    gerente,
+    categoria,
+    grupo_articulo,
+    marca,
+    departamento,
+    desc_proveedor,
+    estado_agrupado,
+    prime_order;
+
+ DROP TABLE IF EXISTS fecha;
+ DROP TABLE IF EXISTS pedidos_eco_oms_sku;
+ DROP TABLE IF EXISTS pedidos_eco_oms_mat;
+ DROP TABLE IF EXISTS pedido_sku_venta;
+ DROP TABLE IF EXISTS promo_vtex;
+ DROP TABLE IF EXISTS pedidos;
+ DROP TABLE IF EXISTS estados_promo_legado_sql;
+ DROP TABLE IF EXISTS estados_promo_legado_wong_io_sql;
+ DROP TABLE IF EXISTS estados_promo_legado_metro_io_sql;
+ DROP TABLE IF EXISTS data_janis;
+ DROP TABLE IF EXISTS pedidos_t129;
+ DROP TABLE IF EXISTS estados_origen;
+ DROP TABLE IF EXISTS pedido_mat;
+ DROP TABLE IF EXISTS dscto_neto;
+ DROP TABLE IF EXISTS clientes;
+ DROP TABLE IF EXISTS clientes_sk_cliente;
+ DROP TABLE IF EXISTS clientes_bonus;
+ DROP TABLE IF EXISTS promocional_cab_folio;
+ DROP TABLE IF EXISTS promocional_det_folio;
+ DROP TABLE IF EXISTS folio;
+ DROP TABLE IF EXISTS margen_pedido_detalle;
+ DROP TABLE IF EXISTS pedidos_sku_promo;
+
+END;
+
+
+
+$$
+;
+

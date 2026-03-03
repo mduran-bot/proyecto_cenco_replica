@@ -1,0 +1,4 @@
+# file: C:\Users\maxim\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\pyspark\profiler.py
+# hypothesis_version: 6.151.9
+
+['=', 'Filename: ', 'Increment', 'Line #', 'Line Contents', 'Mem usage', 'Occurrences', 'Profiler', 'SparkContext', '__dict__', '__main__', 'backend', 'cumulative', 'include_children', 'psutil', 'rdd_%d.pstats', 'time', 'udf_%d.pstats', 'udf_%d_memory.txt', 'w+', '{0:', '{0}.{1}f', '} MiB']

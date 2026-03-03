@@ -1,0 +1,2141 @@
+-- DROP PROCEDURE dl_sp_dashboards_ecommerce.sp_reporte_quiebres_ecommmerce_tipologia();
+
+CREATE OR REPLACE PROCEDURE dl_sp_dashboards_ecommerce.sp_reporte_quiebres_ecommmerce_tipologia()
+	LANGUAGE plpgsql
+AS $$
+	
+	
+	
+	
+	
+	
+
+DECLARE
+    fecha varchar(8);               -- fecha base (ayer)
+    fecha_actual varchar(8);        -- fecha de proceso (hoy)
+    ult3dias varchar(8);            -- 3 días atrás
+    ult30dias varchar(8);           -- 30 días atrás
+    fechastockiniciodia varchar(8); -- día anterior
+    ultimos10dias varchar(8);       -- 10 días atrás
+    futuros10dias varchar(8);       -- 10 días adelante
+    i_gx VARCHAR(8); -- variable temporal para el proceso while
+    i  VARCHAR(8); -- variable temporal para el proceso while
+
+BEGIN
+
+    -- Si fecha_in es NULL o vacío, asigna la fecha anterior
+  --  IF fecha_in IS NULL OR fecha_in = '' THEN
+        fecha := to_char(current_date - interval '1 day', 'yyyymmdd');
+ --  ELSE
+   --     fecha := fecha_in;
+  --  END IF;
+
+    fecha_actual:= to_char(current_date, 'yyyymmdd');
+
+
+    -- calcular las otras fechas reutilizando la variable fecha
+    ult3dias := to_char(to_date(fecha, 'yyyymmdd') - interval '2 days', 'yyyymmdd');
+    ult30dias := to_char(to_date(fecha, 'yyyymmdd') - interval '29 days', 'yyyymmdd');
+    fechastockiniciodia := to_char(to_date(fecha, 'yyyymmdd') - interval '1 day', 'yyyymmdd');
+    ultimos10dias := to_char(to_date(fecha, 'yyyymmdd') - interval '9 days', 'yyyymmdd');
+    futuros10dias := to_char(to_date(fecha, 'yyyymmdd') + interval '9 days', 'yyyymmdd');
+    i_gx := fecha;
+    i  := fecha; 
+
+    --------------------------------------------------------MAESTRO DE PICKING ECOMMERCE --------------------------------------------------------------------
+
+    CREATE TEMPORARY TABLE pedidos AS
+    SELECT *
+    FROM dl_sp_dashboards_ecommerce.tbl_ods_picking_ecommerce
+    WHERE cod_fecha_picking = fecha;
+
+
+    --------------------------------------------------------MAESTRO DE MATERIALES --------------------------------------------------------------------
+
+    CREATE TEMPORARY TABLE materiales AS
+    SELECT
+        DISTINCT id_material AS cod_material,
+        id_ean_principal,
+        desc_material,
+        id_categoria,
+        desc_categoria,
+        desc_grupo_articulo,
+        id_grupo_articulo,
+        desc_sub_categoria,
+        desc_gerente,
+        p.desc_jefe_categoria,
+        e.desc_gerencia_comercial,
+        a.sk_proveedor,
+        CASE
+            WHEN n.id_proveedor = '0000010000' THEN 'POR IDENTIFICAR'
+            WHEN n.id_proveedor < '0000010000' THEN 'EXT'
+            ELSE 'NAC'
+        END AS origen_proveedor,
+        a.sk_tipo_set_venta,
+        id_tipo_set_venta,
+        desc_tipo_set_venta,
+        a.sk_clase_surtido,
+        id_clase_surtido,
+        desc_clase_surtido,
+        a.sk_tipo_surtido_incluido,
+        id_tipo_surtido_incluido,
+        q.desc_tipo_surtido_incluido,
+        sk_material
+    FROM
+        dl_sp_capa_semantica.dw_cencofcic_dim_material a
+        LEFT JOIN dl_sp_maestras.dim_grupo_articulo b ON a.sk_grupo_articulo = b.sk_grupo_articulo
+        LEFT JOIN dl_sp_maestras.dim_categoria c ON b.sk_categoria = c.sk_categoria
+        LEFT JOIN dl_sp_maestras.dim_gerente d ON b.sk_gerente = d.sk_gerente
+        LEFT JOIN dl_sp_maestras.dim_gerencia_comercial  e ON b.sk_gerencia_comercial = e.sk_gerencia_comercial
+        LEFT JOIN dl_sp_capa_semantica.dw_cencofcic_dim_marca m ON a.sk_marca = m.sk_marca
+        LEFT JOIN dl_sp_capa_semantica.dw_cencofcic_dim_proveedor n ON a.sk_proveedor = n.sk_proveedor
+        LEFT JOIN dl_sp_maestras.dim_sub_categoria o ON b.sk_sub_categoria = o.sk_sub_categoria
+        LEFT JOIN dl_sp_maestras.dim_jefe_categoria p ON b.sk_jefe_categoria = p.sk_jefe_categoria
+        LEFT JOIN dl_sp_maestras.dim_tipo_surtido_incluido q ON a.sk_tipo_surtido_incluido = q.sk_tipo_surtido_incluido
+        LEFT JOIN dl_sp_maestras.dim_tipo_set_venta r ON a.sk_tipo_set_venta = r.sk_tipo_set_venta
+        LEFT JOIN dl_sp_maestras.dim_clase_surtido s ON a.sk_clase_surtido = s.sk_clase_surtido
+    WHERE
+        trim(id_grupo_articulo) <> '00000000';
+
+
+--------------------------------------------------------MAESTRO DE MATERIALES - TIENDA CATALOGADOS--------------------------------------------------------------------
+
+
+CREATE TEMPORARY TABLE material_tienda_activos (
+    cod_material VARCHAR(20),
+    cod_tienda VARCHAR(4)
+);
+
+-- Bloque 1: Verifica si `cod_dia = fecha` no tiene registros y realiza la inserción correspondiente.
+INSERT INTO material_tienda_activos
+SELECT
+    cod_material,
+    cod_tienda
+FROM per_super_pd_stg.trx_status_mat
+WHERE cod_dia = fecha_actual
+AND cod_estado_final IN ('AC', 'BL') --CAMBIO CLOUD NO CONSIDERAR BLOQUEO VENTA Y BLOQUEO ECOMMERCE
+AND NOT EXISTS (
+    SELECT 1
+    FROM per_super_pd_stg.trx_status_mat
+    WHERE cod_dia = fecha
+);
+
+-- Bloque 2: Si `cod_dia = fecha` tiene registros, realiza la otra inserción.
+INSERT INTO material_tienda_activos
+SELECT
+    cod_material,
+    cod_tienda
+FROM per_super_pd_stg.trx_status_mat
+WHERE cod_dia = fecha
+AND cod_estado_final IN ('AC', 'BL'); --CAMBIO CLOUD NO CONSIDERAR BLOQUEO VENTA Y BLOQUEO ECOMMERCE
+
+
+-- MAESTRO DE MATERIALES - TIENDA CATALOGADOS (GREYSTORE)--------------------------------------------------------------------
+
+
+
+CREATE TEMPORARY TABLE material_tienda_activos_greystore_exclusivos (
+    cod_material VARCHAR(20),
+    cod_tienda VARCHAR(4)
+);
+
+-- Si no hay datos para la fecha proporcionada, insertar la información
+-- Bloque 1: Verifica si `cod_dia = fecha` no tiene registros y realiza la inserción correspondiente.
+INSERT INTO material_tienda_activos_greystore_exclusivos
+SELECT
+    a.cod_material,
+    a.cod_tienda
+FROM per_super_pd_stg.trx_status_mat a
+INNER JOIN dl_sp_maestras.dim_tienda b
+    ON a.cod_tienda = b.id_tienda
+WHERE cod_dia = fecha_actual
+AND b.sk_formato = 9 
+AND NOT EXISTS (
+    SELECT 1
+    FROM per_super_pd_stg.trx_status_mat
+    WHERE cod_dia = fecha
+);
+
+-- Bloque 2: Si `cod_dia = fecha` tiene registros, realiza la otra inserción.
+INSERT INTO material_tienda_activos_greystore_exclusivos
+SELECT
+    a.cod_material,
+    a.cod_tienda
+FROM per_super_pd_stg.trx_status_mat a
+INNER JOIN dl_sp_maestras.dim_tienda b
+    ON a.cod_tienda = b.id_tienda
+WHERE cod_dia = fecha
+AND b.sk_formato = 9 ;  -- GREYSTORE
+
+
+-- Crear una tabla temporal para los resultados combinados
+
+CREATE TEMPORARY TABLE material_tienda_activos_gx (
+    cod_material VARCHAR(20),
+    cod_tienda VARCHAR(4)
+);
+
+-- Insertar datos en material_tienda_activos_gx
+INSERT INTO material_tienda_activos_gx
+SELECT DISTINCT cod_material, 'GR01' AS cod_tienda
+FROM material_tienda_activos
+WHERE cod_tienda = 'H003'
+
+UNION
+
+SELECT DISTINCT cod_material, 'GR01' AS cod_tienda
+FROM material_tienda_activos_greystore_exclusivos
+WHERE cod_tienda = 'GW01'
+
+UNION ALL
+
+SELECT DISTINCT cod_material, 'GR03' AS cod_tienda
+FROM material_tienda_activos
+WHERE cod_tienda = 'S003'
+
+UNION
+
+SELECT DISTINCT cod_material, 'GR03' AS cod_tienda
+FROM material_tienda_activos_greystore_exclusivos
+WHERE cod_tienda = 'GW03';
+
+
+-- MAESTRO DE MATERIALES - TIENDA - PEDIDO CON PICKING-------------------------------------------------------------------
+
+
+
+-- Insertar los datos en la tabla temporal
+
+CREATE TEMPORARY TABLE pedidos_campos_basicos AS 
+SELECT DISTINCT
+    store,
+    tienda_origen AS store_origen,
+    a.status estado,
+    cod_fecha_picking,
+    cod_fecha_creacion,
+    cod_fecha_picking_order,
+    vtex_id,
+    picker,
+    main_category,
+    main_refid,
+    main_sku,
+    main_unit,
+    main_requested_units,
+    main_requested_unit_spec,
+    main_requested_grams,
+    main_requested_gram_spec,
+    main_picked_units,
+    main_picked_unit_spec,
+    main_picked_grams,
+    main_picked_gram_spec,
+    main_difference_units,
+    main_difference_unit_spec,
+    main_difference_grams,
+    main_difference_gram_spec,
+    mto_venta_bruta_comprado
+FROM pedidos a ;
+
+    --Crear una columna de unidades pickeadas (sin considerar pesables) para tener control de los perecibles
+ALTER TABLE pedidos_campos_basicos ADD COLUMN es_pesable INT;
+ALTER TABLE pedidos_campos_basicos ADD COLUMN main_picked_units_actualizado INT;
+ALTER TABLE pedidos_campos_basicos ADD COLUMN es_quiebre_antes_sustitucion INT;
+ALTER TABLE pedidos_campos_basicos ADD COLUMN tipo_quiebre VARCHAR(50);
+ALTER TABLE pedidos_campos_basicos ADD COLUMN main_difference_grams_actualizado DECIMAL(10,2);
+ALTER TABLE pedidos_campos_basicos ADD COLUMN cod_tienda CHAR(4);
+ALTER TABLE pedidos_campos_basicos ADD COLUMN cod_tienda_origen CHAR(4);
+
+-- Actualizar los valores de las nuevas columnas
+UPDATE pedidos_campos_basicos
+SET cod_tienda = CASE 
+    WHEN LEFT(store, 4) IN ('GM01', 'GW01') THEN 'GR01'
+    WHEN LEFT(store, 4) IN ('GM03', 'GW03') THEN 'GR03'
+    WHEN LEFT(store, 4) = 'TH12' THEN 'W101'
+    ELSE LEFT(store, 4)
+END,
+cod_tienda_origen = CASE
+    WHEN LEFT(store_origen, 4) = 'TH12' THEN 'W101'
+    ELSE LEFT(store_origen, 4)
+END;
+
+UPDATE pedidos_campos_basicos
+SET es_pesable = 0, es_quiebre_antes_sustitucion = 0, tipo_quiebre = 'sin quiebre';
+
+UPDATE pedidos_campos_basicos
+SET main_picked_units_actualizado = CASE WHEN main_picked_units > main_requested_units THEN main_requested_units ELSE main_picked_units END;
+
+UPDATE pedidos_campos_basicos
+SET main_difference_grams_actualizado = CASE WHEN main_picked_grams > main_requested_grams THEN 0 ELSE main_difference_grams END;
+
+UPDATE pedidos_campos_basicos
+SET es_pesable = 1
+WHERE main_requested_grams > 0;
+
+UPDATE pedidos_campos_basicos
+SET es_quiebre_antes_sustitucion = 1 
+WHERE main_picked_units_actualizado < main_requested_units
+AND es_pesable = 0;
+
+UPDATE pedidos_campos_basicos
+SET tipo_quiebre = CASE
+    WHEN es_quiebre_antes_sustitucion = 1 AND main_picked_units = 0 THEN 'es quiebre faltante total'
+    WHEN es_quiebre_antes_sustitucion = 1 AND main_picked_units < main_requested_units THEN 'es quiebre incompleto'
+END
+WHERE es_quiebre_antes_sustitucion = 1
+AND es_pesable = 0;
+
+UPDATE pedidos_campos_basicos
+SET es_quiebre_antes_sustitucion = 1
+WHERE (
+    CASE
+        WHEN main_picked_grams > main_requested_grams THEN main_requested_grams
+        ELSE main_picked_grams
+    END
+) < main_requested_grams
+AND es_pesable = 1;
+
+UPDATE pedidos_campos_basicos
+SET tipo_quiebre = CASE
+    WHEN es_quiebre_antes_sustitucion = 1 AND main_picked_grams = 0 THEN 'es quiebre faltante total'
+    WHEN es_quiebre_antes_sustitucion = 1 AND main_picked_grams < main_requested_grams THEN 'es quiebre incompleto'
+END
+WHERE es_quiebre_antes_sustitucion = 1
+AND es_pesable = 1;
+
+--------------------------------------------------------MAESTRO DE MATERIALES - TIENDA - DIA CREACION CON PICKING-------------------------------------------------------------------
+
+CREATE TEMPORARY TABLE maestro_material_tienda_quiebre as 
+select
+    cod_tienda,
+    cod_fecha_picking fecha_picking,
+    right(replicate('0', 18) + main_refid, 18) cod_material,
+    case
+        when es_pesable = 0 then 'no es pesable'
+        else 'es pesable'
+    end es_pesable,
+    tipo_quiebre,
+    case
+        when es_quiebre_antes_sustitucion = 1 then 'es quiebre antes de sustitucion'
+        else 'sin quiebre'
+    end es_quiebre_antes_sustitucion,
+    COUNT(distinct vtex_id) Trx,
+    SUM(mto_venta_bruta_comprado) Monto_Venta_Bruta_Requerido,
+    SUM(main_difference_grams_actualizado) Q_gramos_no_pickeado_solo_pesable,
+    SUM(main_requested_units) Q_unidades_requeridas,
+    SUM(main_picked_units_actualizado) Q_unidades_pickeadas,
+    SUM(main_requested_grams) Q_gramos_requerido_solo_pesable
+from
+    pedidos_campos_basicos a
+    left join dl_sp_maestras.dim_estado_orden_online b on a.estado = b.SK_ESTADO_ORDEN_ONLINE
+    left join materiales e on right(replicate('0',18)+main_refid,18) = e.COD_MATERIAL
+group by
+    cod_tienda,
+    cod_fecha_picking,
+    main_refid,
+    case
+        when es_pesable = 0 then 'no es pesable'
+        else 'es pesable'
+    end,
+    tipo_quiebre,
+    case
+        when es_quiebre_antes_sustitucion = 1 then 'es quiebre antes de sustitucion'
+        else 'sin quiebre'
+    end; -- Crear la tabla maestro con los valores sumados
+
+
+CREATE TEMPORARY TABLE maestro AS
+select
+    cod_tienda,
+    fecha_picking,
+    cod_material,
+    es_pesable,
+    SUM(Trx) Trx,
+    SUM(Monto_Venta_Bruta_Requerido) Monto_Venta_Bruta_Requerido,
+    SUM(Q_gramos_no_pickeado_solo_pesable) Q_gramos_no_pickeado_solo_pesable,
+    SUM(Q_unidades_requeridas) Q_unidades_requeridas,
+    SUM(Q_unidades_pickeadas) Q_unidades_pickeadas,
+    SUM(Q_gramos_requerido_solo_pesable) Q_gramos_requerido_solo_pesable
+from
+    maestro_material_tienda_quiebre
+group by
+    cod_tienda,
+    fecha_picking,
+    cod_material,
+    es_pesable; -- Crear las tablas auxiliares
+
+
+
+CREATE TEMPORARY TABLE aux_quiebre AS
+select
+    cod_tienda,
+    fecha_picking,
+    cod_material,
+    es_quiebre_antes_sustitucion,
+    SUM(Trx) Trx,
+    SUM(Monto_Venta_Bruta_Requerido) Monto_Venta_Bruta_Requerido,
+    SUM(Q_gramos_no_pickeado_solo_pesable) Q_gramos_no_pickeado_solo_pesable,
+    SUM(Q_unidades_requeridas) Q_unidades_requeridas,
+    SUM(Q_unidades_pickeadas) Q_unidades_pickeadas,
+    SUM(Q_gramos_requerido_solo_pesable) Q_gramos_requerido_solo_pesable
+from
+    maestro_material_tienda_quiebre
+GROUP BY
+    cod_tienda,
+    fecha_picking,
+    cod_material,
+    es_quiebre_antes_sustitucion; -- Crear tablas auxiliares para quiebre
+
+CREATE TEMPORARY TABLE aux_quiebre_apertura AS
+select
+    cod_tienda,
+    fecha_picking,
+    cod_material,
+    tipo_quiebre,
+    SUM(Trx) Trx,
+    SUM(Monto_Venta_Bruta_Requerido) Monto_Venta_Bruta_Requerido,
+    SUM(Q_gramos_no_pickeado_solo_pesable) Q_gramos_no_pickeado_solo_pesable,
+    SUM(Q_unidades_requeridas) Q_unidades_requeridas,
+    SUM(Q_unidades_pickeadas) Q_unidades_pickeadas,
+    SUM(Q_gramos_requerido_solo_pesable) Q_gramos_requerido_solo_pesable 
+from
+    maestro_material_tienda_quiebre
+GROUP BY
+    cod_tienda,
+    fecha_picking,
+    cod_material,
+    tipo_quiebre; -- Crear tablas auxiliares para quiebre apertura
+
+alter table
+    maestro add Trx_Con_quiebre int;
+alter table
+    maestro add Monto_Venta_Bruta_Requerido_Con_quiebre numeric(10,2);
+alter table
+    maestro add Q_gramos_no_pickeado_solo_pesable_Con_quiebre numeric(10,2);
+alter table
+    maestro add Q_unidades_requeridas_Con_quiebre numeric(10,2);
+alter table
+    maestro add Q_unidades_pickeadas_Con_quiebre numeric(10,2);
+alter table
+    maestro add Q_gramos_requerido_solo_pesable_Con_quiebre numeric(10,2);
+alter table
+    maestro add Trx_Con_quiebre_Faltante int;
+alter table
+    maestro add Monto_Venta_Bruta_Requerido_Con_quiebre_Faltante numeric(10,2);
+alter table
+    maestro add Q_gramos_no_pickeado_solo_pesable_Con_quiebre_Faltante numeric(10,2);
+alter table
+    maestro add Q_unidades_requeridas_Con_quiebre_Faltante numeric(10,2);
+alter table
+    maestro add Q_unidades_pickeadas_Con_quiebre_Faltante numeric(10,2);
+alter table
+    maestro add Q_gramos_requerido_solo_pesable_Con_quiebre_Faltante numeric(10,2);
+alter table
+    maestro add Trx_Con_quiebre_Incompleto int;
+alter table
+    maestro add Monto_Venta_Bruta_Requerido_Con_quiebre_Incompleto numeric(10,2);
+alter table
+    maestro add Q_gramos_no_pickeado_solo_pesable_Con_quiebre_Incompleto numeric(10,2);
+alter table
+    maestro add Q_unidades_requeridas_Con_quiebre_Incompleto numeric(10,2);
+alter table
+    maestro add Q_unidades_pickeadas_Con_quiebre_Incompleto numeric(10,2);
+alter table
+    maestro add Q_gramos_requerido_solo_pesable_Con_quiebre_Incompleto numeric(10,2);
+alter table
+    maestro add Trx_Sin_quiebre int;
+alter table
+    maestro add Monto_Venta_Bruta_Requerido_Sin_quiebre numeric(10,2);
+alter table
+    maestro add Q_gramos_no_pickeado_solo_pesable_Sin_quiebre numeric(10,2);
+alter table
+    maestro add Q_unidades_requeridas_Sin_quiebre numeric(10,2);
+alter table
+    maestro add Q_unidades_pickeadas_Sin_quiebre numeric(10,2);
+alter table
+    maestro add Q_gramos_requerido_solo_pesable_Sin_quiebre numeric(10,2);
+
+UPDATE
+    maestro SET Trx_Con_quiebre = 0, Monto_Venta_Bruta_Requerido_Con_quiebre = 0, Q_gramos_no_pickeado_solo_pesable_Con_quiebre = 0,
+    Q_unidades_requeridas_Con_quiebre = 0,
+    Q_unidades_pickeadas_Con_quiebre = 0,
+    Q_gramos_requerido_solo_pesable_Con_quiebre = 0,
+    Trx_Sin_quiebre = 0,
+    Monto_Venta_Bruta_Requerido_Sin_quiebre = 0,
+    Q_gramos_no_pickeado_solo_pesable_Sin_quiebre = 0,
+    Q_unidades_requeridas_Sin_quiebre = 0,
+    Q_unidades_pickeadas_Sin_quiebre = 0,
+    Q_gramos_requerido_solo_pesable_Sin_quiebre = 0,
+    Trx_Con_quiebre_incompleto = 0,
+    Monto_Venta_Bruta_Requerido_Con_quiebre_incompleto = 0,
+    Q_gramos_no_pickeado_solo_pesable_Con_quiebre_incompleto = 0,
+    Q_unidades_requeridas_Con_quiebre_incompleto = 0,
+    Q_unidades_pickeadas_Con_quiebre_incompleto = 0,
+    Q_gramos_requerido_solo_pesable_Con_quiebre_incompleto = 0,
+    Trx_Con_quiebre_faltante = 0,
+    Monto_Venta_Bruta_Requerido_Con_quiebre_faltante = 0,
+    Q_gramos_no_pickeado_solo_pesable_Con_quiebre_faltante = 0,
+    Q_unidades_requeridas_Con_quiebre_faltante = 0,
+    Q_unidades_pickeadas_Con_quiebre_faltante = 0,
+    Q_gramos_requerido_solo_pesable_Con_quiebre_faltante = 0 ;
+
+UPDATE maestro
+SET 
+    Trx_Con_quiebre = b.Trx,
+    Monto_Venta_Bruta_Requerido_Con_quiebre = b.Monto_Venta_Bruta_Requerido,
+    Q_gramos_no_pickeado_solo_pesable_Con_quiebre = b.Q_gramos_no_pickeado_solo_pesable,
+    Q_unidades_requeridas_Con_quiebre = b.Q_unidades_requeridas,
+    Q_unidades_pickeadas_Con_quiebre = b.Q_unidades_pickeadas,
+    Q_gramos_requerido_solo_pesable_Con_quiebre = b.Q_gramos_requerido_solo_pesable
+FROM aux_quiebre b
+WHERE maestro.cod_material = b.cod_material
+  AND maestro.COD_TIENDA = b.cod_tienda
+  AND maestro.fecha_picking = b.fecha_picking
+  AND b.es_quiebre_antes_sustitucion = 'es quiebre antes de sustitucion';
+
+
+UPDATE maestro
+SET 
+    Trx_Sin_quiebre = b.Trx,
+    Monto_Venta_Bruta_Requerido_Sin_quiebre = b.Monto_Venta_Bruta_Requerido,
+    Q_gramos_no_pickeado_solo_pesable_Sin_quiebre = b.Q_gramos_no_pickeado_solo_pesable,
+    Q_unidades_requeridas_Sin_quiebre = b.Q_unidades_requeridas,
+    Q_unidades_pickeadas_Sin_quiebre = b.Q_unidades_pickeadas,
+    Q_gramos_requerido_solo_pesable_Sin_quiebre = b.Q_gramos_requerido_solo_pesable
+FROM aux_quiebre b
+WHERE maestro.cod_material = b.cod_material
+  AND maestro.COD_TIENDA = b.cod_tienda
+  AND maestro.fecha_picking = b.fecha_picking
+  AND b.es_quiebre_antes_sustitucion = 'sin quiebre';
+
+
+UPDATE maestro
+SET 
+    Trx_Con_quiebre_faltante = b.Trx,
+    Monto_Venta_Bruta_Requerido_Con_quiebre_faltante = b.Monto_Venta_Bruta_Requerido,
+    Q_gramos_no_pickeado_solo_pesable_Con_quiebre_faltante = b.Q_gramos_no_pickeado_solo_pesable,
+    Q_unidades_requeridas_Con_quiebre_faltante = b.Q_unidades_requeridas,
+    Q_unidades_pickeadas_Con_quiebre_faltante = b.Q_unidades_pickeadas,
+    Q_gramos_requerido_solo_pesable_Con_quiebre_faltante = b.Q_gramos_requerido_solo_pesable
+FROM aux_quiebre_apertura b
+WHERE maestro.cod_material = b.cod_material
+  AND maestro.COD_TIENDA = b.cod_tienda
+  AND maestro.fecha_picking = b.fecha_picking
+  AND b.tipo_quiebre = 'es quiebre faltante total';
+
+
+UPDATE maestro
+SET 
+    Trx_Con_quiebre_incompleto = b.Trx,
+    Monto_Venta_Bruta_Requerido_Con_quiebre_incompleto = b.Monto_Venta_Bruta_Requerido,
+    Q_gramos_no_pickeado_solo_pesable_Con_quiebre_incompleto = b.Q_gramos_no_pickeado_solo_pesable,
+    Q_unidades_requeridas_Con_quiebre_incompleto = b.Q_unidades_requeridas,
+    Q_unidades_pickeadas_Con_quiebre_incompleto = b.Q_unidades_pickeadas,
+    Q_gramos_requerido_solo_pesable_Con_quiebre_incompleto = b.Q_gramos_requerido_solo_pesable
+FROM aux_quiebre_apertura b
+WHERE maestro.cod_material = b.cod_material
+  AND maestro.COD_TIENDA = b.cod_tienda
+  AND maestro.fecha_picking = b.fecha_picking
+  AND b.tipo_quiebre = 'es quiebre incompleto';
+
+
+DELETE FROM maestro 
+WHERE 
+cod_material in (
+    SELECT COD_MATERIAL
+    FROM materiales 
+    WHERE 
+     lower(desc_gerencia_comercial) 
+     NOT IN ('food abarrotes', 'food perecibles', 'non food')
+);
+
+--------------------------------------------------------TIPIFICAR QUIEBRES ECOMMERCE-------------------------------------------------------------------
+ALTER TABLE
+    maestro ADD ID_UNIVERSO_VALIDO INT;
+ALTER TABLE
+    maestro ADD ID_RESULTADO_FALTANTE INT;
+UPDATE
+    maestro SET ID_UNIVERSO_VALIDO = 1, ID_RESULTADO_FALTANTE = 0;
+UPDATE
+    maestro SET ID_RESULTADO_FALTANTE = 1 WHERE Trx_Con_quiebre > 0;
+
+
+--------------------------MAESTRO DE REPORTE DE QUIEBRES-------------------------------
+
+CREATE TEMPORARY TABLE reporte_quiebres AS
+SELECT
+    *
+FROM
+    maestro;
+    -- Filtra los resultados para obtener solo los registros con quiebres faltantes, si es necesario
+    --WHERE ID_RESULTADO_FALTANTE = 1;
+
+
+--------------------------UNIVERSO DE SKUS A ANALIZAR----------------------------------
+
+CREATE TEMPORARY TABLE combinatorias_material_tienda_quiebre_ecommerce AS
+
+SELECT
+    DISTINCT cod_material,
+    cod_tienda 
+FROM
+    reporte_quiebres;
+
+
+--------------------------CONSOLIDAR STOCK DEL GREYSTORE INICIO DE PICKING----------------------------------
+
+CREATE TEMPORARY TABLE stock_gr01_inicio_picking  AS
+SELECT
+    A.COD_MATERIAL,
+    'GR01' AS COD_TIENDA,
+    SUM(cnt_stock_tda) AS CNT_STOCK_INICIO,
+    SUM(mto_stock_tda) AS MTO_STOCK_INICIO,
+    SUM(CNT_STOCK) AS CNT_STOCK_TOTAL_INICIO,
+    SUM(MTO_STOCK) AS MTO_STOCK_TOTAL_INICIO
+FROM
+    per_super_pd_stg.trx_stock_mat A
+WHERE
+    COD_DIA = fechastockiniciodia 
+    AND COD_TIENDA IN ('H003', 'GW01')
+GROUP BY
+    A.COD_MATERIAL;
+    
+
+CREATE TEMPORARY TABLE stock_gr03_inicio_picking AS
+SELECT
+    A.COD_MATERIAL,
+    'GR03' AS COD_TIENDA,
+    SUM(CNT_STOCK_TDA) AS CNT_STOCK_INICIO,
+    SUM(MTO_STOCK_TDA) AS MTO_STOCK_INICIO,
+    SUM(CNT_STOCK) AS CNT_STOCK_TOTAL_INICIO,
+    SUM(MTO_STOCK) AS MTO_STOCK_TOTAL_INICIO
+FROM
+    per_super_pd_stg.trx_stock_mat A
+WHERE
+    COD_DIA = fechastockiniciodia 
+    AND COD_TIENDA IN ('S003', 'GW03')
+GROUP BY
+    A.COD_MATERIAL;
+
+
+
+--------------------------CONSOLIDAR STOCK DEL GREYSTORE FIN DE PICKING----------------------------------
+
+
+CREATE TEMPORARY TABLE stock_gr01_fin_picking AS
+SELECT
+    A.COD_MATERIAL,
+    'GR01' AS COD_TIENDA,
+    SUM(CNT_STOCK_TDA) AS CNT_STOCK_FIN,
+    SUM(MTO_STOCK_TDA) AS MTO_STOCK_FIN,
+    SUM(CNT_STOCK) AS CNT_STOCK_TOTAL_FIN,
+    SUM(MTO_STOCK) AS MTO_STOCK_TOTAL_FIN
+FROM
+    per_super_pd_stg.trx_stock_mat A
+WHERE
+    COD_DIA = fecha  
+    AND COD_TIENDA IN ('H003', 'GW01')
+GROUP BY
+    A.COD_MATERIAL;
+
+
+
+
+CREATE TEMPORARY TABLE stock_gr03_fin_picking AS
+SELECT
+    A.COD_MATERIAL,
+    'GR03' AS COD_TIENDA,
+    SUM(CNT_STOCK_TDA) AS CNT_STOCK_FIN,
+    SUM(MTO_STOCK_TDA) AS MTO_STOCK_FIN,
+    SUM(CNT_STOCK) AS CNT_STOCK_TOTAL_FIN,
+    SUM(MTO_STOCK) AS MTO_STOCK_TOTAL_FIN
+FROM
+    per_super_pd_stg.trx_stock_mat A
+WHERE
+    COD_DIA = fecha  
+    AND COD_TIENDA IN ('S003', 'GW03')
+GROUP BY
+    A.COD_MATERIAL;
+
+
+--------------------------STOCK INICIO DEL DIA DE PICKING----------------------------------
+
+-- OBTENER STOCK INICIO DEL DIA DE PICKING DE LAS COMBINATORIAS TIENDA
+
+CREATE TEMPORARY TABLE stock_inicio_dia_picking AS
+SELECT
+    A.COD_MATERIAL,
+    A.COD_TIENDA,
+    SUM(CNT_STOCK_TDA) AS CNT_STOCK_INICIO,
+    SUM(MTO_STOCK_TDA) AS MTO_STOCK_INICIO,
+    SUM(CNT_STOCK) AS CNT_STOCK_TOTAL_INICIO,
+    SUM(MTO_STOCK) AS MTO_STOCK_TOTAL_INICIO
+FROM
+    per_super_pd_stg.trx_stock_mat A
+    INNER JOIN combinatorias_material_tienda_quiebre_ecommerce B
+        ON A.COD_MATERIAL = B.cod_material
+        AND A.COD_TIENDA = B.cod_tienda
+WHERE
+    COD_DIA = fechastockiniciodia 
+GROUP BY
+    A.COD_MATERIAL,
+    A.COD_TIENDA;
+
+
+--------------------------STOCK FIN DEL DIA PICKING----------------------------------
+
+-- OBTENER STOCK FIN DEL DIA DE PICKING DE LAS COMBINATORIAS TIENDA
+
+
+CREATE TEMPORARY TABLE stock_fin_dia_picking AS
+SELECT
+    A.COD_MATERIAL,
+    A.COD_TIENDA,
+    SUM(CNT_STOCK_TDA) AS CNT_STOCK_FIN,
+    SUM(MTO_STOCK_TDA) AS MTO_STOCK_FIN,
+    SUM(CNT_STOCK) AS CNT_STOCK_TOTAL_FIN,
+    SUM(MTO_STOCK) AS MTO_STOCK_TOTAL_FIN
+FROM
+    per_super_pd_stg.trx_stock_mat A
+    INNER JOIN combinatorias_material_tienda_quiebre_ecommerce B
+        ON A.COD_MATERIAL = B.cod_material
+        AND A.COD_TIENDA = B.cod_tienda
+WHERE
+    COD_DIA = fecha 
+GROUP BY
+    A.COD_MATERIAL,
+    A.COD_TIENDA;
+
+
+
+--------------------------VENTA GREYSTORE----------------------------------
+
+-- VENTA DEL GREYSTORE GR01
+
+
+CREATE TEMPORARY TABLE venta_gr01 AS
+SELECT
+    COD_MATERIAL,
+    COD_DIA,
+    'GR01' AS COD_TIENDA,
+    SUM(V.CNT_VENTA) AS CNT_VENTA,
+    SUM(V.MTO_VENTA_BRUTA) AS MTO_VENTA_BRUTA,
+    SUM(V.MTO_VENTA_NETA) AS MTO_VENTA_NETA
+FROM
+    per_super_pd_stg.trx_venta_mat V
+
+WHERE
+    COD_CANAL_DISTRIBUCION = 'RE'
+    AND COD_TIENDA IN ('H003', 'GM01', 'GW01')
+    AND V.COD_DIA between ult30dias and fecha
+GROUP BY
+    COD_MATERIAL,
+    COD_DIA
+HAVING
+    SUM(V.CNT_VENTA) > 0;
+
+-- VENTA DEL GREYSTORE GR03
+
+
+CREATE TEMPORARY TABLE venta_gr03 AS
+SELECT
+    COD_MATERIAL,
+    COD_DIA,
+    'GR03' AS COD_TIENDA,
+    SUM(V.CNT_VENTA) AS CNT_VENTA,
+    SUM(V.MTO_VENTA_BRUTA) AS MTO_VENTA_BRUTA,
+    SUM(V.MTO_VENTA_NETA) AS MTO_VENTA_NETA
+FROM
+    per_super_pd_stg.trx_venta_mat V
+
+WHERE
+    COD_CANAL_DISTRIBUCION = 'RE'
+    AND COD_TIENDA IN ('S003', 'GM03', 'GW03')
+    AND V.COD_DIA between ult30dias and fecha
+GROUP BY
+    COD_MATERIAL,
+    COD_DIA
+HAVING
+    SUM(V.CNT_VENTA) > 0;
+
+
+
+
+--------------------------VENTA GREYSTORE CRUCE CON LISTA DE SKUS ECOMMERCE----------------------------------
+
+-- VENTA LISTADO GR01
+
+CREATE TEMPORARY TABLE venta_listado_gr01 AS
+SELECT
+    V.COD_MATERIAL,
+    'GR01' AS COD_TIENDA,
+    MAX(COD_DIA) AS ULTFECHAVENTA,
+    SUM(V.CNT_VENTA) AS CNT_VENTA,
+    SUM(V.MTO_VENTA_BRUTA) AS MTO_VENTA_BRUTA,
+    SUM(V.MTO_VENTA_NETA) AS MTO_VENTA_NETA
+FROM
+    venta_gr01 V 
+    INNER JOIN combinatorias_material_tienda_quiebre_ecommerce S 
+        ON V.COD_MATERIAL = S.COD_MATERIAL
+        AND V.COD_TIENDA = S.COD_TIENDA
+    WHERE 
+       V.COD_DIA between ult30dias and fecha
+GROUP BY
+    V.COD_MATERIAL
+HAVING
+    SUM(V.CNT_VENTA) > 0;
+
+-- VENTA LISTADO GR03
+
+CREATE TEMPORARY TABLE venta_listado_gr03 AS    
+SELECT
+    V.COD_MATERIAL,
+    'GR03' AS COD_TIENDA,
+    MAX(COD_DIA) AS ULTFECHAVENTA,
+    SUM(V.CNT_VENTA) AS CNT_VENTA,
+    SUM(V.MTO_VENTA_BRUTA) AS MTO_VENTA_BRUTA,
+    SUM(V.MTO_VENTA_NETA) AS MTO_VENTA_NETA
+FROM
+    venta_gr01 V 
+    INNER JOIN combinatorias_material_tienda_quiebre_ecommerce S 
+        ON V.COD_MATERIAL = S.COD_MATERIAL
+        AND V.COD_TIENDA = S.COD_TIENDA
+    WHERE 
+       V.COD_DIA between ult30dias and fecha
+GROUP BY
+    V.COD_MATERIAL
+HAVING
+    SUM(V.CNT_VENTA) > 0;
+
+
+
+
+--------------------------VENTA----------------------------------
+    --CALCULAR MAXIMO DIA DE VENTA
+
+CREATE TEMPORARY TABLE venta AS
+SELECT
+    V.COD_MATERIAL,
+    V.COD_TIENDA,
+    MAX(COD_DIA) ULTFECHAVENTA,
+    SUM(V.CNT_VENTA) CNT_VENTA,
+    SUM(V.MTO_VENTA_BRUTA) MTO_VENTA_BRUTA,
+    SUM(V.MTO_VENTA_NETA) MTO_VENTA_NETA
+FROM
+    per_super_pd_stg.trx_venta_mat V
+    INNER JOIN combinatorias_material_tienda_quiebre_ecommerce S ON V.COD_MATERIAL = S.COD_MATERIAL AND V.COD_TIENDA = S.COD_TIENDA
+WHERE
+    COD_CANAL_DISTRIBUCION = 'RE'
+    AND  V.COD_DIA between ult30dias and fecha
+GROUP BY
+    V.COD_MATERIAL,
+    V.COD_TIENDA
+HAVING
+    SUM(V.CNT_VENTA) > 0 ;
+
+
+
+
+    
+--------------------------INTEGRACION MAESTRO, VENTA Y STOCK----------------------------------
+
+CREATE TEMPORARY TABLE maestro_quiebre_ecommerce_stock_venta AS
+SELECT
+    A.cod_material,
+    A.cod_tienda,
+    COALESCE(B.cnt_stock_inicio, 0) AS cnt_stock_inicio_dia_picking,
+    COALESCE(B.mto_stock_inicio, 0) AS mto_stock_inicio_dia_picking,
+    COALESCE(B.cnt_stock_total_inicio, 0) AS cnt_stock_total_inicio_dia_picking,
+    COALESCE(B.mto_stock_total_inicio, 0) AS mto_stock_total_inicio_dia_picking,
+    COALESCE(E.cnt_stock_fin, 0) AS cnt_stock_fin_dia_picking,
+    COALESCE(E.mto_stock_fin, 0) AS mto_stock_fin_dia_picking,
+    COALESCE(E.cnt_stock_total_fin, 0) AS cnt_stock_total_fin_dia_picking,
+    COALESCE(E.mto_stock_total_fin, 0) AS mto_stock_total_fin_dia_picking,
+    COALESCE(C.cnt_venta, 0) AS cnt_venta,
+    COALESCE(C.mto_venta_bruta, 0) AS mto_venta_bruta,
+    COALESCE(C.mto_venta_neta, 0) AS mto_venta_neta,
+    COALESCE(C.ultfechaventa, 0) AS ultdiaventa,
+    DATEDIFF(
+        day, 
+        TO_DATE(ultfechaventa, 'YYYYMMDD'), 
+        TO_DATE(fecha, 'YYYYMMDD')
+    )
+    AS diassinventa,
+    D.id_tipo_set_venta,
+    D.desc_tipo_set_venta,
+    D.id_clase_surtido,
+    D.desc_clase_surtido,
+    D.id_tipo_surtido_incluido,
+    D.desc_tipo_surtido_incluido,
+    D.origen_proveedor
+FROM
+    combinatorias_material_tienda_quiebre_ecommerce A
+    LEFT JOIN stock_inicio_dia_picking B 
+        ON A.cod_material = B.cod_material 
+        AND A.cod_tienda = B.cod_tienda
+    LEFT JOIN stock_fin_dia_picking E 
+        ON A.cod_material = E.cod_material 
+        AND A.cod_tienda = E.cod_tienda
+    LEFT JOIN venta C 
+        ON A.cod_material = C.cod_material 
+        AND A.cod_tienda = C.cod_tienda
+    LEFT JOIN materiales D 
+        ON A.cod_material = D.cod_material;
+
+
+--ACTUALIZAR STOCK DE GREYSTORE
+
+UPDATE maestro_quiebre_ecommerce_stock_venta
+SET 
+    cnt_stock_inicio_dia_picking = b.cnt_stock_inicio,
+    mto_stock_inicio_dia_picking = b.mto_stock_inicio,
+    cnt_stock_total_inicio_dia_picking = b.cnt_stock_inicio,
+    mto_stock_total_inicio_dia_picking = b.mto_stock_total_inicio
+FROM 
+    stock_gr01_inicio_picking b 
+WHERE 
+    maestro_quiebre_ecommerce_stock_venta.cod_material = b.cod_material 
+    AND maestro_quiebre_ecommerce_stock_venta.cod_tienda = b.cod_tienda
+    AND maestro_quiebre_ecommerce_stock_venta.cod_tienda = 'GR01';
+
+
+UPDATE maestro_quiebre_ecommerce_stock_venta
+SET 
+    cnt_stock_inicio_dia_picking = b.cnt_stock_inicio,
+    mto_stock_inicio_dia_picking = b.mto_stock_inicio,
+    cnt_stock_total_inicio_dia_picking = b.cnt_stock_inicio,
+    mto_stock_total_inicio_dia_picking = b.mto_stock_total_inicio
+FROM 
+    stock_gr03_inicio_picking b 
+WHERE 
+   maestro_quiebre_ecommerce_stock_venta.cod_material = b.cod_material 
+    AND maestro_quiebre_ecommerce_stock_venta.cod_tienda = b.cod_tienda
+    AND maestro_quiebre_ecommerce_stock_venta.cod_tienda = 'GR03';
+
+
+
+UPDATE maestro_quiebre_ecommerce_stock_venta
+SET 
+    cnt_stock_fin_dia_picking = b.cnt_stock_fin,
+    mto_stock_fin_dia_picking = b.mto_stock_fin,
+    cnt_stock_total_fin_dia_picking = b.cnt_stock_fin,
+    mto_stock_total_fin_dia_picking = b.mto_stock_total_fin
+FROM 
+    stock_gr01_fin_picking b
+WHERE 
+    maestro_quiebre_ecommerce_stock_venta.cod_material = b.cod_material
+    AND maestro_quiebre_ecommerce_stock_venta.cod_tienda = 'GR01';
+
+
+UPDATE maestro_quiebre_ecommerce_stock_venta
+SET 
+    cnt_stock_fin_dia_picking = b.cnt_stock_fin,
+    mto_stock_fin_dia_picking = b.mto_stock_fin,
+    cnt_stock_total_fin_dia_picking = b.cnt_stock_fin,
+    mto_stock_total_fin_dia_picking = b.mto_stock_total_fin
+FROM 
+    stock_gr03_fin_picking b
+WHERE 
+    maestro_quiebre_ecommerce_stock_venta.cod_material = b.cod_material 
+    AND maestro_quiebre_ecommerce_stock_venta.cod_tienda = b.cod_tienda
+    AND maestro_quiebre_ecommerce_stock_venta.cod_tienda = 'GR03';
+
+
+UPDATE maestro_quiebre_ecommerce_stock_venta
+SET 
+    cnt_venta = COALESCE(b.cnt_venta, 0),
+    mto_venta_bruta = COALESCE(b.mto_venta_bruta, 0),
+    mto_venta_neta = COALESCE(b.mto_venta_neta, 0),
+    ultdiaventa = COALESCE(b.ultfechaventa, 0),
+    diassinventa = DATEDIFF(
+        day, 
+        TO_DATE(ULTFECHAVENTA, 'YYYYMMDD'), 
+        TO_DATE(fecha, 'YYYYMMDD')
+    )
+FROM venta_listado_gr01 b
+WHERE 
+    maestro_quiebre_ecommerce_stock_venta.cod_material = b.cod_material
+    AND maestro_quiebre_ecommerce_stock_venta.cod_tienda = b.cod_tienda
+    AND maestro_quiebre_ecommerce_stock_venta.cod_tienda = 'GR01';
+
+
+UPDATE maestro_quiebre_ecommerce_stock_venta
+SET 
+    cnt_venta = COALESCE(b.cnt_venta, 0),
+    mto_venta_bruta = COALESCE(b.mto_venta_bruta, 0),
+    mto_venta_neta = COALESCE(b.mto_venta_neta, 0),
+    ultdiaventa = COALESCE(b.ultfechaventa, 0),
+    diassinventa = DATEDIFF(
+        day, 
+        TO_DATE(ULTFECHAVENTA, 'YYYYMMDD'), 
+        TO_DATE(FECHA, 'YYYYMMDD')
+    )
+FROM venta_listado_gr03 b
+WHERE 
+    maestro_quiebre_ecommerce_stock_venta.cod_material = b.cod_material
+    AND maestro_quiebre_ecommerce_stock_venta.cod_tienda = b.cod_tienda
+    AND maestro_quiebre_ecommerce_stock_venta.cod_tienda = 'GR03';
+
+
+
+--------------------------ULTIMO DIA CON STOCK (GREYSTORE)----------------------------------
+
+CREATE TEMPORARY TABLE stock_gr0x_maestro AS
+SELECT
+    A.cod_material,
+    cod_dia,
+    'GR01' AS cod_tienda,
+    SUM(cnt_stock_tda) AS cnt_stock_tienda,
+    SUM(mto_stock_tda) AS mto_stock_tienda,
+    SUM(cnt_stock) AS cnt_stock,
+    SUM(mto_stock) AS mto_stock
+FROM
+    per_super_pd_stg.trx_stock_mat A
+WHERE
+    cod_dia >= ult30dias
+    AND cod_dia <= fecha
+    AND cod_tienda IN ('H003', 'GW01')
+GROUP BY
+    A.cod_material,
+    cod_dia
+
+UNION ALL
+
+SELECT
+    A.cod_material,
+    cod_dia,
+    'GR03' AS cod_tienda,
+    SUM(cnt_stock_tda) AS cnt_stock_tienda,
+    SUM(mto_stock_tda) AS mto_stock_tienda,
+    SUM(cnt_stock) AS cnt_stock,
+    SUM(mto_stock) AS mto_stock
+FROM
+    per_super_pd_stg.trx_stock_mat  A
+WHERE
+    cod_dia >= ult30dias
+    AND cod_dia <= fecha
+    AND cod_tienda IN ('S003', 'GW03')
+GROUP BY
+    A.cod_material,
+    cod_dia;
+
+
+--EXTRAER STOCK DE LOS DIAS DESDE QUE LAS COMBINATORIAS NO TIENEN VENTA
+    
+
+    create TEMPORARY table new_temp_gx (
+        cod_dia INT,
+        cod_material VARCHAR(18),
+        cod_tienda VARCHAR(4),
+        cnt_stock FLOAT,
+        mto_stock FLOAT
+    );
+
+
+    create TEMPORARY table new_temp2_gx (
+        cod_dia INT,
+        cod_material VARCHAR(18),
+        cod_tienda VARCHAR(4),
+        cnt_stock FLOAT,
+        mto_stock FLOAT
+    );
+
+    create TEMPORARY table historiastock_gx (
+        cod_dia INT,
+        cod_material VARCHAR(18),
+        cod_tienda VARCHAR(4),
+        cnt_stock FLOAT,
+        mto_stock FLOAT
+    );
+
+
+    while i_gx >= ult30dias 
+    loop
+    
+        insert into new_temp_gx
+        select
+            cast(i_gx as INT  )  cod_dia,
+            cod_material,
+            cod_tienda,
+            0,
+            0
+        from
+            maestro_quiebre_ecommerce_stock_venta 
+        where i_gx >= ultdiaventa;
+
+        insert into new_temp2_gx
+        select
+            v.cod_dia,
+            v.cod_material,
+            v.cod_tienda,
+            sum(v.cnt_stock_tienda) as cnt_stock_ultimo,
+            sum(v.mto_stock_tienda) as mto_stock_ultimo
+        from
+            stock_gr0x_maestro v
+        inner join maestro_quiebre_ecommerce_stock_venta s 
+            on v.cod_material = s.cod_material 
+            and v.cod_tienda = s.cod_tienda 
+            and v.cod_dia >= s.ultdiaventa
+        where v.cod_dia = i_gx
+        group by
+            v.cod_dia, v.cod_material, v.cod_tienda
+        having sum(v.cnt_stock_tienda) > 0;
+
+        
+        insert into historiastock_gx
+        select * from new_temp2_gx
+        union all
+        select t.*
+        from new_temp_gx t
+        left outer join new_temp2_gx h on t.cod_material = h.cod_material and t.cod_tienda = h.cod_tienda
+        where h.cod_material is null and h.cod_tienda is null;
+
+        -- Actualización de la fecha I_GX para la siguiente iteración
+        i_gx := TO_CHAR(TO_DATE(i_gx, 'yyyymmdd') - INTERVAL '1 day', 'yyyymmdd'); 
+
+        -- Imprimir la fecha actual para depuración
+        raise notice 'Procesando fecha: %', i_gx;
+
+        -- Limpieza de las tablas temporales
+        delete from new_temp_gx;
+        delete from new_temp2_gx;
+    end loop;
+
+
+
+
+
+--------------------------IDENTIFICAR CAMBIO DE STOCK GREYSTORE----------------------------------
+--EN LOS DIAS EN DONDE NO SE VENDE EL PRODUCTO SE IDENTIFICA EL DÍA EN DONDE INGRESO MERCADERIA (CAMBIO DE STOCK)
+
+
+CREATE TEMPORARY TABLE cambiodestock_gx (
+    cod_material VARCHAR(18),
+    cod_tienda VARCHAR(4),
+    diaanterioringreso INT,
+    diaingreso INT
+);
+
+INSERT INTO cambiodestock_gx
+SELECT
+    cod_material,
+    cod_tienda,
+    MIN(maximo) AS diaanterioringreso,
+    MIN(m) AS diaingreso
+FROM (
+    SELECT
+        A.cod_material,
+        A.cod_tienda,
+        MAX(A.cod_dia) AS maximo,
+        CAST(TO_CHAR(
+            TO_DATE(MAX(A.cod_dia), 'YYYYMMDD') + INTERVAL '1 day', 
+            'YYYYMMDD'
+        ) AS INT ) AS m
+    FROM
+        historiastock_gx A
+    INNER JOIN historiastock_gx B 
+        ON A.cod_material = B.cod_material 
+        AND A.cod_tienda = B.cod_tienda 
+        AND A.cnt_stock < B.cnt_stock
+    WHERE
+        A.cod_dia < B.cod_dia
+    GROUP BY
+        A.cod_material,
+        A.cod_tienda
+) A
+GROUP BY
+    cod_material,
+    cod_tienda;
+
+
+
+--------------------------ULTIMO DIA CON STOCK----------------------------------
+--EXTRAER STOCK DE LOS DIAS DESDE QUE LAS COMBINATORIAS NO TIENEN VENTA
+
+-- Creación de tablas temporales sin el prefijo "#"
+
+CREATE TEMPORARY TABLE new_temp (
+    cod_dia INT,
+    cod_material VARCHAR(18),
+    cod_tienda VARCHAR(4),
+    cnt_stock FLOAT,
+    mto_stock FLOAT
+);
+
+CREATE TEMPORARY TABLE new_temp2 (
+    cod_dia INT,
+    cod_material VARCHAR(18),
+    cod_tienda VARCHAR(4),
+    cnt_stock FLOAT,
+    mto_stock FLOAT
+);
+
+
+CREATE TEMPORARY TABLE historiastock (
+    cod_dia INT,
+    cod_material VARCHAR(18),
+    cod_tienda VARCHAR(4),
+    cnt_stock FLOAT,
+    mto_stock FLOAT
+);
+
+
+
+-- Bucle para iterar desde la fecha inicial hasta la fecha límite (ULT30DIAS)
+WHILE i >= ult30dias LOOP
+
+    INSERT INTO new_temp
+    SELECT
+        cast(i as INT )  cod_dia,
+        cod_material,
+        cod_tienda,
+        0,
+        0
+    FROM
+        maestro_quiebre_ecommerce_stock_venta
+    WHERE
+        i >= ultdiaventa;
+
+    INSERT INTO new_temp2
+    SELECT
+        v.cod_dia,
+        v.cod_material,
+        v.cod_tienda,
+        SUM(cnt_stock_tda) AS cnt_stock_ultimo,
+        SUM(mto_stock_tda) AS mto_stock_ultimo
+    FROM
+        per_super_pd_stg.trx_stock_mat v
+    INNER JOIN maestro_quiebre_ecommerce_stock_venta s 
+        ON v.cod_material = s.cod_material 
+        AND v.cod_tienda = s.cod_tienda 
+        AND v.cod_dia >= s.ultdiaventa
+    WHERE
+        v.cod_dia = i
+    GROUP BY
+        v.cod_dia, v.cod_material, v.cod_tienda
+    HAVING
+        SUM(cnt_stock_tda) > 0;
+
+    INSERT INTO historiastock
+    SELECT
+        *
+    FROM
+        new_temp2
+    UNION ALL
+    SELECT
+        t.*
+    FROM
+        new_temp t
+    LEFT OUTER JOIN new_temp2 h 
+        ON t.cod_material = h.cod_material 
+        AND t.cod_tienda = h.cod_tienda
+    WHERE
+        h.cod_material IS NULL
+        AND h.cod_tienda IS NULL;
+
+ 
+    i := TO_CHAR(TO_DATE(i, 'yyyymmdd') - INTERVAL '1 day', 'yyyymmdd'); 
+    RAISE NOTICE 'I = %', i;
+
+    DELETE FROM new_temp;
+    DELETE FROM new_temp2;
+END LOOP;
+
+
+--------------------------IDENTIFICAR CAMBIO DE STOCK----------------------------------
+-- EN LOS DIAS EN DONDE NO SE VENDE EL PRODUCTO SE IDENTIFICA EL DÍA EN DONDE INGRESO MERCADERIA (CAMBIO DE STOCK)
+
+
+create TEMPORARY table cambiodestock as 
+
+select
+    cod_material,
+    cod_tienda,
+    min(maximo) diaanterioringreso,
+    min(m) diaingreso
+from
+(
+    select
+        a.cod_material,
+        a.cod_tienda,
+        max(a.cod_dia) maximo,
+        to_char(to_date(max(a.cod_dia)::text, 'yyyymmdd') + interval '1 day', 'yyyymmdd')::integer as m
+    from
+        historiastock a
+    inner join historiastock b 
+        on a.cod_material = b.cod_material 
+        and a.cod_tienda = b.cod_tienda 
+        and a.cnt_stock < b.cnt_stock
+    where
+        a.cod_dia < b.cod_dia
+    group by
+        a.cod_material, a.cod_tienda
+) a
+group by
+    cod_material, cod_tienda;
+
+ALTER TABLE
+    cambiodestock ADD column cnt_stock float;
+ALTER TABLE
+    cambiodestock ADD column mto_stock float;
+
+update cambiodestock
+set 
+    cnt_stock = h.cnt_stock, 
+    mto_stock = h.mto_stock
+from historiastock h
+where cambiodestock.cod_material = h.cod_material 
+  and cambiodestock.cod_tienda = h.cod_tienda 
+  and cambiodestock.diaanterioringreso = h.cod_dia;
+
+
+alter table maestro_quiebre_ecommerce_stock_venta add column ultdiaingreso int;
+alter table maestro_quiebre_ecommerce_stock_venta add column diasultimoingreso int;
+alter table maestro_quiebre_ecommerce_stock_venta add column cnt_stock_previo_ingreso float;
+alter table maestro_quiebre_ecommerce_stock_venta add column mto_stock_previo_ingreso float;
+alter table maestro_quiebre_ecommerce_stock_venta add column estado_ingreso_stock varchar(20);
+
+update maestro_quiebre_ecommerce_stock_venta 
+set 
+    ultdiaingreso = 0,
+    diasultimoingreso = 0,
+    cnt_stock_previo_ingreso = 0,
+    mto_stock_previo_ingreso = 0,
+    estado_ingreso_stock = '';
+
+
+update maestro_quiebre_ecommerce_stock_venta
+set 
+    estado_ingreso_stock = 'SI INGRESO STOCK',
+    ultdiaingreso = c.diaingreso,
+    cnt_stock_previo_ingreso = c.cnt_stock,
+    mto_stock_previo_ingreso = c.mto_stock,
+    diasultimoingreso = DATEDIFF(
+    day,
+    TO_DATE(
+        TO_CHAR(DATEADD(day, -1, TO_DATE(DIAINGRESO, 'YYYYMMDD')), 'YYYYMMDD'),
+        'YYYYMMDD'
+    ),
+    TO_DATE(fecha, 'YYYYMMDD')
+)
+
+from cambiodestock c
+where maestro_quiebre_ecommerce_stock_venta.cod_material = c.cod_material 
+  and maestro_quiebre_ecommerce_stock_venta.cod_tienda = c.cod_tienda;
+
+
+update maestro_quiebre_ecommerce_stock_venta
+set 
+    estado_ingreso_stock = 'NO INGRESO STOCK',
+    ultdiaingreso = 0,
+    cnt_stock_previo_ingreso = cnt_stock_fin_dia_picking,
+    mto_stock_previo_ingreso = mto_stock_fin_dia_picking,
+    diasultimoingreso = 0
+where ultdiaingreso = 0;
+
+
+--------------------------ACTUALIZACION GREYSTORE----------------------------------
+
+alter table cambiodestock_gx add column cnt_stock float;
+alter table cambiodestock_gx add column mto_stock float;
+
+update cambiodestock_gx
+set cnt_stock = h.cnt_stock, mto_stock = h.mto_stock
+from historiastock_gx h
+where cambiodestock_gx.cod_material = h.cod_material
+  and cambiodestock_gx.cod_tienda = h.cod_tienda
+  and cambiodestock_gx.diaanterioringreso = h.cod_dia;
+
+
+update maestro_quiebre_ecommerce_stock_venta
+set 
+    estado_ingreso_stock = 'SI INGRESO STOCK',
+    ultdiaingreso = c.diaingreso,
+    cnt_stock_previo_ingreso = c.cnt_stock,
+    mto_stock_previo_ingreso = c.mto_stock,
+    diasultimoingreso = DATEDIFF(
+    day,
+    TO_DATE(
+        TO_CHAR(DATEADD(day, -1, TO_DATE(DIAINGRESO, 'YYYYMMDD')), 'YYYYMMDD'),
+        'YYYYMMDD'
+    ),
+    TO_DATE(FECHA, 'YYYYMMDD')
+)
+
+from cambiodestock_gx c
+where maestro_quiebre_ecommerce_stock_venta.cod_material = c.cod_material
+  and maestro_quiebre_ecommerce_stock_venta.cod_tienda = c.cod_tienda;
+
+update maestro_quiebre_ecommerce_stock_venta
+set 
+    estado_ingreso_stock = 'NO INGRESO STOCK',
+    ultdiaingreso = 0,
+    cnt_stock_previo_ingreso = cnt_stock_fin_dia_picking,
+    mto_stock_previo_ingreso = mto_stock_fin_dia_picking,
+    diasultimoingreso = 0
+where ultdiaingreso = 0;
+
+
+--------------------------COBERTURA INICIO DEL DIA----------------------------------
+
+-- Crear tabla temporal cambiodestock_inicio
+
+create TEMPORARY table cobertura_inicio as
+select
+    d.cod_material,
+    d.cod_tienda,
+    mto_venta_neta_90d,
+    mto_margen_90d,
+    mto_venta_neta_90d - mto_margen_90d as mto_costo_90d
+from
+    per_super_pd_stg.trx_stock_cobertura_mat d
+    inner join maestro_quiebre_ecommerce_stock_venta a on d.cod_material = a.cod_material and d.cod_tienda = a.cod_tienda
+where
+    cod_dia = fechastockiniciodia;
+
+
+-- Añadir columnas a la tabla maestroquiebreecommercestockventa
+alter table maestro_quiebre_ecommerce_stock_venta add column mto_venta_neta_90d_inicio_dia_picking decimal(15,2);
+alter table maestro_quiebre_ecommerce_stock_venta add column mto_margen_90d_inicio_dia_picking decimal(15,2);
+alter table maestro_quiebre_ecommerce_stock_venta add column mto_costo_90d_inicio_dia_picking decimal(15,2);
+
+-- Actualizar columnas a cero en maestroquiebreecommercestockventa
+update maestro_quiebre_ecommerce_stock_venta
+set 
+    mto_costo_90d_inicio_dia_picking = 0, 
+    mto_venta_neta_90d_inicio_dia_picking = 0, 
+    mto_margen_90d_inicio_dia_picking = 0;
+
+-- Actualizar columnas en maestroquiebreecommercestockventa con los valores de coberturainicio
+update maestro_quiebre_ecommerce_stock_venta
+set 
+    mto_costo_90d_inicio_dia_picking = c.mto_costo_90d, 
+    mto_venta_neta_90d_inicio_dia_picking = c.mto_venta_neta_90d, 
+    mto_margen_90d_inicio_dia_picking = c.mto_margen_90d
+from
+    cobertura_inicio c
+where
+    maestro_quiebre_ecommerce_stock_venta.cod_material = c.cod_material
+    and maestro_quiebre_ecommerce_stock_venta.cod_tienda = c.cod_tienda;
+
+--------------------------COBERTURA FIN DEL DIA----------------------------------
+
+create TEMPORARY table cobertura_ultimo as
+select
+    d.cod_material,
+    d.cod_tienda,
+    mto_venta_neta_90d,
+    mto_margen_90d,
+    mto_venta_neta_90d - mto_margen_90d as mto_costo_90d
+from
+    per_super_pd_stg.trx_stock_cobertura_mat d
+    inner join maestro_quiebre_ecommerce_stock_venta a on d.cod_material = a.cod_material and d.cod_tienda = a.cod_tienda
+where
+    cod_dia = fecha;
+
+
+alter table maestro_quiebre_ecommerce_stock_venta add mto_venta_neta_90d_fin_dia_picking decimal(15,2);
+alter table maestro_quiebre_ecommerce_stock_venta add mto_margen_90d_fin_dia_picking decimal(15,2);
+alter table maestro_quiebre_ecommerce_stock_venta add mto_costo_90d_fin_dia_picking decimal(15,2);
+
+
+update maestro_quiebre_ecommerce_stock_venta 
+set 
+    mto_costo_90d_fin_dia_picking = 0, 
+    mto_venta_neta_90d_fin_dia_picking = 0, 
+    mto_margen_90d_fin_dia_picking = 0;
+
+update maestro_quiebre_ecommerce_stock_venta 
+set 
+    mto_costo_90d_fin_dia_picking = c.mto_costo_90d, 
+    mto_venta_neta_90d_fin_dia_picking = c.mto_venta_neta_90d, 
+    mto_margen_90d_fin_dia_picking = c.mto_margen_90d
+from
+    cobertura_ultimo c
+where
+    maestro_quiebre_ecommerce_stock_venta.cod_material = c.cod_material
+    and maestro_quiebre_ecommerce_stock_venta.cod_tienda = c.cod_tienda;
+
+
+
+--------------------------COBERTURA INICIO DEL DIA GREYSTORE----------------------------------
+
+-- Crear tabla temporal cobertura_inicio_greystore
+
+create TEMPORARY table cobertura_inicio_greystore as
+select
+    d.cod_material,
+    'GR01' as cod_tienda,
+    sum(mto_venta_neta_90d) mto_venta_neta_90d,
+    sum(mto_margen_90d) mto_margen_90d,
+    sum(mto_venta_neta_90d) - sum(mto_margen_90d) as mto_costo_90d
+from
+    per_super_pd_stg.trx_stock_cobertura_mat d
+where
+    cod_dia = fechastockiniciodia
+    and cod_tienda in ('H003', 'GW01')
+group by
+    d.cod_material
+
+union all
+
+select
+    d.cod_material,
+    'GR03' as cod_tienda,
+    sum(mto_venta_neta_90d) mto_venta_neta_90d,
+    sum(mto_margen_90d) mto_margen_90d,
+    sum(mto_venta_neta_90d) - sum(mto_margen_90d) as mto_costo_90d
+from
+    per_super_pd_stg.trx_stock_cobertura_mat d
+where
+    cod_dia = fechastockiniciodia
+    and cod_tienda in ('S003', 'GW03')
+group by
+    d.cod_material;
+
+
+update maestro_quiebre_ecommerce_stock_venta
+set 
+    mto_costo_90d_inicio_dia_picking = c.mto_costo_90d,
+    mto_venta_neta_90d_inicio_dia_picking = c.mto_venta_neta_90d,
+    mto_margen_90d_inicio_dia_picking = c.mto_margen_90d
+from
+    cobertura_inicio_greystore c
+where
+    maestro_quiebre_ecommerce_stock_venta.cod_material = c.cod_material
+    and maestro_quiebre_ecommerce_stock_venta.cod_tienda = c.cod_tienda;
+
+
+
+--------------------------COBERTURA FIN DEL DIA GREYSTORE----------------------------------
+
+create TEMPORARY table cobertura_fin_greystore as
+select
+    d.cod_material,
+    'GR01' as cod_tienda,
+    sum(mto_venta_neta_90d) mto_venta_neta_90d,
+    sum(mto_margen_90d) mto_margen_90d,
+    sum(mto_venta_neta_90d) - sum(mto_margen_90d) as mto_costo_90d
+from
+    per_super_pd_stg.trx_stock_cobertura_mat d
+where
+    cod_dia = fecha
+    and cod_tienda in ('H003', 'GW01')
+group by
+    d.cod_material
+
+union all
+
+select
+    d.cod_material,
+    'GR03' as cod_tienda,
+    sum(mto_venta_neta_90d) mto_venta_neta_90d,
+    sum(mto_margen_90d) mto_margen_90d,
+    sum(mto_venta_neta_90d) - sum(mto_margen_90d) as mto_costo_90d
+from
+    per_super_pd_stg.trx_stock_cobertura_mat d
+where
+    cod_dia = fecha
+    and cod_tienda in ('S003', 'GW03')
+group by
+    d.cod_material;
+
+
+update maestro_quiebre_ecommerce_stock_venta 
+set 
+    mto_costo_90d_fin_dia_picking = c.mto_costo_90d, 
+    mto_venta_neta_90d_fin_dia_picking = c.mto_venta_neta_90d, 
+    mto_margen_90d_fin_dia_picking = c.mto_margen_90d
+from
+    cobertura_fin_greystore c
+where
+    maestro_quiebre_ecommerce_stock_venta.cod_material = c.cod_material
+    and maestro_quiebre_ecommerce_stock_venta.cod_tienda = c.cod_tienda;
+
+
+
+--------------------------INTEGRAR REPORTE CONSOLIDADO----------------------------------
+
+CREATE TEMPORARY TABLE reporte_quiebres_consolidado AS 
+SELECT
+    a.*,
+    b.cnt_stock_inicio_dia_picking,
+    b.mto_stock_inicio_dia_picking,
+    b.cnt_stock_total_inicio_dia_picking,
+    b.mto_stock_total_inicio_dia_picking,
+    b.cnt_stock_fin_dia_picking,
+    b.mto_stock_fin_dia_picking,
+    b.cnt_stock_total_fin_dia_picking,
+    b.mto_stock_total_fin_dia_picking,
+    b.cnt_venta AS cnt_venta_ult_30dias,
+    b.mto_venta_bruta AS mto_venta_bruta_ult_30dias,
+    b.mto_venta_neta AS mto_venta_neta_ult_30dias,
+    b.ultdiaventa,
+    b.diassinventa,
+    b.id_tipo_set_venta,
+    b.desc_tipo_set_venta,
+    b.id_clase_surtido,
+    b.desc_clase_surtido,
+    b.id_tipo_surtido_incluido,
+    b.desc_tipo_surtido_incluido,
+    b.origen_proveedor,
+    b.ultdiaingreso,
+    b.diasultimoingreso,
+    b.cnt_stock_previo_ingreso,
+    b.mto_stock_previo_ingreso,
+    b.estado_ingreso_stock,
+    b.mto_costo_90d_inicio_dia_picking,
+    b.mto_venta_neta_90d_inicio_dia_picking,
+    b.mto_margen_90d_inicio_dia_picking,
+    b.mto_costo_90d_fin_dia_picking,
+    b.mto_venta_neta_90d_fin_dia_picking,
+    b.mto_margen_90d_fin_dia_picking,
+    CASE
+        WHEN c.cod_material IS NOT NULL THEN 'ACTIVO'
+        ELSE 'NO ACTIVO'
+    END estado_material_tienda 
+FROM
+    reporte_quiebres a
+    INNER JOIN maestro_quiebre_ecommerce_stock_venta b ON a.cod_material = b.cod_material AND a.cod_tienda = b.cod_tienda
+    LEFT JOIN material_tienda_activos c ON a.cod_material = c.cod_material AND a.cod_tienda = c.cod_tienda;
+    --SELECT * FROM #reporte_quiebres_consolidado
+
+
+UPDATE reporte_quiebres_consolidado
+SET estado_material_tienda = 
+    CASE 
+        WHEN b.cod_material IS NOT NULL THEN 'ACTIVO'
+        ELSE 'NO ACTIVO' 
+    END
+FROM material_tienda_activos_gx b
+WHERE reporte_quiebres_consolidado.cod_material = b.cod_material
+    AND reporte_quiebres_consolidado.cod_tienda = b.cod_tienda
+    AND  reporte_quiebres_consolidado.cod_tienda IN ('GR01', 'GR03');
+
+
+ALTER TABLE
+    reporte_quiebres_consolidado ADD found_rate_ecommerce NUMERIC(10,2);
+ALTER TABLE
+    reporte_quiebres_consolidado ADD cob_inicio NUMERIC(10,2);
+ALTER TABLE
+    reporte_quiebres_consolidado ADD cob_fin NUMERIC(10,2);
+UPDATE
+    reporte_quiebres_consolidado SET found_rate_ecommerce = CAST(q_unidades_pickeadas AS NUMERIC(10,2))/ NULLIF(CAST(q_unidades_requeridas AS NUMERIC(10,2)),0),
+    cob_inicio = ISNULL(
+        mto_stock_inicio_dia_picking / NULLIF((mto_costo_90d_inicio_dia_picking / 90), 0),
+        0
+    ),
+    cob_fin = ISNULL(
+        mto_stock_fin_dia_picking / NULLIF((mto_costo_90d_fin_dia_picking / 90), 0),
+        0
+    );
+
+
+
+-- --------------------------AÑADIR KPI DE FILL RATE----------------------------------
+
+CREATE TEMPORARY TABLE mat_unicos as 
+SELECT
+    DISTINCT cod_material 
+FROM
+    reporte_quiebres_consolidado ;
+
+
+CREATE TEMPORARY TABLE fr as 
+SELECT
+    c.cod_material,
+    SUM(a.mto_entregado_15_dias) montorecibido15d,
+    SUM(a.mto_pedido_15_dias) montopedido15d
+FROM
+    per_super_pd_stg.trx_pedido_mat_new a
+    INNER JOIN mat_unicos c ON a.cod_material = c.cod_material
+WHERE
+    a.cod_dia = fecha
+    AND desc_concensuado = 'SI'
+GROUP BY
+    c.cod_material;
+
+ALTER TABLE
+    reporte_quiebres_consolidado ADD fr_15d NUMERIC(10,2);
+ALTER TABLE
+    reporte_quiebres_consolidado ADD montorecibido15d NUMERIC(10,2);
+ALTER TABLE
+    reporte_quiebres_consolidado ADD montopedido15d NUMERIC(10,2);
+
+UPDATE
+    reporte_quiebres_consolidado SET montorecibido15d = 0, montopedido15d = 0;
+
+UPDATE reporte_quiebres_consolidado
+SET 
+    montorecibido15d = b.montorecibido15d,
+    montopedido15d = b.montopedido15d,
+    fr_15d = b.montorecibido15d / NULLIF(b.montopedido15d, 0)
+FROM fr b
+WHERE reporte_quiebres_consolidado.cod_material = b.cod_material;
+
+
+--------------------------AJUSTE DE INVENTARIO (consultar si ha habido movimientos los últimos 10 dìas)----------------------------------
+--TOTAL TIENDAS
+
+CREATE TEMPORARY TABLE ajuste as 
+select
+    material as cod_material,
+    centro as cod_tienda,
+    sum(desmedro) as mto_desmedro,
+    sum(ajuste) as mto_ajuste,
+    sum(ajuste) + sum(desmedro) total_ajustes
+from
+    per_super_pd_stg.trx_merma_mat
+where
+    dia_natural >= ultimos10dias
+    and dia_natural <= fecha
+group by
+    material,
+    centro ;
+
+--TOTAL GREYSTORE
+
+CREATE TEMPORARY TABLE ajuste_gx as 
+
+select * from ( 
+select
+    material as cod_material,
+    'GR01' cod_tienda,
+    sum(desmedro) mto_desmedro,
+    sum(ajuste) mto_ajuste,
+    sum(ajuste) + sum(desmedro) total_ajustes
+from
+    per_super_pd_stg.trx_merma_mat
+where
+    dia_natural >= ultimos10dias
+    and dia_natural <= fecha
+    and centro in ('H003', 'GW01')
+group by
+    material
+union all
+select
+    material as cod_material,
+    'GR03' cod_tienda,
+    sum(desmedro) mto_desmedro,
+    sum(ajuste) mto_ajuste,
+    sum(ajuste) + sum(desmedro) total_ajustes
+from
+    per_super_pd_stg.trx_merma_mat
+where
+    dia_natural >= ultimos10dias
+    and dia_natural <= fecha
+    and centro in ('S003', 'GW03')
+group by
+    material
+ ) a ;
+
+alter table
+    reporte_quiebres_consolidado add ajuste int;
+
+update
+    reporte_quiebres_consolidado set ajuste = 0;
+
+
+UPDATE reporte_quiebres_consolidado
+SET ajuste = 1
+FROM ajuste b
+WHERE reporte_quiebres_consolidado.cod_material = b.cod_material
+  AND reporte_quiebres_consolidado.cod_tienda = b.cod_tienda;
+
+
+UPDATE reporte_quiebres_consolidado
+SET ajuste = 1
+FROM ajuste_gx b
+WHERE reporte_quiebres_consolidado.cod_material = b.cod_material
+  AND reporte_quiebres_consolidado.cod_tienda IN ('GR01', 'GR03');
+
+
+
+
+--------------------------AÑADIR CON PEDIDOS PENDIENTES---------------------------------
+
+--TOTAL TIENDAS Y GREYSTORE
+CREATE TEMPORARY TABLE pedidos_futuro AS 
+SELECT DISTINCT 
+    SUBSTRING(
+        '000000000000000000' || TRIM(a.articulo), 
+        LENGTH('000000000000000000' || TRIM(a.articulo)) - 17, 
+        18
+    ) AS cod_material
+FROM
+    per_super_pd_stg.pedidosproveedor a
+WHERE
+    a.fechaentregareal >= fecha
+    AND a.fechaentregareal <= futuros10dias
+    AND a.clasedocumento NOT IN ('DEV', 'ZDEV', 'ZPDP', 'ZNCR')
+    AND a.indicadorborrado NOT IN ('L', 'X')
+    AND a.tipoproceso = 'A';
+
+
+ALTER TABLE
+    reporte_quiebres_consolidado ADD con_pedido_pendiente INT;
+
+UPDATE
+    reporte_quiebres_consolidado SET con_pedido_pendiente = 0;
+
+UPDATE reporte_quiebres_consolidado
+SET con_pedido_pendiente = 1
+FROM pedidos_futuro b
+WHERE reporte_quiebres_consolidado.cod_material = b.cod_material;
+
+
+
+--------------------------AÑADIR INFORMACION DE PALETAS----------------------------------
+    --TOTAL TIENDAS
+
+
+CREATE TEMPORARY TABLE paletas as 
+select
+    distinct cod_material,
+    cod_tienda_destino 
+from
+    per_super_pd_stg.trx_paletas_pendientes
+where
+    cod_dia = fecha;
+
+
+CREATE TEMPORARY TABLE paletas_gx as 
+select
+    distinct cod_material,
+    'GR01' cod_tienda_destino
+from
+    per_super_pd_stg.trx_paletas_pendientes
+where
+    cod_dia = fecha
+    and cod_tienda = 'H003'
+union all
+select
+    distinct cod_material,
+    'GR03' cod_tienda_destino
+from
+    per_super_pd_stg.trx_paletas_pendientes
+where
+    cod_dia = fecha
+    and cod_tienda = 'S003';
+
+
+alter table
+    reporte_quiebres_consolidado add tiene_paleta_pendiente int;
+update
+    reporte_quiebres_consolidado set tiene_paleta_pendiente = 0;
+
+UPDATE reporte_quiebres_consolidado
+SET tiene_paleta_pendiente = 1
+FROM paletas b
+WHERE reporte_quiebres_consolidado.cod_material = b.cod_material
+  AND reporte_quiebres_consolidado.cod_tienda = b.cod_tienda_destino;
+
+
+UPDATE reporte_quiebres_consolidado
+SET tiene_paleta_pendiente = 1
+FROM paletas_gx b
+WHERE reporte_quiebres_consolidado.cod_material = b.cod_material
+  AND reporte_quiebres_consolidado.cod_tienda = b.cod_tienda_destino
+  AND reporte_quiebres_consolidado.cod_tienda IN ('GR01', 'GR03');
+
+
+
+--------------------------BUSCAR STOCK EN CD10----------------------------------
+--SELECT *
+--INTO #STOCK_CD10
+--FROM "G200603SVHB8.IC_DATOS".stage.dbo.trx_stock_mat
+--WHERE cod_dia = fecha AND cod_tienda = 'CD10' AND cnt_stock > 0
+--ALTER TABLE #REPORTE_QUIEBRES_CONSOLIDADO ADD stk_cd10 INT
+--UPDATE #REPORTE_QUIEBRES_CONSOLIDADO SET stk_cd10 = 0
+--UPDATE #REPORTE_QUIEBRES_CONSOLIDADO SET stk_cd10 = 1 FROM #REPORTE_QUIEBRES_CONSOLIDADO a INNER JOIN #STOCK_CD10 b ON a.cod_material = b.cod_material
+---------------------------------------- AÑADIR VISTA DE SISTEMAS---------------------------------------------------
+
+CREATE TEMPORARY TABLE faltante_material_tienda_dia_creacion AS
+SELECT
+    DISTINCT cod_fecha_creacion AS fecha_creacion,
+    cod_tienda_origen AS cod_tienda,
+    RIGHT(REPLICATE('0', 18) + main_refid, 18) AS cod_material
+FROM
+    pedidos_campos_basicos
+WHERE
+    UPPER(tipo_quiebre) <> 'SIN QUIEBRE' ;
+    
+--------------------OBTENER STOCK INICIO DEL DIA DE COMPRA-----------------------------
+
+CREATE TEMPORARY TABLE faltante_material_tienda_dia_creacion_dia_anterior AS
+SELECT
+    *,
+    TO_CHAR(DATEADD(DAY, -1, CAST(fecha_creacion AS DATE)), 'YYYYMMDD') AS dia_anterior
+FROM
+    faltante_material_tienda_dia_creacion;
+
+
+CREATE TEMPORARY TABLE stock_inicio_dia_compra AS
+SELECT
+    a.cod_material,
+    a.cod_tienda,
+    b.fecha_creacion,
+    SUM(cnt_stock_tda) AS cnt_stock_inicio,
+    SUM(mto_stock_tda) AS mto_stock_inicio,
+    SUM(cnt_stock) AS cnt_stock_total_inicio,
+    SUM(mto_stock) AS mto_stock_total_inicio
+FROM
+    per_super_pd_stg.trx_stock_mat a
+    INNER JOIN faltante_material_tienda_dia_creacion_dia_anterior b ON a.cod_material = b.cod_material AND a.cod_tienda = b.cod_tienda AND a.cod_dia = b.dia_anterior
+GROUP BY
+    a.cod_material,
+    a.cod_tienda,
+    b.fecha_creacion;
+
+
+--------------------OBTENER STOCK FIN DEL DIA DE COMPRA-----------------------------
+
+CREATE TEMPORARY TABLE stock_fin_dia_compra AS
+SELECT
+    a.cod_material,
+    a.cod_tienda,
+    a.cod_dia,
+    SUM(cnt_stock_tda) AS cnt_stock_fin,
+    SUM(mto_stock_tda) AS mto_stock_fin,
+    SUM(cnt_stock) AS cnt_stock_total_fin,
+    SUM(mto_stock) AS mto_stock_total_fin
+FROM
+    per_super_pd_stg.trx_stock_mat a
+    INNER JOIN faltante_material_tienda_dia_creacion b ON a.cod_material = b.cod_material AND a.cod_tienda = b.cod_tienda AND a.cod_dia = b.fecha_creacion
+GROUP BY
+    a.cod_material,
+    a.cod_tienda,
+    a.cod_dia;
+
+
+CREATE TEMPORARY TABLE faltante_material_tienda_dia_creacion_resultado AS
+SELECT
+    a.*,
+    COALESCE(cnt_stock_total_inicio, 0) AS cnt_stock_total_inicio,
+    CASE
+        WHEN COALESCE(cnt_stock_total_inicio, 0) <= 0 THEN 1
+        ELSE 0
+    END AS id_sistemas
+FROM
+    faltante_material_tienda_dia_creacion a
+    LEFT JOIN stock_inicio_dia_compra b ON a.cod_material = b.cod_material AND a.cod_tienda = b.cod_tienda AND a.fecha_creacion = b.fecha_creacion;
+
+
+CREATE TEMPORARY TABLE id_sistemas AS
+SELECT
+    DISTINCT cod_fecha_picking,
+    cod_material,
+    cod_tienda,
+    CASE
+        WHEN id_sistemas > 0 THEN 1
+        ELSE 0
+    END AS id_sistemas
+FROM
+(
+    SELECT
+        cod_fecha_picking,
+        RIGHT(REPLICATE('0', 18) + a.main_refid, 18) AS cod_material,
+        a.cod_tienda,
+        SUM(id_sistemas) AS id_sistemas
+    FROM
+        pedidos_campos_basicos a
+        LEFT JOIN faltante_material_tienda_dia_creacion_resultado b ON a.cod_fecha_creacion = b.fecha_creacion AND RIGHT(REPLICATE('0', 18) + a.main_refid, 18) = b.cod_material AND a.cod_tienda_origen = b.cod_tienda
+    WHERE
+        tipo_quiebre <> 'sin quiebre'
+    GROUP BY
+        cod_fecha_picking,
+        RIGHT(REPLICATE('0', 18) + a.main_refid, 18),
+        a.cod_tienda
+) a
+WHERE
+    id_sistemas > 0;
+
+--------------------------CREAR REGLAS----------------------------------
+ALTER TABLE
+    reporte_quiebres_consolidado ADD gestion VARCHAR(50);
+ALTER TABLE
+    reporte_quiebres_consolidado ADD tipo VARCHAR(50);
+ALTER TABLE
+    reporte_quiebres_consolidado ADD subtipo VARCHAR(50);
+UPDATE
+    reporte_quiebres_consolidado SET tipo = '', gestion = '', subtipo = '';
+UPDATE
+    reporte_quiebres_consolidado SET tipo = 'Void', gestion = 'Ecommerce'  WHERE estado_material_tienda = 'NO ACTIVO' AND tipo = '' AND id_resultado_faltante = 1;
+UPDATE
+    reporte_quiebres_consolidado SET tipo = 'Set de Venta', gestion = 'Ecommerce' WHERE (LTRIM(RTRIM(desc_tipo_set_venta)) = 'SET VENTAS' OR LTRIM(RTRIM(desc_tipo_surtido_incluido)) = 'Ecommerce') AND id_resultado_faltante = 1;
+UPDATE
+    reporte_quiebres_consolidado SET tipo = 'Stock Ficticio', gestion = 'Inventario' WHERE cnt_stock_inicio_dia_picking > 0 AND (diassinventa >= 1 OR diassinventa IS NULL) AND found_rate_ecommerce = 0 AND estado_ingreso_stock = 'NO INGRESO STOCK' AND tipo = '' AND id_resultado_faltante = 1;
+UPDATE
+    reporte_quiebres_consolidado SET tipo = 'Trastienda', gestion = 'Inventario' WHERE cnt_stock_inicio_dia_picking > 0 AND (diassinventa >= 1 OR diassinventa IS NULL) AND found_rate_ecommerce = 0 AND estado_ingreso_stock = 'SI INGRESO STOCK' AND tipo = '' AND id_resultado_faltante = 1;
+UPDATE
+    reporte_quiebres_consolidado SET tipo = 'Picking', gestion = 'Ecommerce' WHERE cob_inicio >= 1 AND cob_fin >= 1 AND diassinventa = 0 AND tipo = '' AND id_resultado_faltante = 1;
+UPDATE
+    reporte_quiebres_consolidado SET tipo = 'Fill rate' WHERE (fr_15d < 0.9) and tipo = '' AND id_resultado_faltante = 1 ;
+UPDATE
+    reporte_quiebres_consolidado SET tipo = 'Sin Stock' WHERE (fr_15d >= 0.9 or fr_15d is null) and tipo = '' AND id_resultado_faltante = 1;
+UPDATE
+    reporte_quiebres_consolidado SET subtipo = 'Ajuste de inventario' WHERE tipo = 'Sin Stock' AND ajuste = 1 AND subtipo = '';
+UPDATE
+    reporte_quiebres_consolidado SET subtipo = 'Paletas retenidas' WHERE tipo = 'Sin Stock' AND tiene_paleta_pendiente = 1 AND subtipo = '';
+UPDATE
+    reporte_quiebres_consolidado SET subtipo = 'Sin Pedido Pendiente' WHERE tipo = 'Sin Stock' AND con_pedido_pendiente = 0 AND subtipo = '';
+UPDATE
+    reporte_quiebres_consolidado SET subtipo = 'Con Pedido Pendiente' WHERE tipo = 'Sin Stock' AND con_pedido_pendiente = 1 AND subtipo = '';
+ALTER TABLE
+    reporte_quiebres_consolidado ADD id_void INT;
+ALTER TABLE
+    reporte_quiebres_consolidado ADD id_set_venta INT;
+ALTER TABLE
+    reporte_quiebres_consolidado ADD id_fictico INT;
+ALTER TABLE
+    reporte_quiebres_consolidado ADD id_trastienda INT;
+ALTER TABLE
+    reporte_quiebres_consolidado ADD id_picking INT;
+ALTER TABLE
+    reporte_quiebres_consolidado ADD id_sin_stock INT;
+ALTER TABLE
+    reporte_quiebres_consolidado ADD id_fill_rate INT;
+ALTER TABLE
+    reporte_quiebres_consolidado ADD id_paletas_retenidas INT;
+ALTER TABLE
+    reporte_quiebres_consolidado ADD id_ajuste_inventario INT;
+ALTER TABLE
+    reporte_quiebres_consolidado ADD id_con_pedido_pendientes INT;
+ALTER TABLE
+    reporte_quiebres_consolidado ADD id_sin_pedido_pendientes INT;
+ALTER TABLE
+    reporte_quiebres_consolidado ADD id_sistemas INT;
+UPDATE
+    reporte_quiebres_consolidado SET  id_void = 0, id_set_venta = 0, id_fictico = 0, id_trastienda = 0,
+    id_picking = 0,
+    id_sin_stock = 0,
+    id_fill_rate = 0,
+    id_paletas_retenidas = 0,
+    id_ajuste_inventario = 0,
+    id_con_pedido_pendientes = 0,
+    id_sin_pedido_pendientes = 0,
+    id_sistemas = 0;
+UPDATE
+    reporte_quiebres_consolidado SET id_void = 1 WHERE tipo = 'Void';
+UPDATE
+    reporte_quiebres_consolidado SET id_set_venta = 1 WHERE tipo = 'Set de Venta';
+UPDATE
+    reporte_quiebres_consolidado SET id_fictico = 1 WHERE tipo = 'Stock Ficticio';
+UPDATE
+    reporte_quiebres_consolidado SET id_trastienda = 1 WHERE tipo = 'Trastienda';
+UPDATE
+    reporte_quiebres_consolidado SET id_picking = 1 WHERE tipo = 'Picking';
+UPDATE
+    reporte_quiebres_consolidado SET id_sin_stock = 1 WHERE tipo = 'Sin Stock';
+UPDATE
+    reporte_quiebres_consolidado SET id_fill_rate = 1 WHERE tipo = 'Fill rate';
+UPDATE
+    reporte_quiebres_consolidado SET id_paletas_retenidas = 1 WHERE subtipo = 'Paletas retenidas';
+UPDATE
+    reporte_quiebres_consolidado SET id_ajuste_inventario = 1 WHERE subtipo = 'Ajuste de inventario';
+UPDATE
+    reporte_quiebres_consolidado SET id_con_pedido_pendientes = 1 WHERE subtipo = 'Con Pedido Pendiente';
+UPDATE
+    reporte_quiebres_consolidado SET id_sin_pedido_pendientes = 1 WHERE subtipo = 'Sin Pedido Pendiente';
+
+UPDATE reporte_quiebres_consolidado
+SET id_sistemas = 1
+FROM id_sistemas b
+WHERE reporte_quiebres_consolidado.cod_tienda = b.cod_tienda
+  AND reporte_quiebres_consolidado.cod_material = b.cod_material
+  AND reporte_quiebres_consolidado.tipo NOT IN ('SET DE VENTA')
+  AND reporte_quiebres_consolidado.id_resultado_faltante = 1
+  AND reporte_quiebres_consolidado.cod_tienda NOT IN ('GR01', 'GR03');
+
+
+---------------------------------------------------------- SURTIDO DE GREYSTORE --------------------------------------------------------------------------
+
+DELETE FROM
+    dl_sp_dashboards_ecommerce.tbl_trx_quiebres_ecommerce
+WHERE
+   fecha_picking = fecha;
+
+INSERT INTO
+    dl_sp_dashboards_ecommerce.tbl_trx_quiebres_ecommerce
+SELECT
+    a.*,
+    desc_material,
+    desc_grupo_articulo,
+    desc_sub_categoria,
+    desc_categoria,
+    desc_jefe_categoria,
+    desc_gerente,
+    desc_gerencia_comercial,
+    sk_mes,
+    sk_semana,
+    current_timestamp fecha_registro_tabla
+FROM
+    reporte_quiebres_consolidado a
+    INNER JOIN materiales b ON a.cod_material = b.cod_material
+    INNER JOIN dl_sp_maestras.dim_dia c ON a.fecha_picking = c.sk_dia;
+
+
+
+DROP TABLE IF EXISTS new_temp2;
+DROP TABLE IF EXISTS new_temp;
+DROP TABLE IF EXISTS new_temp2_gx;
+DROP TABLE IF EXISTS new_temp_gx;
+
+
+
+DROP TABLE IF EXISTS reporte_quiebres_consolidado;
+DROP TABLE IF EXISTS id_sistemas;
+DROP TABLE IF EXISTS faltante_material_tienda_dia_creacion_resultado;
+DROP TABLE IF EXISTS stock_fin_dia_compra;
+DROP TABLE IF EXISTS stock_inicio_dia_compra;
+DROP TABLE IF EXISTS faltante_material_tienda_dia_creacion;
+DROP TABLE IF EXISTS paletas_gx;
+DROP TABLE IF EXISTS paletas;
+DROP TABLE IF EXISTS pedidos_futuro;
+DROP TABLE IF EXISTS ajuste_gx;
+DROP TABLE IF EXISTS ajuste;
+DROP TABLE IF EXISTS fr;
+DROP TABLE IF EXISTS mat_unicos;
+DROP TABLE IF EXISTS cobertura_fin_greystore;
+DROP TABLE IF EXISTS cobertura_inicio_greystore;
+DROP TABLE IF EXISTS cobertura_ultimo;
+DROP TABLE IF EXISTS cobertura_inicio;
+DROP TABLE IF EXISTS cambiostock;
+DROP TABLE IF EXISTS historiastock;
+DROP TABLE IF EXISTS stock_gr0x_maestro;
+DROP TABLE IF EXISTS maestro_quiebre_ecommerce_stock_venta;
+DROP TABLE IF EXISTS venta;
+DROP TABLE IF EXISTS venta_listado_gr03;
+DROP TABLE IF EXISTS venta_listado_gr01;
+DROP TABLE IF EXISTS venta_gr01;
+DROP TABLE IF EXISTS venta_gr03;
+DROP TABLE IF EXISTS stock_fin_dia_picking;
+DROP TABLE IF EXISTS stock_inicio_dia_picking;
+DROP TABLE IF EXISTS stock_gr03_fin_picking;
+DROP TABLE IF EXISTS stock_gr01_fin_picking;
+DROP TABLE IF EXISTS stock_gr03_inicio_picking;
+DROP TABLE IF EXISTS stock_gr01_inicio_picking;
+DROP TABLE IF EXISTS combinatorias_material_tienda_quiebre_ecommerce;
+DROP TABLE IF EXISTS reporte_quiebres;
+DROP TABLE IF EXISTS maestro;
+DROP TABLE IF EXISTS aux_quiebre_apertura;
+DROP TABLE IF EXISTS aux_quiebre;
+DROP TABLE IF EXISTS maestro_material_tienda_quiebre;
+DROP TABLE IF EXISTS pedidos_campos_basicos;
+DROP TABLE IF EXISTS material_tienda_activos_gx;
+DROP TABLE IF EXISTS material_tienda_activos_greystore_exclusivos;
+DROP TABLE IF EXISTS material_tienda_activos;
+DROP TABLE IF EXISTS materiales;
+DROP TABLE IF EXISTS pedidos;
+DROP TABLE IF EXISTS cambiodestock_gx;
+
+
+
+END;
+
+
+
+
+
+
+$$
+;
+

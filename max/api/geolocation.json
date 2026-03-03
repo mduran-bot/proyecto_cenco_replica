@@ -1,0 +1,1096 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Geolocation Service",
+    "description": "Manage geolocation and geocoding easily\n\n **Last update**: 17 nov 25, 02:32 p. m.",
+    "version": "1.12.0",
+    "x-logo": null,
+    "x-janis-keywords": [
+      "geolocation",
+      "geocoding",
+      "latitude",
+      "longitude",
+      "address",
+      "google maps"
+    ],
+    "lastUpdate": "2025-11-17T17:32:40.437Z"
+  },
+  "tags": [
+    {
+      "name": "Geocode",
+      "description": "Address to geolocation transformations"
+    },
+    {
+      "name": "Settings",
+      "description": "Geolocation service configurations"
+    },
+    {
+      "name": "Address Validation",
+      "description": "For address validations"
+    }
+  ],
+  "servers": [
+    {
+      "url": "https://geolocation.janis.in/api",
+      "description": "The Prod API server",
+      "variables": {
+        "environment": {
+          "default": "prod"
+        }
+      }
+    },
+    {
+      "url": "https://geolocation.janisqa.in/api",
+      "description": "The QA API server",
+      "variables": {
+        "environment": {
+          "default": "qa"
+        }
+      }
+    },
+    {
+      "url": "https://geolocation.janisdev.in/api",
+      "description": "The Beta API server",
+      "variables": {
+        "environment": {
+          "default": "beta"
+        }
+      }
+    },
+    {
+      "url": "http://geolocation.janis.localhost:3071/api",
+      "description": "The Local API server",
+      "variables": {
+        "environment": {
+          "default": "local"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/address-validation": {
+      "post": {
+        "x-janis-namespace": "address-validation",
+        "x-janis-method": "post",
+        "x-janis-permissions": [],
+        "operationId": "postAddressValidation",
+        "tags": [
+          "Address Validation"
+        ],
+        "summary": "Complete information of an address",
+        "description": "It obtains all data from an incomplete address\n",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "The address to complete",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "address": {
+                    "description": "The address to complete, if possible add city and country to achieve unambiguous results",
+                    "type": "string",
+                    "example": "Dorrego 965 Piso 1, Rosario"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompleteAddress"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/geocode": {
+      "post": {
+        "x-janis-namespace": "geocode",
+        "x-janis-method": "create",
+        "x-janis-permissions": [],
+        "deprecated": true,
+        "operationId": "createGeocode",
+        "tags": [
+          "Geocode"
+        ],
+        "summary": "Geocode an address",
+        "description": "**DEPRECATED** This API is deprecated and will be removed in the future.\n\nNo production flows should rely on this API.\n",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "The adrress to geocode",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddressToGeocode_API"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/AddressGeocoded_API"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/ServiceLimitReached"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/setting/{entity}": {
+      "get": {
+        "x-janis-namespace": "setting",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "geolocation:setting:read"
+        ],
+        "operationId": "getSetting",
+        "tags": [
+          "Settings"
+        ],
+        "summary": "Get the setting of an entity",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "entity",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "example": "googleMaps"
+            },
+            "required": true,
+            "description": "The name of the entity that owns the settings to be retrieved"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The settings were retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ProvidersSettings"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "x-janis-namespace": "setting",
+        "x-janis-method": "update",
+        "x-janis-permissions": [
+          "geolocation:setting:write"
+        ],
+        "operationId": "updateSetting",
+        "tags": [
+          "Settings"
+        ],
+        "summary": "Update the setting of an entity",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "entity",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "example": "providers"
+            },
+            "required": true,
+            "description": "The name of the entity that owns the settings to be updated"
+          }
+        ],
+        "requestBody": {
+          "description": "The settings configurations",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/ProvidersSettings"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The settings were updated"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-key",
+        "description": "The API Key"
+      },
+      "ApiSecret": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-secret",
+        "description": "The API Secret"
+      },
+      "JanisClient": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-client",
+        "description": "The Client Code"
+      }
+    },
+    "parameters": {
+      "id": {
+        "name": "id",
+        "in": "path",
+        "schema": {
+          "type": "string",
+          "example": "d555345345345as67a342a"
+        },
+        "required": true,
+        "description": "The unique identifier of the item"
+      },
+      "ListSortDirection": {
+        "name": "sortDirection",
+        "in": "query",
+        "description": "The direction to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
+        }
+      },
+      "ListPageNumber": {
+        "name": "x-janis-page",
+        "in": "header",
+        "description": "The page to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "default": 1
+        }
+      },
+      "ListPageSize": {
+        "name": "x-janis-page-size",
+        "in": "header",
+        "description": "The page size to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "default": 60
+        }
+      },
+      "JanisEntity": {
+        "name": "janis-entity",
+        "in": "header",
+        "description": "The entity name",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      }
+    },
+    "headers": {
+      "x-janis-total": {
+        "description": "The total amount of records in the list",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "responses": {
+      "SuccessCreateResponse": {
+        "description": "The item was created",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "SuccessUpdateResponse": {
+        "description": "The item was updated",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "GenericSuccess": {
+        "description": "Operation succeeded",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "BadRequest": {
+        "description": "A client error has ocurred.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Authentication missing or invalid",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Not authorized request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ServiceLimitReached": {
+        "description": "A service limit was reached. Try again later.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "InternalError": {
+        "description": "A server error has ocurred."
+      },
+      "AddressGeocoded_API": {
+        "description": "The address was geocoded successfully",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "latitude": {
+                  "description": "The location latitude",
+                  "type": "number",
+                  "minimum": -90,
+                  "maximum": 90
+                },
+                "longitude": {
+                  "description": "The location longitude",
+                  "type": "number",
+                  "minimum": -180,
+                  "maximum": 180
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "id": {
+        "description": "The unique identifier of the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "d555345345345as67a342a"
+      },
+      "status": {
+        "description": "The item status",
+        "type": "string",
+        "default": "active",
+        "enum": [
+          "active",
+          "inactive"
+        ],
+        "example": "active"
+      },
+      "dateCreated": {
+        "description": "The date of creation",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-12T19:00:00.000Z"
+      },
+      "dateModified": {
+        "description": "The date of the last modification",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-20T19:00:00.000Z"
+      },
+      "dateCreatedDay": {
+        "description": "The day of creation",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-08-07T16:00:00.000Z"
+      },
+      "dateModifiedDay": {
+        "description": "The day of last modification",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-08-07T16:00:00.000Z"
+      },
+      "userCreated": {
+        "description": "The ID of the user who created the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "6a1fc1eeb5b68406e0487a10"
+      },
+      "userModified": {
+        "description": "The ID of the user who last modified the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "7e1fc1eeb5b68406e048796"
+      },
+      "CompleteAddress": {
+        "type": "object",
+        "properties": {
+          "countryCode": {
+            "description": "The 3-digit country code",
+            "type": "string",
+            "example": "ARG"
+          },
+          "state": {
+            "description": "The state of the address",
+            "type": "string",
+            "example": "Santa Fe"
+          },
+          "city": {
+            "description": "The city of the address",
+            "type": "string",
+            "example": "Rosario"
+          },
+          "neighborhood": {
+            "description": "The neighborhood of the address",
+            "type": "string",
+            "example": "Centro"
+          },
+          "street": {
+            "description": "The street of the address",
+            "type": "string",
+            "example": "Dorrego"
+          },
+          "streetNumber": {
+            "description": "The street number of the address",
+            "type": "string",
+            "example": "965"
+          },
+          "complement": {
+            "type": "string",
+            "description": "A complement of the address (floor, apartment number, etc)",
+            "example": "Piso 1"
+          },
+          "postalCode": {
+            "type": "string",
+            "description": "The postal code",
+            "example": "S2000"
+          },
+          "geolocation": {
+            "description": "The location expressed in coordinates. First element is longitude, second is latitude.",
+            "type": "array",
+            "items": {
+              "type": "number",
+              "description": "The coordinate"
+            },
+            "minItems": 2,
+            "maxItems": 2,
+            "example": [
+              -32.946572,
+              -60.649497
+            ]
+          },
+          "formattedAddress": {
+            "description": "A human-readable string representing the address",
+            "type": "string",
+            "example": "Dorrego 965 Piso 1, S2000 Rosario, Santa Fe, Argentina"
+          }
+        }
+      },
+      "AddressToGeocode_API": {
+        "type": "object",
+        "description": "The address you want to geocode.\n\nIn addition to required fields, you must provide two of the following: state, city and neighborhood.\n",
+        "properties": {
+          "country": {
+            "type": "string",
+            "description": "The ISO2, ISO3 or full name of the country",
+            "example": "ARG"
+          },
+          "state": {
+            "type": "string",
+            "description": "The state name",
+            "example": "Ciudad Autónoma de Buenos Aires",
+            "nullable": true
+          },
+          "city": {
+            "type": "string",
+            "description": "The city name",
+            "example": "Ciudad Autónoma de Buenos Aires",
+            "nullable": true
+          },
+          "neighborhood": {
+            "type": "string",
+            "description": "The neighborhood name",
+            "example": "Palermo",
+            "nullable": true
+          },
+          "streetName": {
+            "type": "string",
+            "description": "The street name",
+            "example": "Costa Rica",
+            "nullable": true
+          },
+          "streetNumber": {
+            "type": "string",
+            "description": "The street number",
+            "example": "4988",
+            "nullable": true
+          },
+          "postalCode": {
+            "type": "string",
+            "description": "The postal code",
+            "example": "1425",
+            "nullable": true
+          }
+        },
+        "required": [
+          "country",
+          "streetName"
+        ]
+      },
+      "ProvidersSettings": {
+        "type": "object",
+        "description": "Google Maps Settings",
+        "properties": {
+          "googleMapsApiKey": {
+            "type": "string",
+            "description": "This is the API Key provided by Google Maps to use their services",
+            "example": "xxxxxx-xxxxxxxxxxxxxxxxxxxxx"
+          }
+        }
+      },
+      "listenerEvent": {
+        "description": "A JANIS Event object",
+        "type": "object",
+        "properties": {
+          "service": {
+            "description": "The source service name",
+            "type": "string",
+            "example": "id"
+          },
+          "entity": {
+            "description": "The event related entity",
+            "type": "string",
+            "example": "profile"
+          },
+          "event": {
+            "description": "The event name",
+            "type": "string",
+            "example": "created"
+          },
+          "client": {
+            "description": "The source event client",
+            "type": "string",
+            "example": "fizzmod"
+          },
+          "id": {
+            "description": "The event related entity ID",
+            "type": "string",
+            "example": "5d699c1ae8ebb95eaa24aca9"
+          }
+        },
+        "required": [
+          "service",
+          "entity",
+          "event"
+        ]
+      },
+      "CoordinateToDistance": {
+        "type": "object",
+        "description": "The coordinate",
+        "properties": {
+          "lat": {
+            "description": "The location latitude",
+            "type": "number",
+            "example": -40
+          },
+          "lng": {
+            "description": "The location longitude",
+            "type": "number",
+            "example": -10
+          }
+        }
+      },
+      "DistanceRequestBody": {
+        "type": "object",
+        "description": "The origin and destination coordinates to calculate the distance",
+        "properties": {
+          "origin": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CoordinateToDistance"
+              }
+            ],
+            "description": "The origin coordinate"
+          },
+          "destinations": {
+            "type": "array",
+            "description": "The destination coordinates",
+            "items": {
+              "$ref": "#/components/schemas/CoordinateToDistance"
+            }
+          },
+          "additionalSettings": {
+            "type": "object",
+            "description": "Additional settings for the request. See [https://developers.google.com/maps/documentation/routes/reference/rest/v2/TopLevel/computeRoutes]",
+            "properties": {
+              "travelMode": {
+                "type": "string",
+                "description": "The travel mode. See [https://developers.google.com/maps/documentation/routes/reference/rest/v2/RouteTravelMode]",
+                "enum": [
+                  "DRIVE",
+                  "WALK",
+                  "BICYCLE",
+                  "TRANSIT",
+                  "TWO_WHEELER"
+                ],
+                "example": "DRIVE"
+              },
+              "routingPreference": {
+                "type": "string",
+                "description": "The routing preference. See [https://developers.google.com/maps/documentation/routes/reference/rest/v2/RoutingPreference]",
+                "enum": [
+                  "TRAFFIC_UNAWARE",
+                  "TRAFFIC_AWARE",
+                  "TRAFFIC_AWARE_OPTIMAL"
+                ],
+                "example": "TRAFFIC_UNAWARE"
+              },
+              "trafficModel": {
+                "type": "string",
+                "description": "The traffic model. See [https://developers.google.com/maps/documentation/routes/reference/rest/v2/TrafficModel]",
+                "enum": [
+                  "BEST_GUESS",
+                  "OPTIMISTIC",
+                  "PESSIMISTIC"
+                ],
+                "example": "BEST_GUESS"
+              }
+            }
+          }
+        },
+        "required": [
+          "origin",
+          "destinations"
+        ]
+      },
+      "DistanceResponse": {
+        "type": "object",
+        "description": "The distance was calculated successfully",
+        "properties": {
+          "distance": {
+            "description": "\nTotal distance between the point of origin and the different destination points.\n\n> The distance is represented in the unit of measurement `meters`.\n",
+            "type": "number",
+            "example": 1000
+          },
+          "duration": {
+            "description": "\nTotal duration between the point of origin and the different destination points.\n\n> The duration is represented in the unit of time `seconds`.\n",
+            "type": "number",
+            "example": 145
+          },
+          "legs": {
+            "type": "array",
+            "description": "The legs of the route",
+            "items": {
+              "type": "object",
+              "properties": {
+                "distance": {
+                  "type": "number",
+                  "description": "The distance in meters between the start and end point",
+                  "example": 340
+                },
+                "duration": {
+                  "type": "number",
+                  "description": "The duration in seconds between the start and end point",
+                  "example": 15
+                },
+                "start": {
+                  "type": "object",
+                  "description": "The coordinates of the start point",
+                  "properties": {
+                    "original": {
+                      "allOf": [
+                        {
+                          "$ref": "#/components/schemas/CoordinateToDistance"
+                        }
+                      ],
+                      "description": "The original coordinates sent"
+                    },
+                    "suggested": {
+                      "allOf": [
+                        {
+                          "$ref": "#/components/schemas/CoordinateToDistance"
+                        }
+                      ],
+                      "description": "The suggested coordinates by Google Maps API"
+                    }
+                  }
+                },
+                "end": {
+                  "type": "object",
+                  "description": "The coordinates of the end point",
+                  "properties": {
+                    "original": {
+                      "allOf": [
+                        {
+                          "$ref": "#/components/schemas/CoordinateToDistance"
+                        }
+                      ],
+                      "description": "The original coordinates sent"
+                    },
+                    "suggested": {
+                      "allOf": [
+                        {
+                          "$ref": "#/components/schemas/CoordinateToDistance"
+                        }
+                      ],
+                      "description": "The suggested coordinates by Google Maps API"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "AddressRequestBody": {
+        "type": "object",
+        "description": "The address to format with details",
+        "properties": {
+          "address": {
+            "type": "string",
+            "description": "The address",
+            "example": "Costa Rica 4988 Piso 1, Palermo"
+          }
+        },
+        "required": [
+          "address"
+        ]
+      },
+      "AddressToGeocode": {
+        "type": "object",
+        "description": "The address you want to geocode.\n\nIn addition to required fields, you **must** provide at least two of the following fields: `state`, `city` and `neighborhood`.\n\nThe more fields are received, the more accurate geocoding will be. Sending the `country` is recommended to avoid false positives of similar addresses in different regions.\n",
+        "properties": {
+          "country": {
+            "type": "string",
+            "description": "The ISO2, ISO3 or full name of the country",
+            "example": "ARG"
+          },
+          "state": {
+            "type": "string",
+            "description": "The state name",
+            "example": "Ciudad Autónoma de Buenos Aires",
+            "nullable": true
+          },
+          "city": {
+            "type": "string",
+            "description": "The city name",
+            "example": "Ciudad Autónoma de Buenos Aires",
+            "nullable": true
+          },
+          "neighborhood": {
+            "type": "string",
+            "description": "The neighborhood name",
+            "example": "Palermo",
+            "nullable": true
+          },
+          "streetName": {
+            "type": "string",
+            "description": "The street name",
+            "example": "Costa Rica",
+            "nullable": true
+          },
+          "streetNumber": {
+            "type": "string",
+            "description": "The street number (as a string)",
+            "example": "4988",
+            "nullable": true
+          },
+          "postalCode": {
+            "type": "string",
+            "description": "The postal code",
+            "example": "1425",
+            "nullable": true
+          }
+        },
+        "required": [
+          "country",
+          "streetName"
+        ]
+      },
+      "GeocodingResult": {
+        "type": "object",
+        "description": "The address was geocoded successfully",
+        "properties": {
+          "latitude": {
+            "description": "The location latitude",
+            "type": "number",
+            "minimum": -90,
+            "maximum": 90
+          },
+          "longitude": {
+            "description": "The location longitude",
+            "type": "number",
+            "minimum": -180,
+            "maximum": 180
+          },
+          "source": {
+            "description": "The source of the geocoding result.",
+            "type": "string",
+            "enum": [
+              "gmaps",
+              "cache"
+            ],
+            "example": "gmaps"
+          }
+        }
+      },
+      "Coordinates": {
+        "type": "object",
+        "description": "The coordinate",
+        "properties": {
+          "lat": {
+            "description": "The location latitude",
+            "type": "number",
+            "example": -40
+          },
+          "lng": {
+            "description": "The location longitude",
+            "type": "number",
+            "example": -10
+          }
+        }
+      },
+      "OptimizeRequestBody": {
+        "type": "object",
+        "description": "The origin, intermediates and destination coordinates to optimize",
+        "properties": {
+          "origin": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Coordinates"
+              }
+            ],
+            "description": "The origin coordinate"
+          },
+          "intermediates": {
+            "type": "array",
+            "description": "The intermediate coordinates",
+            "items": {
+              "$ref": "#/components/schemas/Coordinates"
+            }
+          },
+          "destination": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Coordinates"
+              }
+            ],
+            "description": "The destination coordinate"
+          }
+        },
+        "required": [
+          "origin",
+          "intermediates",
+          "destination"
+        ]
+      },
+      "OptimizeResponse": {
+        "type": "object",
+        "description": "The response of the optimized route",
+        "properties": {
+          "origin": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Coordinates"
+              }
+            ],
+            "description": "The origin coordinate"
+          },
+          "intermediates": {
+            "type": "array",
+            "description": "The intermediate coordinates in the optimized order",
+            "items": {
+              "$ref": "#/components/schemas/Coordinates"
+            }
+          },
+          "destination": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Coordinates"
+              }
+            ],
+            "description": "The destination coordinate"
+          },
+          "optimizedIntermediatesIndex": {
+            "type": "array",
+            "description": "The index of the intermediate coordinates in the optimized order",
+            "items": {
+              "type": "number"
+            },
+            "example": [
+              1,
+              0,
+              2
+            ]
+          },
+          "optimized": {
+            "type": "boolean",
+            "description": "Determines if the route was optimized",
+            "example": true
+          }
+        }
+      }
+    }
+  }
+}

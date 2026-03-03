@@ -1,0 +1,372 @@
+-- DROP PROCEDURE dl_sp_temporal.sp_alerta_mayorista();
+
+CREATE OR REPLACE PROCEDURE dl_sp_temporal.sp_alerta_mayorista()
+	LANGUAGE plpgsql
+AS $$
+	
+	
+
+
+
+declare
+	fechaini_act	int;
+	fechafin_act	int;
+	fechaini_act_v	varchar;
+	fechafin_act_v	varchar;
+
+begin
+	fechaini_act	:=	cast(to_char(convert_timezone('GMT','GMT+5',getdate()),'yyyymmdd') as int); ---cast(to_char(dateadd(month,-1,dateadd(day,-1,convert_timezone('GMT','GMT+5',getdate()))),'yyyymm') as int); ---GETDATE()
+	fechafin_act	:=	cast(to_char(convert_timezone('GMT','GMT+5',getdate()),'yyyymmdd') as int);
+	fechaini_act_v	:=	to_char(convert_timezone('GMT','GMT+5',getdate()),'yyyymmdd');
+	fechafin_act_v	:=	to_char(convert_timezone('GMT','GMT+5',getdate()),'yyyymmdd');
+	
+
+
+---IF OBJECT_ID('tempdb..#fecha_act') is not null drop table #fecha_act
+drop table if exists #fecha_act;
+select SK_DIA as codfecha,sk_Semana Semana,desc_abrv_dia_sem as NOM_DIA,SK_DIA_ANIO_ANT into #fecha_act 
+---from [G200603SVHB5\IC_DW].DW_CENCOFCIC.DBO.DIM_DIA
+from dl_sp_maestras.dim_dia
+where SK_DIA>=fechaini_act and SK_DIA<=fechafin_act;
+
+---create nonclustered index ix_codfecha on #fecha_act(codfecha)
+
+---IF OBJECT_ID('tempdb..#PEDIDOS') is not null drop table #PEDIDOS
+drop table if exists #PEDIDOS;
+select CreationDate,SUBSTRING(TO_CHAR(a.CreationDate, 'YYYYMMDD'),5,2)MES
+        ,SEMANA
+        ,SUBSTRING(TO_CHAR(CreationDate, 'YYYYMMDD'),7,2)DIA 
+         , ClientDocument DNI
+        , ReferenceCode COD_MAT
+        , right('000000000000000000' + ReferenceCode,18)COD_MATERIAL
+        , ordernum VTEX_ID
+        ,SKUName MATERIAL 
+        ,SUM (Quantity_SKU) Q_SKU
+        , SUM(SKUTotalPrice * Quantity_SKU)VENTA_BRUTA
+        ,CASE WHEN  (SellerName in ('wongfood','metrofood','app','appmetro')or SellerName like '%wongiot%' or SellerName like '%metroios%' or SellerName like '%metroioh%')
+         then 'TIENDA' else 'ALMACEN' end as OPERACION
+        ,CASE WHEN (SellerName NOT IN ('wongfood','metrofood','appmetro','app') AND SellerName NOT like '%wongiot%' AND SellerName NOT like '%metroios%' AND  SellerName NOT like '%metroioh%') AND (HOST LIKE '%metro%' or HOST='appmetro')  THEN 'S129' 
+         WHEN (SellerName NOT IN ('wongfood','metrofood','appmetro','app') AND SellerName NOT like '%wongiot%' AND SellerName NOT like '%metroios%' AND  SellerName NOT like '%metroioh%')AND (HOST LIKE '%wong%' OR HOST='app') THEN 'T129'
+         WHEN SUBSTRING(COURRIER,1,4) = 'TH12' THEN 'W101' 
+         ELSE SUBSTRING (COURRIER,1,4) END COD_TIENDA
+        ,CASE WHEN  UtmSource like '%AppMetro%' or UtmSource like '%AppWong%' THEN 'APP' ELSE 'WEB' END CANAL_ECO
+        ,CASE WHEN  COURRIER LIKE '%REC%' OR COURRIER LIKE '%RETIRO%' OR  COURRIER LIKE '%AUTO%' THEN 'RETIRO EN TIENDA' ELSE 'DELIVERY' END DESPACHO 
+        ,prime_order
+        ,sellerorderid
+        ,shippingvalue Pago_Delivery
+        ,corporatedocument
+        ,statusorder
+into #PEDIDOS
+---from [G200603SVHB8\IC_DATOS].ODS.[dbo].[ECO_OMS] a WITH(NOLOCK)
+from stg_ecommerce_vtex.eco_oms a
+inner join #fecha_act b on TO_CHAR(a.CreationDate, 'YYYYMMDD') = b.codfecha
+and StatusOrder not in ('',' ')
+WHERE quantity_sku<>0 AND  Courrier not in ('Transportadora Donación','Transportadora Donacion') 
+group by CreationDate,SUBSTRING(TO_CHAR(a.CreationDate, 'YYYYMMDD'),5,2)
+        ,SEMANA
+        ,SUBSTRING(TO_CHAR(CreationDate, 'YYYYMMDD'),7,2) 
+        ,ClientDocument 
+        , ReferenceCode 
+        , right('000000000000000000' + ReferenceCode,18)
+        , ordernum 
+        ,SKUName  
+        ,CASE WHEN  (SellerName in ('wongfood','metrofood','app','appmetro')or SellerName like '%wongiot%' or SellerName like '%metroios%' or SellerName like '%metroioh%')
+         then 'TIENDA' else 'ALMACEN' end
+        ,CASE WHEN (SellerName NOT IN ('wongfood','metrofood','appmetro','app') AND SellerName NOT like '%wongiot%' AND SellerName NOT like '%metroios%' AND  SellerName NOT like '%metroioh%') AND (HOST LIKE '%metro%' or HOST='appmetro')  THEN 'S129' 
+         WHEN (SellerName NOT IN ('wongfood','metrofood','appmetro','app') AND SellerName NOT like '%wongiot%' AND SellerName NOT like '%metroios%' AND  SellerName NOT like '%metroioh%')AND (HOST LIKE '%wong%' OR HOST='app') THEN 'T129'
+         WHEN SUBSTRING(COURRIER,1,4) = 'TH12' THEN 'W101' 
+         ELSE SUBSTRING (COURRIER,1,4) END 
+        ,CASE WHEN  UtmSource like '%AppMetro%' or UtmSource like '%AppWong%' THEN 'APP' ELSE 'WEB' END  
+        ,CASE WHEN  COURRIER LIKE '%REC%' OR COURRIER LIKE '%RETIRO%' OR  COURRIER LIKE '%AUTO%' THEN 'RETIRO EN TIENDA' ELSE 'DELIVERY' END
+        ,prime_order
+        ,sellerorderid
+        ,shippingvalue 
+        ,corporatedocument
+        ,statusorder;
+ 
+Update #PEDIDOS
+set DNI=corporatedocument
+where DNI IS null;
+
+
+---DECLARE sql as varchar(max)
+---DECLARE sql_wong_io as varchar(max)
+---DECLARE sql_metro_io as varchar(max)
+
+---SET sql = '
+---if OBJECT_ID(''tempdb..##mayoristas_estados_prime_legado_sql'') is not null drop table ##mayoristas_estados_prime_legado_sql
+drop table if exists ##mayoristas_estados_prime_legado_sql;
+---SELECT * 
+---into ##mayoristas_estados_prime_legado_sql
+---FROM OPENQUERY([JANIS_1],''
+SELECT
+	 ---convert_tz(FROM_UNIXTIME(O.date_created),''''GMT'''',''''-05:00'''') AS FechaPedido,
+	 to_char(from_unixtime_janis(O.date_created),'yyyymmdd') as FechaPedido,
+     O.seq_id AS Pedido,
+     O.vtex_id as vtex_id ,
+     seller_ecom_id as Seller,
+     O.status AS statusOrder
+into ##mayoristas_estados_prime_legado_sql
+FROM stg_ecommerce_janis_legacy.wms_orders O
+where to_char(from_unixtime_janis(O.date_created)	,'yyyymmdd') >= fechaini_act_v
+and to_char(from_unixtime_janis(O.date_created)	,'yyyymmdd') <= fechafin_act_v;
+---WHERE DATE_FORMAT(convert_tz(FROM_UNIXTIME(O.date_created),''''GMT'''',''''-05:00''''),''''%Y%m%d'''') >='''''+fechaini_act+''''' AND 
+---	DATE_FORMAT(convert_tz(FROM_UNIXTIME(O.date_created),''''GMT'''',''''-05:00''''),''''%Y%m%d'''') <='''''+ fechafin_act+'''''
+---'')'
+
+--print(sql)
+---exec(sql)
+
+
+---SET sql_wong_io = '
+---if OBJECT_ID(''tempdb..##mayoristas_estados_prime_legado_wong_io_sql'') is not null drop table ##mayoristas_estados_prime_legado_wong_io_sql
+drop table if exists ##mayoristas_estados_prime_legado_wong_io_sql;
+---SELECT * 
+---into ##mayoristas_estados_prime_legado_wong_io_sql
+---FROM OPENQUERY([JANIS_WONG_IO],''
+SELECT
+	 ---convert_tz(FROM_UNIXTIME(O.date_created),''''GMT'''',''''-05:00'''') AS FechaPedido,
+	 to_char(from_unixtime_janis(O.date_created),'yyyymmdd') as FechaPedido,
+     O.seq_id AS Pedido,
+     O.vtex_id as vtex_id ,
+     seller_ecom_id as Seller,
+     O.status AS statusOrder
+into ##mayoristas_estados_prime_legado_wong_io_sql
+FROM stg_ecommerce_janis_wongio.wms_orders O
+where to_char(from_unixtime_janis(O.date_created)	,'yyyymmdd') >= fechaini_act_v
+and to_char(from_unixtime_janis(O.date_created)	,'yyyymmdd') <= fechafin_act_v;
+---WHERE DATE_FORMAT(convert_tz(FROM_UNIXTIME(O.date_created),''''GMT'''',''''-05:00''''),''''%Y%m%d'''') >='''''+fechaini_act+''''' AND 
+---	DATE_FORMAT(convert_tz(FROM_UNIXTIME(O.date_created),''''GMT'''',''''-05:00''''),''''%Y%m%d'''') <='''''+ fechafin_act+''''' 
+---'')'
+
+
+--print(sql)
+---exec(sql_wong_io)
+
+---SET sql_metro_io = '
+---if OBJECT_ID(''tempdb..##mayoristas_estados_prime_legado_metro_io_sql'') is not null drop table ##mayoristas_estados_prime_legado_metro_io_sql
+drop table if exists ##mayoristas_estados_prime_legado_metro_io_sql;
+---SELECT * 
+---into ##mayoristas_estados_prime_legado_metro_io_sql
+---FROM OPENQUERY([JANIS_METRO_IO],''
+SELECT
+	 ---convert_tz(FROM_UNIXTIME(O.date_created),''''GMT'''',''''-05:00'''') AS FechaPedido,
+	 to_char(from_unixtime_janis(O.date_created),'yyyymmdd') as FechaPedido,
+     O.seq_id AS Pedido,
+     O.vtex_id as vtex_id ,
+     seller_ecom_id as Seller,
+     O.status AS statusOrder
+into ##mayoristas_estados_prime_legado_metro_io_sql
+FROM stg_ecommerce_janis_metroio.wms_orders O
+where to_char(from_unixtime_janis(O.date_created)	,'yyyymmdd') >= fechaini_act_v
+and to_char(from_unixtime_janis(O.date_created)	,'yyyymmdd') <= fechafin_act_v;
+---WHERE DATE_FORMAT(convert_tz(FROM_UNIXTIME(O.date_created),''''GMT'''',''''-05:00''''),''''%Y%m%d'''') >='''''+fechaini_act+''''' AND 
+---	DATE_FORMAT(convert_tz(FROM_UNIXTIME(O.date_created),''''GMT'''',''''-05:00''''),''''%Y%m%d'''') <='''''+ fechafin_act+''''' 
+
+---'')'
+
+--print(sql)
+---exec(sql_metro_io)
+
+---IF OBJECT_ID('tempdb..#data_janis') is not null drop table #data_janis
+drop table if exists #data_janis;
+SELECT *, FECHAPEDIDO FECHA_PEDIDO INTO #data_janis FROM ##mayoristas_estados_prime_legado_sql
+UNION ALL
+SELECT *, FECHAPEDIDO FECHA_PEDIDO FROM ##mayoristas_estados_prime_legado_metro_io_sql
+UNION ALL
+SELECT *, FECHAPEDIDO FECHA_PEDIDO FROM ##mayoristas_estados_prime_legado_wong_io_sql;
+
+
+ALTER TABLE #data_janis
+ADD DESC_ESTADO_ORDEN_ONLINE_AGRUPADO VARCHAR(200);
+ 
+UPDATE #data_janis
+SET DESC_ESTADO_ORDEN_ONLINE_AGRUPADO=B.DESC_ESTADO_ORDEN_ONLINE_AGRUPADO            
+FROM  #data_janis A INNER JOIN  dl_sp_maestras.dim_estado_orden_online B  ON A.statusOrder = B.SK_ESTADO_ORDEN_ONLINE;
+
+---IF OBJECT_ID('tempdb..#PEDIDOS_T129') is not null drop table #PEDIDOS_T129
+drop table if exists #PEDIDOS_T129;
+SELECT DISTINCT N_Ped_eCommerce Seller
+	,SUBSTRING(N_Ped_eCommerce,5,21)VTEX_ID
+	,ESTADO
+	,Fec_Pedido FECHA_PEDIDO
+	, DESC_ESTADO_ORDEN_ONLINE_AGRUPADO
+INTO #PEDIDOS_T129	
+---FROM [ODS].[dbo].[Transacciones_T129]  A
+from per_super_pd_int.transacciones_nonfood A
+    INNER JOIN #fecha_act C ON A.Fec_Pedido=C.CODFECHA
+	LEFT JOIN dl_sp_maestras.dim_estado_orden_online B ON A.ESTADO = B.DESC_ESTADO_ORDEN_ONLINE
+WHERE COD_MATERIAL <> 'FLETE ECOMMERCE';
+
+   
+---IF OBJECT_ID('tempdb..#estados_prime_ORIGEN') is not null drop table #estados_prime_ORIGEN
+drop table if exists #estados_prime_ORIGEN;
+SELECT DISTINCT FECHA_PEDIDO,SELLER,VTEX_ID,DESC_ESTADO_ORDEN_ONLINE_AGRUPADO INTO #estados_prime_ORIGEN 
+FROM #data_janis
+UNION ALL
+SELECT DISTINCT FECHA_PEDIDO,SELLER,VTEX_ID, DESC_ESTADO_ORDEN_ONLINE_AGRUPADO 
+FROM #PEDIDOS_T129;
+ 
+ALTER TABLE #PEDIDOS
+ADD ESTADO_AGRUPADO VARCHAR(100);
+
+UPDATE #PEDIDOS
+SET ESTADO_AGRUPADO=DESC_ESTADO_ORDEN_ONLINE_AGRUPADO
+FROM  #PEDIDOS A INNER JOIN #estados_prime_ORIGEN B ON A.VTEX_ID=B.VTEX_ID;
+
+---DETAILS MATERIAL
+	SELECT ID_MATERIAL,ID_EAN_PRINCIPAL,A.SK_DIA_CREACION_MATERIAL,DESC_MATERIAL,DESC_MARCA,ID_UM_BASE,ID_PROVEEDOR,DESC_PROVEEDOR,
+	ID_GRUPO_ARTICULO,DESC_GRUPO_ARTICULO,ID_CATEGORIA,DESC_CATEGORIA,DESC_JEFE_CATEGORIA,DESC_JEFE_CATEGORIA_MP,DESC_JEFE_CATEGORIA_IMP,ID_SUB_CATEGORIA,DESC_SUB_CATEGORIA,ID_SECCION,DESC_SECCION,ID_DEPARTAMENTO,DESC_DEPARTAMENTO,ID_AREA,DESC_AREA,ID_GERENCIA_COMERCIAL,DESC_GERENCIA_COMERCIAL,ID_GERENTE,DESC_GERENTE,
+	DESC_UNIDAD_NEGOCIO,E.SK_CATEGORIA,A.SK_MATERIAL,B.SK_MARCA,ID_TIPO_IGV
+	INTO #MATERIALES_UNIDO 
+	FROM dl_sp_capa_semantica.dw_cencofcic_dim_material A
+	INNER JOIN dl_sp_capa_semantica.dw_cencofcic_dim_marca B ON A.SK_MARCA=B.SK_MARCA
+	INNER JOIN dl_sp_capa_semantica.dw_cencofcic_dim_proveedor C ON A.SK_PROVEEDOR=C.SK_PROVEEDOR
+	INNER JOIN dl_sp_maestras.dim_grupo_articulo D ON A.SK_GRUPO_ARTICULO=D.SK_GRUPO_ARTICULO
+	INNER JOIN dl_sp_maestras.dim_categoria E ON D.SK_CATEGORIA=E.SK_CATEGORIA
+	INNER JOIN dl_sp_maestras.dim_jefe_categoria F ON D.SK_JEFE_CATEGORIA=F.SK_JEFE_CATEGORIA
+	INNER JOIN dl_sp_maestras.dim_jefe_categoria_mp G ON D.SK_JEFE_CATEGORIA_MP=G.SK_JEFE_CATEGORIA_MP
+	INNER JOIN dl_sp_maestras.dim_jefe_categoria_imp H ON D.SK_JEFE_CATEGORIA_IMP=H.SK_JEFE_CATEGORIA_IMP
+	INNER JOIN dl_sp_maestras.dim_sub_categoria I ON D.SK_SUB_CATEGORIA=I.SK_SUB_CATEGORIA
+	INNER JOIN dl_sp_maestras.dim_seccion J ON D.SK_SECCION=J.SK_SECCION
+	INNER join dl_sp_maestras.dim_departamento K ON D.SK_DEPARTAMENTO=K.SK_DEPARTAMENTO
+	INNER JOIN dl_sp_maestras.dim_area L ON D.SK_AREA=L.SK_AREA
+	INNER JOIN dl_sp_maestras.dim_gerencia_comercial M ON D.SK_GERENCIA_COMERCIAL=M.SK_GERENCIA_COMERCIAL
+	INNER JOIN dl_sp_maestras.dim_gerente N ON D.SK_GERENTE=N.SK_GERENTE;
+	
+	drop table if exists #DETAILS_MATERIAL;
+	SELECT id_material as COD_MATERIAL,ID_EAN_PRINCIPAL as EAN,SK_DIA_CREACION_MATERIAL as FECHA_CREACION,DESC_MATERIAL,DESC_MARCA as MARCA
+	,ID_UM_BASE as UMB,ID_PROVEEDOR as COD_PROVEEDOR,DESC_PROVEEDOR,ID_GRUPO_ARTICULO as COD_GA,DESC_GRUPO_ARTICULO as GRUPO_ARTICULO,
+	ID_CATEGORIA as COD_CATEGORIA,DESC_CATEGORIA as CATEGORIA,DESC_JEFE_CATEGORIA JEFE_CATEGORIA
+	,DESC_JEFE_CATEGORIA_MP JEFE_CATEGORIA_MP,DESC_JEFE_CATEGORIA_IMP JEFE_CATEGORIA_IMP,
+	ID_SUB_CATEGORIA COD_SUB_CATEGORIA,DESC_SUB_CATEGORIA SUB_CATEGORIA,ID_SECCION COD_SECCION,DESC_SECCION SECCION,
+	ID_DEPARTAMENTO COD_DEPARTAMENTO,DESC_DEPARTAMENTO DEPARTAMENTO,ID_AREA COD_AREA,DESC_AREA AREAS,ID_GERENCIA_COMERCIAL COD_GERENCIA,
+	DESC_GERENCIA_COMERCIAL GERENCIA_COMERCIAL,ID_GERENTE COD_GERENTE,DESC_GERENTE GERENTE,DESC_UNIDAD_NEGOCIO UNIDAD_NEGOCIO,SK_CATEGORIA,SK_MATERIAL,SK_MARCA,ID_TIPO_IGV
+	INTO #DETAILS_MATERIAL 
+	FROM #MATERIALES_UNIDO;
+
+---
+
+
+---IF OBJECT_ID('tempdb..#PEDIDO_MAT')IS NOT NULL DROP TABLE #PEDIDO_MAT
+drop table if exists #PEDIDO_MAT;
+SELECT E.*,M.DESC_MATERIAL,M.MARCA,M.GRUPO_ARTICULO,M.CATEGORIA,GERENTE,M.UNIDAD_NEGOCIO UNIDAD_NEGOCIO
+,M.SECCION,M.DEPARTAMENTO,M.GERENCIA_COMERCIAL,ID_TIPO_IGV,
+CASE WHEN ID_TIPO_IGV IN (0,3,4,5) THEN VENTA_BRUTA ELSE VENTA_BRUTA/1.18  END as VENTA_NETA,
+CASE WHEN SK_CADENA=1 THEN 'WONG' WHEN SK_CADENA=2 THEN 'METRO' END CADENA 
+INTO #PEDIDO_MAT  FROM #PEDIDOS E
+LEFT JOIN #DETAILS_MATERIAL M  ON E.COD_MATERIAL=M.COD_MATERIAL
+LEFT JOIN dl_sp_maestras.dim_tienda B ON E.COD_TIENDA=B.ID_TIENDA;
+
+
+---DECLARE cab_folio as varchar(max)
+
+---SET cab_folio = '
+---if OBJECT_ID(''tempdb..##mayoristas_pedido_cab_folio'') is not null drop table ##mayoristas_pedido_cab_folio
+drop table if exists ##mayoristas_pedido_cab_folio;
+---SELECT * into ##mayoristas_pedido_cab_folio
+---FROM OPENQUERY(BI_CLOUD_DATALABS,''
+select sk_folio_online,cod_ticket_vtex 
+into ##mayoristas_pedido_cab_folio
+from dl_sp_capa_semantica.dw_cencofcic_dim_folio_online 
+---where sk_dia>='''''+fechaini_act+''''' AND sk_dia <='''''+ fechafin_act+''''' 
+where sk_dia >= fechaini_act and sk_dia <= fechafin_act;
+---'')'
+
+---exec(cab_folio)
+
+---DECLARE det_folio as varchar(max)
+
+---SET det_folio = '
+---if OBJECT_ID(''tempdb..##mayoristas_pedido_det_folio'') is not null drop table ##mayoristas_pedido_det_folio
+drop table if exists ##mayoristas_pedido_det_folio;
+---SELECT * into ##mayoristas_pedido_det_folio
+---FROM OPENQUERY(BI_CLOUD_DATALABS,''
+select sk_folio_online,sk_dia,sk_material,mto_margen_online 
+into ##mayoristas_pedido_det_folio
+from dl_sp_capa_semantica.dw_cencofcic_fact_pedido_cliente_promocion_online_mat 
+where sk_dia >= fechaini_act and sk_dia <= fechafin_act;
+---where sk_dia>='''''+fechaini_act+''''' AND sk_dia <='''''+ fechafin_act+''''' 
+---'')'
+
+---exec(det_folio)
+
+ALTER TABLE ##mayoristas_pedido_det_folio
+ADD SELLER_ORDER VARCHAR(50);
+
+UPDATE ##mayoristas_pedido_det_folio
+SET  SELLER_ORDER= cod_ticket_vtex
+FROM  ##mayoristas_pedido_det_folio A INNER JOIN  ##mayoristas_pedido_cab_folio B ON A.sk_folio_online=B.sk_folio_online;
+
+ALTER TABLE ##mayoristas_pedido_det_folio
+ADD COD_MATERIAL VARCHAR(50);
+
+UPDATE ##mayoristas_pedido_det_folio
+SET  COD_MATERIAL=B.COD_MATERIAL
+FROM  ##mayoristas_pedido_det_folio A INNER JOIN  #DETAILS_MATERIAL B ON A.SK_MATERIAL=B.SK_MATERIAL;
+
+
+ALTER TABLE #PEDIDO_MAT
+ADD MARGEN NUMERIC(14,2);
+
+UPDATE #PEDIDO_MAT
+SET  MARGEN= mto_margen_online
+FROM  #PEDIDO_MAT A INNER JOIN  ##mayoristas_pedido_det_folio B ON A.sellerorderid=B.SELLER_ORDER AND A.COD_MATERIAL=B.COD_MATERIAL;
+
+ALTER TABLE #PEDIDO_MAT
+ADD MARGEN_PORCENTUAL  NUMERIC(14,2);
+
+UPDATE #PEDIDO_MAT
+SET  MARGEN_PORCENTUAL= MARGEN/NULLIF(VENTA_NETA,0);
+
+DELETE FROM #PEDIDO_MAT
+WHERE MATERIAL LIKE '%Bolsa Compostable%';
+
+---IF OBJECT_ID('tempdb..#CLIENTES') is not null drop table #CLIENTES
+drop table if exists #CLIENTES;
+SELECT DISTINCT DNI,COUNT(DISTINCT VTEX_ID)TRX INTO #CLIENTES FROM #PEDIDO_MAT
+GROUP BY DNI;
+
+---IF OBJECT_ID('tempdb..#CLIENTES_SK_CLIENTE') is not null drop table #CLIENTES_SK_CLIENTE
+drop table if exists #CLIENTES_SK_CLIENTE;
+SELECT DISTINCT DNI,TRX,ROW_NUMBER()OVER(ORDER BY DNI) SK_CLIENTE INTO #CLIENTES_SK_CLIENTE FROM #CLIENTES;
+
+ALTER TABLE #PEDIDO_MAT
+ADD COD_CLIENTE VARCHAR(50);
+
+UPDATE #PEDIDO_MAT
+SET COD_CLIENTE=SK_CLIENTE
+FROM #PEDIDO_MAT A INNER JOIN #CLIENTES_SK_CLIENTE B ON A.DNI=B.DNI;
+
+---IF OBJECT_ID('tempdb..#CLIENTE_SKU') is not null drop table #CLIENTE_SKU
+drop table if exists #CLIENTE_SKU;
+SELECT DISTINCT CADENA,COD_CLIENTE,COD_MAT,MATERIAL,COUNT(DISTINCT VTEX_ID)TRX,SUM(Q_SKU)UNIDADES,SUM(VENTA_NETA)VENTA_NETA,SUM(MARGEN)MARGEN,SUM(MARGEN)/NULLIF(SUM(VENTA_NETA),0)MARGEN_PORCENTUAL
+,GRUPO_ARTICULO,CATEGORIA,GERENTE,UNIDAD_NEGOCIO,GERENCIA_COMERCIAL,OPERACION 
+INTO #CLIENTE_SKU
+FROM #PEDIDO_MAT
+--WHERE ESTADO_AGRUPADO IN ('ENTREGADO','EN PROCESO','PENDIENTE DE PICKING') 
+GROUP BY CADENA,COD_CLIENTE,COD_MAT,MATERIAL,GRUPO_ARTICULO,CATEGORIA,GERENTE,UNIDAD_NEGOCIO,GERENCIA_COMERCIAL,OPERACION 
+ORDER BY MARGEN asc;
+
+DROP TABLE if exists #CLIENTE_MAYORISTA;
+SELECT DISTINCT * INTO #CLIENTE_MAYORISTA FROM #CLIENTE_SKU
+WHERE UNIDADES>=12 AND GERENCIA_COMERCIAL LIKE '%FOOD ABARROTES%' AND OPERACION='TIENDA'  AND MARGEN_PORCENTUAL<-0.0  AND  UNIDAD_NEGOCIO NOT LIKE '%ELECTRO%'
+UNION ALL
+SELECT * FROM #CLIENTE_SKU
+WHERE UNIDADES>=3 AND UNIDAD_NEGOCIO LIKE '%ELECTRO%' AND MARGEN_PORCENTUAL<-0.0;
+
+DROP TABLE if exists dl_sp_temporal.CLIENTE_MAYORISTA_DETALLE;
+SELECT DISTINCT A.*, GETDATE() FECHA_ACT
+INTO dl_sp_temporal.CLIENTE_MAYORISTA_DETALLE 
+FROM #PEDIDO_MAT A 
+INNER JOIN #CLIENTE_MAYORISTA B ON A.COD_CLIENTE=B.COD_CLIENTE 
+AND A.COD_MAT=B.COD_MAT
+AND A.CADENA=B.CADENA;
+
+
+end
+
+
+$$
+;
+

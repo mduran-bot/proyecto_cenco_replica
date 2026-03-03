@@ -1,0 +1,123 @@
+{
+  "timestamp": "2026-02-25T15:37:51.545430",
+  "client": "metro",
+  "test_entities": [
+    "orders",
+    "order-items",
+    "products",
+    "skus",
+    "stock"
+  ],
+  "entity_to_gold_table": {
+    "orders": "wms_orders",
+    "order-items": "wms_order_items",
+    "products": "products",
+    "skus": "skus",
+    "stock": "stock"
+  },
+  "results": {
+    "bronze_to_silver": {
+      "orders": {
+        "status": "FAILED",
+        "reason": "Fixture file not found"
+      },
+      "order-items": {
+        "status": "FAILED",
+        "reason": "Fixture file not found"
+      },
+      "products": {
+        "status": "FAILED",
+        "reason": "Fixture file not found"
+      },
+      "skus": {
+        "status": "FAILED",
+        "reason": "Fixture file not found"
+      },
+      "stock": {
+        "status": "FAILED",
+        "reason": "Fixture file not found"
+      }
+    },
+    "silver_to_gold": {
+      "wms_orders": {
+        "status": "SKIPPED",
+        "reason": "Bronze\u2192Silver failed for orders"
+      },
+      "wms_order_items": {
+        "status": "SKIPPED",
+        "reason": "Bronze\u2192Silver failed for order-items"
+      },
+      "products": {
+        "status": "SKIPPED",
+        "reason": "Bronze\u2192Silver failed for products"
+      },
+      "skus": {
+        "status": "SKIPPED",
+        "reason": "Bronze\u2192Silver failed for skus"
+      },
+      "stock": {
+        "status": "SKIPPED",
+        "reason": "Bronze\u2192Silver failed for stock"
+      }
+    },
+    "validations": {
+      "wms_orders": {
+        "record_count_validation": "WARNING",
+        "counts": {
+          "bronze": 0,
+          "silver": 0,
+          "gold": 0
+        }
+      },
+      "wms_order_items": {
+        "record_count_validation": "WARNING",
+        "counts": {
+          "bronze": 0,
+          "silver": 0,
+          "gold": 0
+        }
+      },
+      "products": {
+        "record_count_validation": "WARNING",
+        "counts": {
+          "bronze": 0,
+          "silver": 0,
+          "gold": 0
+        }
+      },
+      "skus": {
+        "record_count_validation": "WARNING",
+        "counts": {
+          "bronze": 0,
+          "silver": 0,
+          "gold": 0
+        }
+      },
+      "stock": {
+        "record_count_validation": "WARNING",
+        "counts": {
+          "bronze": 0,
+          "silver": 0,
+          "gold": 0
+        }
+      }
+    }
+  },
+  "summary": {
+    "bronze_to_silver": {
+      "total": 5,
+      "successful": 0,
+      "success_rate": 0.0
+    },
+    "silver_to_gold": {
+      "total": 5,
+      "successful": 0,
+      "success_rate": 0.0
+    },
+    "validations": {
+      "total": 5,
+      "passed": 0,
+      "success_rate": 0.0
+    }
+  }
+}

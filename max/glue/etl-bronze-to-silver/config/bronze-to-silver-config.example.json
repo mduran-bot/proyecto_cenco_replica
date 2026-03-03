@@ -1,0 +1,220 @@
+{
+    "_comment": "Pipeline ETL Bronze-to-Silver - Configuración Parametrizable por Entidad",
+    "_description": "Este archivo es un template que se parametriza dinámicamente según el entity_type. Los valores se cargan desde entities_mapping.json y field_mappings.json.",
+    
+    "entity_config": {
+        "_comment": "Configuración específica de la entidad - Se carga dinámicamente desde entities_mapping.json",
+        "entity_type": "${entity_type}",
+        "_entity_type_description": "Tipo de entidad a procesar (orders, products, stock, etc.)",
+        "primary_key": "${primary_key}",
+        "_primary_key_description": "Campo(s) que identifican únicamente un registro. Ejemplo: ['id'] o ['order_id', 'item_id']",
+        "dedup_field": "${dedup_field}",
+        "_dedup_field_description": "Campo de timestamp usado para deduplicación. Se mantiene el registro más reciente.",
+        "required_fields": "${required_fields}",
+        "_required_fields_description": "Lista de campos que no deben ser NULL. Registros con nulls en estos campos se marcarán como críticos."
+    },
+    
+    "type_mappings": {
+        "_comment": "Conversiones de tipos MySQL → Redshift",
+        "unix_timestamp_to_iso8601": {
+            "_description": "Convierte BIGINT Unix timestamp a TIMESTAMP ISO 8601",
+            "source_type": "bigint",
+            "target_type": "timestamp",
+            "fields": ["dateCreated", "dateModified", "startPickingTime", "endPickingTime"],
+            "_example": "1706025600 → 2024-01-23T12:00:00Z"
+        },
+        "tinyint_to_boolean": {
+            "_description": "Convierte TINYINT(1) a BOOLEAN",
+            "source_type": "tinyint",
+            "target_type": "boolean",
+            "fields": ["hasInfiniteStock", "applyQuotation", "infiniteStock"],
+            "_example": "1 → true, 0 → false"
+        },
+        "decimal_to_numeric": {
+            "_description": "Convierte DECIMAL(12,9) a NUMERIC(12,9) preservando precisión",
+            "source_type": "decimal",
+            "target_type": "numeric",
+            "precision": 12,
+            "scale": 9,
+            "fields": ["lat", "lng"],
+            "_example": "-12.046374000 → -12.046374000"
+        },
+        "int_to_bigint": {
+            "_description": "Convierte INT a BIGINT para IDs",
+            "source_type": "int",
+            "target_type": "bigint",
+            "fields": ["id", "storeId", "customerId", "productId", "skuId"],
+            "_example": "123456 → 123456 (pero con rango mayor)"
+        },
+        "varchar_numeric_passthrough": {
+            "_description": "Mantiene VARCHAR con valores numéricos sin conversión",
+            "source_type": "varchar",
+            "target_type": "varchar",
+            "fields": ["phone", "postalCode", "documentNumber"],
+            "_example": "'12345' → '12345' (sin conversión a número)"
+        }
+    },
+    
+    "input": {
+        "_comment": "Configuración de la fuente de datos en la capa Bronze - Parametrizable",
+        "bucket": "${bronze_bucket}",
+        "_bucket_description": "Nombre del bucket S3 que contiene los datos raw en formato JSON. Se pasa como parámetro CLI.",
+        "prefix": "${client}/${bronze_prefix}/",
+        "_prefix_description": "Prefijo (carpeta) dentro del bucket. Formato: {client}/{entity_type}/ (ej: metro/orders/)",
+        "format": "json",
+        "_format_description": "Formato de los archivos de entrada. Actualmente solo soporta 'json'"
+    },
+    "output": {
+        "_comment": "Configuración de destino en la capa Silver (Apache Iceberg) - Parametrizable",
+        "database": "silver",
+        "_database_description": "Nombre de la base de datos Iceberg donde se escribirán las tablas",
+        "table": "${client}_${silver_table}",
+        "_table_description": "Nombre de la tabla Iceberg de destino. Formato: {client}_{entity_type}_clean (ej: metro_orders_clean)",
+        "partition_columns": [
+            "year",
+            "month",
+            "day"
+        ],
+        "_partition_columns_description": "Particionamiento temporal estándar para todas las entidades transaccionales"
+    },
+    "normalization": {
+        "_comment": "Configuración del módulo DataNormalizer - Estandariza formatos de datos",
+        "email_columns": [
+            "email",
+            "customer_email",
+            "email_contacto"
+        ],
+        "_email_columns_description": "Lista de columnas que contienen direcciones de email. Se convertirán a minúsculas",
+        "phone_columns": [
+            "phone",
+            "customer_phone",
+            "telefono_contacto"
+        ],
+        "_phone_columns_description": "Lista de columnas que contienen números de teléfono. Se eliminarán caracteres no numéricos",
+        "date_columns": [
+            "dateCreated",
+            "dateModified"
+        ],
+        "_date_columns_description": "Lista de columnas que contienen fechas. Se estandarizarán al formato yyyy-MM-dd",
+        "timestamp_columns": [
+            "dateCreated",
+            "dateModified",
+            "startPickingTime",
+            "endPickingTime"
+        ],
+        "_timestamp_columns_description": "Lista de columnas que contienen timestamps. Se estandarizarán al formato yyyy-MM-dd HH:mm:ss"
+    },
+    "duplicate_detection": {
+        "_comment": "Configuración del módulo DuplicateDetector - Usa entity_config.primary_key",
+        "key_columns": "${primary_key}",
+        "_key_columns_description": "Se carga dinámicamente desde entity_config.primary_key. Define la clave de negocio para detectar duplicados."
+    },
+    "conflict_resolution": {
+        "_comment": "Configuración del módulo ConflictResolver - Usa entity_config.dedup_field",
+        "timestamp_column": "${dedup_field}",
+        "_timestamp_column_description": "Se carga dinámicamente desde entity_config.dedup_field. Columna de timestamp para seleccionar el registro más reciente.",
+        "strategy": "most_recent",
+        "_strategy_description": "Estrategia de resolución: 'most_recent' (más reciente), 'least_nulls' (menos nulls), 'first' (primer registro)"
+    },
+    "data_gaps": {
+        "_comment": "Configuración del módulo DataGapHandler - Usa entity_config.required_fields",
+        "critical_columns": "${required_fields}",
+        "_critical_columns_description": "Se carga dinámicamente desde entity_config.required_fields. Columnas críticas que no deben tener valores null.",
+        "default_values": {
+            "status": "active"
+        },
+        "_default_values_description": "Valores por defecto genéricos. Valores específicos por entidad se definen en redshift_schemas.json",
+        "reject_incomplete": false,
+        "_reject_incomplete_description": "Si es true, los registros con brechas críticas serán filtrados. Si es false, se marcarán pero se mantendrán"
+    },
+    "type_conversion": {
+        "_comment": "Configuración del módulo DataTypeConverter - Usa type_mappings definidos arriba",
+        "enabled": true,
+        "_enabled_description": "Si es true, se aplicarán las conversiones de tipo definidas en type_mappings",
+        "inference_sample_size": 100,
+        "_inference_sample_size_description": "Número de registros a muestrear para inferir el tipo de dato de cada columna",
+        "inference_threshold": 0.9,
+        "_inference_threshold_description": "Porcentaje mínimo de valores que deben parsearse exitosamente para aplicar la conversión (0.0 a 1.0)",
+        "explicit_conversions": {
+            "_comment": "Conversiones explícitas por tipo de dato. Se aplican según type_mappings",
+            "timestamp_fields": ["dateCreated", "dateModified", "startPickingTime", "endPickingTime"],
+            "boolean_fields": ["hasInfiniteStock", "applyQuotation", "infiniteStock"],
+            "numeric_fields": ["lat", "lng"],
+            "bigint_fields": ["id", "storeId", "customerId", "productId", "skuId"]
+        },
+        "_explicit_conversions_description": "Conversiones explícitas de tipo agrupadas por categoría. Se cargan desde type_mappings."
+    },
+    "json_flattening": {
+        "_comment": "Configuración del módulo JSONFlattener - Aplana estructuras JSON anidadas",
+        "max_depth": 10,
+        "_max_depth_description": "Profundidad máxima de recursión para aplanar estructuras anidadas",
+        "explode_arrays": true,
+        "_explode_arrays_description": "Si es true, los arrays se explotarán en filas separadas. Si es false, se convertirán a strings JSON",
+        "separator": "_",
+        "_separator_description": "Carácter separador para nombres de columnas aplanadas. Ejemplo: 'cliente.nombre' se convierte en 'cliente_nombre'"
+    },
+    "data_cleaning": {
+        "_comment": "Configuración del módulo DataCleaner - Limpia datos",
+        "trim_strings": true,
+        "_trim_strings_description": "Si es true, elimina espacios en blanco al inicio y final de todos los strings",
+        "empty_to_null": true,
+        "_empty_to_null_description": "Si es true, convierte strings vacíos a valores null",
+        "fix_encoding": true,
+        "_fix_encoding_description": "Si es true, detecta y corrige problemas de encoding UTF-8"
+    },
+    "iceberg": {
+        "_comment": "Configuración específica de Apache Iceberg",
+        "catalog_type": "hadoop",
+        "_catalog_type_description": "Tipo de catálogo Iceberg: 'hadoop', 'hive', 'glue'",
+        "warehouse_path": "s3://data-lake-silver/iceberg",
+        "_warehouse_path_description": "Ruta S3 donde se almacenarán las tablas Iceberg",
+        "write_mode": "append",
+        "_write_mode_description": "Modo de escritura: 'append' (agregar), 'overwrite' (sobrescribir)",
+        "enable_schema_evolution": true,
+        "_enable_schema_evolution_description": "Si es true, permite agregar nuevas columnas automáticamente cuando el esquema cambia"
+    },
+    "logging": {
+        "_comment": "Configuración de logging y métricas",
+        "log_level": "INFO",
+        "_log_level_description": "Nivel de logging: 'DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'",
+        "cloudwatch_log_group": "/aws/glue/bronze-to-silver",
+        "_cloudwatch_log_group_description": "Grupo de logs de CloudWatch donde se escribirán los logs",
+        "enable_metrics": true,
+        "_enable_metrics_description": "Si es true, se registrarán métricas de cada etapa del pipeline en CloudWatch"
+    },
+    "performance": {
+        "_comment": "Configuración de rendimiento y optimización",
+        "spark_shuffle_partitions": 200,
+        "_spark_shuffle_partitions_description": "Número de particiones para operaciones de shuffle en Spark",
+        "enable_adaptive_query_execution": true,
+        "_enable_adaptive_query_execution_description": "Si es true, habilita la ejecución adaptativa de consultas de Spark",
+        "cache_intermediate_results": false,
+        "_cache_intermediate_results_description": "Si es true, cachea resultados intermedios en memoria (útil para debugging, consume más memoria)"
+    },
+    "_usage_notes": [
+        "1. Este archivo es un TEMPLATE parametrizable por entity_type",
+        "2. Los valores con ${variable} se reemplazan dinámicamente en tiempo de ejecución",
+        "3. La configuración específica de cada entidad se carga desde entities_mapping.json",
+        "4. Las conversiones de tipo se definen en la sección type_mappings",
+        "5. Para ejecutar: python run_pipeline_to_silver.py --entity-type orders --client metro",
+        "6. El script carga automáticamente primary_key, dedup_field y required_fields desde entities_mapping.json",
+        "7. Para testing local con LocalStack, asegúrate de que los buckets existan antes de ejecutar"
+    ],
+    "_entity_examples": {
+        "orders": {
+            "primary_key": ["id"],
+            "dedup_field": "dateModified",
+            "required_fields": ["id", "storeId", "dateCreated"]
+        },
+        "products": {
+            "primary_key": ["id"],
+            "dedup_field": "dateModified",
+            "required_fields": ["id", "name", "categoryId"]
+        },
+        "stock": {
+            "primary_key": ["id"],
+            "dedup_field": "dateModified",
+            "required_fields": ["id", "sku", "warehouse", "stock"]
+        }
+    }
+}

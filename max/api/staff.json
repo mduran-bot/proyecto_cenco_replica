@@ -1,0 +1,2212 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Staff Service",
+    "description": "Staff Service\n\n **Last update**: 22 ene 26, 10:20 a. m.",
+    "version": "1.2.0",
+    "x-logo": null,
+    "x-janis-keywords": [
+      "staff"
+    ],
+    "lastUpdate": "2026-01-22T13:20:17.185Z"
+  },
+  "tags": [
+    {
+      "name": "Client",
+      "description": "For managing Clients"
+    },
+    {
+      "name": "Shift",
+      "description": "For managing Shifts"
+    },
+    {
+      "name": "Work Log",
+      "description": "For managing Work Logs"
+    },
+    {
+      "name": "Work Log Type",
+      "description": "For managing Work Log Types"
+    },
+    {
+      "name": "Default Work Log Type",
+      "description": "For managing Default Work Log Types"
+    }
+  ],
+  "servers": [
+    {
+      "url": "https://staff.janis.in/api",
+      "description": "The Prod API server",
+      "variables": {
+        "environment": {
+          "default": "prod"
+        }
+      }
+    },
+    {
+      "url": "https://staff.janisqa.in/api",
+      "description": "The QA API server",
+      "variables": {
+        "environment": {
+          "default": "qa"
+        }
+      }
+    },
+    {
+      "url": "https://staff.janisdev.in/api",
+      "description": "The Beta API server",
+      "variables": {
+        "environment": {
+          "default": "beta"
+        }
+      }
+    },
+    {
+      "url": "http://staff.janis.localhost:3144/api",
+      "description": "The Local API server",
+      "variables": {
+        "environment": {
+          "default": "local"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/default-work-log-type/{id}": {
+      "get": {
+        "x-janis-namespace": "default-work-log-type",
+        "x-janis-method": "get",
+        "x-janis-permissions": [],
+        "operationId": "defaultWorkLogTypeGet",
+        "summary": "API to get a default work log type by id",
+        "description": "**IMPORTANT**: Although `janis-client` header is requested, the data is not retrieved by client\n",
+        "tags": [
+          "Default Work Log Type"
+        ],
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultWorkLogType"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "x-janis-namespace": "default-work-log-type",
+        "x-janis-method": "update",
+        "x-janis-permissions": [],
+        "operationId": "defaultWorkLogTypeUpdate",
+        "summary": "Update default work log type",
+        "description": "**IMPORTANT**: Although `janis-client` header is requested, the data is not retrieved by client\n",
+        "tags": [
+          "Default Work Log Type"
+        ],
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/DefaultWorkLogType"
+                  },
+                  {
+                    "required": [
+                      "referenceId"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessUpdateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/default-work-log-type": {
+      "get": {
+        "x-janis-namespace": "default-work-log-type",
+        "x-janis-method": "list",
+        "x-janis-permissions": [],
+        "operationId": "defaultWorkLogTypeList",
+        "tags": [
+          "Default Work Log Type"
+        ],
+        "summary": "Get a list of default work log types",
+        "description": "**IMPORTANT**: Although `janis-client` header is requested, the data is not retrieved by client\n",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/DefaultWorkLogTypeFilters"
+          },
+          {
+            "$ref": "#/components/parameters/DefaultWorkLogTypeSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultWorkLogTypeList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "x-janis-namespace": "default-work-log-type",
+        "x-janis-method": "create",
+        "x-janis-permissions": [],
+        "operationId": "defaultWorkLogTypeCreate",
+        "summary": "Create default work log type",
+        "description": "**IMPORTANT**: Although `janis-client` header is requested, the data is not retrieved by client\n",
+        "tags": [
+          "Default Work Log Type"
+        ],
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/DefaultWorkLogType"
+                  },
+                  {
+                    "required": [
+                      "type",
+                      "name",
+                      "status",
+                      "referenceId"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessCreateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/shift/{id}": {
+      "get": {
+        "x-janis-namespace": "shift",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "staff:shift:read"
+        ],
+        "x-janis-roles": [
+          "pickingPick"
+        ],
+        "operationId": "shiftGet",
+        "summary": "API to get a shift by id",
+        "description": "Returns a shift by id",
+        "tags": [
+          "Shift"
+        ],
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/OpenedShift"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ClosedShift"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/shift": {
+      "get": {
+        "x-janis-namespace": "shift",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "staff:shift:read"
+        ],
+        "x-janis-roles": [
+          "pickingPick"
+        ],
+        "operationId": "shiftList",
+        "tags": [
+          "Shift"
+        ],
+        "summary": "Get a list of shifts",
+        "description": "Returns a list of all shifts",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ShiftFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ShiftSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShiftList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/shift-close": {
+      "post": {
+        "x-janis-namespace": "shift",
+        "x-janis-method": "close",
+        "x-janis-permissions": [
+          "staff:shift:write"
+        ],
+        "x-janis-roles": [
+          "pickingPick"
+        ],
+        "operationId": "shiftClose",
+        "tags": [
+          "Shift"
+        ],
+        "summary": "Close an open shift",
+        "description": "Closes the currently open shift for the current user",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "endDate": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "The end date of the shift",
+                    "example": "2024-01-15T17:00:00.000Z"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessUpdateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/shift-open": {
+      "post": {
+        "x-janis-namespace": "shift",
+        "x-janis-method": "open",
+        "x-janis-permissions": [
+          "staff:shift:write"
+        ],
+        "x-janis-roles": [
+          "pickingPick"
+        ],
+        "operationId": "shiftOpen",
+        "tags": [
+          "Shift"
+        ],
+        "summary": "Open a new shift",
+        "description": "Opens a new shift for the current user",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessCreateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/work-log": {
+      "get": {
+        "x-janis-namespace": "work-log",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "staff:work-log:read"
+        ],
+        "x-janis-roles": [
+          "pickingPick"
+        ],
+        "operationId": "workLogList",
+        "tags": [
+          "Work Log"
+        ],
+        "summary": "Get a list of work logs",
+        "description": "Returns a list of all work logs",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/WorkLogFilters"
+          },
+          {
+            "$ref": "#/components/parameters/WorkLogSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkLogList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "x-janis-namespace": "work-log",
+        "x-janis-method": "create",
+        "x-janis-permissions": [
+          "staff:work-log:write"
+        ],
+        "x-janis-roles": [
+          "pickingPick"
+        ],
+        "operationId": "workLogCreate",
+        "tags": [
+          "Work Log"
+        ],
+        "summary": "Create a new work log",
+        "description": "Creates a new work log for the current user",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "startDate": {
+                      "$ref": "#/components/schemas/WorkLog/properties/startDate"
+                    },
+                    "endDate": {
+                      "$ref": "#/components/schemas/WorkLog/properties/endDate"
+                    },
+                    "workLogTypeRefId": {
+                      "type": "string",
+                      "description": "The work log type ID",
+                      "example": "work-log-type-001"
+                    }
+                  },
+                  "required": [
+                    "workLogTypeRefId"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Batch response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Item Batch response",
+                  "type": "object",
+                  "properties": {
+                    "itemsCreated": {
+                      "description": "Items which were created successfully.",
+                      "type": "array",
+                      "items": {
+                        "description": "An item from the work log batch response.",
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "$ref": "#/components/schemas/WorkLog/properties/id"
+                          }
+                        }
+                      }
+                    },
+                    "itemsUpdated": {
+                      "description": "Items which were updated successfully.",
+                      "type": "array",
+                      "items": {
+                        "description": "An item from the work log batch response.",
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "$ref": "#/components/schemas/WorkLog/properties/id"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/work-log-type/{id}": {
+      "get": {
+        "x-janis-namespace": "work-log-type",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "staff:work-log-type:read"
+        ],
+        "x-janis-roles": [
+          "pickingPick"
+        ],
+        "operationId": "workLogTypeGet",
+        "summary": "API to get a work log type by id",
+        "description": "Returns a work log type by id",
+        "tags": [
+          "Work Log Type"
+        ],
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkLogType"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "x-janis-namespace": "work-log-type",
+        "x-janis-method": "update",
+        "x-janis-permissions": [
+          "staff:work-log-type:write"
+        ],
+        "operationId": "workLogTypeUpdate",
+        "summary": "Update a work log type",
+        "description": "Update a work log type",
+        "tags": [
+          "Work Log Type"
+        ],
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/WorkLogType"
+                  },
+                  {
+                    "required": [
+                      "referenceId"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessUpdateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/work-log-type": {
+      "get": {
+        "x-janis-namespace": "work-log-type",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "staff:work-log-type:read"
+        ],
+        "x-janis-roles": [
+          "pickingPick"
+        ],
+        "operationId": "workLogTypeList",
+        "tags": [
+          "Work Log Type"
+        ],
+        "summary": "Get a list of work log types",
+        "description": "Returns a list of all work log types",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/WorkLogTypeFilters"
+          },
+          {
+            "$ref": "#/components/parameters/WorkLogTypeSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkLogTypeList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "x-janis-namespace": "work-log-type",
+        "x-janis-method": "create",
+        "x-janis-permissions": [
+          "staff:work-log-type:write"
+        ],
+        "operationId": "workLogTypeCreate",
+        "summary": "Create work log type",
+        "description": "Create a new work log type",
+        "tags": [
+          "Work Log Type"
+        ],
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/WorkLogType"
+                  },
+                  {
+                    "required": [
+                      "type",
+                      "name",
+                      "status",
+                      "referenceId"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessCreateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/setting/{entity}": {
+      "get": {
+        "x-janis-namespace": "setting",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "staff:setting:read"
+        ],
+        "x-janis-roles": [
+          "pickingPick"
+        ],
+        "operationId": "getSetting",
+        "tags": [
+          "Settings"
+        ],
+        "summary": "Get by entity",
+        "description": "Get the settings available for a given entity",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "entity",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "example": "shift"
+            },
+            "required": true,
+            "description": "The name of the entity that owns the settings to be retrieved"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The settings were retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/GlobalSetting"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ShiftSettings"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "x-janis-namespace": "setting",
+        "x-janis-method": "update",
+        "x-janis-permissions": [
+          "staff:setting:write"
+        ],
+        "operationId": "updateSetting",
+        "tags": [
+          "Settings"
+        ],
+        "summary": "Update by entity",
+        "description": "Update the settings available for a given entity",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "entity",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "example": "shift"
+            },
+            "required": true,
+            "description": "The name of the entity that owns the settings to be updated"
+          }
+        ],
+        "requestBody": {
+          "description": "The settings configurations",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/GlobalSetting"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ShiftSettings"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The settings were updated"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-key",
+        "description": "The API Key"
+      },
+      "ApiSecret": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-secret",
+        "description": "The API Secret"
+      },
+      "JanisClient": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-client",
+        "description": "The Client Code"
+      }
+    },
+    "parameters": {
+      "id": {
+        "name": "id",
+        "in": "path",
+        "schema": {
+          "type": "string",
+          "example": "631fb04c8fe08f51a8ee5949"
+        },
+        "required": true,
+        "description": "The unique identifier of the item"
+      },
+      "ListSortDirection": {
+        "name": "sortDirection",
+        "in": "query",
+        "description": "The direction to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
+        }
+      },
+      "ListPageNumber": {
+        "name": "x-janis-page",
+        "in": "header",
+        "description": "The page to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "default": 1
+        }
+      },
+      "ListPageSize": {
+        "name": "x-janis-page-size",
+        "in": "header",
+        "description": "The page size to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "default": 60
+        }
+      },
+      "JanisEntity": {
+        "name": "janis-entity",
+        "in": "header",
+        "description": "The entity name",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "DefaultWorkLogTypeSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "id",
+            "type",
+            "status",
+            "referenceId",
+            "dateCreated"
+          ]
+        }
+      },
+      "DefaultWorkLogTypeFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/DefaultWorkLogType/properties/id"
+            },
+            "type": {
+              "$ref": "#/components/schemas/DefaultWorkLogType/properties/type"
+            },
+            "status": {
+              "$ref": "#/components/schemas/DefaultWorkLogType/properties/status"
+            },
+            "referenceId": {
+              "$ref": "#/components/schemas/DefaultWorkLogType/properties/referenceId"
+            },
+            "isInternal": {
+              "$ref": "#/components/schemas/DefaultWorkLogType/properties/isInternal"
+            }
+          }
+        }
+      },
+      "ShiftSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "id",
+            "startDate",
+            "endDate",
+            "status",
+            "userId",
+            "workStatus",
+            "dateCreated",
+            "dateModified"
+          ]
+        }
+      },
+      "ShiftFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/BaseShift/properties/id"
+            },
+            "userId": {
+              "$ref": "#/components/schemas/BaseShift/properties/userId"
+            },
+            "status": {
+              "$ref": "#/components/schemas/ShiftStatus"
+            },
+            "displayId": {
+              "$ref": "#/components/schemas/BaseShift/properties/displayId"
+            },
+            "startDateRange": {
+              "type": "object",
+              "properties": {
+                "from": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Start date range from",
+                  "example": "2024-01-15T09:00:00.000Z"
+                },
+                "to": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Start date range to",
+                  "example": "2024-01-15T17:00:00.000Z"
+                }
+              }
+            },
+            "endDateRange": {
+              "type": "object",
+              "properties": {
+                "from": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "End date range from",
+                  "example": "2024-01-15T09:00:00.000Z"
+                },
+                "to": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "End date range to",
+                  "example": "2024-01-15T17:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "WorkLogSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "id",
+            "status",
+            "shiftId",
+            "startDate",
+            "endDate",
+            "dateCreated"
+          ]
+        }
+      },
+      "WorkLogFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/WorkLog/properties/id"
+            },
+            "status": {
+              "$ref": "#/components/schemas/WorkLog/properties/status"
+            },
+            "shiftId": {
+              "$ref": "#/components/schemas/WorkLog/properties/shiftId"
+            },
+            "workLogTypeId": {
+              "$ref": "#/components/schemas/WorkLog/properties/workLogTypeId"
+            },
+            "startDateRange": {
+              "type": "object",
+              "properties": {
+                "from": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Start date range from",
+                  "example": "2024-01-15T09:00:00.000Z"
+                },
+                "to": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Start date range to",
+                  "example": "2024-01-15T17:00:00.000Z"
+                }
+              }
+            },
+            "endDateRange": {
+              "type": "object",
+              "properties": {
+                "from": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "End date range from",
+                  "example": "2024-01-15T09:00:00.000Z"
+                },
+                "to": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "End date range to",
+                  "example": "2024-01-15T17:00:00.000Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "WorkLogTypeSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "id",
+            "type",
+            "status",
+            "referenceId",
+            "dateCreated"
+          ]
+        }
+      },
+      "WorkLogTypeFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/WorkLogType/properties/id"
+            },
+            "type": {
+              "$ref": "#/components/schemas/WorkLogType/properties/type"
+            },
+            "status": {
+              "$ref": "#/components/schemas/WorkLogType/properties/status"
+            },
+            "referenceId": {
+              "$ref": "#/components/schemas/WorkLogType/properties/referenceId"
+            },
+            "isInternal": {
+              "$ref": "#/components/schemas/WorkLogType/properties/isInternal"
+            }
+          }
+        }
+      }
+    },
+    "headers": {
+      "x-janis-total": {
+        "description": "The total amount of records in the list",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "responses": {
+      "SuccessCreateResponse": {
+        "description": "The item was created",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "SuccessUpdateResponse": {
+        "description": "The item was updated",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "GenericSuccess": {
+        "description": "Operation succeeded",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "BadRequest": {
+        "description": "A client error has ocurred.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Authentication missing or invalid",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Not authorized request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "InternalError": {
+        "description": "A server error has ocurred."
+      },
+      "NotFound": {
+        "description": "Item is not found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string",
+                  "example": "common.message.notFound"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "id": {
+        "description": "The unique identifier of the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "631fb04c8fe08f51a8ee5949"
+      },
+      "status": {
+        "description": "The item status",
+        "type": "string",
+        "default": "active",
+        "enum": [
+          "active",
+          "inactive"
+        ],
+        "example": "active"
+      },
+      "dateCreated": {
+        "description": "The date of creation",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-12T19:00:00.000Z"
+      },
+      "dateModified": {
+        "description": "The date of the last modification",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-20T19:00:00.000Z"
+      },
+      "dateCreatedDay": {
+        "description": "The day of creation",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-08-07T16:00:00.000Z"
+      },
+      "dateModifiedDay": {
+        "description": "The day of last modification",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-08-07T16:00:00.000Z"
+      },
+      "dateCreatedRange": {
+        "description": "Creation date range",
+        "type": "object",
+        "properties": {
+          "from": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/dateCreated"
+              }
+            ],
+            "description": "Date range from"
+          },
+          "to": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/dateCreated"
+              }
+            ],
+            "description": "Date range to"
+          }
+        }
+      },
+      "userCreated": {
+        "description": "The ID of the user who created the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "6a1fc1eeb5b68406e0487a10"
+      },
+      "userModified": {
+        "description": "The ID of the user who last modified the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "7e1fc1eeb5b68406e048796"
+      },
+      "BaseWorkLogType": {
+        "description": "A base work log type",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "referenceId": {
+            "type": "string",
+            "example": "picking-store-001"
+          },
+          "name": {
+            "type": "string",
+            "example": "Picking from store"
+          },
+          "description": {
+            "type": "string",
+            "example": "Picking from store"
+          },
+          "suggestedTime": {
+            "type": "number",
+            "example": 30
+          },
+          "isInternal": {
+            "type": "boolean",
+            "example": false
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "work",
+              "pause",
+              "problem"
+            ],
+            "example": "work"
+          },
+          "status": {
+            "$ref": "#/components/schemas/status"
+          }
+        }
+      },
+      "listenerEvent": {
+        "description": "A JANIS Event object",
+        "type": "object",
+        "properties": {
+          "service": {
+            "description": "The source service name",
+            "type": "string",
+            "example": "id"
+          },
+          "entity": {
+            "description": "The event related entity",
+            "type": "string",
+            "example": "profile"
+          },
+          "event": {
+            "description": "The event name",
+            "type": "string",
+            "example": "created"
+          },
+          "client": {
+            "description": "The source event client",
+            "type": "string",
+            "example": "fizzmod"
+          },
+          "id": {
+            "description": "The event related entity ID",
+            "type": "string",
+            "example": "5d699c1ae8ebb95eaa24aca9"
+          }
+        },
+        "required": [
+          "service",
+          "entity",
+          "event"
+        ]
+      },
+      "DefaultWorkLogType": {
+        "description": "A default work log type",
+        "type": "object",
+        "properties": {
+          "id": {
+            "allOf": [
+              {
+                "description": "The id of the default work log type"
+              },
+              {
+                "$ref": "#/components/schemas/BaseWorkLogType/properties/id"
+              }
+            ]
+          },
+          "referenceId": {
+            "allOf": [
+              {
+                "description": "The reference ID of the default work log type"
+              },
+              {
+                "$ref": "#/components/schemas/BaseWorkLogType/properties/referenceId"
+              }
+            ]
+          },
+          "name": {
+            "allOf": [
+              {
+                "description": "The name of the default work log type"
+              },
+              {
+                "$ref": "#/components/schemas/BaseWorkLogType/properties/name"
+              }
+            ]
+          },
+          "description": {
+            "allOf": [
+              {
+                "description": "The description of the default work log type"
+              },
+              {
+                "$ref": "#/components/schemas/BaseWorkLogType/properties/description"
+              }
+            ]
+          },
+          "suggestedTime": {
+            "allOf": [
+              {
+                "description": "The suggested time in minutes of the default work log type"
+              },
+              {
+                "$ref": "#/components/schemas/BaseWorkLogType/properties/suggestedTime"
+              }
+            ]
+          },
+          "isInternal": {
+            "allOf": [
+              {
+                "description": "Indicates if the default work log type is internal"
+              },
+              {
+                "$ref": "#/components/schemas/BaseWorkLogType/properties/isInternal"
+              }
+            ]
+          },
+          "type": {
+            "allOf": [
+              {
+                "description": "The type of the default work log type"
+              },
+              {
+                "$ref": "#/components/schemas/BaseWorkLogType/properties/type"
+              }
+            ]
+          },
+          "status": {
+            "allOf": [
+              {
+                "description": "The status of the default work log type"
+              },
+              {
+                "$ref": "#/components/schemas/BaseWorkLogType/properties/status"
+              }
+            ]
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          }
+        }
+      },
+      "DefaultWorkLogTypeList": {
+        "description": "The list",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/DefaultWorkLogType"
+        }
+      },
+      "BaseShift": {
+        "description": "A shift",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The start date of the shift",
+            "example": "2024-01-15T09:00:00.000Z"
+          },
+          "dateToClose": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The date to close the shift",
+            "example": "2024-01-15T17:00:00.000Z"
+          },
+          "dateMaxToClose": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The maximum date to close the shift",
+            "example": "2024-01-15T17:00:00.000Z"
+          },
+          "userId": {
+            "type": "string",
+            "description": "The ID of the user who owns the shift",
+            "example": "6a1fc1eeb5b68406e0487a10"
+          },
+          "displayId": {
+            "type": "string",
+            "description": "The display ID of the shift",
+            "example": "240715-EARPIQ"
+          },
+          "reopeningExtensionTime": {
+            "readOnly": true,
+            "type": "number",
+            "description": "The reopening extension time in minutes",
+            "example": 60
+          },
+          "workStatus": {
+            "type": "string",
+            "description": "The work status of the shift",
+            "enum": [
+              "isFree",
+              "isInPause",
+              "isPicking",
+              "isWorking",
+              "isWithProblem"
+            ],
+            "example": "isPicking"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          }
+        }
+      },
+      "OpenedShift": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseShift"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "status": {
+                "type": "string",
+                "description": "The status of the shift",
+                "enum": [
+                  "opened"
+                ],
+                "example": "opened"
+              }
+            }
+          }
+        ]
+      },
+      "ClosedShift": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseShift"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "closed"
+                ],
+                "description": "The status of the shift",
+                "example": "closed"
+              },
+              "endDate": {
+                "type": "string",
+                "format": "date-time",
+                "description": "The end date of the shift",
+                "example": "2024-01-15T17:00:00.000Z"
+              },
+              "totalShiftTime": {
+                "type": "number",
+                "description": "The total time of the shift in minutes",
+                "example": 480
+              },
+              "totalAvailableTime": {
+                "type": "number",
+                "description": "The total available time of the shift in minutes",
+                "example": 120
+              },
+              "totalPauseTime": {
+                "type": "number",
+                "description": "The total time of pause type work logs in minutes",
+                "example": 60
+              },
+              "totalWorkTime": {
+                "type": "number",
+                "description": "The total time of work type work logs in minutes",
+                "example": 360
+              },
+              "totalProblemTime": {
+                "type": "number",
+                "description": "The total time of problem type work logs in minutes",
+                "example": 60
+              },
+              "workTimeDistribution": {
+                "$ref": "#/components/schemas/WorkLogTypeTimeDistribution"
+              },
+              "pauseTimeDistribution": {
+                "$ref": "#/components/schemas/WorkLogTypeTimeDistribution"
+              },
+              "problemTimeDistribution": {
+                "$ref": "#/components/schemas/WorkLogTypeTimeDistribution"
+              },
+              "workTimeDistributionWorkLogTypeId": {
+                "$ref": "#/components/schemas/WorkLogTypeTimeDistributionWorkLogTypeId"
+              },
+              "pauseTimeDistributionWorkLogTypeId": {
+                "$ref": "#/components/schemas/WorkLogTypeTimeDistributionWorkLogTypeId"
+              },
+              "problemTimeDistributionWorkLogTypeId": {
+                "$ref": "#/components/schemas/WorkLogTypeTimeDistributionWorkLogTypeId"
+              }
+            }
+          }
+        ]
+      },
+      "WorkLogTypeTimeDistribution": {
+        "description": "A work log type time distribution",
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "workLogTypeId": {
+              "$ref": "#/components/schemas/WorkLog/properties/workLogTypeId"
+            },
+            "time": {
+              "type": "number",
+              "description": "The time of the work log type in minutes",
+              "example": 60
+            }
+          }
+        }
+      },
+      "WorkLogTypeTimeDistributionWorkLogTypeId": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "description": "The ID of the work log type",
+          "example": "6a1fc1eeb5b68406e0487a10"
+        }
+      },
+      "ShiftStatus": {
+        "type": "string",
+        "description": "The status of the shift",
+        "example": "opened",
+        "enum": [
+          "opened",
+          "closed"
+        ]
+      },
+      "ShiftList": {
+        "description": "The list",
+        "type": "array",
+        "items": {
+          "oneOf": [
+            {
+              "$ref": "#/components/schemas/OpenedShift"
+            },
+            {
+              "$ref": "#/components/schemas/ClosedShift"
+            }
+          ]
+        }
+      },
+      "WorkLog": {
+        "description": "A work log",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "shiftId": {
+            "type": "string",
+            "description": "The ID of the shift this work log belongs to",
+            "example": "631fb04c8fe08f51a8ee5949"
+          },
+          "workLogTypeId": {
+            "type": "string",
+            "description": "The work log type ID",
+            "example": "631fb04c8fe08f51a8ee5949"
+          },
+          "workLogTypeRefId": {
+            "type": "string",
+            "description": "The work log type reference ID",
+            "example": "picking-store-001"
+          },
+          "workLogTypeName": {
+            "type": "string",
+            "description": "The work log type name",
+            "example": "Picking from store"
+          },
+          "userId": {
+            "type": "string",
+            "description": "The ID of the user who owns the work log",
+            "example": "6a1fc1eeb5b68406e0487a10"
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The start date of the work log",
+            "example": "2024-01-15T09:00:00.000Z"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The end date of the work log",
+            "example": "2024-01-15T17:00:00.000Z"
+          },
+          "time": {
+            "type": "number",
+            "description": "The time of the work log in minutes",
+            "example": 50
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "inProgress",
+              "finished"
+            ],
+            "description": "The status of the work log",
+            "example": "inProgress"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          }
+        }
+      },
+      "WorkLogList": {
+        "description": "The list",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/WorkLog"
+        }
+      },
+      "WorkLogType": {
+        "description": "A work log type",
+        "type": "object",
+        "properties": {
+          "id": {
+            "allOf": [
+              {
+                "description": "The id of the work log type"
+              },
+              {
+                "$ref": "#/components/schemas/BaseWorkLogType/properties/id"
+              }
+            ]
+          },
+          "referenceId": {
+            "allOf": [
+              {
+                "description": "The reference ID of the work log type"
+              },
+              {
+                "$ref": "#/components/schemas/BaseWorkLogType/properties/referenceId"
+              }
+            ]
+          },
+          "name": {
+            "allOf": [
+              {
+                "description": "The name of the work log type"
+              },
+              {
+                "$ref": "#/components/schemas/BaseWorkLogType/properties/name"
+              }
+            ]
+          },
+          "description": {
+            "allOf": [
+              {
+                "description": "The description of the work log type"
+              },
+              {
+                "$ref": "#/components/schemas/BaseWorkLogType/properties/description"
+              }
+            ]
+          },
+          "suggestedTime": {
+            "allOf": [
+              {
+                "description": "The suggested time in minutes of the work log type"
+              },
+              {
+                "$ref": "#/components/schemas/BaseWorkLogType/properties/suggestedTime"
+              }
+            ]
+          },
+          "isInternal": {
+            "allOf": [
+              {
+                "description": "Indicates if the work log type is internal"
+              },
+              {
+                "$ref": "#/components/schemas/BaseWorkLogType/properties/isInternal"
+              }
+            ]
+          },
+          "type": {
+            "allOf": [
+              {
+                "description": "The type of the work log type"
+              },
+              {
+                "$ref": "#/components/schemas/BaseWorkLogType/properties/type"
+              }
+            ]
+          },
+          "status": {
+            "allOf": [
+              {
+                "description": "The status of the work log type"
+              },
+              {
+                "$ref": "#/components/schemas/BaseWorkLogType/properties/status"
+              }
+            ]
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          }
+        }
+      },
+      "WorkLogTypeList": {
+        "description": "The list",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/WorkLogType"
+        }
+      },
+      "GlobalSetting": {
+        "type": "object",
+        "description": "Global settings",
+        "title": "Global",
+        "properties": {
+          "enabledShiftAndWorkLog": {
+            "type": "boolean",
+            "description": "This setting will be used to determine if shift and work log registration is enabled",
+            "default": false,
+            "example": true
+          }
+        }
+      },
+      "ShiftSettings": {
+        "type": "object",
+        "description": "Shift settings",
+        "title": "Shift",
+        "properties": {
+          "defaultShiftDuration": {
+            "type": "number",
+            "description": "This setting will be used to determine the default shift duration in hours",
+            "example": 8,
+            "default": 8
+          },
+          "defaultShiftMaxDuration": {
+            "type": "number",
+            "description": "This setting will be used to determine the default shift max duration in hours",
+            "example": 12,
+            "default": 12
+          }
+        }
+      }
+    }
+  }
+}

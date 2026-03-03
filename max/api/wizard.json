@@ -1,0 +1,791 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Wizard Service",
+    "description": "Wizard Service\n\n **Last update**: 27 nov 25, 11:03 a. m.",
+    "version": "1.3.0",
+    "x-janis-private": true,
+    "x-logo": null,
+    "x-janis-keywords": [
+      "wizard"
+    ],
+    "lastUpdate": "2025-11-27T14:03:11.462Z"
+  },
+  "tags": [
+    {
+      "name": "Templated Client",
+      "description": "A templated client is the way of creating a new Janis Client with predefined, customizable initial configurations"
+    }
+  ],
+  "servers": [
+    {
+      "url": "https://wizard.janis.in/api",
+      "description": "The Prod API server",
+      "variables": {
+        "environment": {
+          "default": "prod"
+        }
+      }
+    },
+    {
+      "url": "https://wizard.janisqa.in/api",
+      "description": "The QA API server",
+      "variables": {
+        "environment": {
+          "default": "qa"
+        }
+      }
+    },
+    {
+      "url": "https://wizard.janisdev.in/api",
+      "description": "The Beta API server",
+      "variables": {
+        "environment": {
+          "default": "beta"
+        }
+      }
+    },
+    {
+      "url": "http://wizard.janis.localhost:3141/api",
+      "description": "The Local API server",
+      "variables": {
+        "environment": {
+          "default": "local"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/templated-client/{id}": {
+      "get": {
+        "x-janis-namespace": "templated-client",
+        "x-janis-method": "get",
+        "x-janis-permissions": [],
+        "operationId": "getTemplatedClient",
+        "tags": [
+          "Templated Client"
+        ],
+        "summary": "Get a Templated Client",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Templated Client found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TemplatedClient"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "x-janis-namespace": "templated-client",
+        "x-janis-method": "update",
+        "x-janis-permissions": [],
+        "operationId": "updateTemplatedClient",
+        "tags": [
+          "Templated Client"
+        ],
+        "summary": "Update a Templated Client",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "requestBody": {
+          "description": "A Templated Client",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TemplatedClient"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessUpdateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/templated-client": {
+      "get": {
+        "x-janis-namespace": "templated-client",
+        "x-janis-method": "list",
+        "x-janis-permissions": [],
+        "operationId": "listTemplatedClients",
+        "tags": [
+          "Templated Client"
+        ],
+        "summary": "List Templated Clients",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TemplatedClientSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/TemplatedClientFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Templated Clients listed",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TemplatedClientList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "x-janis-namespace": "templated-client",
+        "x-janis-method": "create",
+        "x-janis-permissions": [],
+        "operationId": "createTemplatedClient",
+        "tags": [
+          "Templated Client"
+        ],
+        "summary": "Create a Templated Client",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": []
+          }
+        ],
+        "requestBody": {
+          "description": "A Templated Client",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TemplatedClient"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessCreateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/templated-client/{id}/retry": {
+      "post": {
+        "x-janis-namespace": "templated-client",
+        "x-janis-method": "retry",
+        "x-janis-permissions": [],
+        "operationId": "retryTemplatedClient",
+        "tags": [
+          "Templated Client"
+        ],
+        "summary": "Retry the process of a Templated Client",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The templated client was retried"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-key",
+        "description": "The API Key"
+      },
+      "ApiSecret": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-secret",
+        "description": "The API Secret"
+      },
+      "JanisClient": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-client",
+        "description": "The Client Code"
+      }
+    },
+    "parameters": {
+      "id": {
+        "name": "id",
+        "in": "path",
+        "schema": {
+          "type": "string",
+          "example": "631fb04c8fe08f51a8ee5949"
+        },
+        "required": true,
+        "description": "The unique identifier of the item"
+      },
+      "ListSortDirection": {
+        "name": "sortDirection",
+        "in": "query",
+        "description": "The direction to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
+        }
+      },
+      "ListPageNumber": {
+        "name": "x-janis-page",
+        "in": "header",
+        "description": "The page to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "default": 1
+        }
+      },
+      "ListPageSize": {
+        "name": "x-janis-page-size",
+        "in": "header",
+        "description": "The page size to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "default": 60
+        }
+      },
+      "JanisEntity": {
+        "name": "janis-entity",
+        "in": "header",
+        "description": "The entity name",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "TemplatedClientSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "name",
+            "code",
+            "status",
+            "dateCreated"
+          ]
+        }
+      },
+      "TemplatedClientFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/TemplatedClient/properties/id"
+            },
+            "name": {
+              "$ref": "#/components/schemas/TemplatedClient/properties/name"
+            },
+            "code": {
+              "$ref": "#/components/schemas/TemplatedClient/properties/code"
+            },
+            "status": {
+              "$ref": "#/components/schemas/TemplatedClient/properties/status"
+            },
+            "userCreated": {
+              "$ref": "#/components/schemas/TemplatedClient/properties/userCreated"
+            },
+            "dateCreatedRange": {
+              "type": "object",
+              "description": "A range for creation date",
+              "properties": {
+                "from": {
+                  "type": "string",
+                  "description": "The beginning of the range",
+                  "format": "date-time",
+                  "example": "2025-01-16T16:08:24.994Z"
+                },
+                "to": {
+                  "type": "string",
+                  "description": "The end of the range",
+                  "format": "date-time",
+                  "example": "2025-01-18T16:08:24.994Z"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "headers": {
+      "x-janis-total": {
+        "description": "The total amount of records in the list",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "responses": {
+      "SuccessCreateResponse": {
+        "description": "The item was created",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "SuccessUpdateResponse": {
+        "description": "The item was updated",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "GenericSuccess": {
+        "description": "Operation succeeded",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "BadRequest": {
+        "description": "A client error has ocurred.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Authentication missing or invalid",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Not authorized request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "InternalError": {
+        "description": "A server error has ocurred."
+      }
+    },
+    "schemas": {
+      "id": {
+        "description": "The unique identifier of the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "631fb04c8fe08f51a8ee5949"
+      },
+      "status": {
+        "description": "The item status",
+        "type": "string",
+        "default": "active",
+        "enum": [
+          "active",
+          "inactive"
+        ],
+        "example": "active"
+      },
+      "dateCreated": {
+        "description": "The date of creation",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-12T19:00:00.000Z"
+      },
+      "dateModified": {
+        "description": "The date of the last modification",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-20T19:00:00.000Z"
+      },
+      "dateCreatedDay": {
+        "description": "The day of creation",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-08-07T16:00:00.000Z"
+      },
+      "dateModifiedDay": {
+        "description": "The day of last modification",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-08-07T16:00:00.000Z"
+      },
+      "userCreated": {
+        "description": "The ID of the user who created the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "6a1fc1eeb5b68406e0487a10"
+      },
+      "userModified": {
+        "description": "The ID of the user who last modified the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "7e1fc1eeb5b68406e048796"
+      },
+      "TemplatedClient": {
+        "type": "object",
+        "description": "A Templated Client",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "name": {
+            "type": "string",
+            "description": "The client name (this will be visible to users)",
+            "example": "Apu's Kwik-E-Mart"
+          },
+          "code": {
+            "type": "string",
+            "description": "The client code (this will be used in API calls)",
+            "example": "kwikemart"
+          },
+          "market": {
+            "type": "string",
+            "description": "The target market of the client",
+            "example": "grocery",
+            "enum": [
+              "grocery",
+              "retail",
+              "homeAndDeco",
+              "pharmacy",
+              "fashion",
+              "all"
+            ]
+          },
+          "countryCode": {
+            "type": "string",
+            "description": "The ISO3 Code of the client country",
+            "example": "ARG"
+          },
+          "locale": {
+            "type": "string",
+            "description": "The locale of the client",
+            "example": "es"
+          },
+          "currencyCode": {
+            "type": "string",
+            "description": "The ISO3 Code of the client default currency",
+            "example": "es"
+          },
+          "timezone": {
+            "type": "string",
+            "description": "The ISO Code of the client default timezone",
+            "example": "es"
+          },
+          "createUsers": {
+            "type": "boolean",
+            "description": "Whether or not to create default users",
+            "default": false,
+            "example": false
+          },
+          "usersPassword": {
+            "type": "string",
+            "description": "The password to be set to the created users. This **MUST** be a strong password that passes the [default organization password requirements](https://app.janis.in/id/organization/new).\n\nRequired if `createUsers` is `true`\n",
+            "writeOnly": true,
+            "example": "Str0ngPa$$word!"
+          },
+          "useDemoDatasets": {
+            "type": "boolean",
+            "description": "Whether to apply a demo dataset to the client (locations, warehouses, carriers, catalog, etc)",
+            "default": false,
+            "example": false
+          },
+          "useStoredGoods": {
+            "type": "boolean",
+            "description": "Whether to use positions and stored goods or plain stock",
+            "default": false,
+            "example": false
+          },
+          "customization": {
+            "type": "object",
+            "description": "Client customization properties",
+            "properties": {
+              "clientImage": {
+                "type": "string",
+                "description": "An URL that points to the client logo",
+                "example": "https://example.com/logo.png"
+              },
+              "mainColor": {
+                "type": "string",
+                "description": "The client's main color",
+                "nullable": true,
+                "example": "#1877c1"
+              },
+              "secondaryColor": {
+                "type": "string",
+                "description": "The client's secondary color",
+                "nullable": true,
+                "example": "#4e343a"
+              }
+            }
+          },
+          "process": {
+            "description": "The status of the client processing",
+            "type": "object",
+            "readOnly": true,
+            "properties": {
+              "executionArn": {
+                "description": "The ARN of the process state machine",
+                "type": "string",
+                "example": "arn:aws:states:us-east-1:000000000000:execution:StateMachineName:307b7798-965c-4659-86c0-8c0193cd3174"
+              },
+              "executionUrl": {
+                "description": "The URL of the process state machine",
+                "type": "string",
+                "example": "https://us-east-1.console.aws.amazon.com/states/home#/executions/details/arn:aws:states:us-east-1:000000000000:execution:StateMachineName:307b7798-965c-4659-86c0-8c0193cd3174"
+              },
+              "startDate": {
+                "description": "The date when the process started",
+                "type": "string",
+                "format": "date-time",
+                "example": "2025-02-06T18:24:10Z"
+              },
+              "endDate": {
+                "description": "The date when the process ended",
+                "type": "string",
+                "format": "date-time",
+                "example": "2025-02-06T18:24:10Z"
+              },
+              "error": {
+                "description": "The details of the error, in case the process fails",
+                "type": "object",
+                "additionalProperties": true,
+                "example": {
+                  "Error": "TypeError",
+                  "Cause": "Some error cause"
+                }
+              }
+            }
+          },
+          "resources": {
+            "description": "The resources created for the client",
+            "type": "object",
+            "properties": {
+              "clientId": {
+                "description": "The client ID",
+                "type": "string",
+                "example": "631fb04c8fe08f51a8ee5949"
+              }
+            }
+          },
+          "status": {
+            "description": "The status",
+            "type": "string",
+            "readOnly": true,
+            "default": "pending",
+            "enum": [
+              "pending",
+              "processing",
+              "waitingClientCreation",
+              "finished",
+              "failed"
+            ],
+            "example": "pending"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "code",
+          "market",
+          "countryCode",
+          "locale",
+          "currencyCode",
+          "timezone",
+          "status",
+          "userCreated",
+          "dateCreated"
+        ]
+      },
+      "TemplatedClientList": {
+        "type": "array",
+        "description": "A list of Templated Clients",
+        "items": {
+          "$ref": "#/components/schemas/TemplatedClient"
+        }
+      }
+    }
+  }
+}

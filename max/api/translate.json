@@ -1,0 +1,662 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "description": "Translate Service",
+    "title": "Translate Service",
+    "version": "1.5.1",
+    "x-logo": null
+  },
+  "tags": [
+    {
+      "name": "Languages",
+      "description": "To manage languages"
+    }
+  ],
+  "servers": [
+    {
+      "url": "https://translate.janis.in/api",
+      "description": "The Prod API server",
+      "variables": {
+        "environment": {
+          "default": "prod"
+        }
+      }
+    },
+    {
+      "url": "https://translate.janisqa.in/api",
+      "description": "The QA API server",
+      "variables": {
+        "environment": {
+          "default": "qa"
+        }
+      }
+    },
+    {
+      "url": "https://translate.janisdev.in/api",
+      "description": "The Beta API server",
+      "variables": {
+        "environment": {
+          "default": "beta"
+        }
+      }
+    },
+    {
+      "url": "http://translate.janis.localhost:3017/api",
+      "description": "The Local API server",
+      "variables": {
+        "environment": {
+          "default": "local"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/language": {
+      "get": {
+        "x-janis-namespace": "language",
+        "x-janis-method": "list",
+        "operationId": "listLanguages",
+        "tags": [
+          "Languages"
+        ],
+        "summary": "List the languages",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/LanguagesSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/LanguagesFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/listLanguagesSuccess"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-key",
+        "description": "The API Key"
+      },
+      "ApiSecret": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-secret",
+        "description": "The API Secret"
+      },
+      "JanisClient": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-client",
+        "description": "The Client Code"
+      }
+    },
+    "parameters": {
+      "id": {
+        "name": "id",
+        "in": "path",
+        "schema": {
+          "type": "string",
+          "example": "d555345345345as67a342a"
+        },
+        "required": true,
+        "description": "The unique identifier of the item"
+      },
+      "ListSortDirection": {
+        "name": "sortDirection",
+        "in": "query",
+        "description": "The direction to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
+        }
+      },
+      "ListPageNumber": {
+        "name": "x-janis-page",
+        "in": "header",
+        "description": "The page to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "default": 1
+        }
+      },
+      "ListPageSize": {
+        "name": "x-janis-page-size",
+        "in": "header",
+        "description": "The page size to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "default": 60
+        }
+      },
+      "LanguagesSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "id",
+            "namespace"
+          ]
+        }
+      },
+      "LanguagesFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "$ref": "#/components/schemas/Language/properties/name"
+            },
+            "code": {
+              "$ref": "#/components/schemas/Language/properties/code"
+            },
+            "variant": {
+              "$ref": "#/components/schemas/Language/properties/variant"
+            },
+            "fallback": {
+              "$ref": "#/components/schemas/Language/properties/fallback"
+            },
+            "fullCode": {
+              "$ref": "#/components/schemas/Language/properties/fullCode"
+            },
+            "status": {
+              "$ref": "#/components/schemas/Language/properties/status"
+            }
+          }
+        }
+      },
+      "ReleasesSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "id",
+            "namespace",
+            "language"
+          ]
+        }
+      },
+      "ReleasesFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "namespace": {
+              "description": "The namespace",
+              "type": "string"
+            },
+            "language": {
+              "description": "The language",
+              "type": "string"
+            },
+            "status": {
+              "description": "The status name",
+              "type": "string"
+            }
+          }
+        }
+      },
+      "TranslatesSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "id",
+            "namespace"
+          ]
+        }
+      },
+      "TranslatesFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "namespace": {
+              "$ref": "#/components/schemas/Translate/properties/namespace"
+            },
+            "key": {
+              "$ref": "#/components/schemas/Translate/properties/key"
+            },
+            "language": {
+              "description": "Language for filter for a already translated values.\nThis field refer to the `fullCode` of the [Languages](/v2/service/translate#tag/Languages). entity.\nYou **must** combine this filter with `value` filter to work properly.\n",
+              "type": "string"
+            },
+            "value": {
+              "description": "The translated value in the `language` selected.\nYou **must** combine this filter with `language` filter to work properly.\n"
+            },
+            "fullKey": {
+              "description": "Full Key combining namespace and key",
+              "type": "string",
+              "example": "common.status.active"
+            },
+            "status": {
+              "$ref": "#/components/schemas/Translate/properties/status"
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "id": {
+        "description": "The unique identifier of the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "d555345345345as67a342a"
+      },
+      "status": {
+        "description": "The item status",
+        "type": "string",
+        "default": "active",
+        "enum": [
+          "active",
+          "inactive"
+        ],
+        "example": "active"
+      },
+      "dateCreated": {
+        "description": "The date of creation",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-12T19:00:00.000Z"
+      },
+      "dateModified": {
+        "description": "The date of the last modification",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-20T19:00:00.000Z"
+      },
+      "userCreated": {
+        "description": "The ID of the user who created the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "6a1fc1eeb5b68406e0487a10"
+      },
+      "userModified": {
+        "description": "The ID of the user who last modified the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "7e1fc1eeb5b68406e048796"
+      },
+      "Language": {
+        "description": "Represents a language variant",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "name": {
+            "description": "The name",
+            "type": "string",
+            "example": "English (UK)"
+          },
+          "code": {
+            "description": "The language 2-digit code",
+            "type": "string",
+            "example": "en"
+          },
+          "variant": {
+            "description": "The language 2-digit variant",
+            "type": "string",
+            "example": "UK"
+          },
+          "fullCode": {
+            "description": "The full code (concatenating code and variant with a hyphen, or just the code if variant is empty)",
+            "type": "string",
+            "readOnly": true,
+            "example": "en-UK"
+          },
+          "fallback": {
+            "description": "The fallback language full code (code or code-variant)",
+            "type": "string",
+            "example": "en"
+          },
+          "status": {
+            "$ref": "#/components/schemas/status"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "code",
+          "status"
+        ]
+      },
+      "Release": {
+        "description": "Represents a bundle of translates for an especific service and language",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "namespace": {
+            "description": "The namespace",
+            "type": "string",
+            "example": "common"
+          },
+          "language": {
+            "description": "The full language",
+            "type": "string",
+            "example": "en-US"
+          },
+          "status": {
+            "description": "The status name",
+            "type": "string",
+            "enum": [
+              "pending",
+              "ready"
+            ],
+            "example": "pending"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "dateReleased": {
+            "description": "The latest date it was released",
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true,
+            "example": "2019-07-20T19:00:00.000Z"
+          }
+        },
+        "required": [
+          "id",
+          "namespace",
+          "language",
+          "status"
+        ]
+      },
+      "Translate": {
+        "description": "Represents a key of translate without translation values",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "namespace": {
+            "description": "The namespace",
+            "type": "string",
+            "example": "common"
+          },
+          "key": {
+            "description": "The key",
+            "type": "string",
+            "example": "message.success"
+          },
+          "status": {
+            "description": "The item status",
+            "type": "string",
+            "default": "pending",
+            "enum": [
+              "pending",
+              "ready"
+            ],
+            "example": "pending"
+          },
+          "translatedLanguages": {
+            "description": "A list of translated languages, comma separated",
+            "type": "string",
+            "readOnly": true,
+            "example": "es, en"
+          }
+        },
+        "required": [
+          "id",
+          "namespace",
+          "key",
+          "status"
+        ]
+      },
+      "TranslateFull": {
+        "description": "Represents a key of translate with translation values",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Translate"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "values": {
+                "description": "The translate values for each language. It's a mapping of language to value.",
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "example": {
+                  "es": "¡Éxito!",
+                  "en": "Success!"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "responses": {
+      "SuccessCreateResponse": {
+        "description": "The item was created",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "SuccessUpdateResponse": {
+        "description": "The item was updated",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "GenericSuccess": {
+        "description": "Operation succeeded",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "BadRequest": {
+        "description": "A client error has ocurred.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Authentication missing or invalid",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Not authorized request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "InternalError": {
+        "description": "A server error has ocurred."
+      },
+      "getLanguageSuccess": {
+        "description": "OK",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Language"
+            }
+          }
+        }
+      },
+      "listLanguagesSuccess": {
+        "description": "OK",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Language"
+              }
+            }
+          }
+        }
+      },
+      "getReleaseSuccess": {
+        "description": "OK",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Release"
+            }
+          }
+        }
+      },
+      "listReleasesSuccess": {
+        "description": "OK",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Release"
+              }
+            }
+          }
+        }
+      },
+      "getTranslateSuccess": {
+        "description": "OK",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/TranslateFull"
+            }
+          }
+        }
+      },
+      "listTranslatesSuccess": {
+        "description": "OK",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Translate"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

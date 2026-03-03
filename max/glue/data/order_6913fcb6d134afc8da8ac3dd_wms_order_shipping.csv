@@ -1,0 +1,2 @@
+order_id,id,city,neighborhood,complement,lat,lng,carrier_id,shipping_window_start,shipping_window_end,shipped_date_start,shipped_date_end
+6913fcb6d134afc8da8ac3dd,f17897b0-e9fa-415c-8acc-2779b10ff7dc,Lima,Lima,,-12.09201,-76.95096,6913f39c20fd2aec34745cfa,2025-11-12T19:00:00.000Z,2025-11-12T20:00:00.000Z,2025-11-12T21:10:57.204Z,2025-11-12T21:10:57.204Z

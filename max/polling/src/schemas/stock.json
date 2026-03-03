@@ -1,0 +1,99 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "stock",
+  "title": "Stock",
+  "description": "Schema de validación para registros de stock/inventario de Janis",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Identificador único del registro de stock",
+      "example": "631fb04c8fe08f51a8ee5949"
+    },
+    "skuId": {
+      "type": "string",
+      "description": "Identificador del SKU",
+      "example": "SKU_001"
+    },
+    "skuCatalogId": {
+      "type": "string",
+      "description": "Identificador del SKU en el catálogo",
+      "example": "SKU_CAT_001"
+    },
+    "quantity": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Cantidad total en stock",
+      "example": 100
+    },
+    "reservedQuantity": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "description": "Cantidad reservada",
+      "example": 10
+    },
+    "availableQuantity": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "description": "Cantidad disponible (quantity - reservedQuantity)",
+      "example": 90
+    },
+    "wmsStockId": {
+      "type": ["string", "null"],
+      "description": "Identificador en el sistema WMS",
+      "example": "WMS_STOCK_001"
+    },
+    "storeId": {
+      "type": ["string", "null"],
+      "description": "Identificador de la tienda",
+      "example": "STORE_001"
+    },
+    "accountId": {
+      "type": "string",
+      "description": "Identificador de la cuenta a la que pertenece el stock",
+      "example": "631fb04c8fe08f51a8ee5949"
+    },
+    "wmsWarehouseId": {
+      "type": ["string", "null"],
+      "description": "Identificador del almacén en WMS",
+      "example": "WMS_WAREHOUSE_001"
+    },
+    "locationNetworkNodeId": {
+      "type": ["string", "null"],
+      "description": "Identificador del nodo de red de ubicación",
+      "example": "LOCATION_NETWORK_NODE_001"
+    },
+    "statusPublished": {
+      "type": ["string", "null"],
+      "enum": ["published", "pending", "error", null],
+      "description": "Estado de publicación",
+      "example": "published"
+    },
+    "lastSyncDate": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "Fecha de última sincronización",
+      "example": "2023-01-01T00:00:00.000Z"
+    },
+    "dateCreated": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Fecha de creación del registro"
+    },
+    "dateModified": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Fecha de última modificación del registro"
+    }
+  },
+  "required": [
+    "id",
+    "skuId",
+    "skuCatalogId",
+    "quantity",
+    "accountId",
+    "dateCreated",
+    "dateModified"
+  ],
+  "additionalProperties": true
+}

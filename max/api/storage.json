@@ -1,0 +1,400 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Storage Service",
+    "description": "Storage Service\n\n **Last update**: 03 oct 25, 08:50 a. m.",
+    "version": "1.9.1",
+    "x-logo": null,
+    "x-janis-keywords": [
+      "storage"
+    ],
+    "lastUpdate": "2025-10-03T11:50:07.046Z"
+  },
+  "tags": [
+    {
+      "name": "Credentials",
+      "description": "For managing File Upload"
+    },
+    {
+      "name": "Signed Files",
+      "description": "For managing File"
+    }
+  ],
+  "servers": [
+    {
+      "url": "https://storage.janis.in/api",
+      "description": "The Prod API server",
+      "variables": {
+        "environment": {
+          "default": "prod"
+        }
+      }
+    },
+    {
+      "url": "https://storage.janisqa.in/api",
+      "description": "The QA API server",
+      "variables": {
+        "environment": {
+          "default": "qa"
+        }
+      }
+    },
+    {
+      "url": "https://storage.janisdev.in/api",
+      "description": "The Beta API server",
+      "variables": {
+        "environment": {
+          "default": "beta"
+        }
+      }
+    },
+    {
+      "url": "http://storage.janis.localhost:3109/api",
+      "description": "The Local API server",
+      "variables": {
+        "environment": {
+          "default": "local"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/credentials": {
+      "get": {
+        "x-janis-namespace": "credentials",
+        "x-janis-method": "get",
+        "x-janis-permissions": [],
+        "x-janis-roles": [
+          "deliveryLastMile"
+        ],
+        "operationId": "getCredentials",
+        "tags": [
+          "Credentials"
+        ],
+        "summary": "Get credentials to upload files",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "fileName",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "The filename to sing (required if no fileNames param is received)"
+          },
+          {
+            "name": "fileNames",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "description": "The filenames to sign  (required if no fileName param is received)"
+          },
+          {
+            "name": "serviceName",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The serviceName of the Microservice"
+          },
+          {
+            "name": "entity",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "items": {
+                "type": "string",
+                "example": "order"
+              }
+            },
+            "description": "The file entity"
+          },
+          {
+            "name": "expiration",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": 60
+            },
+            "description": "The credential expiration time in seconds"
+          },
+          {
+            "name": "fileExpiration",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "oneDay",
+                "tenDays",
+                "month",
+                "threeMonths",
+                "sixMonths",
+                "never"
+              ]
+            },
+            "description": "The file expiration",
+            "example": "oneDay"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The credentials to upload each file",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Credentials"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/signed-files": {
+      "get": {
+        "x-janis-namespace": "getSignedFiles",
+        "x-janis-method": "get",
+        "x-janis-permissions": [],
+        "operationId": "getSignedFiles",
+        "tags": [
+          "Signed Files"
+        ],
+        "summary": "Get the files signed",
+        "parameters": [
+          {
+            "name": "paths",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "description": "The paths to sign"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The signed files",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SignedFiles"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-key",
+        "description": "The API Key"
+      },
+      "ApiSecret": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-secret",
+        "description": "The API Secret"
+      },
+      "JanisClient": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-client",
+        "description": "The Client Code"
+      }
+    },
+    "responses": {
+      "GenericSuccess": {
+        "description": "Operation succeeded",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "BadRequest": {
+        "description": "A client error has ocurred.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Authentication missing or invalid",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Not authorized request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "InternalError": {
+        "description": "A server error has ocurred."
+      },
+      "SignedFileRedirect": {
+        "description": "A response indicating that the file has been signed and providing the signed URL."
+      }
+    },
+    "schemas": {
+      "Credentials": {
+        "type": "object",
+        "description": "The Files signed",
+        "properties": {
+          "fileNames": {
+            "type": "object",
+            "description": "The files names signed",
+            "additionalProperties": {
+              "type": "object"
+            },
+            "example": {
+              "image.png": {
+                "url": "https://s3.amazonaws.com/bucketName",
+                "fields": {
+                  "key": "cdn/files/cientCode/3CM6sniEdXTBeDWMtqpUcvWocWoxrmMr.png",
+                  "bucket": "janis-storage-service-local",
+                  "X-Amz-Algorithm": "AWS4-ABC-SHA256",
+                  "X-Amz-Credential": "ABCAQMPR4JN2JZLNHRH4/20230110/us-east-1/s3/aws4_request",
+                  "X-Amz-Date": "20230110T202205Z",
+                  "Policy": "eyJleHBpcmF0aW9uIjoiMjAyMy0wMS0xMFQyMDoyMzowNVoiLCJjb25kaXRpb==",
+                  "X-Amz-Signature": "fe2e87697802a40481393c05839a904"
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "fileNames"
+        ]
+      },
+      "SignedFiles": {
+        "type": "object",
+        "description": "The Files signed",
+        "properties": {
+          "fileNames": {
+            "type": "object",
+            "description": "The files names signed",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "example": {
+              "cdn/files/clientCode/U2ZPvzsjjTeUy5v56VZjkTUyacfKyE3P.png": "https://cdn.storage.janis.in/files/clientCode/image.png?Expires=1673308800&Key-Pair-Id=K33I33M2DJ895M&Signature=Q-EUWM2F3fULQxEDuCi8BZ2YU3lwuqjf3pIJVm"
+            }
+          }
+        },
+        "required": [
+          "fileNames"
+        ]
+      },
+      "Files": {
+        "type": "object",
+        "description": "The Files with the information",
+        "additionalProperties": {
+          "type": "string"
+        },
+        "example": {
+          "cdn/files/clientCode/U2ZPvzsjjTeUy5v56VZjkTUyacfKyE3P.txt": "file content"
+        }
+      },
+      "FilesInfo": {
+        "type": "object",
+        "description": "The Files with the information",
+        "properties": {
+          "paths": {
+            "type": "object",
+            "description": "The paths of each file",
+            "additionalProperties": {
+              "type": "object"
+            },
+            "example": {
+              "cdn/files/clientCode/U2ZPvzsjjTeUy5v56VZjkTUyacfKyE3P.png": {
+                "AcceptRanges": "bytes",
+                "LastModified": "2023-01-11T18:51:04.000Z",
+                "ContentLength": 9209,
+                "ETag": "\\ffd87faf53d1d1627f635101c295ce78\\",
+                "ContentType": "binary/octet-stream",
+                "Metadata": {}
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

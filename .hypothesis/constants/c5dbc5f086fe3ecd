@@ -1,0 +1,4 @@
+# file: C:\Users\maxim\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\pyspark\sql\streaming\state.py
+# hypothesis_version: 6.151.9
+
+[1000, 'CANNOT_BE_NONE', 'CANNOT_WITHOUT', 'EventTimeTimeout', 'GroupState', 'GroupState(%s)', 'GroupStateTimeout', 'NOT_INT', 'NoTimeout', 'STATE_NOT_EXISTS', 'VALUE_NOT_POSITIVE', 'arg_name', 'arg_type', 'arg_value', 'condition1', 'condition2', 'defined', 'durationMs', 'eventTimeWatermarkMs', 'hasTimedOut', 'newValue', 'optionalValue', 'removed', 'set timeout duration', 'timeoutConf', 'timeoutTimestamp', 'timestamp', 'timestampMs', 'to_pydatetime', 'to_pytimedelta', 'updated', 'watermark', 'watermarkPresent']

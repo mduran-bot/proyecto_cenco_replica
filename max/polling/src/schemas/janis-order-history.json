@@ -1,0 +1,35 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Janis Order History Event",
+  "description": "Schema for Janis order history events",
+  "type": "object",
+  "properties": {
+    "dateCreated": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when the event was created"
+    },
+    "userCreated": {
+      "type": ["string", "null"],
+      "description": "ID of the user who created the event"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["statusChange", "milestone", "note", "other"],
+      "description": "Type of history event"
+    },
+    "name": {
+      "type": "string",
+      "description": "Name or identifier of the event"
+    },
+    "icon": {
+      "type": "string",
+      "description": "Icon identifier for the event"
+    },
+    "customData": {
+      "type": "object",
+      "description": "Additional custom data for the event"
+    }
+  },
+  "required": ["dateCreated", "type", "name"]
+}

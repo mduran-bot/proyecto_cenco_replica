@@ -1,0 +1,4 @@
+# file: C:\Users\maxim\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\pyspark\sql\pandas\types.py
+# hypothesis_version: 6.151.9
+
+[b'geography', b'geometry', b'srid', b'true', b'variant', '17.0.0', 'ANY', 'MALFORMED_GEOGRAPHY', 'MALFORMED_GEOMETRY', 'MALFORMED_VARIANT', 'PandasDataFrameLike', 'PandasSeriesLike', 'TZ', 'UNKNOWN_VALUE_FOR', 'UTC', '__UDT__', 'data_type', 'datetime64[ns]', 'datetime64[us]', 'dateutil/:', 'dict', 'element', 'field_names', 'float32', 'float64', 'int16', 'int32', 'int64', 'int8', 'items', 'key', 'keys', 'mask', 'metadata', 'microsecond', 'np.dtype', 'ns', 'offsets', 'pa.Array', 'pa.ChunkedArray', 'pa.DataType', 'pa.Schema', 'pa.Table', 'pd.Series', 'row', 'srid', 'timedelta64[ns]', 'timedelta64[us]', 'us', 'value', 'var', 'wkb']

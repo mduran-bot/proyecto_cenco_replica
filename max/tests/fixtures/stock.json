@@ -1,0 +1,88 @@
+[
+  {
+    "id": "stock_001",
+    "sku": "SKU001",
+    "store_id": "store_001",
+    "warehouse_id": "warehouse_001",
+    "quantity": 100,
+    "reserved_quantity": 10,
+    "available_quantity": 90,
+    "dateCreated": 1706025600,
+    "dateModified": 1706029200,
+    "location": {
+      "aisle": "A",
+      "shelf": "1",
+      "bin": "01"
+    },
+    "batch": "BATCH001",
+    "expirationDate": 1735689600
+  },
+  {
+    "id": "stock_002",
+    "sku": "SKU002",
+    "store_id": "store_001",
+    "warehouse_id": "warehouse_001",
+    "quantity": 50,
+    "reserved_quantity": 5,
+    "available_quantity": 45,
+    "dateCreated": 1706025700,
+    "dateModified": 1706029300,
+    "location": {
+      "aisle": "B",
+      "shelf": "2",
+      "bin": "05"
+    },
+    "batch": "BATCH002",
+    "expirationDate": null
+  },
+  {
+    "id": "stock_003",
+    "sku": "SKU003",
+    "store_id": "store_002",
+    "warehouse_id": "warehouse_002",
+    "quantity": 0,
+    "reserved_quantity": 0,
+    "available_quantity": 0,
+    "dateCreated": 1706025800,
+    "dateModified": null,
+    "location": null,
+    "batch": null,
+    "expirationDate": null
+  },
+  {
+    "id": "stock_004",
+    "sku": "SKU001",
+    "store_id": "store_002",
+    "warehouse_id": "warehouse_002",
+    "quantity": 200,
+    "reserved_quantity": 20,
+    "available_quantity": 180,
+    "dateCreated": 1706025900,
+    "dateModified": 1706029400,
+    "location": {
+      "aisle": "C",
+      "shelf": "3",
+      "bin": "10"
+    },
+    "batch": "BATCH003",
+    "expirationDate": 1735689600
+  },
+  {
+    "id": "stock_001",
+    "sku": "SKU001",
+    "store_id": "store_001",
+    "warehouse_id": "warehouse_001",
+    "quantity": 95,
+    "reserved_quantity": 15,
+    "available_quantity": 80,
+    "dateCreated": 1706025600,
+    "dateModified": 1706030000,
+    "location": {
+      "aisle": "A",
+      "shelf": "1",
+      "bin": "01"
+    },
+    "batch": "BATCH001",
+    "expirationDate": 1735689600
+  }
+]

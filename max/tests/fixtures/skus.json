@@ -1,0 +1,135 @@
+[
+  {
+    "id": "sku_001",
+    "sku": "SKU001",
+    "product_id": "prod_001",
+    "name": "Product A - Black - Medium",
+    "ean": "1234567890123",
+    "refId": "REF001",
+    "active": 1,
+    "price": 50.25,
+    "listPrice": 60.00,
+    "costPrice": 30.00,
+    "dateCreated": 1706025600,
+    "dateModified": 1706029200,
+    "dimensions": {
+      "width": 10.5,
+      "height": 20.0,
+      "length": 15.0,
+      "weight": 500,
+      "cubicweight": 3.15
+    },
+    "images": [
+      {
+        "url": "https://example.com/sku001.jpg",
+        "alt": "SKU001"
+      }
+    ],
+    "specifications": {
+      "color": "Black",
+      "size": "Medium"
+    },
+    "measurementUnit": "un",
+    "unitMultiplier": 1,
+    "ord": null,
+    "cart_limit": null,
+    "legal_unit_multiplier": null,
+    "min_stock": null
+  },
+  {
+    "id": "sku_002",
+    "sku": "SKU002",
+    "product_id": "prod_002",
+    "name": "Product B - White",
+    "ean": "2345678901234",
+    "refId": "REF002",
+    "active": 1,
+    "price": 50.00,
+    "listPrice": 50.00,
+    "costPrice": 25.00,
+    "dateCreated": 1706025700,
+    "dateModified": 1706029300,
+    "dimensions": {
+      "width": 5.0,
+      "height": 10.0,
+      "length": 8.0,
+      "weight": 200,
+      "cubicweight": 0.4
+    },
+    "images": [
+      {
+        "url": "https://example.com/sku002.jpg",
+        "alt": "SKU002"
+      }
+    ],
+    "specifications": {
+      "color": "White"
+    },
+    "measurementUnit": "un",
+    "unitMultiplier": 1,
+    "ord": 1,
+    "cart_limit": 10,
+    "legal_unit_multiplier": 1.0,
+    "min_stock": 5
+  },
+  {
+    "id": "sku_003",
+    "sku": "SKU003",
+    "product_id": "prod_003",
+    "name": "Product C",
+    "ean": null,
+    "refId": "REF003",
+    "active": 0,
+    "price": 10.00,
+    "listPrice": 10.00,
+    "costPrice": null,
+    "dateCreated": 1706025800,
+    "dateModified": null,
+    "dimensions": null,
+    "images": [],
+    "specifications": {},
+    "measurementUnit": "kg",
+    "unitMultiplier": 0.5,
+    "ord": null,
+    "cart_limit": null,
+    "legal_unit_multiplier": null,
+    "min_stock": null
+  },
+  {
+    "id": "sku_001",
+    "sku": "SKU001",
+    "product_id": "prod_001",
+    "name": "Product A - Black - Medium",
+    "ean": "1234567890123",
+    "refId": "REF001",
+    "active": 1,
+    "price": 55.00,
+    "listPrice": 65.00,
+    "costPrice": 32.00,
+    "dateCreated": 1706025600,
+    "dateModified": 1706030000,
+    "dimensions": {
+      "width": 10.5,
+      "height": 20.0,
+      "length": 15.0,
+      "weight": 500,
+      "cubicweight": 3.15
+    },
+    "images": [
+      {
+        "url": "https://example.com/sku001.jpg",
+        "alt": "SKU001"
+      }
+    ],
+    "specifications": {
+      "color": "Black",
+      "size": "Medium"
+    },
+    "measurementUnit": "un",
+    "unitMultiplier": 1,
+    "ord": null,
+    "cart_limit": null,
+    "legal_unit_multiplier": null,
+    "min_stock": null
+  }
+]

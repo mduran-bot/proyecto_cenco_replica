@@ -1,0 +1,456 @@
+{
+  "orderGroupId": "6913fcb57bb23d30fdaeb865",
+  "commerceSequentialId": "513111",
+  "commerceDateCreated": "2025-11-12T03:18:59.878Z",
+  "commerceSalesChannel": "70",
+  "totalAmount": 23.95,
+  "shippings": [
+    {
+      "carrierId": "6913f39c20fd2aec34745cfa",
+      "addressCommerceId": "pp002T108RetiroenSucursal",
+      "deliveryWindow": {
+        "initialDate": "2025-11-12T19:00:00.000Z",
+        "finalDate": "2025-11-12T20:00:00.000Z",
+        "additionalPrice": 0
+      },
+      "deliveryEstimateDate": "2025-11-12T19:00:00.000Z",
+      "price": 0,
+      "slaName": "Retiro en Wong Retamas La Molina (pp002T108RetiroenSucursal)",
+      "companyName": "T108 REC_TNDA (Normal)",
+      "isPickup": true,
+      "pickupInfo": {
+        "name": "Wong Cenco La Molina",
+        "address": {
+          "commerceId": "pp002T108RetiroenSucursal",
+          "type": "pickup",
+          "countryCode": "PER",
+          "state": "Lima",
+          "city": "Lima",
+          "neighborhood": "Lima",
+          "postalCode": "150114",
+          "streetName": "Las Retamas",
+          "streetNumber": "190",
+          "complement": null,
+          "reference": null,
+          "receiverName": null,
+          "geolocation": [
+            -76.95096,
+            -12.09201
+          ]
+        },
+        "additionalInfo": "",
+        "warehouseRefId": "pp002T108RetiroenSucursal",
+        "pickupPointRefId": "wongiot108wio-pp002T108RetiroenSucursal"
+      },
+      "polygonName": "T108_Retamas_1",
+      "items": [
+        {
+          "index": 0,
+          "id": "6A97D850862F494DA30E4BF8C8369F68",
+          "quantity": 7
+        },
+        {
+          "index": 1,
+          "id": "78C9A913C78147BE886B6CA6A9127933",
+          "quantity": 3
+        }
+      ],
+      "id": "f17897b0-e9fa-415c-8acc-2779b10ff7dc",
+      "status": "pending",
+      "type": "store_pickup",
+      "warehouseId": "68f1f222347ca25dd6df52b4",
+      "dateModified": "2025-11-12T21:10:57.204Z",
+      "deliveryId": "6914f7e007990d056e4b77b2",
+      "locationId": "68f1f21fb4c9f8dc1a230b5c",
+      "realTimeId": "251112-YILFZ4VM"
+    }
+  ],
+  "marketplace": {
+    "marketplaceRefId": "SLR",
+    "marketplaceOrderId": "v11209816wofp-01"
+  },
+  "notifyOrderChangeStatus": "invoiced",
+  "rawTotalAmount": 23.83,
+  "seller": {
+    "name": "WongIO",
+    "externalIds": {
+      "account": "68f0e94e924f5a7f0f22892a",
+      "vtex": "1"
+    },
+    "id": "68f1d50ce819c54b4e8c9c38"
+  },
+  "currency": "PEN",
+  "salesChannelPrefix": "",
+  "salesChannelName": "wongiot108wio-WongIO",
+  "skipPicking": false,
+  "externalPaymentValidation": false,
+  "automaticCapturePostPicking": false,
+  "account": {
+    "id": "68f1cfaa1c8ea89ef5c75539",
+    "name": "wongiot108wio",
+    "ecommerceName": "wongiot108wio",
+    "referenceId": "wongiot108wio",
+    "platform": "vtex"
+  },
+  "salesChannelReferenceId": "wongiot108wio-70",
+  "salesChannelId": "691338a5e2455182792683ee",
+  "sellerSalesChannelId": "691338a5e2455182792683ee",
+  "sellerSalesChannelReferenceId": "wongiot108wio-70",
+  "sellerSalesChannelName": "wongiot108wio-WongIO",
+  "addresses": [
+    {
+      "commerceId": "pp002T108RetiroenSucursal",
+      "type": "pickup",
+      "countryCode": "PER",
+      "state": "Lima",
+      "city": "Lima",
+      "neighborhood": "Lima",
+      "postalCode": "150114",
+      "streetName": "Las Retamas",
+      "streetNumber": "190",
+      "complement": null,
+      "reference": null,
+      "receiverName": "08768396 - Robert - Blume - DNI",
+      "geolocation": [
+        -76.95096,
+        -12.09201
+      ]
+    }
+  ],
+  "commerceId": "SLR-v11209816wofp-01",
+  "orderGroupCommerceId": "SLR-v11209816wofp-01",
+  "status": "readyForDelivery",
+  "originalAmount": 23.83,
+  "totals": {
+    "items": {
+      "originalAmount": 23.83,
+      "amount": 23.83
+    },
+    "discounts": {
+      "originalAmount": 0,
+      "amount": 0
+    },
+    "taxes": {
+      "originalAmount": 0,
+      "amount": 0
+    },
+    "shipping": {
+      "originalAmount": 0,
+      "amount": 0
+    },
+    "costs": {
+      "originalAmount": 0,
+      "amount": 0
+    },
+    "invoice": {
+      "amount": 23.95
+    }
+  },
+  "steps": {
+    "new": {
+      "status": "finished",
+      "dateStart": "2025-11-12T03:19:18.041Z",
+      "dateEnd": "2025-11-12T21:10:57.374Z"
+    },
+    "newOrderAudit": {
+      "status": "finished",
+      "dateStart": "2025-11-12T21:10:57.371Z",
+      "dateEnd": "2025-11-12T21:10:57.374Z"
+    },
+    "picking": {
+      "dateStart": "2025-11-13T00:14:20.569Z",
+      "status": "finished",
+      "dateEnd": "2025-11-13T00:14:22.252Z"
+    },
+    "postPickingPreDntAudit": {
+      "status": "finished",
+      "dateStart": "2025-11-13T00:14:22.090Z",
+      "dateEnd": "2025-11-13T00:14:22.096Z"
+    },
+    "postPickingAudit": {
+      "status": "finished",
+      "dateStart": "2025-11-13T00:14:22.315Z",
+      "dateEnd": "2025-11-13T00:14:22.321Z"
+    },
+    "invoice": {
+      "status": "finished",
+      "dateStart": "2025-11-13T00:14:36.692Z",
+      "dateEnd": "2025-11-13T00:14:49.801Z"
+    },
+    "packing": {
+      "status": "skipped"
+    }
+  },
+  "userCreated": null,
+  "dateCreated": "2025-11-12T03:19:18.042Z",
+  "userModified": null,
+  "dateModified": "2025-11-13T00:14:56.353Z",
+  "errors": [],
+  "planningErrorEmailSent": true,
+  "statusPerLocation": {
+    "68f1f21fb4c9f8dc1a230b5c": {
+      "status": "readyForDelivery",
+      "name": "T108 - Wong Retamas La Molina Comun"
+    }
+  },
+  "statusPerWarehouse": {
+    "68f1f222347ca25dd6df52b4": {
+      "status": "readyForDelivery",
+      "name": "T108 - Wong Retamas La Molina Comun",
+      "locationId": "68f1f21fb4c9f8dc1a230b5c"
+    }
+  },
+  "packages": [
+    {
+      "referenceId": "I763H4",
+      "ean": "SLR-v11209816wofp-01",
+      "packageId": "691522ddcb1e5d077497e226",
+      "packageTypeId": "64d6360e3fb9179aa3cd819e"
+    },
+    {
+      "ean": "ESYQ5S1388LIV",
+      "referenceId": "HZBCHM",
+      "packageTypeId": "64d6360e3fb9179aa3cd819e",
+      "orderItems": [
+        {
+          "id": "78C9A913C78147BE886B6CA6A9127933-01",
+          "quantity": 3
+        }
+      ],
+      "location": {
+        "warehouseId": "68f1f222347ca25dd6df52b4"
+      },
+      "packageId": "691522f954c9eea82eb006b3"
+    },
+    {
+      "ean": "KAFVVKOCQILR7",
+      "referenceId": "DHH6XT",
+      "packageTypeId": "64d6360e3fb9179aa3cd819e",
+      "orderItems": [
+        {
+          "id": "6A97D850862F494DA30E4BF8C8369F68-01",
+          "quantity": 7
+        }
+      ],
+      "packageId": "691522f954c9eea82eb006b4"
+    }
+  ],
+  "deliveryPackagesReady": true,
+  "invoiceIds": [
+    "691522ec26583fbdc23bdae6"
+  ],
+  "invoices": [
+    {
+      "id": "691522ec26583fbdc23bdae6",
+      "number": "112098161",
+      "value": 23.95
+    }
+  ],
+  "settlementRequested": true,
+  "readyForDeliveryMailSent": true,
+  "id": "6913fcb6d134afc8da8ac3dd",
+  "items": [
+    {
+      "commerceSkuId": "192",
+      "commerceProductId": "192",
+      "name": "Agua Sin Gas Mineral San Mateo Bidón 7L",
+      "purchasedPrice": 6.9,
+      "purchasedListPrice": 9.3,
+      "purchasedPricePerMeasurementUnit": 6.9,
+      "listPricePerMeasurementUnit": 6.9,
+      "purchasedQuantity": 3,
+      "sellingMeasurementUnit": "un",
+      "sellingUnitMultiplier": 1,
+      "imageUrl": "https://wongfood.vteximg.com.br/arquivos/ids/353212-250-250/455567-1.jpg?v=637219031564630000",
+      "isGift": false,
+      "shippingPrice": 0,
+      "costPrice": 9.9,
+      "brandId": "806",
+      "brandName": "San Mateo",
+      "categories": [
+        {
+          "commerceId": "1000749",
+          "name": "Agua sin Gas"
+        },
+        {
+          "commerceId": "1803",
+          "name": "Aguas"
+        },
+        {
+          "commerceId": "1800",
+          "name": "Aguas y Bebidas"
+        }
+      ],
+      "dimensions": {
+        "width": 17.3,
+        "height": 39,
+        "length": 17.3,
+        "weight": 7155,
+        "cubicweight": 2.3345
+      },
+      "promotions": [],
+      "taxes": [],
+      "warehouses": {
+        "pickingSuggestion": {
+          "id": "68f1f222347ca25dd6df52b4",
+          "referenceId": "wongiot108wio-T108-Comun",
+          "locationId": "68f1f21fb4c9f8dc1a230b5c",
+          "locationReferenceId": "wongiot108wio-T108-Comun"
+        },
+        "delivery": {
+          "id": "68f1f222347ca25dd6df52b4",
+          "referenceId": "pp002T108RetiroenSucursal",
+          "locationId": "68f1f21fb4c9f8dc1a230b5c",
+          "locationReferenceId": "wongiot108wio-T108-Comun"
+        },
+        "picking": {
+          "id": "68f1f222347ca25dd6df52b4",
+          "referenceId": "pp002T108RetiroenSucursal",
+          "locationId": "68f1f21fb4c9f8dc1a230b5c",
+          "locationReferenceId": "wongiot108wio-T108-Comun"
+        }
+      },
+      "id": "78C9A913C78147BE886B6CA6A9127933",
+      "refId": "455567",
+      "ean": "7753749002059",
+      "substitutionCriteria": "doNotSubstitute",
+      "categoriesIds": [],
+      "eans": [
+        "7753749002059"
+      ],
+      "measurementUnit": "un",
+      "productGroups": [],
+      "skuId": null,
+      "unitMultiplier": 1,
+      "locationId": "68f1f21fb4c9f8dc1a230b5c",
+      "pickingPointId": "68f1f222347ca25dd6df52b4",
+      "hasCandidates": false,
+      "isPicked": true,
+      "pickingResult": [
+        {
+          "ean": "7753749002059",
+          "eanCount": 3,
+          "id": "78C9A913C78147BE886B6CA6A9127933-01",
+          "name": "Agua Sin Gas Mineral San Mateo Bidón 7L",
+          "refId": "455567",
+          "imageUrl": "https://wongfood.vteximg.com.br/arquivos/ids/353212-250-250/455567-1.jpg?v=637219031564630000",
+          "batch": null,
+          "expirationDate": null,
+          "measurementUnit": "un",
+          "unitMultiplier": 1,
+          "sellingMeasurementUnit": "un",
+          "sellingUnitMultiplier": 1,
+          "manualTotalQuantity": 3,
+          "productGroups": [],
+          "price": 6.9,
+          "pricePerMeasurementUnit": 6.9,
+          "quantityPerEan": 1,
+          "totalQuantity": 3
+        }
+      ],
+      "isPickingFulfilled": true,
+      "imageThumbnail": {
+        "path": "cdn/wongio/thumbnails/455567/26dd5c00e0911f91f07eb88aae6208576a0d94a4.webp",
+        "width": 250,
+        "height": 250,
+        "url": "https://cdn.oms.janis.in/wongio/thumbnails/455567/26dd5c00e0911f91f07eb88aae6208576a0d94a4.webp"
+      }
+    },
+    {
+      "commerceSkuId": "2930",
+      "commerceProductId": "2928",
+      "name": "Papa Blanca Yungay x kg",
+      "purchasedPrice": 0.44,
+      "purchasedListPrice": 2.99,
+      "purchasedPricePerMeasurementUnit": 2.99,
+      "listPricePerMeasurementUnit": 2.99,
+      "purchasedQuantity": 7,
+      "sellingMeasurementUnit": "kg",
+      "sellingUnitMultiplier": 0.15,
+      "measurementUnit": "kg",
+      "unitMultiplier": 0.15,
+      "imageUrl": "https://wongfood.vteximg.com.br/arquivos/ids/223610-250-250/Papa-Blanca-Yungay-x-kg-1-7325.jpg?v=636625116402970000",
+      "isGift": false,
+      "shippingPrice": 0,
+      "brandId": "9619",
+      "brandName": "Genérico",
+      "categories": [
+        {
+          "commerceId": "1001320",
+          "name": "Tubérculos y Raíces"
+        },
+        {
+          "commerceId": "802",
+          "name": "Verduras"
+        },
+        {
+          "commerceId": "800",
+          "name": "Frutas y Verduras"
+        }
+      ],
+      "dimensions": {
+        "width": 40,
+        "height": 20,
+        "length": 3.75,
+        "weight": 1000,
+        "cubicweight": 0.6
+      },
+      "promotions": [],
+      "taxes": [],
+      "warehouses": {
+        "pickingSuggestion": {
+          "id": "68f1f222347ca25dd6df52b4"
+        }
+      },
+      "substitutionCriteria": "doNotSubstitute",
+      "productGroups": [],
+      "id": "6A97D850862F494DA30E4BF8C8369F68",
+      "refId": "162060",
+      "ean": "48804",
+      "hasCandidates": false,
+      "isPicked": true,
+      "pickingResult": [
+        {
+          "ean": "48804",
+          "eanCount": 7,
+          "id": "6A97D850862F494DA30E4BF8C8369F68-01",
+          "name": "Papa Blanca Yungay x kg",
+          "refId": "162060",
+          "imageUrl": "https://wongfood.vteximg.com.br/arquivos/ids/223610-250-250/Papa-Blanca-Yungay-x-kg-1-7325.jpg?v=636625116402970000",
+          "batch": null,
+          "expirationDate": null,
+          "measurementUnit": "kg",
+          "unitMultiplier": 0.15,
+          "sellingMeasurementUnit": "kg",
+          "sellingUnitMultiplier": 0.15,
+          "manualTotalQuantity": 7,
+          "productGroups": [],
+          "price": 2.99,
+          "pricePerMeasurementUnit": 2.99,
+          "quantityPerEan": 0.15,
+          "totalQuantity": 1.05
+        }
+      ],
+      "isPickingFulfilled": true
+    }
+  ],
+  "customer": {
+    "firstName": "Robert",
+    "lastName": "Blume",
+    "commerceId": null,
+    "trackedEmail": "7118190000e648f692cf471aec3cd77e@ct.vtex.com.br",
+    "email": "ba554bd25eb44254a802c634446f6fa5@ct.vtex.com.br",
+    "documentType": "DNI",
+    "documentNumber": "08768396",
+    "phone": "+51999089159",
+    "isCorporate": false,
+    "clusters": [],
+    "habeasDataAccepted": false,
+    "id": "6913fcb6d68818a3aec8df98",
+    "isBlacklisted": false,
+    "isFirstOrder": true,
+    "fullname": "Robert Blume",
+    "emailShortened": "ba554bd25eb44254a...@ct.vtex.com.br"
+  },
+  "payments": []
+}

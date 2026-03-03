@@ -1,0 +1,1888 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Packing Service",
+    "description": "Packing Service\n\n **Last update**: 22 dic 25, 09:37 a. m.",
+    "version": "1.18.0",
+    "x-logo": null,
+    "x-janis-keywords": [
+      "packing",
+      "package",
+      "package type",
+      "packaging"
+    ],
+    "lastUpdate": "2025-12-22T12:37:33.485Z"
+  },
+  "tags": [
+    {
+      "name": "Package",
+      "description": "Containers where products are placed during your store operation from picking to delivery"
+    },
+    {
+      "name": "Package Type",
+      "description": "Package types allow you to generate consistent packages based on predefined properties"
+    }
+  ],
+  "servers": [
+    {
+      "url": "https://packing.janis.in/api",
+      "description": "The Prod API server",
+      "variables": {
+        "environment": {
+          "default": "prod"
+        }
+      }
+    },
+    {
+      "url": "https://packing.janisqa.in/api",
+      "description": "The QA API server",
+      "variables": {
+        "environment": {
+          "default": "qa"
+        }
+      }
+    },
+    {
+      "url": "https://packing.janisdev.in/api",
+      "description": "The Beta API server",
+      "variables": {
+        "environment": {
+          "default": "beta"
+        }
+      }
+    },
+    {
+      "url": "http://packing.janis.localhost:3076/api",
+      "description": "The Local API server",
+      "variables": {
+        "environment": {
+          "default": "local"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/order/{id}/generate-package-labels": {
+      "post": {
+        "x-janis-namespace": "order",
+        "x-janis-method": "generatePackageLabels",
+        "x-janis-permissions": [
+          "packing:package:write"
+        ],
+        "operationId": "generatePackageLabels",
+        "tags": [
+          "Package"
+        ],
+        "summary": "Generate order package labels",
+        "description": "Generate a PDF document of the Package Labels",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The created document link",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "pdfLink": {
+                      "type": "string",
+                      "description": "The generated PDF file download link",
+                      "example": "http://storage.com/file.pdf"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/order/{id}/packages": {
+      "post": {
+        "x-janis-namespace": "order",
+        "x-janis-method": "packages",
+        "x-janis-permissions": [
+          "packing:package:write"
+        ],
+        "operationId": "createOrderPackages",
+        "tags": [
+          "Package"
+        ],
+        "summary": "Create or update massive order packages",
+        "description": "Create or update massive prder packages",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "The package to create or update.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrderPackagesBatch"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/OrderPackagesBatchResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/order/{id}/release": {
+      "post": {
+        "x-janis-namespace": "order",
+        "x-janis-method": "release",
+        "x-janis-permissions": [
+          "packing:package:write"
+        ],
+        "operationId": "releaseOrderPackages",
+        "tags": [
+          "Package"
+        ],
+        "summary": "Update or remove massive order packages",
+        "description": "Update or remove massive order packages",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/OrderPackagesReleaseResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/package/{id}": {
+      "get": {
+        "x-janis-namespace": "package",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "packing:package:read"
+        ],
+        "operationId": "getPackage",
+        "tags": [
+          "Package"
+        ],
+        "summary": "Get one Package by ID",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A Package found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Package"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "x-janis-namespace": "package",
+        "x-janis-method": "update",
+        "x-janis-permissions": [
+          "packing:package:write"
+        ],
+        "operationId": "updatePackage",
+        "tags": [
+          "Package"
+        ],
+        "summary": "Update one Package",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "requestBody": {
+          "description": "A Package",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Package"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessUpdateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/package": {
+      "get": {
+        "x-janis-namespace": "package",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "packing:package:read"
+        ],
+        "x-janis-roles": [
+          "pickingPack"
+        ],
+        "operationId": "listPackages",
+        "tags": [
+          "Package"
+        ],
+        "summary": "Get a list of Packages",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PackageSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/PackageFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of packages",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PackageList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "x-janis-namespace": "package",
+        "x-janis-method": "create",
+        "x-janis-permissions": [
+          "packing:package:write"
+        ],
+        "operationId": "createPackage",
+        "tags": [
+          "Package"
+        ],
+        "summary": "Create one Package",
+        "description": "This API creates new packages and uses (updates) existing packages as follows:\n\nOnly in cases where the package to be created is a returnable package type and there is a returnable package that has the status `free` or `inUse`, will it be updated by adding one more use.\n\nOtherwise a new package will be created.\n",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "A Package",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Package"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GenericSuccess"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/package/{id}/discard": {
+      "post": {
+        "x-janis-namespace": "package",
+        "x-janis-method": "discard",
+        "x-janis-permissions": [
+          "packing:package:discard"
+        ],
+        "operationId": "discardPackage",
+        "tags": [
+          "Package"
+        ],
+        "summary": "Discard returnable package",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessUpdateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/package/{id}/release": {
+      "post": {
+        "x-janis-namespace": "package",
+        "x-janis-method": "release",
+        "x-janis-permissions": [
+          "packing:package:write"
+        ],
+        "operationId": "releasePackage",
+        "tags": [
+          "Package"
+        ],
+        "summary": "Release returnable package in use",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessUpdateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/package-type/{id}": {
+      "get": {
+        "x-janis-namespace": "package-type",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "packing:package-type:read"
+        ],
+        "operationId": "getPackageType",
+        "tags": [
+          "Package Type"
+        ],
+        "summary": "Get one Package Type by ID",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A Package type found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PackageType"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "x-janis-namespace": "package-type",
+        "x-janis-method": "update",
+        "x-janis-permissions": [
+          "packing:package-type:write"
+        ],
+        "operationId": "updatePackageType",
+        "tags": [
+          "Package Type"
+        ],
+        "summary": "Update one Package Type",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "requestBody": {
+          "description": "A Package Type",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PackageType"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessUpdateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/package-type": {
+      "get": {
+        "x-janis-namespace": "package-type",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "packing:package-type:read"
+        ],
+        "x-janis-roles": [
+          "pickingPick",
+          "pickingControl",
+          "pickingPack",
+          "deliveryLastMile",
+          "deliveryDispatch",
+          "deliveryPickup",
+          "deliveryShippingContainer"
+        ],
+        "operationId": "listPackageType",
+        "tags": [
+          "Package Type"
+        ],
+        "summary": "Get a list of Package Types",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PackageTypeFilters"
+          },
+          {
+            "$ref": "#/components/parameters/PackageTypeSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of package types",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PackageTypeList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "402": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "x-janis-namespace": "package-type",
+        "x-janis-method": "post",
+        "x-janis-permissions": [
+          "packing:package-type:write"
+        ],
+        "operationId": "createPackageType",
+        "tags": [
+          "Package Type"
+        ],
+        "summary": "Create one Package Type",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "a PackageType",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PackageType"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessCreateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-key",
+        "description": "The API Key"
+      },
+      "ApiSecret": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-secret",
+        "description": "The API Secret"
+      },
+      "JanisClient": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-client",
+        "description": "The Client Code"
+      }
+    },
+    "parameters": {
+      "id": {
+        "name": "id",
+        "in": "path",
+        "schema": {
+          "type": "string",
+          "example": "d555345345345as67a342a"
+        },
+        "required": true,
+        "description": "The unique identifier of the item"
+      },
+      "ListSortDirection": {
+        "name": "sortDirection",
+        "in": "query",
+        "description": "The direction to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
+        }
+      },
+      "ListPageNumber": {
+        "name": "x-janis-page",
+        "in": "header",
+        "description": "The page to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "default": 1
+        }
+      },
+      "ListPageSize": {
+        "name": "x-janis-page-size",
+        "in": "header",
+        "description": "The page size to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "default": 60
+        }
+      },
+      "PackageSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "ean",
+            "dimensions.height",
+            "dimensions.length",
+            "dimensions.volume",
+            "status",
+            "dateCreated",
+            "dateModified"
+          ]
+        }
+      },
+      "PackageFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "Field to filter the package",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/PackageBase/properties/id"
+            },
+            "orderId": {
+              "$ref": "#/components/schemas/PackageBase/properties/orderId"
+            },
+            "packageTypeId": {
+              "$ref": "#/components/schemas/PackageBase/properties/packageTypeId"
+            },
+            "referenceId": {
+              "$ref": "#/components/schemas/PackageBase/properties/referenceId"
+            },
+            "ean": {
+              "type": "string",
+              "description": "The partial or complete barcode of the package. If `dateCreatedRange` is not passed, it will use 15 days range.\n\nWe recommend using `strictEan` whenever possible as it is more accurate.\n",
+              "example": "LB-005"
+            },
+            "strictEan": {
+              "type": "string",
+              "description": "The barcode of the package.\n\nThis property is for searching by full EAN.\n",
+              "example": "PLB-00515"
+            },
+            "description": {
+              "$ref": "#/components/schemas/PackageBase/properties/description"
+            },
+            "price": {
+              "$ref": "#/components/schemas/PackageBase/properties/price"
+            },
+            "dateCreatedRange": {
+              "type": "object",
+              "description": "A range of dates where the packages were created",
+              "properties": {
+                "from": {
+                  "$ref": "#/components/schemas/PackageBase/properties/dateCreated"
+                },
+                "to": {
+                  "$ref": "#/components/schemas/PackageBase/properties/dateCreated"
+                }
+              },
+              "required": [
+                "from",
+                "to"
+              ]
+            },
+            "dateModifiedRange": {
+              "type": "object",
+              "description": "A range of dates where the packages were modified",
+              "properties": {
+                "from": {
+                  "$ref": "#/components/schemas/PackageBase/properties/dateModified"
+                },
+                "to": {
+                  "$ref": "#/components/schemas/PackageBase/properties/dateModified"
+                }
+              },
+              "required": [
+                "from",
+                "to"
+              ]
+            },
+            "status": {
+              "$ref": "#/components/schemas/PackageBase/properties/status"
+            }
+          }
+        }
+      },
+      "PackageTypeSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "name",
+            "identifier",
+            "identifierType",
+            "material",
+            "maxUsageQuantity",
+            "acquisitionCost",
+            "dateCreated",
+            "dateModified"
+          ]
+        }
+      },
+      "PackageTypeFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The field to apply the filter",
+        "required": false,
+        "style": "deepObject",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/PackageType/properties/id"
+            },
+            "name": {
+              "$ref": "#/components/schemas/PackageType/properties/name"
+            },
+            "identifier": {
+              "$ref": "#/components/schemas/PackageType/properties/identifier"
+            },
+            "identifierType": {
+              "$ref": "#/components/schemas/PackageType/properties/identifierType"
+            },
+            "material": {
+              "$ref": "#/components/schemas/PackageType/properties/material"
+            },
+            "returnable": {
+              "$ref": "#/components/schemas/PackageType/properties/returnable"
+            },
+            "requirePosition": {
+              "$ref": "#/components/schemas/PackageType/properties/requirePosition"
+            },
+            "maxUsageQuantity": {
+              "$ref": "#/components/schemas/PackageType/properties/maxUsageQuantity"
+            },
+            "acquisitionCost": {
+              "$ref": "#/components/schemas/PackageType/properties/acquisitionCost"
+            },
+            "status": {
+              "$ref": "#/components/schemas/PackageType/properties/status"
+            }
+          }
+        }
+      },
+      "FunctionsFields": {
+        "name": "fields",
+        "in": "query",
+        "description": "Reduce the response to fields",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "example": [
+            "id",
+            "name",
+            "referenceId"
+          ]
+        }
+      },
+      "FunctionsFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the model",
+        "schema": {
+          "type": "object",
+          "description": "The filters to apply to the model",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "The id to filter",
+              "example": "d555345345345as67a342b"
+            }
+          }
+        }
+      },
+      "FunctionsCalculateTotals": {
+        "name": "calculateTotals",
+        "in": "query",
+        "description": "Indicates if the response must return the totals data applied filters. **Default** `false`",
+        "schema": {
+          "type": "boolean",
+          "example": true
+        }
+      },
+      "FunctionsAllItems": {
+        "name": "allItems",
+        "in": "query",
+        "description": "Indicates if the response must return all items. **Default** `false`",
+        "schema": {
+          "type": "boolean",
+          "example": true
+        }
+      }
+    },
+    "headers": {
+      "x-janis-total": {
+        "description": "The total amount of records in the list",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "x-janis-total-created": {
+        "description": "The total amount of records created",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "x-janis-total-updated": {
+        "description": "The total amount of records updated",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "x-janis-total-not-modified": {
+        "description": "The total amount of records not modified",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "x-janis-total-error": {
+        "description": "The total amount of records that were invalid",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "x-janis-total-removed": {
+        "description": "The total amount of records removed",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "responses": {
+      "SuccessCreateResponse": {
+        "description": "The item was created",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "SuccessUpdateResponse": {
+        "description": "The item was updated",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "GenericSuccess": {
+        "description": "Operation succeeded",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "BadRequest": {
+        "description": "A client error has ocurred.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Authentication missing or invalid",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Not authorized request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "InternalError": {
+        "description": "A server error has ocurred."
+      },
+      "OrderPackagesBatchResponse": {
+        "description": "Batch responses",
+        "content": {
+          "application/json": {
+            "schema": {
+              "description": "Item Batch response",
+              "type": "object",
+              "properties": {
+                "itemsCreated": {
+                  "description": "Items which were created successfully.",
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OrderPackagesBatchResponseCorrectItem"
+                  }
+                },
+                "itemsUpdated": {
+                  "description": "Items which were updated successfully.",
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OrderPackagesBatchResponseCorrectItem"
+                  }
+                },
+                "itemsNotModified": {
+                  "description": "Items that did not need to be modified.",
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OrderPackagesBatchResponseCorrectItem"
+                  }
+                },
+                "itemsError": {
+                  "description": "Items that were not valid.",
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "position": {
+                        "description": "Package position in array body",
+                        "type": "string",
+                        "example": "0.packages.1"
+                      },
+                      "errorMessage": {
+                        "description": "Failure message showing an error description",
+                        "type": "string",
+                        "example": "Returnable package types require an EAN"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "headers": {
+          "x-janis-total-created": {
+            "$ref": "#/components/headers/x-janis-total-created"
+          },
+          "x-janis-total-updated": {
+            "$ref": "#/components/headers/x-janis-total-updated"
+          },
+          "x-janis-total-not-modified": {
+            "$ref": "#/components/headers/x-janis-total-not-modified"
+          },
+          "x-janis-total-error": {
+            "$ref": "#/components/headers/x-janis-total-error"
+          }
+        }
+      },
+      "OrderPackagesReleaseResponse": {
+        "description": "Batch responses",
+        "content": {
+          "application/json": {
+            "schema": {
+              "description": "Item Batch response",
+              "type": "object",
+              "properties": {
+                "itemsUpdated": {
+                  "description": "Items which were updated successfully.",
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OrderPackagesReleaseResponseItem"
+                  }
+                },
+                "itemsRemoved": {
+                  "description": "Items which were removed successfully.",
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OrderPackagesReleaseResponseItem"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "headers": {
+          "x-janis-total-updated": {
+            "$ref": "#/components/headers/x-janis-total-updated"
+          },
+          "x-janis-total-removed": {
+            "$ref": "#/components/headers/x-janis-total-removed"
+          }
+        }
+      }
+    },
+    "schemas": {
+      "id": {
+        "description": "The unique identifier of the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "d555345345345as67a342a"
+      },
+      "status": {
+        "description": "The item status",
+        "type": "string",
+        "default": "active",
+        "enum": [
+          "active",
+          "inactive"
+        ],
+        "example": "active"
+      },
+      "dateCreated": {
+        "description": "The date of creation",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-12T19:00:00.000Z"
+      },
+      "dateModified": {
+        "description": "The date of the last modification",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-20T19:00:00.000Z"
+      },
+      "userCreated": {
+        "description": "The ID of the user who created the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "6a1fc1eeb5b68406e0487a10"
+      },
+      "userModified": {
+        "description": "The ID of the user who last modified the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "7e1fc1eeb5b68406e048796"
+      },
+      "OrderPackagesBatch": {
+        "description": "A Package Batch",
+        "type": "array",
+        "minItems": 1,
+        "maxItems": 10000,
+        "uniqueItems": true,
+        "items": {
+          "$ref": "#/components/schemas/OrderPackagesBatchItem"
+        }
+      },
+      "OrderPackagesBatchItem": {
+        "description": "A package added",
+        "type": "object",
+        "properties": {
+          "referenceId": {
+            "$ref": "#/components/schemas/PackageBase/properties/referenceId"
+          },
+          "ean": {
+            "$ref": "#/components/schemas/PackageBase/properties/ean"
+          },
+          "packageTypeId": {
+            "$ref": "#/components/schemas/PackageBase/properties/packageTypeId"
+          },
+          "dimensions": {
+            "$ref": "#/components/schemas/PackageDimensions"
+          },
+          "price": {
+            "type": "number",
+            "description": "Package's price. If not send, it will be tried to be calculated based on the `items` and `packages` that it contains.",
+            "example": 100
+          },
+          "items": {
+            "type": "array",
+            "description": "List of items inside the package",
+            "items": {
+              "$ref": "#/components/schemas/PackageItem"
+            }
+          },
+          "packages": {
+            "description": "A list of packages inside this package",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderPackagesBatchItem"
+            }
+          }
+        }
+      },
+      "OrderPackagesBatchResponseCorrectItem": {
+        "description": "An item from the order packages batch response.",
+        "type": "object",
+        "properties": {
+          "referenceId": {
+            "$ref": "#/components/schemas/PackageBase/properties/referenceId"
+          },
+          "ean": {
+            "$ref": "#/components/schemas/PackageBase/properties/ean"
+          },
+          "packageTypeId": {
+            "$ref": "#/components/schemas/PackageBase/properties/packageTypeId"
+          },
+          "orderId": {
+            "$ref": "#/components/schemas/PackageBase/properties/orderId"
+          },
+          "id": {
+            "$ref": "#/components/schemas/id"
+          }
+        }
+      },
+      "OrderPackagesReleaseResponseItem": {
+        "description": "An item from the order packages release batch response.",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          }
+        }
+      },
+      "Dimensions": {
+        "type": "object",
+        "description": "Dimensions",
+        "properties": {
+          "width": {
+            "type": "number",
+            "description": "Width in centimeters",
+            "example": 20
+          },
+          "height": {
+            "type": "number",
+            "description": "Height in centimeters",
+            "example": 35
+          },
+          "length": {
+            "type": "number",
+            "description": "Length in centimeters",
+            "example": 20
+          },
+          "weight": {
+            "type": "number",
+            "description": "Weight in grams",
+            "example": 1600
+          }
+        }
+      },
+      "PackageDimensions": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Dimensions"
+          },
+          {
+            "type": "object",
+            "description": "Package dimensions. These are inherited from the Package Type if not sent.",
+            "properties": {
+              "cubing": {
+                "type": "number",
+                "description": "To calculate volumetric weight",
+                "example": 10
+              },
+              "volume": {
+                "type": "number",
+                "description": "Relation of the width height and length in cubic centimeters",
+                "readOnly": true,
+                "example": 22950
+              }
+            }
+          }
+        ]
+      },
+      "ItemDimensions": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Dimensions"
+          },
+          {
+            "type": "object",
+            "description": "Item required dimensions",
+            "required": [
+              "width",
+              "height",
+              "length",
+              "weight"
+            ]
+          }
+        ]
+      },
+      "PackageItem": {
+        "type": "object",
+        "description": "A Package Item",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Item's ID",
+            "example": "6058f002b299900011a7f8f2"
+          },
+          "name": {
+            "type": "string",
+            "description": "Item's name",
+            "example": "Coca Cola 1.5L"
+          },
+          "refId": {
+            "type": "string",
+            "description": "Item's reference",
+            "example": "coca-cola-15L"
+          },
+          "ean": {
+            "type": "string",
+            "description": "Item's ean",
+            "example": "0746546544654"
+          },
+          "currency": {
+            "type": "string",
+            "description": "Item's price currency ISO3 Code",
+            "example": "USD"
+          },
+          "price": {
+            "type": "number",
+            "description": "Item's price",
+            "example": 150
+          },
+          "quantity": {
+            "type": "number",
+            "description": "Item's quantity",
+            "example": 2
+          },
+          "imageUrl": {
+            "type": "string",
+            "description": "Item's image url",
+            "example": "https://via.placeholder.com/300"
+          },
+          "brandName": {
+            "type": "string",
+            "description": "Item's company name",
+            "example": "Coca Cola"
+          },
+          "categories": {
+            "type": "array",
+            "description": "A list of product categories",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "Category ID from Catalog Service",
+                  "example": "6058f002b299900011a7f8f2"
+                },
+                "name": {
+                  "type": "string",
+                  "description": "Category name",
+                  "example": "Bebidas"
+                }
+              }
+            }
+          },
+          "dimensions": {
+            "$ref": "#/components/schemas/ItemDimensions"
+          },
+          "sellingMeasurementUnit": {
+            "type": "string",
+            "description": "The order item **Measurement Unit**",
+            "example": "un",
+            "nullable": true
+          },
+          "sellingUnitMultiplier": {
+            "type": "number",
+            "description": "The order item **Unit Multiplier**",
+            "example": 1,
+            "nullable": true
+          },
+          "productGroupIds": {
+            "type": "array",
+            "description": "A list of packages inside this package",
+            "items": {
+              "type": "string",
+              "example": "6058f002b299900011a7f8f2"
+            }
+          }
+        }
+      },
+      "PackageLocation": {
+        "type": "object",
+        "description": "A location **Package**",
+        "properties": {
+          "warehouseId": {
+            "type": "string",
+            "description": "This refers to the `id` in the **Warehouse** Entity. See [Warehouse](/v2/service/wms#tag/Warehouse).\n\nIt is required in location.\n",
+            "example": "6b8bdac48ba45b0011913909"
+          },
+          "positionKey": {
+            "type": "string",
+            "description": "Package location in warehouse.",
+            "example": "PLC-1234"
+          }
+        }
+      },
+      "PackageBase": {
+        "type": "object",
+        "description": "A Package",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "orderId": {
+            "type": "string",
+            "description": "This refers to the `id` of the **Order**. See [Order](/v2/service/oms#tag/Orders)",
+            "example": "4f1fc1eeb5b68406e0487a09"
+          },
+          "packageTypeId": {
+            "type": "string",
+            "description": "The ID of a [Package Type](#operation/getPackageType).\n\nIf you use the package `ean` to match against the Package Type `identifier`, don't send this field.\nOtherwise, this field is **required**.\n",
+            "example": "d555345345345as67a3424"
+          },
+          "ean": {
+            "type": "string",
+            "description": "The barcode of the package. This will be used to match a Package Type if `packageTypeId` is not sent.\n\nOtherwise, this field is **required** if the `packageTypeId` is not passed or the package type is returnable. See [Package Type](#tag/Package-Type)\n",
+            "example": "PLB-00515"
+          },
+          "description": {
+            "type": "string",
+            "description": "A description of the content of the package",
+            "example": "Order number OL-654654400545"
+          },
+          "referenceId": {
+            "type": "string",
+            "description": "The `referenceId` of the package",
+            "example": "654654400545-1234"
+          },
+          "material": {
+            "type": "string",
+            "description": "Package's material. This is inherited from the Package Type.",
+            "example": "Plastic",
+            "readOnly": true
+          },
+          "dimensions": {
+            "$ref": "#/components/schemas/PackageDimensions"
+          },
+          "currency": {
+            "type": "string",
+            "description": "Package's price currency ISO3 Code (this is inherited from it's items currency)",
+            "example": "USD",
+            "readOnly": true
+          },
+          "price": {
+            "type": "number",
+            "description": "Package's price. If not send, it will be tried to be calculated based on the `items` and `packages` that it contains.",
+            "example": 100
+          },
+          "packages": {
+            "type": "array",
+            "description": "A list of packages inside this package",
+            "items": {
+              "$ref": "#/components/schemas/id"
+            }
+          },
+          "returnable": {
+            "type": "boolean",
+            "description": "If package should return to the store/warehouse. This is inherited from the Package Type.",
+            "example": true,
+            "readOnly": true
+          },
+          "acquisitionCost": {
+            "type": "number",
+            "description": "Cost of acquisition of the package itself. This is inherited from the Package Type.",
+            "readOnly": true,
+            "example": 5.2
+          },
+          "location": {
+            "$ref": "#/components/schemas/PackageLocation"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "status": {
+            "description": "The package status",
+            "type": "string",
+            "default": "inUse",
+            "enum": [
+              "inUse",
+              "free",
+              "discarded"
+            ],
+            "example": "inUse"
+          }
+        }
+      },
+      "Package": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/PackageBase"
+          },
+          {
+            "properties": {
+              "items": {
+                "type": "array",
+                "description": "List of items inside the package",
+                "items": {
+                  "$ref": "#/components/schemas/PackageItem"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "PackageList": {
+        "type": "array",
+        "description": "Array of Packages",
+        "items": {
+          "$ref": "#/components/schemas/PackageBase"
+        }
+      },
+      "PackageType": {
+        "description": "A Package Type",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "name": {
+            "type": "string",
+            "description": "The package type's name",
+            "example": "Plastic basket"
+          },
+          "identifier": {
+            "type": "string",
+            "description": "The package type's identifier. This works in combination with `identifierType`.\n\nLeave this empty if the package type does not have a barcode or it doesn't have a pattern\n",
+            "example": "PLB-"
+          },
+          "identifierType": {
+            "type": "string",
+            "description": "The identifier type sets how packages EANs will be compared with the identifier in order to detect the correct package type.\n\nLeave this empty if the package type does not have a barcode or it doesn't have a pattern\n",
+            "example": "startsWith",
+            "enum": [
+              "isEqualTo",
+              "startsWith"
+            ]
+          },
+          "material": {
+            "type": "string",
+            "description": "The package type's material",
+            "example": "Plastic"
+          },
+          "isDefault": {
+            "type": "boolean",
+            "description": "Whether this package type is or not the default when no package types are matched\n\n`Warning` **PackageType** entity must have only one default. Set this property as true will override any other existent **PackageType** *isDefault* as **false**\n",
+            "example": false,
+            "default": false
+          },
+          "width": {
+            "type": "number",
+            "description": "Width of the package in centimeters",
+            "example": 10
+          },
+          "height": {
+            "type": "number",
+            "description": "Height of the package in centimeters",
+            "example": 100
+          },
+          "length": {
+            "type": "number",
+            "description": "Length of the package in centimeters",
+            "example": 42
+          },
+          "volume": {
+            "type": "number",
+            "description": "Relation of height, width and length in cubic centimeters",
+            "example": 42000,
+            "readOnly": true
+          },
+          "cubing": {
+            "type": "number",
+            "description": "Weight volumetric",
+            "example": 90
+          },
+          "weightEmpty": {
+            "type": "number",
+            "description": "Weight of the package when it's empty",
+            "example": 1
+          },
+          "maxWeight": {
+            "type": "number",
+            "description": "Max weight in the package in grams",
+            "example": 10
+          },
+          "returnable": {
+            "type": "boolean",
+            "description": "If the package have to be returned to the store",
+            "example": true,
+            "default": false
+          },
+          "requirePosition": {
+            "type": "boolean",
+            "description": "Indicates if the package requires a position",
+            "example": true,
+            "default": false
+          },
+          "maxUsageQuantity": {
+            "type": "number",
+            "description": "Maximum quantity of times that the package can be used. Only available when `returnable` is `true`.",
+            "example": 2
+          },
+          "acquisitionCost": {
+            "type": "number",
+            "description": "Cost of acquisition of each package of this type",
+            "example": 9,
+            "default": 0
+          },
+          "incompatibleCategories": {
+            "type": "array",
+            "description": "The IDs of the categories which are incompatible with the package type. This refer to the `id` of the **Category** Entity. See [Category](/v2/service/catalog#tag/Category).",
+            "items": {
+              "type": "string",
+              "description": "ID of a [Category](/v2/service/catalog#operation/listCategory).",
+              "example": "1555345345345as67a3424"
+            }
+          },
+          "sellingPrice": {
+            "type": "number",
+            "description": "The selling price of the package type that will be charged to the customer",
+            "example": 40
+          },
+          "icon": {
+            "type": "string",
+            "description": "The icon that represents the ``PackageType``",
+            "example": "box"
+          },
+          "status": {
+            "$ref": "#/components/schemas/status"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "PackageTypeList": {
+        "type": "array",
+        "description": "List of package types",
+        "items": {
+          "$ref": "#/components/schemas/PackageType"
+        }
+      },
+      "listenerEvent": {
+        "description": "A JANIS Event object",
+        "type": "object",
+        "properties": {
+          "service": {
+            "description": "The source service name",
+            "type": "string",
+            "example": "id"
+          },
+          "entity": {
+            "description": "The event related entity",
+            "type": "string",
+            "example": "profile"
+          },
+          "event": {
+            "description": "The event name",
+            "type": "string",
+            "example": "created"
+          },
+          "client": {
+            "description": "The source event client",
+            "type": "string",
+            "example": "fizzmod"
+          },
+          "id": {
+            "description": "The event related entity ID",
+            "type": "string",
+            "example": "5d699c1ae8ebb95eaa24aca9"
+          }
+        },
+        "required": [
+          "service",
+          "entity",
+          "event"
+        ]
+      },
+      "FunctionError": {
+        "type": "object",
+        "description": "The error message",
+        "properties": {
+          "message": {
+            "description": "The error message",
+            "type": "string",
+            "readOnly": true,
+            "example": "Database Failed"
+          }
+        }
+      },
+      "FunctionTotals": {
+        "type": "object",
+        "description": "The totals data. It is only available when `calculateTotals` parameter is active",
+        "properties": {
+          "total": {
+            "description": "The total items found in database applied filters",
+            "type": "number",
+            "readOnly": true,
+            "example": 2
+          },
+          "pages": {
+            "description": "The total pages for the filters applied",
+            "type": "number",
+            "readOnly": true,
+            "example": 1
+          },
+          "page": {
+            "description": "The actual page",
+            "type": "number",
+            "readOnly": true,
+            "example": 1
+          }
+        }
+      }
+    }
+  }
+}

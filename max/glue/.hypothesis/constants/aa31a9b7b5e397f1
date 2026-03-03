@@ -1,0 +1,4 @@
+# file: C:\Users\maxim\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\pyspark\sql\context.py
+# hypothesis_version: 6.151.9
+
+['AtomicValue', 'HiveContext', 'JavaObject', 'PandasDataFrameLike', 'PythonTest', 'RDD[Any]', 'RDD[AtomicValue]', 'RDD[RowLike]', 'RowLike', 'SPARK_HOME', 'SQLContext', 'SparkContext', '__main__', 'df', 'hive', 'json', 'jsonStrings', 'local[4]', 'os', 'pa.Table', 'rdd', 'row1', 'row2', 'row3', 'sc', 'sqlContext', 'tempfile']

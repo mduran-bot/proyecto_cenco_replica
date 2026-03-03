@@ -1,0 +1,1060 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "KPI Service",
+    "description": "Get insights of your operation\n\n **Last update**: 26 ene 26, 10:16 a. m.",
+    "version": "1.9.3",
+    "x-logo": null,
+    "x-janis-keywords": [
+      "kpis",
+      "metrics",
+      "orders",
+      "locations",
+      "warehouses",
+      "sales channels",
+      "fulfillment",
+      "statistics",
+      "stats",
+      "real time"
+    ],
+    "lastUpdate": "2026-01-26T13:16:05.881Z"
+  },
+  "tags": [
+    {
+      "name": "Order Fulfillment Status",
+      "description": "See insights of your fulfillment operation status by location, warehouse or sales channel."
+    },
+    {
+      "name": "Settings",
+      "description": "The KPI service can have different settings grouped by entity."
+    }
+  ],
+  "servers": [
+    {
+      "url": "https://kpi.janis.in/api",
+      "description": "The Prod API server",
+      "variables": {
+        "environment": {
+          "default": "prod"
+        }
+      }
+    },
+    {
+      "url": "https://kpi.janisqa.in/api",
+      "description": "The QA API server",
+      "variables": {
+        "environment": {
+          "default": "qa"
+        }
+      }
+    },
+    {
+      "url": "https://kpi.janisdev.in/api",
+      "description": "The Beta API server",
+      "variables": {
+        "environment": {
+          "default": "beta"
+        }
+      }
+    },
+    {
+      "url": "http://kpi.janis.localhost:3103/api",
+      "description": "The Local API server",
+      "variables": {
+        "environment": {
+          "default": "local"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/order-status-by-location": {
+      "get": {
+        "x-janis-namespace": "order-status-by-location",
+        "x-janis-method": "report",
+        "x-janis-permissions": [
+          "kpi:order-fulfillment-status:read"
+        ],
+        "operationId": "reportOrderStatusByLocation",
+        "tags": [
+          "Order Fulfillment Status"
+        ],
+        "summary": "Get a report of Order fulfillment status metrics by location",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/OrderFulfillmentStatusByLocationFilters"
+          },
+          {
+            "$ref": "#/components/parameters/OrderFulfillmentStatusByLocationSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order fulfillment status metrics report",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderFulfillmentStatusReport"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/order-status-by-sales-channel": {
+      "get": {
+        "x-janis-namespace": "order-status-by-sales-channel",
+        "x-janis-method": "report",
+        "x-janis-permissions": [
+          "kpi:order-fulfillment-status:read"
+        ],
+        "operationId": "reportOrderStatusBySalesChannel",
+        "tags": [
+          "Order Fulfillment Status"
+        ],
+        "summary": "Get a report of Order fulfillment status metrics by sales channel",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/OrderFulfillmentStatusBySalesChannelFilters"
+          },
+          {
+            "$ref": "#/components/parameters/OrderFulfillmentStatusBySalesChannelSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order fulfillment status metrics report",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderFulfillmentStatusReport"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/order-status-by-time-slot": {
+      "get": {
+        "x-janis-namespace": "order-status-by-time-slot",
+        "x-janis-method": "report",
+        "x-janis-permissions": [
+          "kpi:order-fulfillment-status:read"
+        ],
+        "operationId": "reportOrderStatusByTimeSlot",
+        "tags": [
+          "Order Fulfillment Status"
+        ],
+        "summary": "Get a report of Order fulfillment status metrics by time slot",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/OrderFulfillmentStatusByTimeSlotFilters"
+          },
+          {
+            "$ref": "#/components/parameters/OrderFulfillmentStatusByTimeSlotSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order fulfillment status metrics report",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderFulfillmentStatusReport"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/order-status-by-warehouse": {
+      "get": {
+        "x-janis-namespace": "order-status-by-warehouse",
+        "x-janis-method": "report",
+        "x-janis-permissions": [
+          "kpi:order-fulfillment-status:read"
+        ],
+        "operationId": "reportOrderStatusByWarehouse",
+        "tags": [
+          "Order Fulfillment Status"
+        ],
+        "summary": "Get a report of Order fulfillment status metrics by warehouse",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/OrderFulfillmentStatusByWarehouseFilters"
+          },
+          {
+            "$ref": "#/components/parameters/OrderFulfillmentStatusByWarehouseSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order fulfillment status metrics report",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderFulfillmentStatusReport"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/setting/{entity}": {
+      "get": {
+        "x-janis-namespace": "setting",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "kpi:setting:read"
+        ],
+        "operationId": "getSetting",
+        "tags": [
+          "Settings"
+        ],
+        "summary": "Get by entity",
+        "description": "Get the settings available for a given entity",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "entity",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "example": "order-status-by-time-slot"
+            },
+            "required": true,
+            "description": "The name of the entity that owns the settings to be retrieved"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The settings were retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/OrderStatusByTimeSlotSettings"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "x-janis-namespace": "setting",
+        "x-janis-method": "update",
+        "x-janis-permissions": [
+          "kpi:setting:write"
+        ],
+        "operationId": "updateSetting",
+        "tags": [
+          "Settings"
+        ],
+        "summary": "Update by entity",
+        "description": "Update the settings available for a given entity",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "entity",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "example": "order-status-by-time-slot"
+            },
+            "required": true,
+            "description": "The name of the entity that owns the settings to be updated"
+          }
+        ],
+        "requestBody": {
+          "description": "The settings configurations",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/OrderStatusByTimeSlotSettings"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The settings were updated"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-key",
+        "description": "The API Key"
+      },
+      "ApiSecret": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-secret",
+        "description": "The API Secret"
+      },
+      "JanisClient": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-client",
+        "description": "The Client Code"
+      }
+    },
+    "parameters": {
+      "id": {
+        "name": "id",
+        "in": "path",
+        "schema": {
+          "type": "string",
+          "example": "d555345345345as67a342a"
+        },
+        "required": true,
+        "description": "The unique identifier of the item"
+      },
+      "ListSortDirection": {
+        "name": "sortDirection",
+        "in": "query",
+        "description": "The direction to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
+        }
+      },
+      "ListPageNumber": {
+        "name": "x-janis-page",
+        "in": "header",
+        "description": "The page to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "default": 1
+        }
+      },
+      "ListPageSize": {
+        "name": "x-janis-page-size",
+        "in": "header",
+        "description": "The page size to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "default": 60
+        }
+      },
+      "OrderFulfillmentStatusByLocationFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to report",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "deliveryDateRange": {
+              "type": "object",
+              "description": "A range for order delivery date.",
+              "properties": {
+                "from": {
+                  "type": "string",
+                  "description": "The beginning of the range",
+                  "format": "date-time",
+                  "example": "2019-11-27T16:08:24.994Z"
+                },
+                "to": {
+                  "type": "string",
+                  "description": "The end of the range",
+                  "format": "date-time",
+                  "example": "2019-11-30T16:08:24.994Z"
+                }
+              }
+            },
+            "locationId": {
+              "allOf": [
+                {
+                  "description": "A location Id to filter"
+                },
+                {
+                  "$ref": "#/components/schemas/id"
+                }
+              ]
+            },
+            "sellerId": {
+              "allOf": [
+                {
+                  "description": "A seller Id to filter"
+                },
+                {
+                  "$ref": "#/components/schemas/id"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "OrderFulfillmentStatusByLocationSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "locationName"
+          ]
+        }
+      },
+      "OrderFulfillmentStatusBySalesChannelFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to report",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "deliveryDateRange": {
+              "type": "object",
+              "description": "A range for order delivery date.",
+              "properties": {
+                "from": {
+                  "type": "string",
+                  "description": "The beginning of the range",
+                  "format": "date-time",
+                  "example": "2019-11-27T16:08:24.994Z"
+                },
+                "to": {
+                  "type": "string",
+                  "description": "The end of the range",
+                  "format": "date-time",
+                  "example": "2019-11-30T16:08:24.994Z"
+                }
+              }
+            },
+            "salesChannelId": {
+              "allOf": [
+                {
+                  "description": "A sales channel Id to filter"
+                },
+                {
+                  "$ref": "#/components/schemas/id"
+                }
+              ]
+            },
+            "sellerId": {
+              "allOf": [
+                {
+                  "description": "A seller Id to filter"
+                },
+                {
+                  "$ref": "#/components/schemas/id"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "OrderFulfillmentStatusBySalesChannelSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "salesChannelName"
+          ]
+        }
+      },
+      "OrderFulfillmentStatusByTimeSlotFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to report",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "deliveryDateRange": {
+              "type": "object",
+              "description": "A range for order delivery date.",
+              "properties": {
+                "from": {
+                  "type": "string",
+                  "description": "The beginning of the range",
+                  "format": "date-time",
+                  "example": "2019-11-27T16:08:24.994Z"
+                },
+                "to": {
+                  "type": "string",
+                  "description": "The end of the range",
+                  "format": "date-time",
+                  "example": "2019-11-30T16:08:24.994Z"
+                }
+              }
+            },
+            "warehouseId": {
+              "allOf": [
+                {
+                  "description": "A warehouse Id to filter"
+                },
+                {
+                  "$ref": "#/components/schemas/id"
+                }
+              ]
+            },
+            "sellerId": {
+              "allOf": [
+                {
+                  "description": "A seller Id to filter"
+                },
+                {
+                  "$ref": "#/components/schemas/id"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "OrderFulfillmentStatusByTimeSlotSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "warehouseName",
+            "timeSlot"
+          ]
+        }
+      },
+      "OrderFulfillmentStatusByWarehouseFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to report",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "deliveryDateRange": {
+              "type": "object",
+              "description": "A range for order delivery date.",
+              "properties": {
+                "from": {
+                  "type": "string",
+                  "description": "The beginning of the range",
+                  "format": "date-time",
+                  "example": "2019-11-27T16:08:24.994Z"
+                },
+                "to": {
+                  "type": "string",
+                  "description": "The end of the range",
+                  "format": "date-time",
+                  "example": "2019-11-30T16:08:24.994Z"
+                }
+              }
+            },
+            "warehouseId": {
+              "allOf": [
+                {
+                  "description": "A warehouse Id to filter"
+                },
+                {
+                  "$ref": "#/components/schemas/id"
+                }
+              ]
+            },
+            "locationId": {
+              "allOf": [
+                {
+                  "description": "A location Id to filter"
+                },
+                {
+                  "$ref": "#/components/schemas/id"
+                }
+              ]
+            },
+            "sellerId": {
+              "allOf": [
+                {
+                  "description": "A seller Id to filter"
+                },
+                {
+                  "$ref": "#/components/schemas/id"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "OrderFulfillmentStatusByWarehouseSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "warehouseName"
+          ]
+        }
+      }
+    },
+    "headers": {
+      "x-janis-total": {
+        "description": "The total amount of records in the list",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "responses": {
+      "SuccessCreateResponse": {
+        "description": "The item was created",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "SuccessUpdateResponse": {
+        "description": "The item was updated",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "GenericSuccess": {
+        "description": "Operation succeeded",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "BadRequest": {
+        "description": "A client error has ocurred.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Authentication missing or invalid",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Not authorized request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "InternalError": {
+        "description": "A server error has ocurred."
+      }
+    },
+    "schemas": {
+      "id": {
+        "description": "The unique identifier of the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "d555345345345as67a342a"
+      },
+      "OrderFulfillmentStatusReport": {
+        "type": "array",
+        "description": "Report of Order fulfillment status metrics",
+        "items": {
+          "$ref": "#/components/schemas/OrderFulfillmentStatusReportItem"
+        }
+      },
+      "OrderFulfillmentStatusReportItem": {
+        "type": "object",
+        "description": "A report item of order fulfillment status metrics",
+        "properties": {
+          "id": {
+            "allOf": [
+              {
+                "description": "The id that the report has been group."
+              },
+              {
+                "$ref": "#/components/schemas/id"
+              }
+            ]
+          },
+          "locationId": {
+            "allOf": [
+              {
+                "description": "The metric locationId"
+              },
+              {
+                "$ref": "#/components/schemas/id"
+              }
+            ]
+          },
+          "locationName": {
+            "description": "The location name",
+            "type": "string",
+            "example": "Example Location name"
+          },
+          "sellerId": {
+            "allOf": [
+              {
+                "description": "The metric sellerId"
+              },
+              {
+                "$ref": "#/components/schemas/id"
+              }
+            ]
+          },
+          "sellerName": {
+            "description": "The seller name",
+            "type": "string",
+            "example": "Seller-fizzmodarg"
+          },
+          "warehouseId": {
+            "allOf": [
+              {
+                "description": "The metric warehouseId"
+              },
+              {
+                "$ref": "#/components/schemas/id"
+              }
+            ]
+          },
+          "warehouseName": {
+            "description": "The warehouse name",
+            "type": "string",
+            "example": "Example Warehouse name"
+          },
+          "salesChannelId": {
+            "allOf": [
+              {
+                "description": "The metric salesChannelId"
+              },
+              {
+                "$ref": "#/components/schemas/id"
+              }
+            ]
+          },
+          "salesChannelName": {
+            "description": "The sales channel name",
+            "type": "string",
+            "example": "Example Sales Channel name"
+          },
+          "pending": {
+            "description": "The sum of all metrics that are pending",
+            "type": "number",
+            "example": 4
+          },
+          "picking": {
+            "description": "The sum of all metrics that are picking",
+            "type": "number",
+            "example": 2
+          },
+          "picked": {
+            "description": "The sum of all metrics that are picked",
+            "type": "number",
+            "example": 5
+          },
+          "invoiced": {
+            "description": "The sum of all metrics that are invoiced",
+            "type": "number",
+            "example": 8
+          },
+          "inDelivery": {
+            "description": "The sum of all metrics that are inDelivery",
+            "type": "number",
+            "example": 8
+          },
+          "delivered": {
+            "description": "The sum of all metrics that are delivered",
+            "type": "number",
+            "example": 7
+          },
+          "notDelivered": {
+            "description": "The sum of all metrics that are not delivered",
+            "type": "number",
+            "example": 2
+          },
+          "canceled": {
+            "description": "The sum of all metrics that are canceled",
+            "type": "number",
+            "example": 1
+          },
+          "totalOrders": {
+            "description": "The sum of all orders that have been grouped",
+            "type": "number",
+            "example": 37
+          },
+          "preInvoicingPercentage": {
+            "description": "The percentage of orders that have not been invoiced",
+            "type": "number",
+            "example": 70
+          },
+          "postInvoicingPercentage": {
+            "description": "The percentage of orders that have been invoiced",
+            "type": "number",
+            "example": 30
+          },
+          "timeSlot": {
+            "description": "The delivery time slot of orders",
+            "type": "object",
+            "example": {
+              "intialDate": "2019-11-30T16:00:00.000Z",
+              "finalDate": "2019-11-30T16:59:59.999Z"
+            },
+            "properties": {
+              "initialDate": {
+                "description": "The time slot initial date",
+                "type": "string",
+                "format": "date-time"
+              },
+              "finalDate": {
+                "description": "The time slot final date",
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        }
+      },
+      "OrderStatusByTimeSlotSettings": {
+        "type": "object",
+        "description": "Order Status By Time Slot Settings",
+        "properties": {
+          "timeSlotMode": {
+            "type": "string",
+            "description": "This setting determines how time slots will be saved for Order metrics\n- `deliveryWindow`: Order's deliveryWindow initial and final date will be saved as time slot\n- `deliveryDate`: A logic time slot of one hour range will be generated by the Order's deliveryDate\n",
+            "enum": [
+              "deliveryWindow",
+              "deliveryDate"
+            ],
+            "example": "deliveryDate",
+            "default": "deliveryWindow"
+          }
+        }
+      }
+    }
+  }
+}

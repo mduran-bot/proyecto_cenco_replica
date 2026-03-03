@@ -1,0 +1,553 @@
+-- DROP PROCEDURE dl_sp_dashboards_ecommerce.sp_ejecutar_ods_picking_ecommerce();
+
+CREATE OR REPLACE PROCEDURE dl_sp_dashboards_ecommerce.sp_ejecutar_ods_picking_ecommerce()
+	LANGUAGE plpgsql
+AS $$
+	
+	
+	
+	
+	
+
+DECLARE
+    fechainicio varchar(8);
+    fechafin varchar(8);
+BEGIN
+
+    -- Si fechainicio_in y la fechafin_in es NULL o vacío, asigna : 
+
+   -- IF COALESCE(fechainicio_in,'')  = '' OR COALESCE(fechafin_in,'')  = '' THEN
+
+            fechainicio := to_char(date_trunc('month', convert_timezone('GMT','GMT+5',getdate()) ) - interval '1 month', 'YYYYMMDD'); 
+        fechafin := to_char(convert_timezone('GMT','GMT+5',getdate()) - interval '1 day', 'YYYYMMDD'); 
+    --ELSE
+
+       -- fechainicio := fechainicio_in;
+       -- fechafin := fechafin_in;
+
+    --END IF;
+
+
+
+
+
+    CREATE TEMPORARY  TABLE pedidos_aurora_picking AS
+    SELECT 
+        store.title AS store,    
+        O.ecommerce_account,
+        O.sales_channel AS sales_channel,
+        O.status status,
+
+        CONVERT_TIMEZONE('GMT', '+05:00', DATEADD(SECOND, O.date_created, '1970-01-01 00:00:00')) AS fecha_creacion,
+        CONVERT_TIMEZONE('GMT', '+05:00', DATEADD(SECOND, O.date_picked, '1970-01-01 00:00:00')) AS picking_order,
+        TO_CHAR(CONVERT_TIMEZONE('GMT', '+05:00', DATEADD(SECOND, O.date_created, '1970-01-01 00:00:00')), 'YYYYMMDD') AS cod_fecha_creacion,
+        TO_CHAR(CONVERT_TIMEZONE('GMT', '+05:00', DATEADD(SECOND, O.date_picked, '1970-01-01 00:00:00')) , 'YYYYMMDD') AS cod_fecha_picking_order,
+        O.date_picked,
+        O.vtex_id,
+        O.seq_id AS order_op,
+        O.picker,
+        C.name AS main_category,
+        main_item.ref_id AS main_refid,
+        main_item.sku AS main_sku,
+        main_item.price AS main_price,
+        main_item.selling_price AS main_selling_price,
+        main_item.measurement_unit AS main_unit,
+        main_item.name AS main_product_name,
+        COALESCE(main_item.quantity, 0) AS main_requested_units,
+        'un' AS main_requested_unit_spec,
+        CASE main_item.measurement_unit
+            WHEN 'kg' THEN COALESCE(ROUND(main_item.quantity * 1000 * main_sku.unit_multiplier), 0)
+            WHEN 'un' THEN COALESCE(ROUND(main_item.quantity * 1000 * main_sku.unit_multiplier_un), 0)
+        END AS main_requested_grams,
+        'gr' AS main_requested_gram_spec,
+        COALESCE(main_item.quantity_picked, 0) AS main_picked_units,
+        'un' AS main_picked_unit_spec,
+        CASE main_item.measurement_unit
+            WHEN 'kg' THEN COALESCE(ROUND(main_weight.total), 0)
+            WHEN 'un' THEN COALESCE(ROUND(main_item.quantity_picked * 1000 * main_sku.unit_multiplier_un), 0)
+        END AS main_picked_grams,
+        'gr' AS main_picked_gram_spec,
+        COALESCE(main_item.quantity, 0) - COALESCE(main_item.quantity_picked, 0) AS main_difference_units,
+        'un' AS main_difference_unit_spec,
+        CASE main_item.measurement_unit
+            WHEN 'kg' THEN COALESCE(ROUND(main_item.quantity * 1000 * main_sku.unit_multiplier), 0)
+                - COALESCE(ROUND(main_weight.total), 0)
+            WHEN 'un' THEN COALESCE(ROUND(main_item.quantity * 1000 * main_sku.unit_multiplier_un), 0)
+                - COALESCE(ROUND(main_item.quantity_picked * 1000 * main_sku.unit_multiplier_un), 0)
+        END AS main_difference_grams,
+        'gr' AS main_difference_gram_spec,
+        NULL AS main_result,
+        repl_item.ref_id AS repl_refid,
+        repl_item.sku AS repl_sku,
+        repl_item.price AS repl_price,
+        repl_item.selling_price AS repl_selling_price,
+        repl_item.measurement_unit AS repl_unit,
+        repl_item.name AS repl_product,
+        repl_item.quantity_picked AS repl_picked_units,
+        CASE WHEN repl_item.id IS NULL THEN NULL ELSE 'un' END AS repl_picked_unit_spec,
+        CASE repl_item.measurement_unit
+            WHEN 'kg' THEN ROUND(repl_weight.total)
+            WHEN 'un' THEN ROUND(repl_item.quantity_picked * 1000 * repl_sku.unit_multiplier_un)
+        END AS repl_picked_grams,
+        CASE WHEN repl_item.id IS NULL THEN NULL ELSE 'gr' END AS repl_picked_gram_spec,
+        CASE WHEN repl_item.id IS NULL THEN NULL ELSE 
+            CASE repl_item.measurement_unit
+                WHEN 'kg' THEN ROUND(main_item.quantity * 1000 * main_sku.unit_multiplier)
+                    - ROUND(main_weight.total)
+                    - ROUND(repl_weight.total)
+                WHEN 'un' THEN ROUND(main_item.quantity * 1000 * main_sku.unit_multiplier_un)
+                    - ROUND(main_item.quantity_picked * 1000 * main_sku.unit_multiplier_un)
+                    - ROUND(repl_item.quantity_picked * 1000 * repl_sku.unit_multiplier_un)
+            END 
+        END AS repl_difference_grams,
+        CASE WHEN repl_item.id IS NULL THEN NULL ELSE 'gr' END AS repl_difference_gram_spec,
+        NULL AS repl_result,
+        '' AS shortage_reason,
+        '' AS comment
+    FROM (
+        SELECT I.* 
+        FROM stg_ecommerce_janis_legacy.wms_order_items I 
+        LEFT JOIN stg_ecommerce_janis_legacy.wms_orders O  ON I.order_id = O.id
+        WHERE TO_CHAR(CONVERT_TIMEZONE('GMT', '+05:00', DATEADD(SECOND, O.date_picked, '1970-01-01 00:00:00')), 'YYYYMMDD')  >= fechainicio
+        AND TO_CHAR(CONVERT_TIMEZONE('GMT', '+05:00', DATEADD(SECOND, O.date_picked, '1970-01-01 00:00:00')), 'YYYYMMDD')  <= fechafin
+        AND substitute_of IS NULL
+    ) AS main_item
+    LEFT JOIN stg_ecommerce_janis_legacy.skus AS main_sku ON main_sku.vtex_id = main_item.sku
+    LEFT JOIN (
+        SELECT order_item, SUM(COALESCE(weight, 0)) AS total
+        FROM stg_ecommerce_janis_legacy.wms_order_item_weighables
+        GROUP BY order_item
+    ) AS main_weight ON main_weight.order_item = main_item.id
+    LEFT JOIN stg_ecommerce_janis_legacy.wms_orders AS O ON O.id = main_item.order_id
+    LEFT JOIN stg_ecommerce_janis_legacy.products AS P ON P.ref_id = main_item.ref_id
+    LEFT JOIN stg_ecommerce_janis_legacy.categories AS C ON C.id = P.category
+    LEFT JOIN stg_ecommerce_janis_legacy.wms_stores AS store ON store.id = O.store
+    LEFT JOIN stg_ecommerce_janis_legacy.wms_order_items AS repl_item ON repl_item.substitute_of = main_item.id AND repl_item.sku IS NOT NULL
+    LEFT JOIN stg_ecommerce_janis_legacy.skus AS repl_sku ON repl_sku.vtex_id = repl_item.sku
+    LEFT JOIN (
+        SELECT order_item, SUM(COALESCE(weight, 0)) AS total
+        FROM stg_ecommerce_janis_legacy.wms_order_item_weighables
+        GROUP BY order_item
+    ) AS repl_weight ON repl_weight.order_item = repl_item.id;
+
+
+--METRO IO
+
+CREATE TEMPORARY  TABLE pedidos_metro_io_picking AS
+SELECT 
+    store.title AS store,
+    O.ecommerce_account,
+    O.sales_channel AS sales_channel,
+    O.status AS status,
+    CONVERT_TIMEZONE('GMT', '+05:00', DATEADD(SECOND, O.date_created ,'1970-01-01 00:00:00')) AS fecha_creacion,
+    CONVERT_TIMEZONE('GMT', '+05:00', DATEADD(SECOND, O.date_picked, '1970-01-01 00:00:00')) AS picking_order,
+    TO_CHAR(CONVERT_TIMEZONE('GMT', '+05:00', DATEADD(SECOND, O.date_created ,'1970-01-01 00:00:00')), 'YYYYMMDD') AS cod_fecha_creacion,
+    TO_CHAR(CONVERT_TIMEZONE('GMT', '+05:00', DATEADD(SECOND, O.date_picked, '1970-01-01 00:00:00')) , 'YYYYMMDD') AS cod_fecha_picking_order,
+    O.date_picked,
+    O.vtex_id,
+    O.seq_id AS order_op,
+    O.picker,
+    C.name AS main_category,
+    main_item.ref_id AS main_refid,
+    main_item.sku AS main_sku,
+    main_item.price AS main_price,
+    main_item.selling_price AS main_selling_price,
+    main_item.measurement_unit AS main_unit,
+    main_item.name AS main_product_name,
+    COALESCE(main_item.quantity, 0) AS main_requested_units,
+    'un' AS main_requested_unit_spec,
+    CASE 
+        WHEN main_item.measurement_unit = 'kg' THEN COALESCE(ROUND(main_item.quantity * 1000 * main_sku.unit_multiplier), 0)
+        WHEN main_item.measurement_unit = 'un' THEN COALESCE(ROUND(main_item.quantity * 1000 * main_sku.unit_multiplier_un), 0)
+    END AS main_requested_grams,
+    'gr' AS main_requested_gram_spec,
+    COALESCE(main_item.quantity_picked, 0) AS main_picked_units,
+    'un' AS main_picked_unit_spec,
+    CASE 
+        WHEN main_item.measurement_unit = 'kg' THEN COALESCE(ROUND(main_weight.total), 0)
+        WHEN main_item.measurement_unit = 'un' THEN COALESCE(ROUND(main_item.quantity_picked * 1000 * main_sku.unit_multiplier_un), 0)
+    END AS main_picked_grams,
+    'gr' AS main_picked_gram_spec,
+    COALESCE(main_item.quantity, 0) - COALESCE(main_item.quantity_picked, 0) AS main_difference_units,
+    'un' AS main_difference_unit_spec,
+    CASE 
+        WHEN main_item.measurement_unit = 'kg' THEN COALESCE(ROUND(main_item.quantity * 1000 * main_sku.unit_multiplier), 0)
+             - COALESCE(ROUND(main_weight.total), 0)
+        WHEN main_item.measurement_unit = 'un' THEN COALESCE(ROUND(main_item.quantity * 1000 * main_sku.unit_multiplier_un), 0)
+             - COALESCE(ROUND(main_item.quantity_picked * 1000 * main_sku.unit_multiplier_un), 0)
+    END AS main_difference_grams,
+    'gr' AS main_difference_gram_spec,
+    NULL AS main_result,
+    repl_item.ref_id AS repl_refid,
+    repl_item.sku AS repl_sku,
+    repl_item.price AS repl_price,
+    repl_item.selling_price AS repl_selling_price,
+    repl_item.measurement_unit AS repl_unit,
+    repl_item.name AS repl_product,
+    repl_item.quantity_picked AS repl_picked_units,
+    CASE 
+        WHEN repl_item.id IS NULL THEN NULL 
+        ELSE 'un' 
+    END AS repl_picked_unit_spec,
+    CASE 
+        WHEN repl_item.measurement_unit = 'kg' THEN ROUND(repl_weight.total)
+        WHEN repl_item.measurement_unit = 'un' THEN ROUND(repl_item.quantity_picked * 1000 * repl_sku.unit_multiplier_un)
+    END AS repl_picked_grams,
+    CASE 
+        WHEN repl_item.id IS NULL THEN NULL 
+        ELSE 'gr'
+    END AS repl_picked_gram_spec,
+    CASE 
+        WHEN repl_item.id IS NULL THEN NULL
+        ELSE CASE 
+            WHEN repl_item.measurement_unit = 'kg' THEN ROUND(main_item.quantity * 1000 * main_sku.unit_multiplier)
+                 - ROUND(main_weight.total) - ROUND(repl_weight.total)
+            WHEN repl_item.measurement_unit = 'un' THEN ROUND(main_item.quantity * 1000 * main_sku.unit_multiplier_un)
+                 - ROUND(main_item.quantity_picked * 1000 * main_sku.unit_multiplier_un)
+                 - ROUND(repl_item.quantity_picked * 1000 * repl_sku.unit_multiplier_un)
+        END 
+    END AS repl_difference_grams,
+    CASE 
+        WHEN repl_item.id IS NULL THEN NULL 
+        ELSE 'gr'
+    END AS repl_difference_gram_spec,
+    NULL AS repl_result,
+    '' AS shortage_reason,
+    '' AS comment 
+FROM (
+    SELECT I.* 
+    FROM stg_ecommerce_janis_metroio.wms_order_items I 
+    LEFT JOIN stg_ecommerce_janis_metroio.wms_orders O ON I.order_id = O.id
+        WHERE TO_CHAR(CONVERT_TIMEZONE('GMT', '+05:00', DATEADD(SECOND, O.date_picked, '1970-01-01 00:00:00')) , 'YYYYMMDD')  >= fechainicio
+        AND TO_CHAR(CONVERT_TIMEZONE('GMT', '+05:00', DATEADD(SECOND, O.date_picked, '1970-01-01 00:00:00')), 'YYYYMMDD')  <= fechafin
+      AND substitute_of IS NULL
+) AS main_item
+LEFT JOIN stg_ecommerce_janis_metroio.skus AS main_sku ON main_sku.vtex_id = main_item.sku
+LEFT JOIN (
+    SELECT order_item, SUM(COALESCE(weight, 0)) AS total
+    FROM stg_ecommerce_janis_metroio.wms_order_item_weighables
+    GROUP BY order_item
+) AS main_weight ON main_weight.order_item = main_item.id
+LEFT JOIN stg_ecommerce_janis_metroio.wms_orders AS O ON O.id = main_item.order_id
+LEFT JOIN stg_ecommerce_janis_metroio.products AS P ON P.ref_id = main_item.ref_id
+LEFT JOIN stg_ecommerce_janis_metroio.categories AS C ON C.id = P.category
+LEFT JOIN stg_ecommerce_janis_metroio.wms_stores AS store ON store.id = O.store
+LEFT JOIN stg_ecommerce_janis_metroio.wms_order_items AS repl_item ON repl_item.substitute_of = main_item.id AND repl_item.sku IS NOT NULL
+LEFT JOIN stg_ecommerce_janis_metroio.skus AS repl_sku ON repl_sku.vtex_id = repl_item.sku
+LEFT JOIN (
+    SELECT order_item, SUM(COALESCE(weight, 0)) AS total
+    FROM stg_ecommerce_janis_metroio.wms_order_item_weighables
+    GROUP BY order_item
+) AS repl_weight ON repl_weight.order_item = repl_item.id;
+
+
+--WONG IO
+
+CREATE TEMPORARY  TABLE pedidos_wong_io_picking AS
+SELECT 
+    store.title AS store,
+    O.ecommerce_account,
+    O.sales_channel AS sales_channel,
+    O.status AS status,
+    CONVERT_TIMEZONE('GMT', '+05:00', DATEADD(SECOND, O.date_created, '1970-01-01 00:00:00')) AS fecha_creacion,
+    CONVERT_TIMEZONE('GMT', '+05:00', DATEADD(SECOND, O.date_picked, '1970-01-01 00:00:00')) AS picking_order,
+    TO_CHAR(CONVERT_TIMEZONE('GMT', '+05:00', DATEADD(SECOND, O.date_created, '1970-01-01 00:00:00')), 'YYYYMMDD') AS cod_fecha_creacion,
+    TO_CHAR(CONVERT_TIMEZONE('GMT', '+05:00', DATEADD(SECOND, O.date_picked, '1970-01-01 00:00:00')) , 'YYYYMMDD') AS cod_fecha_picking_order,
+    O.date_picked,
+    O.vtex_id,
+    O.seq_id AS order_op,
+    O.picker,
+    C.name AS main_category,
+    main_item.ref_id AS main_refid,
+    main_item.sku AS main_sku,
+    main_item.price AS main_price,
+    main_item.selling_price AS main_selling_price,
+    main_item.measurement_unit AS main_unit,
+    main_item.name AS main_product_name,
+    COALESCE(main_item.quantity, 0) AS main_requested_units,
+    'un' AS main_requested_unit_spec,
+    CASE 
+        WHEN main_item.measurement_unit = 'kg' THEN COALESCE(ROUND(main_item.quantity * 1000 * main_sku.unit_multiplier), 0)
+        WHEN main_item.measurement_unit = 'un' THEN COALESCE(ROUND(main_item.quantity * 1000 * main_sku.unit_multiplier_un), 0)
+    END AS main_requested_grams,
+    'gr' AS main_requested_gram_spec,
+    COALESCE(main_item.quantity_picked, 0) AS main_picked_units,
+    'un' AS main_picked_unit_spec,
+    CASE 
+        WHEN main_item.measurement_unit = 'kg' THEN COALESCE(ROUND(main_weight.total), 0)
+        WHEN main_item.measurement_unit = 'un' THEN COALESCE(ROUND(main_item.quantity_picked * 1000 * main_sku.unit_multiplier_un), 0)
+    END AS main_picked_grams,
+    'gr' AS main_picked_gram_spec,
+    COALESCE(main_item.quantity, 0) - COALESCE(main_item.quantity_picked, 0) AS main_difference_units,
+    'un' AS main_difference_unit_spec,
+    CASE 
+        WHEN main_item.measurement_unit = 'kg' THEN COALESCE(ROUND(main_item.quantity * 1000 * main_sku.unit_multiplier), 0)
+             - COALESCE(ROUND(main_weight.total), 0)
+        WHEN main_item.measurement_unit = 'un' THEN COALESCE(ROUND(main_item.quantity * 1000 * main_sku.unit_multiplier_un), 0)
+             - COALESCE(ROUND(main_item.quantity_picked * 1000 * main_sku.unit_multiplier_un), 0)
+    END AS main_difference_grams,
+    'gr' AS main_difference_gram_spec,
+    NULL AS main_result,
+    repl_item.ref_id AS repl_refid,
+    repl_item.sku AS repl_sku,
+    repl_item.price AS repl_price,
+    repl_item.selling_price AS repl_selling_price,
+    repl_item.measurement_unit AS repl_unit,
+    repl_item.name AS repl_product,
+    repl_item.quantity_picked AS repl_picked_units,
+    CASE 
+        WHEN repl_item.id IS NULL THEN NULL 
+        ELSE 'un' 
+    END AS repl_picked_unit_spec,
+    CASE 
+        WHEN repl_item.measurement_unit = 'kg' THEN ROUND(repl_weight.total)
+        WHEN repl_item.measurement_unit = 'un' THEN ROUND(repl_item.quantity_picked * 1000 * repl_sku.unit_multiplier_un)
+    END AS repl_picked_grams,
+    CASE 
+        WHEN repl_item.id IS NULL THEN NULL 
+        ELSE 'gr' 
+    END AS repl_picked_gram_spec,
+    CASE 
+        WHEN repl_item.id IS NULL THEN NULL
+        ELSE CASE 
+            WHEN repl_item.measurement_unit = 'kg' THEN ROUND(main_item.quantity * 1000 * main_sku.unit_multiplier)
+                 - ROUND(main_weight.total) - ROUND(repl_weight.total)
+            WHEN repl_item.measurement_unit = 'un' THEN ROUND(main_item.quantity * 1000 * main_sku.unit_multiplier_un)
+                 - ROUND(main_item.quantity_picked * 1000 * main_sku.unit_multiplier_un)
+                 - ROUND(repl_item.quantity_picked * 1000 * repl_sku.unit_multiplier_un)
+        END 
+    END AS repl_difference_grams,
+    CASE 
+        WHEN repl_item.id IS NULL THEN NULL 
+        ELSE 'gr' 
+    END AS repl_difference_gram_spec,
+    NULL AS repl_result,
+    '' AS shortage_reason,
+    '' AS comment 
+FROM (
+    SELECT I.* 
+    FROM stg_ecommerce_janis_wongio.wms_order_items I 
+    LEFT JOIN stg_ecommerce_janis_wongio.wms_orders O ON I.order_id = O.id
+        WHERE TO_CHAR(CONVERT_TIMEZONE('GMT', '+05:00', DATEADD(SECOND, O.date_picked, '1970-01-01 00:00:00')), 'YYYYMMDD')  >= fechainicio
+        AND TO_CHAR(CONVERT_TIMEZONE('GMT', '+05:00', DATEADD(SECOND, O.date_picked, '1970-01-01 00:00:00')), 'YYYYMMDD')  <= fechafin
+      AND substitute_of IS NULL
+) AS main_item
+LEFT JOIN stg_ecommerce_janis_wongio.skus AS main_sku ON main_sku.vtex_id = main_item.sku
+LEFT JOIN (
+    SELECT order_item, SUM(COALESCE(weight, 0)) AS total
+    FROM stg_ecommerce_janis_wongio.wms_order_item_weighables
+    GROUP BY order_item
+) AS main_weight ON main_weight.order_item = main_item.id
+LEFT JOIN stg_ecommerce_janis_wongio.wms_orders AS O ON O.id = main_item.order_id
+LEFT JOIN stg_ecommerce_janis_wongio.products AS P ON P.ref_id = main_item.ref_id
+LEFT JOIN stg_ecommerce_janis_wongio.categories AS C ON C.id = P.category
+LEFT JOIN stg_ecommerce_janis_wongio.wms_stores AS store ON store.id = O.store
+LEFT JOIN stg_ecommerce_janis_wongio.wms_order_items AS repl_item ON repl_item.substitute_of = main_item.id AND repl_item.sku IS NOT NULL
+LEFT JOIN stg_ecommerce_janis_wongio.skus AS repl_sku ON repl_sku.vtex_id = repl_item.sku
+LEFT JOIN (
+    SELECT order_item, SUM(COALESCE(weight, 0)) AS total
+    FROM stg_ecommerce_janis_wongio.wms_order_item_weighables
+    GROUP BY order_item
+) AS repl_weight ON repl_weight.order_item = repl_item.id;
+
+
+
+-- tiendas_legado 
+
+CREATE TEMPORARY  TABLE tiendas_legado (
+    id INT,
+    title VARCHAR(100),
+    ref_id VARCHAR(50),
+    sales_channel INT,
+    ecommerce_account_id INT
+);
+
+INSERT INTO tiendas_legado
+SELECT id, title, ref_id, sales_channel, ecommerce_account_id 
+FROM stg_ecommerce_janis_legacy.wms_stores;
+
+
+
+-- tiendas_metro_io 
+
+
+CREATE TEMPORARY  TABLE tiendas_metro_io (
+    id INT,
+    title VARCHAR(100),
+    ref_id VARCHAR(50),
+    sales_channel INT,
+    ecommerce_account_id INT
+);
+
+
+INSERT INTO tiendas_metro_io
+SELECT id, title, ref_id, sales_channel, ecommerce_account_id
+FROM stg_ecommerce_janis_metroio.wms_stores;
+
+
+-- tiendas_wong_io 
+
+
+CREATE TEMPORARY  TABLE tiendas_wong_io (
+    id INT,
+    title VARCHAR(100),
+    ref_id VARCHAR(50),
+    sales_channel INT,
+    ecommerce_account_id INT
+);
+
+
+INSERT INTO tiendas_wong_io
+SELECT id, title, ref_id, sales_channel, ecommerce_account_id
+FROM stg_ecommerce_janis_wongio.wms_stores;
+
+
+
+
+--pedidos_aurora_picking
+
+ALTER TABLE pedidos_aurora_picking ADD COLUMN tienda_origen VARCHAR(100);
+UPDATE pedidos_aurora_picking
+SET tienda_origen = title
+FROM tiendas_legado b
+WHERE pedidos_aurora_picking.sales_channel = b.sales_channel;
+
+
+--pedidos_metro_io_picking
+
+ALTER TABLE pedidos_metro_io_picking ADD COLUMN tienda_origen VARCHAR(100);
+UPDATE pedidos_metro_io_picking
+SET tienda_origen = title
+FROM tiendas_metro_io b
+WHERE pedidos_metro_io_picking.sales_channel = b.sales_channel;
+
+
+--pedidos_wong_io_picking
+
+ALTER TABLE pedidos_wong_io_picking ADD COLUMN tienda_origen VARCHAR(100);
+UPDATE pedidos_wong_io_picking
+SET tienda_origen = title
+FROM tiendas_wong_io b
+WHERE pedidos_wong_io_picking.sales_channel = b.sales_channel;
+
+
+-- Creacion de la tabla temporal pedidos_pickeados
+
+
+
+CREATE TEMPORARY  TABLE pedidos_pickeados AS
+SELECT * FROM pedidos_aurora_picking
+UNION ALL
+SELECT * FROM pedidos_metro_io_picking
+UNION ALL
+SELECT * FROM pedidos_wong_io_picking;
+
+
+-- Creacion de la tabla temporal pedidos
+
+CREATE TEMPORARY TABLE pedidos AS
+SELECT 
+    store,
+    sales_channel,
+    NULL AS round,
+    status,
+    fecha_creacion,
+    picking_order,
+    picking_order AS picking_start_original,
+    picking_order AS picking_start,
+    picking_order AS picking_end,
+    NULL AS total_time_origin_end,
+    cod_fecha_creacion,
+    cod_fecha_picking_order,
+    cod_fecha_picking_order AS cod_fecha_picking,
+    vtex_id,
+    order_op,
+    picker,
+    main_category,
+    main_refid,
+    main_sku,
+    main_price,
+    main_selling_price,
+    main_unit,
+    main_product_name,
+    main_requested_units,
+    main_requested_unit_spec,
+    main_requested_grams,
+    main_requested_gram_spec,
+    main_picked_units,
+    main_picked_unit_spec,
+    main_picked_grams,
+    main_picked_gram_spec,
+    main_difference_units,
+    main_difference_unit_spec,
+    main_difference_grams,
+    main_difference_gram_spec,
+    main_result,
+    repl_refid,
+    repl_sku,
+    repl_price,
+    repl_selling_price,
+    repl_unit,
+    repl_product,
+    repl_picked_units,
+    repl_picked_unit_spec,
+    repl_picked_grams,
+    repl_picked_gram_spec,
+    repl_difference_grams,
+    repl_difference_gram_spec,
+    repl_result,
+    shortage_reason,
+    comment,
+    tienda_origen
+FROM pedidos_pickeados;
+
+
+
+-- Crear monto de venta
+ALTER TABLE pedidos ADD COLUMN mto_venta_bruta_comprado NUMERIC(10,2);
+UPDATE pedidos
+SET mto_venta_bruta_comprado = main_selling_price * main_requested_units;
+
+
+--ELIMINAR ESTADOS PICKING (20) Y EN PRE PICKING (25)
+--DELETE FROM pedidos WHERE [status] IN (20,25)
+
+
+
+-- Creacion de la tabla temporal de fechas: 
+/*CREATE TEMPORARY  TABLE fechas AS
+SELECT DISTINCT vtex_id FROM pedidos;*/
+
+
+-- Eliminación de registros
+DELETE FROM dl_sp_dashboards_ecommerce.tbl_ods_picking_ecommerce
+where cod_fecha_picking between fechainicio and fechafin ;
+ 
+
+-- Guardar en la tabla
+
+INSERT INTO dl_sp_dashboards_ecommerce.tbl_ods_picking_ecommerce
+SELECT *, CURRENT_TIMESTAMP AS fecha_registro
+FROM pedidos
+WHERE status NOT IN (135, 132, 130, 125, 120, 110, 105, 100, 35, 20, 25);
+
+-- Limpiar tablas
+DROP TABLE IF EXISTS
+ tiendas_legado, 
+ tiendas_metro_io, 
+ tiendas_wong_io, 
+ pedidos, 
+ pedidos_pickeados,
+ pedidos_aurora_picking,
+ pedidos_metro_io_picking,
+ pedidos_wong_io_picking
+ ;
+
+
+END;
+
+
+
+
+$$
+;

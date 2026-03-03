@@ -1,0 +1,4 @@
+# file: C:\Users\maxim\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\pyspark\sql\streaming\readwriter.py
+# hypothesis_version: 6.151.9
+
+['CANNOT_GET_BATCH_ID', 'DataFrame', 'DataStreamReader', 'DataStreamWriter', 'JavaObject', 'NOT_STR', 'NOT_STR_OR_STRUCT', 'SPARK_HOME', 'SparkSession', 'StreamingQuery', 'SupportsProcess', 'TaskContext', 'VALUE_NOT_TRUE', '__main__', 'arg_name', 'arg_type', 'arg_value', 'attr_name', 'availableNow', 'close', 'continuous', 'f', 'local[4]', 'obj_name', 'once', 'open', 'outputMode', 'path', 'process', 'processingTime', 'queryName', 'schema', 'spark', 'tableName']

@@ -1,0 +1,4 @@
+# file: C:\Users\maxim\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\pyspark\sql\udtf.py
+# hypothesis_version: 6.151.9
+
+['AnalyzeArgument', 'AnalyzeResult', 'CANNOT_REGISTER_UDTF', 'DataFrame', 'INVALID_UDTF_NO_EVAL', 'JavaObject', 'OrderingColumn', 'PartitioningColumn', 'SelectedColumn', 'SparkSession', 'TVFArgumentOrName', 'UDTFRegistration', '__main__', 'analyze', 'eval', 'eval_type', 'local[4]', 'message', 'name', 'return_type', 'spark', 'sql.udtf tests', 'true', 'type']

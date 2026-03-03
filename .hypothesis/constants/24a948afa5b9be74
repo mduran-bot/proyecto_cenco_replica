@@ -1,0 +1,4 @@
+# file: C:\Users\maxim\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\pyspark\sql\conversion.py
+# hypothesis_version: 6.151.9
+
+['AXIS_LENGTH_MISMATCH', 'MALFORMED_GEOGRAPHY', 'MALFORMED_GEOMETRY', 'MALFORMED_VARIANT', '__dict__', 'actual_length', 'expected_length', 'metadata', 'pa.Table', 'srid', 'value', 'wkb']

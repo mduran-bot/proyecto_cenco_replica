@@ -1,0 +1,76 @@
+{
+  "timestamp": "2026-02-26T11:19:46.466295",
+  "validation_status": "incomplete",
+  "entities_mapping": {
+    "valid": true,
+    "count": 41,
+    "expected": 41,
+    "entities": [
+      "orders",
+      "products",
+      "stock",
+      "order-items",
+      "order-payments",
+      "picking-sessions",
+      "skus",
+      "categories",
+      "brands",
+      "stores",
+      "customers",
+      "carriers",
+      "delivery-planning",
+      "prices",
+      "promotional-prices",
+      "promotions",
+      "invoices",
+      "admins",
+      "comments",
+      "order-shipping",
+      "order-status-changes",
+      "order-custom-data-fields",
+      "order-item-weighables",
+      "order-payments-connector-responses",
+      "picking-round-orders",
+      "delivery-ranges",
+      "warehouses",
+      "locations",
+      "suppliers",
+      "purchase-orders",
+      "purchase-order-items",
+      "inventory-movements",
+      "returns",
+      "return-items",
+      "shipments",
+      "routes",
+      "route-stops",
+      "drivers",
+      "vehicles",
+      "zones",
+      "sales-channels"
+    ]
+  },
+  "field_mappings": {
+    "valid": false,
+    "count": 5,
+    "expected": 26,
+    "tables": [
+      "wms_orders",
+      "products",
+      "stock",
+      "wms_order_items",
+      "skus"
+    ]
+  },
+  "redshift_schemas": {
+    "valid": false,
+    "count": 5,
+    "expected": 26,
+    "tables": [
+      "wms_orders",
+      "products",
+      "stock",
+      "wms_order_items",
+      "skus"
+    ]
+  }
+}

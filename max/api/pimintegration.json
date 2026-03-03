@@ -1,0 +1,2205 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Pim Integration Service",
+    "description": "Pim Integration Service\n\n **Last update**: 17 jun 25, 05:25 a. m.",
+    "version": "1.1.0",
+    "x-logo": null,
+    "x-janis-keywords": [
+      "pim-integration"
+    ],
+    "lastUpdate": "2025-06-17T09:25:10.644Z"
+  },
+  "tags": [
+    {
+      "name": "Account",
+      "description": "For managing Accounts"
+    },
+    {
+      "name": "Attribute",
+      "description": "For managing Attributes"
+    },
+    {
+      "name": "Brand",
+      "description": "For managing Brands"
+    },
+    {
+      "name": "Category",
+      "description": "For managing Categories"
+    },
+    {
+      "name": "Product",
+      "description": "For managing Products"
+    }
+  ],
+  "servers": [
+    {
+      "url": "https://pim-integration.janis.in/api",
+      "description": "The Prod API server",
+      "variables": {
+        "environment": {
+          "default": "prod"
+        }
+      }
+    },
+    {
+      "url": "https://pim-integration.janisqa.in/api",
+      "description": "The QA API server",
+      "variables": {
+        "environment": {
+          "default": "qa"
+        }
+      }
+    },
+    {
+      "url": "https://pim-integration.janisdev.in/api",
+      "description": "The Beta API server",
+      "variables": {
+        "environment": {
+          "default": "beta"
+        }
+      }
+    },
+    {
+      "url": "http://pim-integration.janis.localhost:3135/api",
+      "description": "The Local API server",
+      "variables": {
+        "environment": {
+          "default": "local"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/account/{id}": {
+      "get": {
+        "x-janis-namespace": "account",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "commerce:account:read"
+        ],
+        "operationId": "getAccount",
+        "tags": [
+          "Account"
+        ],
+        "summary": "Get an Account",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Account found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FormattedAccount"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/account": {
+      "get": {
+        "x-janis-namespace": "account",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "commerce:account:read"
+        ],
+        "operationId": "listAccounts",
+        "tags": [
+          "Account"
+        ],
+        "summary": "List Accounts",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AccountSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/AccountFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Accounts listed",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "x-janis-namespace": "account",
+        "x-janis-method": "save",
+        "x-janis-permissions": [
+          "commerce:account:write"
+        ],
+        "operationId": "saveAccount",
+        "tags": [
+          "Account"
+        ],
+        "summary": "Create or update an Account",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "An Account",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Account"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The Account was saved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "$ref": "#/components/schemas/Account/properties/id"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/attribute/{id}": {
+      "get": {
+        "x-janis-namespace": "attribute",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "pim-integration:attribute:read"
+        ],
+        "operationId": "getAttribute",
+        "tags": [
+          "Attribute"
+        ],
+        "summary": "Get a Attribute",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Attribute found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Attribute"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/attribute": {
+      "get": {
+        "x-janis-namespace": "attribute",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "pim-integration:attribute:read"
+        ],
+        "operationId": "listAttributes",
+        "tags": [
+          "Attribute"
+        ],
+        "summary": "List Attributes",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AttributeSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/AttributeFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Attributes listed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttributeList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/brand/{id}": {
+      "get": {
+        "x-janis-namespace": "brand",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "pim-integration:brand:read"
+        ],
+        "operationId": "getBrand",
+        "tags": [
+          "Brand"
+        ],
+        "summary": "Get a Brand",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Brand found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Brand"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/brand": {
+      "get": {
+        "x-janis-namespace": "brand",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "pim-integration:brand:read"
+        ],
+        "operationId": "listBrands",
+        "tags": [
+          "Brand"
+        ],
+        "summary": "List Brands",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/BrandSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/BrandFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Brands listed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BrandList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/category/{id}": {
+      "get": {
+        "x-janis-namespace": "category",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "pim-integration:category:read"
+        ],
+        "operationId": "getCategory",
+        "tags": [
+          "Category"
+        ],
+        "summary": "Get a Category",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Category found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Category"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "x-janis-namespace": "category",
+        "x-janis-method": "update",
+        "x-janis-permissions": [
+          "catalog:category:write"
+        ],
+        "operationId": "updateCategory",
+        "tags": [
+          "Category"
+        ],
+        "summary": "Update a Category",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "requestBody": {
+          "description": "A Category",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Category"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessUpdateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/category": {
+      "get": {
+        "x-janis-namespace": "category",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "pim-integration:category:read"
+        ],
+        "operationId": "listCategory",
+        "tags": [
+          "Category"
+        ],
+        "summary": "List Category",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CategorySortBy"
+          },
+          {
+            "$ref": "#/components/parameters/CategoryFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Category listed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "x-janis-namespace": "category",
+        "x-janis-method": "create",
+        "x-janis-permissions": [
+          "catalog:category:write"
+        ],
+        "operationId": "createCategory",
+        "tags": [
+          "Category"
+        ],
+        "summary": "Create a Category",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "A Category",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Category"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessCreateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/category/{id}/mapping": {
+      "get": {
+        "x-janis-namespace": "category",
+        "x-janis-method": "getMappings",
+        "x-janis-permissions": [
+          "catalog:category:read"
+        ],
+        "operationId": "getCategoryMappings",
+        "tags": [
+          "Category"
+        ],
+        "summary": "Get the category mapping",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "example": "607f191e810c19729de860ea"
+            },
+            "required": true,
+            "description": "The id of the category"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mappingCategory"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "x-janis-namespace": "category",
+        "x-janis-method": "upsertMappings",
+        "x-janis-permissions": [
+          "catalog:category:write"
+        ],
+        "operationId": "upsertCategoryMappings",
+        "tags": [
+          "Category"
+        ],
+        "summary": "Create or update the category mapping",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "example": "607f191e810c19729de860ea"
+            },
+            "required": true,
+            "description": "The id of the category"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessCreateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/category/{id}/mapping-schema": {
+      "get": {
+        "x-janis-namespace": "category",
+        "x-janis-method": "mappingSchema",
+        "x-janis-permissions": [],
+        "operationId": "mappingSchemaCategory",
+        "tags": [
+          "Category"
+        ],
+        "summary": "The mapping schema of the category",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "example": "607f191e810c19729de860ea"
+            },
+            "required": true,
+            "description": "The id of the category"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/mappingSchemaCategory"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/product/{id}": {
+      "get": {
+        "x-janis-namespace": "product",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "pim-integration:product:read"
+        ],
+        "operationId": "getProduct",
+        "tags": [
+          "Product"
+        ],
+        "summary": "Get a Product",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Product found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/Product"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "salesChannelsDetails": {
+                          "type": "array",
+                          "description": "The product's sales channels details",
+                          "items": {
+                            "type": "object",
+                            "description": "A sales channel detail",
+                            "properties": {
+                              "salesChannelId": {
+                                "type": "string",
+                                "description": "A sales channel ID",
+                                "example": "607f191e810c19729de860ea"
+                              },
+                              "salesChannelName": {
+                                "type": "string",
+                                "description": "The sales channel name",
+                                "example": "A sales channel name"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/product": {
+      "get": {
+        "x-janis-namespace": "product",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "pim-integration:product:read"
+        ],
+        "operationId": "listProducts",
+        "tags": [
+          "Product"
+        ],
+        "summary": "List Products",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ProductSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ProductFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Products listed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/listener/commerce/account/saved": {
+      "post": {
+        "x-janis-namespace": "commerce-account",
+        "x-janis-method": "saved-listener",
+        "tags": [
+          "Account"
+        ],
+        "summary": "Commerce account saved listener",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "description": "Commerce account saved listener",
+        "operationId": "commerceAccountSavedListener",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/listenerEvent"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GenericSuccess"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-key",
+        "description": "The API Key"
+      },
+      "ApiSecret": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-secret",
+        "description": "The API Secret"
+      },
+      "JanisClient": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-client",
+        "description": "The Client Code"
+      }
+    },
+    "parameters": {
+      "id": {
+        "name": "id",
+        "in": "path",
+        "schema": {
+          "type": "string",
+          "example": "631fb04c8fe08f51a8ee5949"
+        },
+        "required": true,
+        "description": "The unique identifier of the item"
+      },
+      "ListSortDirection": {
+        "name": "sortDirection",
+        "in": "query",
+        "description": "The direction to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
+        }
+      },
+      "ListPageNumber": {
+        "name": "x-janis-page",
+        "in": "header",
+        "description": "The page to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "default": 1
+        }
+      },
+      "ListPageSize": {
+        "name": "x-janis-page-size",
+        "in": "header",
+        "description": "The page size to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "default": 60
+        }
+      },
+      "JanisEntity": {
+        "name": "janis-entity",
+        "in": "header",
+        "description": "The entity name",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "AccountSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "userCreated",
+            "userModified",
+            "dateCreated",
+            "status"
+          ]
+        }
+      },
+      "AccountFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/FormattedAccount/properties/id"
+            },
+            "referenceId": {
+              "$ref": "#/components/schemas/FormattedAccount/properties/referenceId"
+            },
+            "userCreated": {
+              "$ref": "#/components/schemas/FormattedAccount/properties/userCreated"
+            },
+            "userModified": {
+              "$ref": "#/components/schemas/FormattedAccount/properties/userModified"
+            },
+            "dateCreated": {
+              "$ref": "#/components/schemas/FormattedAccount/properties/dateCreated"
+            },
+            "status": {
+              "$ref": "#/components/schemas/FormattedAccount/properties/status"
+            }
+          }
+        }
+      },
+      "AttributeSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "name",
+            "referenceId",
+            "isRequired",
+            "appliesToSkus",
+            "fieldType",
+            "dateCreated",
+            "status"
+          ]
+        }
+      },
+      "AttributeFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/Attribute/properties/id"
+            },
+            "name": {
+              "$ref": "#/components/schemas/Attribute/properties/name"
+            },
+            "referenceId": {
+              "$ref": "#/components/schemas/Attribute/properties/referenceId"
+            },
+            "accounts": {
+              "$ref": "#/components/schemas/Attribute/properties/accounts"
+            },
+            "category": {
+              "$ref": "#/components/schemas/Attribute/properties/category"
+            },
+            "dateCreated": {
+              "$ref": "#/components/schemas/Attribute/properties/dateCreated"
+            }
+          }
+        }
+      },
+      "BrandSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "name",
+            "referenceId",
+            "dateCreated"
+          ]
+        }
+      },
+      "BrandFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/Brand/properties/id"
+            },
+            "name": {
+              "$ref": "#/components/schemas/Brand/properties/name"
+            },
+            "referenceId": {
+              "$ref": "#/components/schemas/Brand/properties/referenceId"
+            },
+            "accounts": {
+              "$ref": "#/components/schemas/Brand/properties/accounts"
+            },
+            "dateCreated": {
+              "$ref": "#/components/schemas/Brand/properties/dateCreated"
+            }
+          }
+        }
+      },
+      "CategorySortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "name",
+            "referenceId",
+            "dateCreated"
+          ]
+        }
+      },
+      "CategoryFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/Category/properties/id"
+            },
+            "name": {
+              "$ref": "#/components/schemas/Category/properties/name"
+            },
+            "referenceId": {
+              "$ref": "#/components/schemas/Category/properties/referenceId"
+            },
+            "accounts": {
+              "$ref": "#/components/schemas/Category/properties/accounts"
+            },
+            "dateCreated": {
+              "$ref": "#/components/schemas/Category/properties/dateCreated"
+            }
+          }
+        }
+      },
+      "ProductSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "name",
+            "dateCreated",
+            "dateModified"
+          ]
+        }
+      },
+      "ProductFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/Product/properties/id"
+            },
+            "name": {
+              "$ref": "#/components/schemas/Product/properties/name"
+            },
+            "brandId": {
+              "$ref": "#/components/schemas/Product/properties/brandId"
+            },
+            "categoryId": {
+              "$ref": "#/components/schemas/Product/properties/categoryId"
+            },
+            "dateCreated": {
+              "$ref": "#/components/schemas/Product/properties/dateCreated"
+            }
+          }
+        }
+      }
+    },
+    "headers": {
+      "x-janis-total": {
+        "description": "The total amount of records in the list",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "responses": {
+      "SuccessCreateResponse": {
+        "description": "The item was created",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "SuccessUpdateResponse": {
+        "description": "The item was updated",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "GenericSuccess": {
+        "description": "Operation succeeded",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "BadRequest": {
+        "description": "A client error has ocurred.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Authentication missing or invalid",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Not authorized request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "InternalError": {
+        "description": "A server error has ocurred."
+      }
+    },
+    "schemas": {
+      "id": {
+        "description": "The unique identifier of the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "631fb04c8fe08f51a8ee5949"
+      },
+      "status": {
+        "description": "The item status",
+        "type": "string",
+        "default": "active",
+        "enum": [
+          "active",
+          "inactive"
+        ],
+        "example": "active"
+      },
+      "dateCreated": {
+        "description": "The date of creation",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-12T19:00:00.000Z"
+      },
+      "dateModified": {
+        "description": "The date of the last modification",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-20T19:00:00.000Z"
+      },
+      "dateCreatedDay": {
+        "description": "The day of creation",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-08-07T16:00:00.000Z"
+      },
+      "dateModifiedDay": {
+        "description": "The day of last modification",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-08-07T16:00:00.000Z"
+      },
+      "userCreated": {
+        "description": "The ID of the user who created the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "6a1fc1eeb5b68406e0487a10"
+      },
+      "userModified": {
+        "description": "The ID of the user who last modified the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "7e1fc1eeb5b68406e048796"
+      },
+      "publish": {
+        "type": "object",
+        "description": "The Item's publish properties",
+        "properties": {
+          "status": {
+            "description": "The Item's publish status",
+            "readOnly": true,
+            "type": "string",
+            "enum": [
+              "pendingToPublish",
+              "publishError",
+              "published"
+            ],
+            "example": "published"
+          },
+          "startDate": {
+            "description": "The Item's publish start date",
+            "readOnly": true,
+            "type": "string",
+            "format": "date-time",
+            "example": "2020-12-09T17:44:50.637Z"
+          },
+          "endDate": {
+            "description": "The Item's publish end date",
+            "readOnly": true,
+            "type": "string",
+            "format": "date-time",
+            "example": "2020-12-09T18:44:50.637Z"
+          },
+          "message": {
+            "description": "A message about the publish",
+            "type": "string",
+            "readOnly": true,
+            "example": "Ok but some changes are required"
+          },
+          "errorMessage": {
+            "description": "A message about the publish",
+            "type": "string",
+            "readOnly": true,
+            "example": "Fails because ..."
+          }
+        }
+      },
+      "Account": {
+        "description": "An Account",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "referenceId": {
+            "description": "The Account's reference id",
+            "type": "string",
+            "example": "r-00001"
+          },
+          "name": {
+            "description": "The Account's name",
+            "type": "string",
+            "example": "some account name"
+          },
+          "salesChannels": {
+            "description": "Sales Channels related to the Account. See [Sales Channel](commerce#tag/Sales-Channel)",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "commerceId": {
+                  "description": "Id of the `Sales Channel` in Janis Commerce Service. See [Sales Channel](commerce#tag/Sales-Channel)",
+                  "type": "string",
+                  "example": "8e1fc1eeb5b68406eaaa001"
+                },
+                "storeId": {
+                  "description": "The id of the PIM Integration store related with the Sales Channel",
+                  "type": "string",
+                  "example": "sc-9437"
+                }
+              }
+            }
+          },
+          "publishCatalog": {
+            "description": "Setting that indicates if the Account has catalog publishing enabled. By enabling this setting, you are activating the publication of all entities in Janis Catalog service.",
+            "type": "boolean",
+            "example": true
+          },
+          "status": {
+            "$ref": "#/components/schemas/status"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "FormattedAccount": {
+        "description": "An Account",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/Account/properties/id"
+          },
+          "referenceId": {
+            "$ref": "#/components/schemas/Account/properties/referenceId"
+          },
+          "salesChannels": {
+            "$ref": "#/components/schemas/FormattedSalesChannels"
+          },
+          "publishCatalog": {
+            "$ref": "#/components/schemas/Account/properties/publishCatalog"
+          },
+          "status": {
+            "$ref": "#/components/schemas/status"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          }
+        }
+      },
+      "FormattedSalesChannels": {
+        "description": "Sales Channels related to the account. See [Sales Channel](v2/service/commerce#tag/Sales-Channel)",
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "commerceId": {
+              "description": "Id of the `Sales Channel` in Janis Commerce Service. See [Sales Channel](v2/service/commerce#tag/Sales-Channel)",
+              "type": "string",
+              "example": "8e1fc1eeb5b68406eaaa001"
+            },
+            "storeId": {
+              "description": "The id of the PIM Integration store related with the Sales Channel.",
+              "type": "string",
+              "example": "sc-9437"
+            },
+            "referenceId": {
+              "description": "The Sales Channel's reference ID.",
+              "type": "string",
+              "example": "sc-9437"
+            },
+            "name": {
+              "description": "The Sales Channel's name",
+              "type": "string",
+              "example": "Sales Channel 9437"
+            }
+          }
+        }
+      },
+      "AccountList": {
+        "type": "array",
+        "description": "A list of Accounts",
+        "items": {
+          "$ref": "#/components/schemas/Account"
+        }
+      },
+      "Attribute": {
+        "type": "object",
+        "description": "A Attribute from PIM Integration",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "referenceId": {
+            "type": "string",
+            "description": "The attribute's referenceId",
+            "example": "a-attribute-ref-id"
+          },
+          "name": {
+            "type": "string",
+            "description": "The attribute's name",
+            "example": "A attribute name"
+          },
+          "category": {
+            "type": "string",
+            "description": "The attribute's category ID",
+            "example": "607f191e810c19729de860ea"
+          },
+          "accounts": {
+            "type": "array",
+            "description": "The attribute's accounts IDs",
+            "items": {
+              "type": "string",
+              "description": "An account ID",
+              "example": "607f191e810c19729de860ea"
+            }
+          },
+          "isRequired": {
+            "description": "Determines if the attribute is required",
+            "type": "boolean",
+            "example": true
+          },
+          "appliesToSkus": {
+            "description": "Determines if the attribute applies to skus or products",
+            "type": "boolean",
+            "example": true
+          },
+          "fieldType": {
+            "description": "The Attribute's field type",
+            "type": "string",
+            "enum": [
+              "text",
+              "number"
+            ],
+            "example": "text"
+          },
+          "options": {
+            "description": "The Attribute's possible values.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "XL",
+              "XXL"
+            ]
+          },
+          "defaultValue": {
+            "description": "The default value for the **Product** or **Sku** if no value is defined.\nWhen `options` are defined, `defaultValue` must be one of them.\n",
+            "type": "string",
+            "example": "XL"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "status": {
+            "$ref": "#/components/schemas/status"
+          }
+        },
+        "required": [
+          "name",
+          "referenceId",
+          "fieldType"
+        ]
+      },
+      "AttributeList": {
+        "type": "array",
+        "description": "A list of Attributes",
+        "items": {
+          "$ref": "#/components/schemas/Attribute"
+        }
+      },
+      "Brand": {
+        "type": "object",
+        "description": "A Brand from PIM Integration",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "referenceId": {
+            "type": "string",
+            "description": "The brand's referenceId",
+            "example": "a-brand-ref-id"
+          },
+          "name": {
+            "type": "string",
+            "description": "The brand's name",
+            "example": "A brand name"
+          },
+          "accounts": {
+            "type": "array",
+            "description": "The brand's accounts IDs",
+            "items": {
+              "type": "string",
+              "description": "An account ID",
+              "example": "607f191e810c19729de860ea"
+            }
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          }
+        },
+        "required": [
+          "referenceId",
+          "name"
+        ]
+      },
+      "BrandList": {
+        "type": "array",
+        "description": "A list of Brands",
+        "items": {
+          "$ref": "#/components/schemas/Brand"
+        }
+      },
+      "Category": {
+        "type": "object",
+        "description": "A Category from PIM Integration",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "referenceId": {
+            "type": "string",
+            "description": "The category's referenceId",
+            "example": "a-category-ref-id"
+          },
+          "name": {
+            "type": "string",
+            "description": "The category's name",
+            "example": "A category name"
+          },
+          "accounts": {
+            "type": "array",
+            "description": "The category's accounts IDs",
+            "items": {
+              "type": "string",
+              "description": "An account ID",
+              "example": "607f191e810c19729de860ea"
+            }
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          }
+        },
+        "required": [
+          "referenceId",
+          "name"
+        ]
+      },
+      "CategoryList": {
+        "type": "array",
+        "description": "A list of Category",
+        "items": {
+          "$ref": "#/components/schemas/Category"
+        }
+      },
+      "mappingCategory": {
+        "type": "object",
+        "description": "A Category Mapping",
+        "properties": {
+          "mappings": {
+            "description": "Mappings",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "description": "The id of the attribute in the integration platform.",
+                  "type": "number",
+                  "example": 123
+                },
+                "attributeName": {
+                  "description": "The name of the attribute in the integration platform.",
+                  "type": "string",
+                  "example": "ProductName"
+                },
+                "catalogField": {
+                  "description": "The name of the field in catalog.",
+                  "type": "string",
+                  "example": "product.name"
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "mappings"
+        ]
+      },
+      "mappingSchemaCategory": {
+        "description": "View schema for Attributes according to a Product",
+        "type": "object",
+        "properties": {
+          "rootComponent": {
+            "type": "string",
+            "description": "The component of the view to be rendered. Always set as 'FormSection'.",
+            "example": "FormSection"
+          },
+          "source": {
+            "type": "object",
+            "description": "The source endpoint of the form.",
+            "properties": {
+              "service": {
+                "type": "string",
+                "description": "The service name",
+                "example": "pim-integration"
+              },
+              "namespace": {
+                "type": "string",
+                "description": "The namespace",
+                "example": "category"
+              },
+              "method": {
+                "type": "string",
+                "description": "The method",
+                "example": "getMappings"
+              }
+            }
+          },
+          "sourceEndpointParameters": {
+            "type": "object",
+            "description": "The source endpoint parameters of the form.",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "The name of the target",
+                "example": "id"
+              },
+              "target": {
+                "type": "string",
+                "description": "The type of the target",
+                "example": "path"
+              },
+              "value": {
+                "type": "object",
+                "description": "The value of the target",
+                "properties": {
+                  "dynamic": {
+                    "type": "string",
+                    "description": "The value of the target",
+                    "example": "id"
+                  }
+                }
+              }
+            }
+          },
+          "target": {
+            "type": "object",
+            "description": "The target endpoint of the form.",
+            "properties": {
+              "service": {
+                "type": "string",
+                "description": "The service name",
+                "example": "pim-integration"
+              },
+              "namespace": {
+                "type": "string",
+                "description": "The namespace",
+                "example": "category"
+              },
+              "method": {
+                "type": "string",
+                "description": "The method",
+                "example": "post"
+              }
+            }
+          },
+          "targetEndpointParameters": {
+            "type": "object",
+            "description": "The target endpoint parameters of the form.",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "The name of the target",
+                "example": "id"
+              },
+              "target": {
+                "type": "string",
+                "description": "The type of the target",
+                "example": "path"
+              },
+              "value": {
+                "type": "object",
+                "description": "The value of the target",
+                "properties": {
+                  "dynamic": {
+                    "type": "string",
+                    "description": "The value of the target",
+                    "example": "id"
+                  }
+                }
+              }
+            }
+          },
+          "fieldsGroup": {
+            "description": "The name of the group of mapping fields, if there is one or it is \"generic\".\nWithin each item of the array, there will be the name of the group and the fields.\n",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "description": "Object containing the group name and fields",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "The group name",
+                  "example": "mapping"
+                },
+                "fields": {
+                  "description": "the fields of the fields group",
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "description": "The fields of the fieldsArray",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "The name of the field",
+                        "example": "mappings"
+                      },
+                      "component": {
+                        "type": "string",
+                        "description": "View component to use in the table field",
+                        "enum": [
+                          "FieldsArray"
+                        ],
+                        "example": "FieldsArray"
+                      },
+                      "noLabel": {
+                        "type": "boolean",
+                        "description": "The properties to hide the label of the field",
+                        "example": true
+                      },
+                      "componentAttributes": {
+                        "type": "object",
+                        "description": "The component attributes",
+                        "properties": {
+                          "minElements": {
+                            "type": "number",
+                            "description": "The number of minimum elements",
+                            "example": 1
+                          },
+                          "canChangeElements": {
+                            "type": "boolean",
+                            "description": "Determines if the fields array can change the elements",
+                            "example": false
+                          },
+                          "fields": {
+                            "type": "array",
+                            "description": "The fields that will show in the form",
+                            "items": {
+                              "type": "object",
+                              "description": "the fields",
+                              "properties": {
+                                "name": {
+                                  "description": "The name of the field",
+                                  "type": "string"
+                                },
+                                "component": {
+                                  "description": "View component to use in the table field",
+                                  "type": "string",
+                                  "enum": [
+                                    "Input",
+                                    "Text",
+                                    "Select"
+                                  ]
+                                },
+                                "componentAttributes": {
+                                  "oneOf": [
+                                    {
+                                      "type": "object",
+                                      "title": "Input",
+                                      "properties": {
+                                        "type": {
+                                          "description": "The attribute component type",
+                                          "type": "string",
+                                          "enum": [
+                                            "number"
+                                          ]
+                                        }
+                                      }
+                                    },
+                                    {
+                                      "type": "object",
+                                      "title": "Select",
+                                      "properties": {
+                                        "translateLabels": {
+                                          "type": "boolean",
+                                          "description": "Indicates whether or not the labels should be translated"
+                                        },
+                                        "options": {
+                                          "type": "object",
+                                          "description": "The options available for the value of the Attribute",
+                                          "properties": {
+                                            "scope": {
+                                              "type": "string",
+                                              "description": "The scope for the options. Always set as 'local'."
+                                            },
+                                            "values": {
+                                              "type": "array",
+                                              "description": "The select options",
+                                              "items": {
+                                                "type": "object",
+                                                "description": "The possible options of the select",
+                                                "properties": {
+                                                  "label": {
+                                                    "type": "string",
+                                                    "description": "The option name"
+                                                  },
+                                                  "value": {
+                                                    "type": "string",
+                                                    "description": "The option value"
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "rootComponent",
+          "source",
+          "sourceEndpointParameters",
+          "target",
+          "targetEndpointParameters",
+          "fieldsGroup"
+        ]
+      },
+      "listIntegrationTaxonomy": {
+        "type": "object",
+        "description": "A Taxonomy",
+        "properties": {
+          "id": {
+            "description": "The Integration Taxonomy id",
+            "type": "number",
+            "example": 1234
+          },
+          "name": {
+            "description": "The Integration Taxonomy name",
+            "type": "string",
+            "example": "Some Taxonomy name"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ]
+      },
+      "Product": {
+        "type": "object",
+        "description": "A Product from PIM Integration",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "name": {
+            "type": "string",
+            "description": "The product's name",
+            "example": "A product name"
+          },
+          "brandId": {
+            "type": "string",
+            "description": "The product's brand's ID",
+            "example": "507f191e810c19729de860ea"
+          },
+          "categoryId": {
+            "type": "string",
+            "description": "The product's category ID",
+            "example": "607f191e810c19729de860ea"
+          },
+          "categoriesIds": {
+            "type": "array",
+            "description": "The product's categories IDs",
+            "items": {
+              "type": "string",
+              "description": "A category ID",
+              "example": "607f191e810c19729de860ea"
+            }
+          },
+          "salesChannels": {
+            "type": "array",
+            "description": "The product's sales channels",
+            "items": {
+              "type": "string",
+              "description": "A sales channel ID",
+              "example": "407f191e810c19729de860ea"
+            }
+          },
+          "mainImage": {
+            "type": "string",
+            "description": "The product's main image URL",
+            "example": "product-image-url"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          }
+        }
+      },
+      "ProductList": {
+        "type": "array",
+        "description": "A list of Products",
+        "items": {
+          "$ref": "#/components/schemas/Product"
+        }
+      },
+      "listenerEvent": {
+        "description": "A JANIS Event object",
+        "type": "object",
+        "properties": {
+          "service": {
+            "description": "The source service name",
+            "type": "string",
+            "example": "id"
+          },
+          "entity": {
+            "description": "The event related entity",
+            "type": "string",
+            "example": "profile"
+          },
+          "event": {
+            "description": "The event name",
+            "type": "string",
+            "example": "created"
+          },
+          "client": {
+            "description": "The source event client",
+            "type": "string",
+            "example": "fizzmod"
+          },
+          "id": {
+            "description": "The event related entity ID",
+            "type": "string",
+            "example": "5d699c1ae8ebb95eaa24aca9"
+          }
+        },
+        "required": [
+          "service",
+          "entity",
+          "event"
+        ]
+      }
+    }
+  }
+}

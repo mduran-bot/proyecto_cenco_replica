@@ -1,0 +1,4400 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Mercadolibre Service",
+    "description": "Manage integration between Janis and Mercadolibre.\n\n **Last update**: 12 feb 26, 04:42 p. m.",
+    "version": "1.24.0",
+    "x-logo": null,
+    "x-janis-keywords": [
+      "mercadolibre",
+      "integration",
+      "Ecommerce"
+    ],
+    "lastUpdate": "2026-02-12T19:42:24.360Z"
+  },
+  "tags": [
+    {
+      "name": "Account",
+      "description": "For managing Accounts"
+    },
+    {
+      "name": "Location",
+      "description": "For managing Locations"
+    },
+    {
+      "name": "Meli Item",
+      "description": "For managing MercadoLibre Items"
+    },
+    {
+      "name": "Order",
+      "description": "For managing Order"
+    },
+    {
+      "name": "Order Status Change",
+      "description": "For managing Order Status Change"
+    },
+    {
+      "name": "Price",
+      "description": "For managing Prices"
+    },
+    {
+      "name": "Product",
+      "description": "For managing Product"
+    },
+    {
+      "name": "Sku",
+      "description": "For managing Sku"
+    },
+    {
+      "name": "Stock",
+      "description": "For managing Stock"
+    }
+  ],
+  "servers": [
+    {
+      "url": "https://mercadolibre.janis.in/api",
+      "description": "The Prod API server",
+      "variables": {
+        "environment": {
+          "default": "prod"
+        }
+      }
+    },
+    {
+      "url": "https://mercadolibre.janisqa.in/api",
+      "description": "The QA API server",
+      "variables": {
+        "environment": {
+          "default": "qa"
+        }
+      }
+    },
+    {
+      "url": "https://mercadolibre.janisdev.in/api",
+      "description": "The Beta API server",
+      "variables": {
+        "environment": {
+          "default": "beta"
+        }
+      }
+    },
+    {
+      "url": "http://mercadolibre.janis.localhost:3143/api",
+      "description": "The Local API server",
+      "variables": {
+        "environment": {
+          "default": "local"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/account/{id}": {
+      "get": {
+        "x-janis-namespace": "account",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "commerce:account:read"
+        ],
+        "operationId": "getAccount",
+        "tags": [
+          "Account"
+        ],
+        "summary": "Get an Account",
+        "description": "Retrieve a specific account by its unique identifier",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Account found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Account"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/account": {
+      "get": {
+        "x-janis-namespace": "account",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "commerce:account:read"
+        ],
+        "operationId": "listAccounts",
+        "tags": [
+          "Account"
+        ],
+        "summary": "List Accounts",
+        "description": "Retrieve a paginated list of account records",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AccountSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/AccountFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Accounts listed",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "x-janis-namespace": "account",
+        "x-janis-method": "save",
+        "x-janis-permissions": [
+          "commerce:account:write"
+        ],
+        "operationId": "saveAccount",
+        "tags": [
+          "Account"
+        ],
+        "summary": "Create or update an Account",
+        "description": "Create a new account or update an existing one",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "An Account",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Account"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The Account was saved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "$ref": "#/components/schemas/Account/properties/id"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/integration-item": {
+      "get": {
+        "x-janis-namespace": "integration-item",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "mercadolibre:meli-item:read"
+        ],
+        "operationId": "getIntegrationItem",
+        "tags": [
+          "Meli Item"
+        ],
+        "summary": "Get item from integration",
+        "description": "Retrieve a specific MercadoLibre item record",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/meliItemId"
+          },
+          {
+            "$ref": "#/components/parameters/accountId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Integration item found"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/integration-item-store": {
+      "get": {
+        "x-janis-namespace": "integration-item-store",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "mercadolibre:meli-item:read"
+        ],
+        "operationId": "listIntegrationItemStore",
+        "tags": [
+          "Meli Item"
+        ],
+        "summary": "Get a list of item stores from integration",
+        "description": "Retrieve a list of item stores from the integration system",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/meliItemId"
+          },
+          {
+            "$ref": "#/components/parameters/accountId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Integration item stores found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationItemStoreList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/integration-order": {
+      "get": {
+        "x-janis-namespace": "integration-order",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "mercadolibre:order:read"
+        ],
+        "operationId": "getIntegrationOrder",
+        "tags": [
+          "Order"
+        ],
+        "summary": "Get order from integration",
+        "description": "Retrieve an order from the integration system",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "integrationOrderId",
+            "in": "query",
+            "description": "The integration order ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "accountId",
+            "in": "query",
+            "description": "The account ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Integration order found"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/integration-user-product-stock": {
+      "get": {
+        "x-janis-namespace": "integration-user-product-stock",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "mercadolibre:sku:read"
+        ],
+        "operationId": "getIntegrationUserProductStock",
+        "tags": [
+          "Sku"
+        ],
+        "summary": "Get stock from user product",
+        "description": "Retrieve a list of stock records from the integration system",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "userProductId",
+            "in": "query",
+            "description": "The MercadoLibre user product ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/accountId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User product stock found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationUserProductStockList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/location/{id}": {
+      "get": {
+        "x-janis-namespace": "location",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "mercadolibre:location:read"
+        ],
+        "operationId": "getLocation",
+        "tags": [
+          "Location"
+        ],
+        "summary": "Get a Location",
+        "description": "Retrieves a specific location by its ID",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Location found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Location"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "x-janis-namespace": "location",
+        "x-janis-method": "update",
+        "x-janis-permissions": [
+          "mercadolibre:location:write"
+        ],
+        "operationId": "updateLocation",
+        "tags": [
+          "Location"
+        ],
+        "summary": "Update a Location",
+        "description": "Updates the warehouses information for a specific location",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "wmsWarehouse"
+                ],
+                "properties": {
+                  "wmsWarehouse": {
+                    "type": "object",
+                    "required": [
+                      "id"
+                    ],
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "description": "The warehouse ID"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "The updated location ID"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/location": {
+      "get": {
+        "x-janis-namespace": "location",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "mercadolibre:location:read"
+        ],
+        "operationId": "listLocation",
+        "tags": [
+          "Location"
+        ],
+        "summary": "List Locations",
+        "description": "Retrieve a paginated list of location records",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/LocationSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/LocationFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Location listed",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocationList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/location-import": {
+      "post": {
+        "x-janis-namespace": "location-import",
+        "x-janis-method": "post",
+        "x-janis-permissions": [
+          "mercadolibre:location:write"
+        ],
+        "operationId": "importLocations",
+        "tags": [
+          "Location"
+        ],
+        "summary": "Import locations for an account",
+        "description": "Import locations for an account",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "Account ID for location import",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "accountId"
+                ],
+                "properties": {
+                  "accountId": {
+                    "type": "string",
+                    "description": "The account ID to import locations for",
+                    "example": "5e9f1b3b1c9d440001f7b3b3"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Location import process started successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Location import process started"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/meli-item/{id}": {
+      "get": {
+        "x-janis-namespace": "meli-item",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "mercadolibre:meli-item:read"
+        ],
+        "operationId": "getMeliItem",
+        "tags": [
+          "Meli Item"
+        ],
+        "summary": "Get a MercadoLibre item by ID",
+        "description": "Retrieve a specific MercadoLibre item record by its unique identifier",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeliItem"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/meli-item": {
+      "get": {
+        "x-janis-namespace": "meli-item",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "mercadolibre:meli-item:read"
+        ],
+        "operationId": "listMeliItems",
+        "tags": [
+          "Meli Item"
+        ],
+        "summary": "Get a list of MercadoLibre items",
+        "description": "Retrieve a paginated list of MercadoLibre item records",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/MeliItemFilters"
+          },
+          {
+            "$ref": "#/components/parameters/MeliItemSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeliItemList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/order/{id}": {
+      "get": {
+        "x-janis-namespace": "order",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "mercadolibre:order:read"
+        ],
+        "operationId": "getOrder",
+        "tags": [
+          "Order"
+        ],
+        "summary": "Get an Order",
+        "description": "Retrieve a specific order record",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/order": {
+      "get": {
+        "x-janis-namespace": "order",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "mercadolibre:order:read"
+        ],
+        "operationId": "listOrder",
+        "tags": [
+          "Order"
+        ],
+        "summary": "List Orders",
+        "description": "Retrieve a list of order records",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/OrderSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/OrderFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order listed",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/price/{id}": {
+      "get": {
+        "x-janis-namespace": "price",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "mercadolibre:price:read"
+        ],
+        "operationId": "getPrice",
+        "tags": [
+          "Price"
+        ],
+        "summary": "Get a price by ID",
+        "description": "Retrieve a specific price record by its unique identifier",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Price"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/price": {
+      "get": {
+        "x-janis-namespace": "price",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "mercadolibre:price:read"
+        ],
+        "operationId": "listPrices",
+        "tags": [
+          "Price"
+        ],
+        "summary": "Get a list of prices",
+        "description": "Retrieve a paginated list of price records",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PriceFilters"
+          },
+          {
+            "$ref": "#/components/parameters/PriceSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PriceList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/product/{id}": {
+      "get": {
+        "x-janis-namespace": "product",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "mercadolibre:product:read"
+        ],
+        "operationId": "getProduct",
+        "tags": [
+          "Product"
+        ],
+        "summary": "Get a Product",
+        "description": "Retrieve a specific product record",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Product found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Product"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/product": {
+      "get": {
+        "x-janis-namespace": "product",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "mercadolibre:product:read"
+        ],
+        "operationId": "listProducts",
+        "tags": [
+          "Product"
+        ],
+        "summary": "List Products",
+        "description": "Retrieve a list of product records",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ProductSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ProductFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Products listed",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/retry-meli-item": {
+      "post": {
+        "x-janis-namespace": "retry-meli-item",
+        "x-janis-method": "post",
+        "x-janis-permissions": [
+          "mercadolibre:meli-item:write"
+        ],
+        "operationId": "retryMeliItem",
+        "tags": [
+          "Meli Item"
+        ],
+        "summary": "Retry Meli items with publish status errors",
+        "description": "Retry Meli items with publish status errors",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "Request body for retrying Meli items with status errors. Can be an array of Meli item objects, a single Meli item object, or an empty object to process all Meli items.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "array",
+                    "description": "Array of Meli item objects to retry",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "id"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "description": "The Meli item ID to retry",
+                          "example": "5e9f1b3b1c9d440001f7b3b3"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "description": "Single Meli item object to retry. The id field is required.",
+                    "required": [
+                      "id"
+                    ],
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "description": "The Meli item ID to retry",
+                        "example": "5e9f1b3b1c9d440001f7b3b3"
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "description": "Empty object to retry all Meli items with status errors",
+                    "properties": {}
+                  }
+                ]
+              },
+              "examples": {
+                "arrayMeliItems": {
+                  "summary": "Array of Meli item objects",
+                  "description": "Retry multiple specific Meli items",
+                  "value": [
+                    {
+                      "id": "5e9f1b3b1c9d440001f7b3b3"
+                    },
+                    {
+                      "id": "5e9f1b3b1c9d440001f7b3b4"
+                    }
+                  ]
+                },
+                "singleMeliItem": {
+                  "summary": "Single Meli item object",
+                  "description": "Retry a specific Meli item",
+                  "value": {
+                    "id": "5e9f1b3b1c9d440001f7b3b3"
+                  }
+                },
+                "emptyObject": {
+                  "summary": "Empty object",
+                  "description": "Retry all Meli items with status errors",
+                  "value": {}
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Meli item publishing process started successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Meli item publishing process started"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/retry-sku": {
+      "post": {
+        "x-janis-namespace": "retry-sku",
+        "x-janis-method": "post",
+        "x-janis-permissions": [
+          "mercadolibre:sku:write"
+        ],
+        "operationId": "retrySku",
+        "tags": [
+          "Sku"
+        ],
+        "summary": "Retry Sku with publish status errors",
+        "description": "Retry Sku with publish status errors",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "Request body for retrying SKUs with publish status errors. Can be an array of SKU objects, a single SKU object, or an empty object to process all SKUs.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "array",
+                    "description": "Array of SKU objects to retry",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "id"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "description": "The SKU ID to retry",
+                          "example": "5e9f1b3b1c9d440001f7b3b3"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "description": "Single SKU object to retry. The id field is required.",
+                    "required": [
+                      "id"
+                    ],
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "description": "The SKU ID to retry",
+                        "example": "5e9f1b3b1c9d440001f7b3b3"
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "description": "Empty object to retry all SKUs with publish status errors",
+                    "properties": {}
+                  }
+                ]
+              },
+              "examples": {
+                "arraySkus": {
+                  "summary": "Array of SKU objects",
+                  "description": "Retry multiple specific SKUs",
+                  "value": [
+                    {
+                      "id": "5e9f1b3b1c9d440001f7b3b3"
+                    },
+                    {
+                      "id": "5e9f1b3b1c9d440001f7b3b4"
+                    }
+                  ]
+                },
+                "singleSku": {
+                  "summary": "Single SKU object",
+                  "description": "Retry a specific SKU",
+                  "value": {
+                    "id": "5e9f1b3b1c9d440001f7b3b3"
+                  }
+                },
+                "emptyObject": {
+                  "summary": "Empty object",
+                  "description": "Retry all SKUs with publish status errors",
+                  "value": {}
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "SKU publishing process started successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "SKU publishing process started"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/retry-stock": {
+      "post": {
+        "x-janis-namespace": "retry-stock",
+        "x-janis-method": "post",
+        "x-janis-permissions": [
+          "mercadolibre:stock:write"
+        ],
+        "operationId": "retryStock",
+        "tags": [
+          "Stock"
+        ],
+        "summary": "Retry Stock with publish status errors",
+        "description": "Retry Stock with publish status errors",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "Request body for retrying Stocks with publish status errors. Can be an array of Stock objects, a single Stock object, or an empty object to process all Stocks.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "array",
+                    "description": "Array of Stock objects to retry",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "id"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "description": "The Stock ID to retry",
+                          "example": "5e9f1b3b1c9d440001f7b3b3"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "description": "Single Stock object to retry. The id field is required.",
+                    "required": [
+                      "id"
+                    ],
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "description": "The Stock ID to retry",
+                        "example": "5e9f1b3b1c9d440001f7b3b3"
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "description": "Empty object to retry all Stocks with publish status errors",
+                    "properties": {}
+                  }
+                ]
+              },
+              "examples": {
+                "arrayStocks": {
+                  "summary": "Array of Stock objects",
+                  "description": "Retry multiple specific Stocks",
+                  "value": [
+                    {
+                      "id": "5e9f1b3b1c9d440001f7b3b3"
+                    },
+                    {
+                      "id": "5e9f1b3b1c9d440001f7b3b4"
+                    }
+                  ]
+                },
+                "singleStock": {
+                  "summary": "Single Stock object",
+                  "description": "Retry a specific Stock",
+                  "value": {
+                    "id": "5e9f1b3b1c9d440001f7b3b3"
+                  }
+                },
+                "emptyObject": {
+                  "summary": "Empty object",
+                  "description": "Retry all Stocks with publish status errors",
+                  "value": {}
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Stock publishing process started successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Stock publishing process started"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/sku/{id}": {
+      "get": {
+        "x-janis-namespace": "sku",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "mercadolibre:sku:read"
+        ],
+        "operationId": "getSku",
+        "tags": [
+          "Sku"
+        ],
+        "summary": "Get an Sku",
+        "description": "Retrieve a specific SKU record",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sku found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Sku"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/sku": {
+      "get": {
+        "x-janis-namespace": "sku",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "mercadolibre:sku:read"
+        ],
+        "operationId": "listSkus",
+        "tags": [
+          "Sku"
+        ],
+        "summary": "List Skus",
+        "description": "Retrieve a list of SKU records",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/SkuSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/SkuFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Skus listed",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SkuList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/sku-batch": {
+      "post": {
+        "x-janis-namespace": "sku-batch",
+        "x-janis-method": "post",
+        "x-janis-permissions": [
+          "mercadolibre:sku:write"
+        ],
+        "operationId": "saveSkuBatch",
+        "tags": [
+          "Sku"
+        ],
+        "summary": "Massive update skus",
+        "description": "\nUpdate massive sku items. The maximum of skus admitted is `1000`.\n- The field 'referenceId' refer to `referenceId` fields.\n\n- If any optional property is not defined in the request, and the Sku already exists, the missing property will keep its current value.\n\n**IMPORTANT**: If any of the records to update contains a 'wrong type' property, the whole process will fail.\n",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "The skus to update",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SkuBatchList"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/BatchResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/stock/{id}": {
+      "get": {
+        "x-janis-namespace": "stock",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "mercadolibre:stock:read"
+        ],
+        "operationId": "getStock",
+        "tags": [
+          "Stock"
+        ],
+        "summary": "Get a stock record by ID",
+        "description": "Retrieve a specific stock record by its unique identifier",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Stock"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/stock": {
+      "get": {
+        "x-janis-namespace": "stock",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "mercadolibre:stock:read"
+        ],
+        "operationId": "listStock",
+        "tags": [
+          "Stock"
+        ],
+        "summary": "Get a list of stock records",
+        "description": "Retrieve a paginated list of stock records",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/StockFilters"
+          },
+          {
+            "$ref": "#/components/parameters/StockSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StockList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/order-status-change/{id}": {
+      "get": {
+        "x-janis-namespace": "order-status-change",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "mercadolibre:order-status-change:read"
+        ],
+        "operationId": "getOrderStatusChange",
+        "tags": [
+          "Order Status Change"
+        ],
+        "summary": "Get an Order Status Change",
+        "description": "Retrieve a specific order status change record",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order Status Change found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderStatusChange"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/order-status-change": {
+      "get": {
+        "x-janis-namespace": "order-status-change",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "mercadolibre:order-status-change:read"
+        ],
+        "operationId": "listOrderStatusChanges",
+        "tags": [
+          "Order Status Change"
+        ],
+        "summary": "List Order Status Changes",
+        "description": "Retrieve a list of order status change records",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/OrderStatusChangeSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/OrderStatusChangeFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order Status Changes listed",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderStatusChangeList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/order-status-change/{id}/retry": {
+      "post": {
+        "x-janis-namespace": "order-status-change",
+        "x-janis-method": "retryOrderStatusChange",
+        "x-janis-permissions": [
+          "glovo:order-status-change:retry"
+        ],
+        "operationId": "retryOrderStatusChange",
+        "tags": [
+          "Order Status Change"
+        ],
+        "summary": "Retry a Order Status Change",
+        "description": "It's the action to retry a order status change.\n",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "example": "631fb04c8fe08f51a8ee5949"
+            },
+            "description": "The order status change id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The order status change retried"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-key",
+        "description": "The API Key"
+      },
+      "ApiSecret": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-secret",
+        "description": "The API Secret"
+      },
+      "JanisClient": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-client",
+        "description": "The Client Code"
+      }
+    },
+    "parameters": {
+      "id": {
+        "name": "id",
+        "in": "path",
+        "schema": {
+          "type": "string",
+          "example": "631fb04c8fe08f51a8ee5949"
+        },
+        "required": true,
+        "description": "The unique identifier of the item"
+      },
+      "ListSortDirection": {
+        "name": "sortDirection",
+        "in": "query",
+        "description": "The direction to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
+        }
+      },
+      "ListPageNumber": {
+        "name": "x-janis-page",
+        "in": "header",
+        "description": "The page to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "default": 1
+        }
+      },
+      "ListPageSize": {
+        "name": "x-janis-page-size",
+        "in": "header",
+        "description": "The page size to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "default": 60
+        }
+      },
+      "meliItemId": {
+        "name": "meliItemId",
+        "in": "query",
+        "description": "The MercadoLibre item ID",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "accountId": {
+        "name": "accountId",
+        "in": "query",
+        "description": "The account ID",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "AccountSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "userCreated",
+            "userModified",
+            "dateCreated",
+            "status"
+          ]
+        }
+      },
+      "AccountFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/Account/properties/id"
+            },
+            "referenceId": {
+              "$ref": "#/components/schemas/Account/properties/referenceId"
+            },
+            "userCreated": {
+              "$ref": "#/components/schemas/Account/properties/userCreated"
+            },
+            "userModified": {
+              "$ref": "#/components/schemas/Account/properties/userModified"
+            },
+            "dateCreatedRange": {
+              "$ref": "#/components/schemas/dateCreatedRange"
+            },
+            "dateModifiedRange": {
+              "$ref": "#/components/schemas/dateModifiedRange"
+            },
+            "status": {
+              "$ref": "#/components/schemas/Account/properties/status"
+            }
+          }
+        }
+      },
+      "LocationSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "dateCreated"
+          ]
+        }
+      },
+      "LocationFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/Location/properties/id"
+            },
+            "meliStoreId": {
+              "$ref": "#/components/schemas/Location/properties/meliStoreId"
+            },
+            "networkNodeId": {
+              "$ref": "#/components/schemas/Location/properties/networkNodeId"
+            },
+            "name": {
+              "$ref": "#/components/schemas/Location/properties/name"
+            },
+            "accountId": {
+              "$ref": "#/components/schemas/Location/properties/accountId"
+            },
+            "referenceId": {
+              "$ref": "#/components/schemas/Location/properties/referenceId"
+            },
+            "status": {
+              "$ref": "#/components/schemas/Location/properties/status"
+            },
+            "userModified": {
+              "$ref": "#/components/schemas/Location/properties/userModified"
+            },
+            "dateCreatedRange": {
+              "$ref": "#/components/schemas/dateCreatedRange"
+            },
+            "dateModifiedRange": {
+              "$ref": "#/components/schemas/dateModifiedRange"
+            }
+          }
+        }
+      },
+      "MeliItemSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "meliItemId",
+            "userProductId",
+            "publishStatus",
+            "publish.status",
+            "dateCreated",
+            "dateModified"
+          ]
+        }
+      },
+      "MeliItemFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/id"
+            },
+            "meliItemId": {
+              "$ref": "#/components/schemas/MeliItem/properties/meliItemId"
+            },
+            "userProductId": {
+              "$ref": "#/components/schemas/MeliItem/properties/userProductId"
+            },
+            "skuId": {
+              "$ref": "#/components/schemas/MeliItem/properties/skuId"
+            },
+            "accountId": {
+              "$ref": "#/components/schemas/MeliItem/properties/accountId"
+            },
+            "pricingId": {
+              "$ref": "#/components/schemas/MeliItem/properties/pricingId"
+            },
+            "priceSheetId": {
+              "$ref": "#/components/schemas/MeliItem/properties/priceSheetId"
+            },
+            "catalogSkuId": {
+              "$ref": "#/components/schemas/MeliItem/properties/catalogSkuId"
+            },
+            "meliItemTitle": {
+              "$ref": "#/components/schemas/MeliItem/properties/rawPublishedItem/properties/title"
+            },
+            "meliItemStatus": {
+              "$ref": "#/components/schemas/MeliItem/properties/rawPublishedItem/properties/status"
+            },
+            "dateCreatedRange": {
+              "$ref": "#/components/schemas/dateCreatedRange"
+            },
+            "dateModifiedRange": {
+              "$ref": "#/components/schemas/dateModifiedRange"
+            },
+            "publishStatus": {
+              "$ref": "#/components/schemas/MeliItem/properties/publish/properties/status"
+            },
+            "hasSkuId": {
+              "$ref": "#/components/schemas/MeliItem/properties/hasSkuId"
+            },
+            "hasMeliItemId": {
+              "$ref": "#/components/schemas/MeliItem/properties/hasMeliItemId"
+            },
+            "isDisabled": {
+              "$ref": "#/components/schemas/MeliItem/properties/isDisabled"
+            }
+          }
+        }
+      },
+      "OrderSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "dateCreated",
+            "dateModified"
+          ]
+        }
+      },
+      "OrderFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/Order/properties/id"
+            },
+            "integrationOrderId": {
+              "$ref": "#/components/schemas/Order/properties/integrationOrderId"
+            },
+            "accountId": {
+              "$ref": "#/components/schemas/Order/properties/accountId"
+            },
+            "status": {
+              "$ref": "#/components/schemas/Order/properties/status"
+            },
+            "dateCreatedRange": {
+              "$ref": "#/components/schemas/dateCreatedRange"
+            },
+            "dateModifiedRange": {
+              "$ref": "#/components/schemas/dateModifiedRange"
+            }
+          }
+        }
+      },
+      "PriceSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "meliItemId",
+            "price",
+            "priceSheet",
+            "listPrice",
+            "pricingId",
+            "accountId",
+            "dateCreated",
+            "dateModified"
+          ]
+        }
+      },
+      "PriceFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/id"
+            },
+            "pricingId": {
+              "$ref": "#/components/schemas/Price/properties/pricingId"
+            },
+            "catalogSkuId": {
+              "$ref": "#/components/schemas/Price/properties/catalogSkuId"
+            },
+            "priceSheet": {
+              "$ref": "#/components/schemas/Price/properties/priceSheet"
+            },
+            "accountId": {
+              "$ref": "#/components/schemas/Price/properties/accountId"
+            },
+            "meliItemId": {
+              "$ref": "#/components/schemas/Price/properties/meliItemId"
+            },
+            "hasMeliItemId": {
+              "$ref": "#/components/schemas/Price/properties/hasMeliItemId"
+            },
+            "dateCreatedRange": {
+              "$ref": "#/components/schemas/dateCreatedRange"
+            },
+            "dateModifiedRange": {
+              "$ref": "#/components/schemas/dateModifiedRange"
+            }
+          }
+        }
+      },
+      "ProductSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "dateCreated",
+            "dateModified"
+          ]
+        }
+      },
+      "ProductFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/Product/properties/id"
+            },
+            "name": {
+              "$ref": "#/components/schemas/Product/properties/name"
+            },
+            "referenceId": {
+              "$ref": "#/components/schemas/Product/properties/referenceId"
+            },
+            "catalogId": {
+              "$ref": "#/components/schemas/Product/properties/catalogId"
+            },
+            "accountId": {
+              "$ref": "#/components/schemas/Product/properties/accountId"
+            },
+            "dateCreatedRange": {
+              "$ref": "#/components/schemas/dateCreatedRange"
+            },
+            "dateModifiedRange": {
+              "$ref": "#/components/schemas/dateModifiedRange"
+            },
+            "status": {
+              "$ref": "#/components/schemas/Product/properties/status"
+            }
+          }
+        }
+      },
+      "SkuSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "dateCreated",
+            "dateModified"
+          ]
+        }
+      },
+      "SkuFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/Sku/properties/id"
+            },
+            "name": {
+              "$ref": "#/components/schemas/Sku/properties/name"
+            },
+            "referenceId": {
+              "$ref": "#/components/schemas/Sku/properties/referenceId"
+            },
+            "accountId": {
+              "$ref": "#/components/schemas/Sku/properties/accountId"
+            },
+            "catalogId": {
+              "$ref": "#/components/schemas/Sku/properties/catalogId"
+            },
+            "productCatalogId": {
+              "$ref": "#/components/schemas/Sku/properties/productCatalogId"
+            },
+            "userProductId": {
+              "$ref": "#/components/schemas/Sku/properties/userProductId"
+            },
+            "eans": {
+              "$ref": "#/components/schemas/Sku/properties/eans"
+            },
+            "integrationEan": {
+              "$ref": "#/components/schemas/Sku/properties/integrationEan"
+            },
+            "integrationCategoryId": {
+              "$ref": "#/components/schemas/Sku/properties/integrationCategoryId"
+            },
+            "integrationProductId": {
+              "$ref": "#/components/schemas/Sku/properties/integrationProductId"
+            },
+            "dateCreatedRange": {
+              "$ref": "#/components/schemas/dateCreatedRange"
+            },
+            "dateModifiedRange": {
+              "$ref": "#/components/schemas/dateModifiedRange"
+            },
+            "status": {
+              "$ref": "#/components/schemas/Sku/properties/status"
+            },
+            "publishStatus": {
+              "$ref": "#/components/schemas/Sku/properties/publishStatus"
+            },
+            "hasPrices": {
+              "$ref": "#/components/schemas/Sku/properties/hasPrices"
+            },
+            "meliProductName": {
+              "$ref": "#/components/schemas/Sku/properties/meliProductName"
+            },
+            "meliProductId": {
+              "$ref": "#/components/schemas/Sku/properties/meliProductId"
+            },
+            "meliCategoryId": {
+              "$ref": "#/components/schemas/Sku/properties/integrationCategoryId"
+            },
+            "meliCategoryDomainId": {
+              "$ref": "#/components/schemas/Sku/properties/meliCategoryDomainId"
+            },
+            "hasMeliProductId": {
+              "$ref": "#/components/schemas/Sku/properties/hasMeliProductId"
+            },
+            "hasMeliCategoryId": {
+              "$ref": "#/components/schemas/Sku/properties/hasMeliCategoryId"
+            },
+            "pendingCategory": {
+              "$ref": "#/components/schemas/Sku/properties/publish/properties/pendingCategory"
+            },
+            "pendingMeliProduct": {
+              "$ref": "#/components/schemas/Sku/properties/publish/properties/pendingMeliProduct"
+            }
+          }
+        }
+      },
+      "StockSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "skuId",
+            "wmsStockId",
+            "userProductId",
+            "wmsWarehouseId",
+            "storeId",
+            "meliStoreId",
+            "locationNetworkNodeId",
+            "stock",
+            "publish.status",
+            "dateCreated",
+            "dateModified"
+          ]
+        }
+      },
+      "StockFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/id"
+            },
+            "wmsStockId": {
+              "$ref": "#/components/schemas/Stock/properties/wmsStockId"
+            },
+            "storeId": {
+              "$ref": "#/components/schemas/Stock/properties/storeId"
+            },
+            "accountId": {
+              "$ref": "#/components/schemas/Stock/properties/accountId"
+            },
+            "skuId": {
+              "$ref": "#/components/schemas/Stock/properties/skuId"
+            },
+            "userProductId": {
+              "$ref": "#/components/schemas/Stock/properties/userProductId"
+            },
+            "wmsWarehouseId": {
+              "$ref": "#/components/schemas/Stock/properties/wmsWarehouseId"
+            },
+            "meliStoreId": {
+              "$ref": "#/components/schemas/Stock/properties/meliStoreId"
+            },
+            "locationNetworkNodeId": {
+              "$ref": "#/components/schemas/Stock/properties/locationNetworkNodeId"
+            },
+            "hasUserProductId": {
+              "$ref": "#/components/schemas/Stock/properties/hasUserProductId"
+            },
+            "publishStatus": {
+              "$ref": "#/components/schemas/Stock/properties/publish/properties/status"
+            },
+            "dateCreatedRange": {
+              "$ref": "#/components/schemas/dateCreatedRange"
+            },
+            "dateModifiedRange": {
+              "$ref": "#/components/schemas/dateModifiedRange"
+            }
+          }
+        }
+      },
+      "OrderStatusChangeSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "integrationOrderId",
+            "status",
+            "eventType",
+            "dateCreated",
+            "dateModified"
+          ]
+        }
+      },
+      "OrderStatusChangeFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/OrderStatusChange/properties/id"
+            },
+            "source": {
+              "$ref": "#/components/schemas/OrderStatusChange/properties/source"
+            },
+            "integrationOrderId": {
+              "$ref": "#/components/schemas/OrderStatusChange/properties/integrationOrderId"
+            },
+            "eventType": {
+              "$ref": "#/components/schemas/OrderStatusChange/properties/eventType"
+            },
+            "accountId": {
+              "$ref": "#/components/schemas/OrderStatusChange/properties/accountId"
+            },
+            "claimId": {
+              "$ref": "#/components/schemas/OrderStatusChange/properties/claimId"
+            },
+            "status": {
+              "$ref": "#/components/schemas/OrderStatusChange/properties/status"
+            },
+            "dateCreatedRange": {
+              "$ref": "#/components/schemas/dateCreatedRange"
+            },
+            "dateModifiedRange": {
+              "$ref": "#/components/schemas/dateModifiedRange"
+            }
+          }
+        }
+      }
+    },
+    "headers": {
+      "x-janis-total": {
+        "description": "The total amount of records in the list",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "x-janis-total-updated": {
+        "description": "The total amount of items updated",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "x-janis-total-not-modified": {
+        "description": "The total amount of items not modified",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "x-janis-total-error": {
+        "description": "The total amount of items with error",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "responses": {
+      "GenericSuccess": {
+        "description": "Operation succeeded",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "BadRequest": {
+        "description": "A client error has ocurred.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Authentication missing or invalid",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Not authorized request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "InternalError": {
+        "description": "A server error has ocurred."
+      },
+      "NotFound": {
+        "description": "Record not found."
+      },
+      "BatchResponse": {
+        "description": "Batch responses",
+        "headers": {
+          "x-janis-total-updated": {
+            "$ref": "#/components/headers/x-janis-total-updated"
+          },
+          "x-janis-total-not-modified": {
+            "$ref": "#/components/headers/x-janis-total-not-modified"
+          },
+          "x-janis-total-error": {
+            "$ref": "#/components/headers/x-janis-total-error"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "description": "item Batch response",
+              "type": "object",
+              "properties": {
+                "itemsUpdated": {
+                  "description": "The items that were updated correctly.\n- The *key* of the *object* is the `referenceId` and `accountId` of the updated item.\n- The *value* of the *object* is the updated item.\n",
+                  "type": "object",
+                  "example": {
+                    "item-ref-id-1-account-id-1": "606606782e232624c18f1c18",
+                    "item-ref-id-2-account-id-2": "6066067ff04765697cdd4d9a"
+                  }
+                },
+                "itemsNotModified": {
+                  "description": "The items that were not modified.\nThis occurs when the item in the service **is equal** to the received item.\n- The *key* of the *object* is the `referenceId` and `accountId` of the non modified item.\n- The *value* of the *object* is the `id` of the non modified item.\n",
+                  "type": "object",
+                  "example": {
+                    "item-ref-id-3-account-id-3": "606606827c96a136ead9065e",
+                    "item-ref-id-4-account-id-4": "60660686f42efcf71529e69d"
+                  }
+                },
+                "itemsError": {
+                  "description": "Items with some error.\n- The *key* of the *object* is the `referenceId` and `accountId` of the item.\n- The *value* of the *object* is the validation message error.\n",
+                  "type": "object",
+                  "example": {
+                    "item-ref-id-5-account-id-5": "Invalid Accounts"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "id": {
+        "description": "The unique identifier of the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "631fb04c8fe08f51a8ee5949"
+      },
+      "status": {
+        "description": "The item status",
+        "type": "string",
+        "default": "active",
+        "enum": [
+          "active",
+          "inactive"
+        ],
+        "example": "active"
+      },
+      "dateCreated": {
+        "description": "The date of creation",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-12T19:00:00.000Z"
+      },
+      "dateModified": {
+        "description": "The date of the last modification",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-20T19:00:00.000Z"
+      },
+      "dateCreatedRange": {
+        "description": "Creation date range",
+        "type": "object",
+        "properties": {
+          "from": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/dateCreated"
+              }
+            ],
+            "description": "Date range from"
+          },
+          "to": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/dateCreated"
+              }
+            ],
+            "description": "Date range to"
+          }
+        }
+      },
+      "dateModifiedRange": {
+        "description": "Modification date range",
+        "type": "object",
+        "properties": {
+          "from": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/dateModified"
+              }
+            ],
+            "description": "Date range from"
+          },
+          "to": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/dateModified"
+              }
+            ],
+            "description": "Date range to"
+          }
+        }
+      },
+      "userCreated": {
+        "description": "The ID of the user who created the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "6a1fc1eeb5b68406e0487a10"
+      },
+      "userModified": {
+        "description": "The ID of the user who last modified the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "7e1fc1eeb5b68406e048796"
+      },
+      "Account": {
+        "description": "An Account",
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "The unique identifier of the item",
+            "type": "string",
+            "example": "d555345345345as67a342a"
+          },
+          "referenceId": {
+            "description": "The Account's reference Id",
+            "type": "string",
+            "example": "r-00001"
+          },
+          "name": {
+            "description": "The Account's name",
+            "type": "string",
+            "example": "Sample Account"
+          },
+          "importOrders": {
+            "description": "Whether to import orders",
+            "type": "boolean",
+            "example": true
+          },
+          "integrationAccountId": {
+            "description": "The integration account id",
+            "type": "string",
+            "example": "1234567890"
+          },
+          "skipInvoicing": {
+            "description": "Whether to skip invoicing",
+            "type": "boolean",
+            "example": false
+          },
+          "skipPaymentValidation": {
+            "description": "Whether to skip payment validation",
+            "type": "boolean",
+            "example": false
+          },
+          "site": {
+            "type": "object",
+            "description": "The site associated with the account of the Mercadolibre.",
+            "properties": {
+              "id": {
+                "type": "string",
+                "example": "MLA",
+                "description": "The site Id of the Mercadolibre Account.\n\n| countryName | siteId | defaultCurrency |\n|-------------|--------|-----------------|\n| Argentina | MLA | ARS |\n| Bolivia | MBO | BOB |\n| Brasil | MLB | BRL |\n| Chile | MLC | CLP |\n| Colombia | MCO | COP |\n| Costa Rica | MCR | CRC |\n| Cuba | MCU | CUP |\n| Dominicana | MRD | DOP |\n| Ecuador | MEC | USD |\n| El Salvador | MSV | USD |\n| Guatemala | MGT | GTQ |\n| Honduras | MHN | HNL |\n| Mexico | MLM | MXN |\n| Nicaragua | MNI | NIO |\n| Panamá | MPA | PAB |\n| Paraguay | MPY | PYG |\n| Perú | MPE | PEN |\n| Uruguay | MLU | UYU |\n| Venezuela | MLV | VES |\n",
+                "enum": [
+                  "MLA",
+                  "MBO",
+                  "MLB",
+                  "MLC",
+                  "MCO",
+                  "MCR",
+                  "MCU",
+                  "MRD",
+                  "MEC",
+                  "MSV",
+                  "MGT",
+                  "MHN",
+                  "MLM",
+                  "MNI",
+                  "MPA",
+                  "MPY",
+                  "MPE",
+                  "MLU",
+                  "MLV"
+                ]
+              }
+            }
+          },
+          "officialMeliStoreId": {
+            "description": "The official store id",
+            "type": "string",
+            "example": "194542"
+          },
+          "usePricePerUnitMultiplier": {
+            "description": "Whether to use the price per unit multiplier",
+            "type": "boolean",
+            "example": false
+          },
+          "publishCatalog": {
+            "description": "Whether to publish the catalog",
+            "type": "boolean",
+            "example": true
+          },
+          "importLocations": {
+            "description": "Whether to import locations",
+            "type": "boolean",
+            "example": true
+          },
+          "status": {
+            "$ref": "#/components/schemas/status"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          }
+        }
+      },
+      "AccountList": {
+        "type": "array",
+        "description": "A list of Accounts",
+        "items": {
+          "$ref": "#/components/schemas/Account"
+        }
+      },
+      "IntegrationItemStoreList": {
+        "type": "array",
+        "description": "A list of item stores from integration",
+        "items": {
+          "$ref": "#/components/schemas/IntegrationItemStore"
+        }
+      },
+      "IntegrationItemStore": {
+        "type": "object",
+        "description": "An item store from integration",
+        "properties": {
+          "locationId": {
+            "type": "string",
+            "description": "The location ID. See [Location](/v2/service/mercadolibre#tag/Location).",
+            "example": "6902dc0c939f054db374b9d0"
+          },
+          "locationName": {
+            "type": "string",
+            "description": "The location name",
+            "example": "Warehouse 1"
+          },
+          "store_id": {
+            "type": "string",
+            "description": "The store ID. See [Location](/v2/service/mercadolibre#tag/Location).",
+            "example": "74117734"
+          },
+          "network_node_id": {
+            "type": "string",
+            "description": "The network node ID. See [Location](/v2/service/mercadolibre#tag/Location).",
+            "example": "ARP23234877971"
+          },
+          "item_id": {
+            "type": "string",
+            "description": "The item ID.",
+            "example": "MLA1578966365"
+          },
+          "user_id": {
+            "type": "number",
+            "description": "The user ID.",
+            "example": 2323487797
+          },
+          "site_id": {
+            "type": "string",
+            "description": "The site ID.",
+            "example": "MLA"
+          },
+          "creation_date": {
+            "type": "string",
+            "description": "The creation date.",
+            "example": "2025-11-10T17:07:42.000Z"
+          },
+          "last_update": {
+            "type": "string",
+            "description": "The last update date.",
+            "example": "2025-11-10T17:07:42.000Z"
+          },
+          "status": {
+            "type": "string",
+            "description": "The status.",
+            "example": "ACTIVE"
+          }
+        }
+      },
+      "IntegrationUserProductStockList": {
+        "type": "array",
+        "description": "A list of user product stock",
+        "items": {
+          "$ref": "#/components/schemas/IntegrationUserProductStock"
+        }
+      },
+      "IntegrationUserProductStock": {
+        "type": "object",
+        "description": "A user product stock",
+        "properties": {
+          "locationId": {
+            "type": "string",
+            "description": "The location ID. See [Location](/v2/service/mercadolibre#tag/Location).",
+            "example": "6902dc0c939f054db374b9d0"
+          },
+          "locationName": {
+            "type": "string",
+            "description": "The location name",
+            "example": "Warehouse 1"
+          },
+          "store_id": {
+            "type": "string",
+            "description": "The store ID. See [Location](/v2/service/mercadolibre#tag/Location).",
+            "example": "74117734"
+          },
+          "network_node_id": {
+            "type": "string",
+            "description": "The network node ID. See [Location](/v2/service/mercadolibre#tag/Location).",
+            "example": "ARP23234877971"
+          },
+          "quantity": {
+            "type": "number",
+            "description": "The quantity",
+            "example": 100
+          }
+        }
+      },
+      "Location": {
+        "type": "object",
+        "description": "A location",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "meliStoreId": {
+            "type": "string",
+            "description": "The Mercadolibre location ID",
+            "example": "77682507854"
+          },
+          "networkNodeId": {
+            "type": "string",
+            "description": "The Mercadolibre network node ID",
+            "example": "1234567890"
+          },
+          "name": {
+            "type": "string",
+            "description": "The location name",
+            "example": "Tienda Zona norte-Test"
+          },
+          "accountId": {
+            "type": "string",
+            "description": "This refer to the `id` of the **Account** Entity. See [Account](/v2/service/commerce#tag/Account).",
+            "example": "123a51aabc11cb1e12e123f"
+          },
+          "status": {
+            "type": "string",
+            "description": "The location status",
+            "enum": [
+              "active",
+              "inactive",
+              "deleted"
+            ],
+            "example": "active"
+          },
+          "address": {
+            "type": "object",
+            "description": "The location address",
+            "properties": {
+              "country": {
+                "type": "string",
+                "description": "The country name",
+                "example": "Argentina"
+              },
+              "state": {
+                "type": "string",
+                "description": "The state/province name",
+                "example": "Ciudad Autónoma de Buenos Aires"
+              },
+              "city": {
+                "type": "string",
+                "description": "The city name",
+                "example": "Buenos Aires"
+              },
+              "neighborhood": {
+                "type": "string",
+                "description": "The neighborhood",
+                "example": ""
+              },
+              "postalCode": {
+                "type": "string",
+                "description": "The postal code",
+                "example": "C1407"
+              },
+              "street": {
+                "type": "string",
+                "description": "The street name",
+                "example": "Sanabria"
+              },
+              "number": {
+                "type": "string",
+                "description": "The street number",
+                "example": "1342"
+              }
+            }
+          },
+          "fullAddress": {
+            "type": "string",
+            "description": "The complete formatted address",
+            "example": "Sanabria 1342"
+          },
+          "countryIso3": {
+            "type": "string",
+            "description": "The country ISO3 code",
+            "example": "AR"
+          },
+          "latitude": {
+            "type": "number",
+            "description": "The latitude coordinate",
+            "example": -34.6237154
+          },
+          "longitude": {
+            "type": "number",
+            "description": "The longitude coordinate",
+            "example": -58.4934526
+          },
+          "phoneNumber": {
+            "type": "string",
+            "description": "The phone number",
+            "example": "+541188669494"
+          },
+          "referenceId": {
+            "type": "string",
+            "description": "The reference ID",
+            "example": "78095188157"
+          },
+          "timezone": {
+            "type": "string",
+            "description": "The timezone",
+            "example": "America/Argentina/Buenos_Aires"
+          },
+          "wmsWarehouse": {
+            "type": "object",
+            "description": "The commerce warehouse information",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "The warehouse ID"
+              },
+              "referenceId": {
+                "type": "string",
+                "description": "The warehouse reference ID"
+              },
+              "name": {
+                "type": "string",
+                "description": "The warehouse name"
+              },
+              "locationId": {
+                "type": "string",
+                "description": "The location ID"
+              },
+              "salesChannels": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "List of sales channel IDs"
+              }
+            }
+          },
+          "accountAvailableSalesChannels": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of sales channel IDs available for the account",
+            "example": [
+              "68767601416402a18aff2f20",
+              "68767601416402a18aff2f21"
+            ]
+          },
+          "import": {
+            "type": "object",
+            "description": "The import status information",
+            "properties": {
+              "status": {
+                "type": "string",
+                "description": "The import status",
+                "enum": [
+                  "pendingWarehouseRelation",
+                  "imported",
+                  "error"
+                ],
+                "example": "pendingWarehouseRelation"
+              },
+              "errorMessage": {
+                "type": "string",
+                "description": "The error message if import failed",
+                "example": "500 error to created"
+              }
+            }
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          }
+        }
+      },
+      "LocationList": {
+        "type": "array",
+        "description": "A list of locations",
+        "items": {
+          "$ref": "#/components/schemas/Location"
+        }
+      },
+      "MeliItem": {
+        "description": "A MercadoLibre item record",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "meliItemId": {
+            "description": "The MercadoLibre item identifier",
+            "type": "string",
+            "example": "MLA123456789"
+          },
+          "userProductId": {
+            "description": "The user product identifier",
+            "type": "string",
+            "example": "PROD_001"
+          },
+          "skuId": {
+            "description": "The SKU identifier",
+            "type": "string",
+            "example": "SKU_001"
+          },
+          "accountId": {
+            "description": "The account identifier this item belongs to",
+            "type": "string",
+            "example": "631fb04c8fe08f51a8ee5949"
+          },
+          "pricingId": {
+            "description": "The pricing identifier",
+            "type": "string",
+            "example": "68a86082078175e5ee29615e"
+          },
+          "priceSheetId": {
+            "description": "The price sheet identifier",
+            "type": "string",
+            "example": "68a860860435a452c5c100f0"
+          },
+          "catalogSkuId": {
+            "description": "The catalog SKU identifier",
+            "type": "string",
+            "example": "631fb04c8fe08f51a8ee5949"
+          },
+          "publish": {
+            "description": "The publish status information",
+            "type": "object",
+            "properties": {
+              "status": {
+                "description": "The publish status",
+                "type": "string",
+                "enum": [
+                  "published",
+                  "error",
+                  "pending",
+                  "paused",
+                  "disableError"
+                ],
+                "example": "published"
+              }
+            }
+          },
+          "title": {
+            "description": "The item title",
+            "type": "string",
+            "nullable": true,
+            "example": "Samsung Galaxy S21"
+          },
+          "description": {
+            "description": "The item description",
+            "type": "string",
+            "nullable": true,
+            "example": "Latest Samsung smartphone with advanced features"
+          },
+          "price": {
+            "description": "The item price",
+            "type": "number",
+            "minimum": 0,
+            "nullable": true,
+            "example": 799.99
+          },
+          "availableQuantity": {
+            "description": "The available quantity",
+            "type": "number",
+            "minimum": 0,
+            "nullable": true,
+            "example": 10
+          },
+          "status": {
+            "description": "The publication status",
+            "type": "string",
+            "enum": [
+              "published",
+              "error"
+            ],
+            "example": "published"
+          },
+          "statusLabel": {
+            "description": "The status label in Spanish",
+            "type": "string",
+            "readOnly": true,
+            "example": "Publicado"
+          },
+          "pictures": {
+            "description": "The item pictures",
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "type": "object"
+            }
+          },
+          "attributes": {
+            "description": "The item attributes",
+            "type": "object",
+            "nullable": true
+          },
+          "categoryId": {
+            "description": "The MercadoLibre category ID",
+            "type": "string",
+            "nullable": true,
+            "example": "MLA1055"
+          },
+          "listingTypeId": {
+            "description": "The listing type ID",
+            "type": "string",
+            "nullable": true,
+            "example": "gold_special"
+          },
+          "condition": {
+            "description": "The item condition",
+            "type": "string",
+            "nullable": true,
+            "example": "new"
+          },
+          "buyingMode": {
+            "description": "The buying mode",
+            "type": "string",
+            "nullable": true,
+            "example": "buy_it_now"
+          },
+          "currencyId": {
+            "description": "The currency ID",
+            "type": "string",
+            "nullable": true,
+            "example": "ARS"
+          },
+          "rawPublishedItem": {
+            "type": "object",
+            "description": "Raw MercadoLibre item data",
+            "properties": {
+              "title": {
+                "type": "string",
+                "description": "The item title",
+                "example": "Estuche Baron B Brut Rosé 750 Ml"
+              },
+              "category_id": {
+                "type": "string",
+                "description": "The MercadoLibre category ID",
+                "example": "MLA417665"
+              },
+              "domain_id": {
+                "type": "string",
+                "description": "The MercadoLibre domain ID",
+                "example": "MLA-SPARKLING_WINES"
+              },
+              "user_product_id": {
+                "type": "string",
+                "description": "The user product ID",
+                "example": "MLAU3451373870"
+              },
+              "price": {
+                "type": "string",
+                "description": "The item price",
+                "example": "48890"
+              },
+              "seller_custom_field": {
+                "type": "string",
+                "description": "The seller custom field",
+                "example": "7790975001708"
+              },
+              "pictures": {
+                "type": "array",
+                "description": "The item pictures",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "The picture ID",
+                      "example": "722506-MLA95633550828_102025"
+                    },
+                    "url": {
+                      "type": "string",
+                      "description": "The picture URL",
+                      "example": "http://mla-s2-p.mlstatic.com/722506-MLA95633550828_102025-O.jpg"
+                    },
+                    "secure_url": {
+                      "type": "string",
+                      "description": "The secure picture URL",
+                      "example": "https://mla-s2-p.mlstatic.com/722506-MLA95633550828_102025-O.jpg"
+                    },
+                    "size": {
+                      "type": "string",
+                      "description": "The picture size",
+                      "example": "500x482"
+                    },
+                    "max_size": {
+                      "type": "string",
+                      "description": "The picture max size",
+                      "example": "1200x1157"
+                    },
+                    "quality": {
+                      "type": "string",
+                      "description": "The picture quality",
+                      "example": ""
+                    }
+                  }
+                }
+              },
+              "thumbnail": {
+                "type": "string",
+                "description": "The picture URL",
+                "example": "http://mla-s2-p.mlstatic.com/722506-MLA95633550828_102025-I.jpg"
+              },
+              "permalink": {
+                "type": "string",
+                "description": "The item permalink",
+                "example": "https://articulo.mercadolibre.com.ar/MLA-123456789-smartphone-samsung-galaxy-a54-5g-128gb-6gb-ram-color-awesome-violet-_JM"
+              },
+              "status": {
+                "type": "string",
+                "description": "The MercadoLibre item status",
+                "example": "active",
+                "enum": [
+                  "active",
+                  "paused",
+                  "closed"
+                ]
+              }
+            }
+          },
+          "hasSkuId": {
+            "description": "Whether the item has a SKU ID",
+            "type": "boolean",
+            "example": true
+          },
+          "hasMeliItemId": {
+            "description": "Whether the item has a MercadoLibre item ID",
+            "type": "boolean",
+            "example": true
+          },
+          "isDisabled": {
+            "description": "Whether the item is disabled",
+            "type": "boolean",
+            "example": true
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          }
+        }
+      },
+      "MeliItemList": {
+        "description": "A list of MercadoLibre items",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/MeliItem"
+        }
+      },
+      "Order": {
+        "type": "object",
+        "description": "An order",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "integrationOrderId": {
+            "type": "string",
+            "description": "The integration order id",
+            "example": "V1StGXR8Z5jdHi6B"
+          },
+          "accountId": {
+            "type": "string",
+            "description": "The id of the account associated with the order",
+            "example": "672cdadd1849404bde3d0c70"
+          },
+          "deliveryId": {
+            "type": "string",
+            "description": "The id associated with order shipping",
+            "example": "672cdadd1849404bde3d0c80"
+          },
+          "accountName": {
+            "type": "string",
+            "description": "The name of the account associated with the order",
+            "example": "fizzmodarg"
+          },
+          "status": {
+            "description": "The order status",
+            "type": "string",
+            "enum": [
+              "accepted",
+              "cancelled"
+            ],
+            "example": "accepted"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          }
+        },
+        "required": [
+          "id",
+          "integrationOrderId",
+          "accountId",
+          "accountName",
+          "status"
+        ]
+      },
+      "OrderList": {
+        "type": "array",
+        "description": "A list of orders",
+        "items": {
+          "$ref": "#/components/schemas/Order"
+        }
+      },
+      "Price": {
+        "description": "A pricing record for products",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "pricingId": {
+            "description": "The unique identifier from pricing system",
+            "type": "string",
+            "example": "PRICE_001"
+          },
+          "accountId": {
+            "description": "The account identifier this price belongs to",
+            "type": "string",
+            "example": "631fb04c8fe08f51a8ee5949"
+          },
+          "catalogSkuId": {
+            "description": "The catalog sku identifier this price belongs to",
+            "type": "string",
+            "example": "631fb04c8fe08f51a8ee5949"
+          },
+          "priceSheet": {
+            "description": "The price sheet identifier this price belongs to",
+            "type": "string",
+            "example": "631fb04c8fe08f51a8ee5949"
+          },
+          "price": {
+            "description": "The price value",
+            "type": "number",
+            "minimum": 0,
+            "example": 99.99
+          },
+          "listPrice": {
+            "description": "The list price value",
+            "type": "number",
+            "minimum": 0,
+            "example": 99.99
+          },
+          "minQuantity": {
+            "description": "The minimum quantity",
+            "type": "number",
+            "minimum": 0,
+            "example": 1
+          },
+          "salesChannelIds": {
+            "description": "The sales channel identifiers this price belongs to",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "631fb04c8fe08f51a8ee5949",
+              "631fb04c8fe08f51a8ee5948"
+            ]
+          },
+          "lastPricingUpdateDate": {
+            "description": "The date of the last pricing update",
+            "type": "string",
+            "format": "date-time",
+            "example": "2023-01-01T00:00:00.000Z"
+          },
+          "updateDate": {
+            "description": "The date of the last pricing update",
+            "type": "string",
+            "format": "date-time",
+            "example": "2023-01-01T00:00:00.000Z"
+          },
+          "meliItemId": {
+            "description": "The MercadoLibre item identifier",
+            "type": "string",
+            "example": "MLA123456789"
+          },
+          "status": {
+            "description": "The price status",
+            "type": "string",
+            "enum": [
+              "active",
+              "inactive"
+            ],
+            "example": "active"
+          },
+          "validFrom": {
+            "description": "The date from which this price is valid",
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "example": "2023-01-01T00:00:00.000Z"
+          },
+          "validTo": {
+            "description": "The date until which this price is valid",
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "example": "2023-12-31T23:59:59.000Z"
+          },
+          "hasMeliItemId": {
+            "description": "Whether the price has a MercadoLibre item ID",
+            "type": "boolean",
+            "example": true
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          }
+        }
+      },
+      "PriceList": {
+        "description": "A list of prices",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Price"
+        }
+      },
+      "Product": {
+        "type": "object",
+        "description": "A Product",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "name": {
+            "description": "The product's name.",
+            "type": "string",
+            "example": "The product’s name"
+          },
+          "referenceId": {
+            "type": "string",
+            "description": "The product’s reference ID.",
+            "example": "789385789385"
+          },
+          "catalogId": {
+            "type": "string",
+            "description": "The Janis product's `id`. See [Product](catalog#tag/Product) for further information",
+            "example": "55eb789feef5439719be83a9"
+          },
+          "catalogCategory": {
+            "type": "string",
+            "description": "The Janis catalog category's `id`. See [Category](catalog#tag/Category) for further information",
+            "example": "66eb253feef5439719be83a9"
+          },
+          "catalogCategoryName": {
+            "type": "string",
+            "description": "The Janis catalog category's `name`. See [Category](catalog#tag/Category) for further information",
+            "example": "Shoes"
+          },
+          "accountId": {
+            "type": "string",
+            "description": "The Janis account's `id`. See [Account](commerce#tag/Account) for further information",
+            "example": "66eb149feef9951249be56a9"
+          },
+          "status": {
+            "$ref": "#/components/schemas/status"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          }
+        }
+      },
+      "ProductList": {
+        "type": "array",
+        "description": "A list of products",
+        "items": {
+          "$ref": "#/components/schemas/Product"
+        }
+      },
+      "Sku": {
+        "type": "object",
+        "description": "An Sku",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "name": {
+            "description": "The sku's name.",
+            "type": "string",
+            "example": "A sku name"
+          },
+          "referenceId": {
+            "type": "string",
+            "description": "The sku's reference ID.",
+            "example": "78095188157"
+          },
+          "catalogId": {
+            "type": "string",
+            "description": "The Janis sku's `id`. See [Sku](catalog#tag/Sku) for further information",
+            "example": "66eb250feef5439719be83a9"
+          },
+          "productCatalogId": {
+            "type": "string",
+            "description": "The Janis product's `id`. See [Product](catalog#tag/Product) for further information",
+            "example": "66eb266feef5439719be83a9"
+          },
+          "accountId": {
+            "type": "string",
+            "description": "The Janis account's `id`. See [Account](commerce#tag/Account) for further information",
+            "example": "66eb149feef9951249be56a9"
+          },
+          "publish": {
+            "description": "Determines the publish status of the sku.",
+            "type": "object",
+            "properties": {
+              "status": {
+                "description": "Determines if the sku is pending or synchronized.",
+                "type": "string",
+                "enum": [
+                  "pending",
+                  "synchronized"
+                ],
+                "example": "synchronized"
+              },
+              "pendingCategory": {
+                "description": "Determines if the sku hasn't provided an integration category.",
+                "type": "boolean",
+                "example": true
+              },
+              "pendingMeliProduct": {
+                "description": "Determines if the sku hasn't provided a meli product Id.",
+                "type": "boolean",
+                "example": true
+              }
+            }
+          },
+          "eans": {
+            "type": "array",
+            "description": "The Sku eans.",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "9780201379624",
+              "8375928473840",
+              "9987537281120"
+            ]
+          },
+          "userProductId": {
+            "type": "string",
+            "description": "The user product identifier",
+            "example": "1234567890"
+          },
+          "integrationEan": {
+            "type": "string",
+            "description": "The integration EAN",
+            "example": "9780201379624"
+          },
+          "integrationCategoryId": {
+            "type": "string",
+            "description": "The integration category identifier",
+            "example": "MLU1234"
+          },
+          "integrationProductId": {
+            "type": "string",
+            "description": "The integration product identifier",
+            "example": "MLU9012"
+          },
+          "rawMeliItem": {
+            "type": "object",
+            "description": "Raw MercadoLibre item data",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "The MercadoLibre product name",
+                "example": "Some SKU 1"
+              },
+              "catalog_product_id": {
+                "type": "string",
+                "description": "The MercadoLibre catalog product ID",
+                "example": "MLU1234"
+              },
+              "domain_id": {
+                "type": "string",
+                "description": "The MercadoLibre domain ID",
+                "example": "MLA-BICYCLE_LIGHTS"
+              }
+            }
+          },
+          "published": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "pending",
+                  "synchronized"
+                ],
+                "example": "synchronized"
+              }
+            }
+          },
+          "status": {
+            "$ref": "#/components/schemas/status"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          },
+          "hasPrices": {
+            "description": "Whether the sku has prices",
+            "type": "boolean",
+            "example": true
+          },
+          "meliProductName": {
+            "description": "The MercadoLibre product name",
+            "type": "string",
+            "example": "Some SKU 1"
+          },
+          "meliProductId": {
+            "description": "The MercadoLibre product ID",
+            "type": "string",
+            "example": "MLU1234"
+          },
+          "meliCategoryDomainId": {
+            "description": "The MercadoLibre category domain ID",
+            "type": "string",
+            "example": "MLA-BICYCLE_LIGHTS"
+          },
+          "hasMeliProductId": {
+            "description": "Whether the sku has a MercadoLibre product ID",
+            "type": "boolean",
+            "example": true
+          },
+          "hasMeliCategoryId": {
+            "description": "Whether the sku has a MercadoLibre category ID",
+            "type": "boolean",
+            "example": true
+          },
+          "publishStatus": {
+            "description": "The publish status of the sku",
+            "type": "string",
+            "enum": [
+              "pending",
+              "synchronized",
+              "error"
+            ],
+            "example": "synchronized"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          }
+        }
+      },
+      "SkuList": {
+        "type": "array",
+        "description": "A list of skus",
+        "items": {
+          "$ref": "#/components/schemas/Sku"
+        }
+      },
+      "SkuBatchList": {
+        "description": "The list of Skus",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/SkuBatch"
+        },
+        "maxItems": 1000
+      },
+      "SkuBatch": {
+        "description": "A Sku for Massive Saved",
+        "type": "object",
+        "properties": {
+          "referenceId": {
+            "description": "The Sku's reference id",
+            "type": "string",
+            "example": "some-sku-ref-id"
+          },
+          "accountRefId": {
+            "description": "The Sku's account reference id",
+            "type": "string",
+            "example": "11111c6388e8416e2591fd1c"
+          },
+          "ean": {
+            "description": "The Sku's ean",
+            "type": "string",
+            "example": "134"
+          },
+          "productId": {
+            "description": "The Sku's product id",
+            "type": "string",
+            "example": "4456"
+          },
+          "categoryId": {
+            "description": "The Sku's category id",
+            "type": "string",
+            "example": "3778"
+          }
+        },
+        "required": [
+          "referenceId",
+          "accountRefId"
+        ]
+      },
+      "Stock": {
+        "description": "A stock record for inventory management",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "wmsStockId": {
+            "description": "The WMS stock identifier",
+            "type": "string",
+            "example": "WMS_STOCK_001"
+          },
+          "skuCatalogId": {
+            "description": "The SKU catalog identifier",
+            "type": "string",
+            "example": "SKU_CAT_001"
+          },
+          "storeId": {
+            "description": "The store identifier",
+            "type": "string",
+            "example": "STORE_001"
+          },
+          "accountId": {
+            "description": "The account identifier this stock belongs to",
+            "type": "string",
+            "example": "631fb04c8fe08f51a8ee5949"
+          },
+          "skuId": {
+            "description": "The SKU identifier",
+            "type": "string",
+            "example": "SKU_001"
+          },
+          "userProductId": {
+            "description": "The user product identifier",
+            "type": "string",
+            "example": "USER_PRODUCT_001"
+          },
+          "wmsWarehouseId": {
+            "description": "The WMS warehouse identifier",
+            "type": "string",
+            "example": "WMS_WAREHOUSE_001"
+          },
+          "meliStoreId": {
+            "description": "The MercadoLibre store identifier",
+            "type": "string",
+            "example": "MELI_STORE_001"
+          },
+          "locationNetworkNodeId": {
+            "description": "The location network node identifier",
+            "type": "string",
+            "example": "LOCATION_NETWORK_NODE_001"
+          },
+          "publish": {
+            "description": "The publish status information",
+            "type": "object",
+            "properties": {
+              "status": {
+                "description": "The publish status",
+                "type": "string",
+                "enum": [
+                  "published",
+                  "pending",
+                  "processing",
+                  "error"
+                ],
+                "example": "published"
+              }
+            }
+          },
+          "quantity": {
+            "description": "The total quantity",
+            "type": "number",
+            "minimum": 0,
+            "example": 100
+          },
+          "reservedQuantity": {
+            "description": "The reserved quantity",
+            "type": "number",
+            "minimum": 0,
+            "nullable": true,
+            "example": 10
+          },
+          "availableQuantity": {
+            "description": "The available quantity",
+            "type": "number",
+            "minimum": 0,
+            "nullable": true,
+            "example": 90
+          },
+          "statusPublished": {
+            "description": "The publication status",
+            "type": "string",
+            "enum": [
+              "published",
+              "pending",
+              "error"
+            ],
+            "example": "published"
+          },
+          "statusLabel": {
+            "description": "The status label in Spanish",
+            "type": "string",
+            "readOnly": true,
+            "example": "Publicado"
+          },
+          "lastSyncDate": {
+            "description": "The last synchronization date",
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "example": "2023-01-01T00:00:00.000Z"
+          },
+          "hasUserProductId": {
+            "description": "Whether the stock has a user product ID",
+            "type": "boolean",
+            "example": true
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          }
+        }
+      },
+      "StockList": {
+        "description": "A list of stock records",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Stock"
+        }
+      },
+      "OrderStatusChange": {
+        "type": "object",
+        "description": "An Order Status Change",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "source": {
+            "type": "string",
+            "description": "The source of the status change",
+            "enum": [
+              "mercadolibre",
+              "oms"
+            ],
+            "example": "mercadolibre"
+          },
+          "integrationOrderId": {
+            "type": "string",
+            "description": "The mercadolibre id of the order",
+            "example": "V1StGXR8Z5jdHi6B"
+          },
+          "accountId": {
+            "type": "string",
+            "description": "The id of the account that originated the status change",
+            "example": "672cdadd1849404bde3d0c70"
+          },
+          "accountName": {
+            "type": "string",
+            "description": "The name of the account that originated the status change",
+            "example": "fizzmod"
+          },
+          "clientCode": {
+            "type": "string",
+            "description": "The client code of the order",
+            "example": "defaultClient"
+          },
+          "claimId": {
+            "type": "string",
+            "description": "The claim identifier",
+            "example": "1234567890"
+          },
+          "loggingData": {
+            "type": "array",
+            "description": "A list of logging information of the status change process",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "Saved status change in DB"
+            ]
+          },
+          "rawEvent": {
+            "type": "object",
+            "description": "The raw event of the order received from mercadolibre"
+          },
+          "eventType": {
+            "type": "string",
+            "description": "The event type of the status order",
+            "enum": [
+              "created",
+              "cancelled"
+            ],
+            "example": "created"
+          },
+          "status": {
+            "description": "The order status change processing status",
+            "type": "string",
+            "default": "pending",
+            "enum": [
+              "pending",
+              "processing",
+              "processed",
+              "skipped",
+              "error"
+            ],
+            "example": "pending"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          }
+        },
+        "required": [
+          "id",
+          "source",
+          "integrationOrderId",
+          "accountId",
+          "accountName",
+          "clientCode",
+          "eventType",
+          "status"
+        ]
+      },
+      "OrderStatusChangeList": {
+        "type": "array",
+        "description": "A list of Order Status Changes",
+        "items": {
+          "$ref": "#/components/schemas/OrderStatusChange"
+        }
+      },
+      "listenerEvent": {
+        "description": "A JANIS Event object",
+        "type": "object",
+        "properties": {
+          "service": {
+            "description": "The source service name",
+            "type": "string",
+            "example": "id"
+          },
+          "entity": {
+            "description": "The event related entity",
+            "type": "string",
+            "example": "profile"
+          },
+          "event": {
+            "description": "The event name",
+            "type": "string",
+            "example": "created"
+          },
+          "client": {
+            "description": "The source event client",
+            "type": "string",
+            "example": "fizzmod"
+          },
+          "id": {
+            "description": "The event related entity ID",
+            "type": "string",
+            "example": "5d699c1ae8ebb95eaa24aca9"
+          }
+        },
+        "required": [
+          "service",
+          "entity",
+          "event"
+        ]
+      }
+    }
+  }
+}

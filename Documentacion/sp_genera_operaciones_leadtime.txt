@@ -1,0 +1,411 @@
+-- DROP PROCEDURE dl_sp_dashboards_ecommerce.sp_genera_operaciones_leadtime();
+
+CREATE OR REPLACE PROCEDURE dl_sp_dashboards_ecommerce.sp_genera_operaciones_leadtime()
+	LANGUAGE plpgsql
+AS $$
+	
+	
+	
+declare
+
+var_fecha int;
+
+begin
+
+var_fecha 	:=cast(to_char(dateadd(day,-0,convert_timezone('GMT','GMT+5',getdate())),'yyyymmdd') as int);
+	
+
+
+----------------Leadtime ---------------------------------
+
+drop table if exists #ventana_janis;
+select 
+delivery_planning.id as id_ventana,
+from_unixtime_janis(delivery_planning.date_start)																					        as Fecha_Star_Planning,
+from_unixtime_janis(delivery_planning.date_end)																					            as Fecha_End_Planning
+,store.title																																as title
+,substring(store.title,1,4) as tienda
+,SUBSTRING(carrier.name,6)                                                                                                                  as TransportadoraReal
+,carrier.name                                                                                                                               as Transportadora 
+,upper(carrier.type)																											            as tipo,
+ranges.time_start,
+ranges.time_end,
+ROUND(delivery_planning.quota,0) AS quota2,
+delivery_planning.quota,
+delivery_planning.quantity,
+delivery_planning.quantity_new,
+delivery_planning.quantity_picking,
+delivery_planning.quantity_picked,
+delivery_planning.quantity_invoiced,
+delivery_planning.quantity_shipped,
+delivery_planning.quantity_delivered,
+('['+ranges.time_start+' - '+ ranges.time_end+']') AS VentanaCapacidades,
+from_unixtime_janis(delivery_planning.block_date)																					        as Fecha_Block 
+,delivery_planning.offset                                                                                                                    as HoraCorte,
+delivery_planning.status
+,'['+to_char(from_unixtime_janis(delivery_planning.date_start),'HH24:MI')+'-'+to_char(from_unixtime_janis(delivery_planning.date_end),'HH24:MI')+']'	as ventana_despacho
+,dateadd(hour,-cast((delivery_planning.offset) as int) , from_unixtime_janis(delivery_planning.date_end)) as Fecha_Programacion_Cierre,
+to_char(from_unixtime_janis(delivery_planning.date_start),'HH24:MI') as Hora_Inicio,
+to_char(from_unixtime_janis(delivery_planning.date_end),'HH24:MI') as Hora_Final,
+to_char(from_unixtime_janis(delivery_planning.date_start),'yyyymmdd') as Dia_Programado
+into #ventana_janis
+from stg_ecommerce_janis_wongio.wms_logistic_delivery_planning as   delivery_planning
+inner join stg_ecommerce_janis_wongio.wms_stores as  store on store.id = delivery_planning.store
+inner join stg_ecommerce_janis_wongio.wms_logistic_carriers as carrier on carrier.id = delivery_planning.carrier
+inner join stg_ecommerce_janis_wongio.wms_logistic_delivery_ranges as ranges on  delivery_planning.delivery_range = ranges.id
+where to_char(from_unixtime_janis(delivery_planning.date_start),'yyyymmdd')=var_fecha
+union all 
+select 
+delivery_planning.id as id_ventana,
+from_unixtime_janis(delivery_planning.date_start)																					        as Fecha_Star_Planning,
+from_unixtime_janis(delivery_planning.date_end)																					            as Fecha_End_Planning
+,store.title																																as title
+,substring(store.title,1,4) as tienda
+,SUBSTRING(carrier.name,6)                                                                                                                  as TransportadoraReal
+,carrier.name                                                                                                                               as Transportadora 
+,upper(carrier.type)																											            as tipo,
+ranges.time_start,
+ranges.time_end,
+ROUND(delivery_planning.quota,0) AS quota2,
+delivery_planning.quota,
+delivery_planning.quantity,
+delivery_planning.quantity_new,
+delivery_planning.quantity_picking,
+delivery_planning.quantity_picked,
+delivery_planning.quantity_invoiced,
+delivery_planning.quantity_shipped,
+delivery_planning.quantity_delivered,
+('['+ranges.time_start+' - '+ ranges.time_end+']') AS VentanaCapacidades,
+from_unixtime_janis(delivery_planning.block_date)																					        as Fecha_Block 
+,delivery_planning.offset                                                                                                                    as HoraCorte,
+delivery_planning.status
+,'['+to_char(from_unixtime_janis(delivery_planning.date_start),'HH24:MI')+'-'+to_char(from_unixtime_janis(delivery_planning.date_end),'HH24:MI')+']'	as ventana_despacho
+,dateadd(hour,-cast((delivery_planning.offset) as int) , from_unixtime_janis(delivery_planning.date_end)) as Fecha_Programacion_Cierre,
+to_char(from_unixtime_janis(delivery_planning.date_start),'HH24:MI') as Hora_Inicio,
+to_char(from_unixtime_janis(delivery_planning.date_end),'HH24:MI') as Hora_Final,
+to_char(from_unixtime_janis(delivery_planning.date_start),'yyyymmdd') as Dia_Programado
+from stg_ecommerce_janis_metroio.wms_logistic_delivery_planning as   delivery_planning
+inner join stg_ecommerce_janis_metroio.wms_stores as  store on store.id = delivery_planning.store
+inner join stg_ecommerce_janis_metroio.wms_logistic_carriers as carrier on carrier.id = delivery_planning.carrier
+inner join stg_ecommerce_janis_metroio.wms_logistic_delivery_ranges as ranges on  delivery_planning.delivery_range = ranges.id
+where to_char(from_unixtime_janis(delivery_planning.date_start),'yyyymmdd')=var_fecha
+union all 
+select 
+delivery_planning.id as id_ventana,
+from_unixtime_janis(delivery_planning.date_start)																					        as Fecha_Star_Planning,
+from_unixtime_janis(delivery_planning.date_end)																					            as Fecha_End_Planning
+,store.title																																as title
+,substring(store.title,1,4) as tienda
+,SUBSTRING(carrier.name,6)                                                                                                                  as TransportadoraReal
+,carrier.name                                                                                                                               as Transportadora 
+,upper(carrier.type)																											            as tipo,
+ranges.time_start,
+ranges.time_end,
+ROUND(delivery_planning.quota,0) AS quota2,
+delivery_planning.quota,
+delivery_planning.quantity,
+delivery_planning.quantity_new,
+delivery_planning.quantity_picking,
+delivery_planning.quantity_picked,
+delivery_planning.quantity_invoiced,
+delivery_planning.quantity_shipped,
+delivery_planning.quantity_delivered,
+('['+ranges.time_start+' - '+ ranges.time_end+']') AS VentanaCapacidades,
+from_unixtime_janis(delivery_planning.block_date)																					        as Fecha_Block 
+,delivery_planning.offset                                                                                                                    as HoraCorte,
+delivery_planning.status
+,'['+to_char(from_unixtime_janis(delivery_planning.date_start),'HH24:MI')+'-'+to_char(from_unixtime_janis(delivery_planning.date_end),'HH24:MI')+']'	as ventana_despacho
+,dateadd(hour,-cast((delivery_planning.offset) as int) , from_unixtime_janis(delivery_planning.date_end)) as Fecha_Programacion_Cierre,
+to_char(from_unixtime_janis(delivery_planning.date_start),'HH24:MI') as Hora_Inicio,
+to_char(from_unixtime_janis(delivery_planning.date_end),'HH24:MI') as Hora_Final,
+to_char(from_unixtime_janis(delivery_planning.date_start),'yyyymmdd') as Dia_Programado
+from stg_ecommerce_janis_legacy.wms_logistic_delivery_planning as   delivery_planning
+inner join stg_ecommerce_janis_legacy.wms_stores as  store on store.id = delivery_planning.store
+inner join stg_ecommerce_janis_legacy.wms_logistic_carriers as carrier on carrier.id = delivery_planning.carrier
+inner join stg_ecommerce_janis_legacy.wms_logistic_delivery_ranges as ranges on  delivery_planning.delivery_range = ranges.id
+where to_char(from_unixtime_janis(delivery_planning.date_start),'yyyymmdd')=var_fecha
+;
+
+delete from #ventana_janis
+where title like '%WongIO%';
+
+delete from #ventana_janis
+where title like '%I101%';
+
+delete from #ventana_janis
+where title like '%avos%';
+
+delete  from #ventana_janis
+where transportadorareal like '%Dona%';
+
+delete  from #ventana_janis
+where transportadorareal like '%Venta_Eventos%';
+
+delete  from  #ventana_janis
+where   transportadorareal like '%egular%';
+
+delete   from #ventana_janis
+where   transportadorareal like '%feria%';
+
+delete   from #ventana_janis
+where   transportadorareal like '%NoPrimVtna%';
+
+--select distinct * from #ventana_janis
+--where   transportadorareal like '%NoPrimVtna%';
+
+drop table if exists #ventana_janis_cadena;
+select distinct
+a.*
+, case  when d.id_cadena='02' then 'METRO'
+		when d.id_cadena='01' then 'WONG' end as cadena
+		,case when transportadorareal like '%ENT_DOMIC%' or transportadorareal like '%XDELIVERY%' or transportadorareal like '%xpress agendado%'  then 'DAD'
+      when  transportadorareal like '%REC_TNDA%' then 'RETIRO' else 'OTROS' end DESPACHO
+into #ventana_janis_cadena
+from #ventana_janis a
+left join dl_sp_maestras.dim_tienda c on a.tienda=c.id_tienda
+left join dl_sp_maestras.dim_cadena d on (c.sk_cadena=d.sk_cadena);
+
+
+drop table if exists #ventana_unica;
+select distinct cadena,tienda cod_tienda,DESPACHO,Dia_Programado,id_ventana,Transportadora,transportadorareal Transportadora_filtro,ventana_despacho
+,quota,quantity,Hora_Inicio,Hora_Final,fecha_star_planning fecha_ini_ven,fecha_end_planning fecha_fin_ven
+,fecha_block fecha_cierre,fecha_programacion_cierre,
+case when fecha_block is null then 'Abierta'
+when   dateadd(minute,+1,fecha_block)<fecha_programacion_cierre then 'Cierre Capacidad'
+when  dateadd(minute,+1,fecha_block)>=fecha_programacion_cierre then 'Cierre Programado'
+else 'Otros' end Estado_ventana,
+abs(datediff(minute,fecha_block,fecha_programacion_cierre)) as minutos_DevSt,
+-- CAST(FLOOR(abs(datediff(minute,fecha_block,fecha_programacion_cierre) / 60)) AS VARCHAR) || ':' || LPAD(CAST(abs(datediff(minute,fecha_block,fecha_programacion_cierre)) % 60 AS VARCHAR), 2, '0') 
+-- AS DevSt,
+ (SPLIT_PART(CAST(FLOOR(abs(datediff(minute,fecha_block,fecha_programacion_cierre) / 60)) AS VARCHAR) || ':' || LPAD(CAST(abs(datediff(minute,fecha_block,fecha_programacion_cierre)) % 60 AS VARCHAR), 2, '0')
+, ':', 1) || '.' || SPLIT_PART(CAST(FLOOR(abs(datediff(minute,fecha_block,fecha_programacion_cierre) / 60)) AS VARCHAR) || ':' || LPAD(CAST(abs(datediff(minute,fecha_block,fecha_programacion_cierre)) % 60 AS VARCHAR), 2, '0')
+, ':', 2))::DECIMAL(10,2) 
+ AS DevSt,
+ dateadd(hour,-3,fecha_star_planning) Fecha_inicio_menos_3h
+into #ventana_unica from #ventana_janis_cadena;
+
+delete from #ventana_unica
+where quota=0 ;
+
+delete from #ventana_unica
+where quantity=0 ;
+
+
+alter table  #ventana_unica add fecha_fin_sg_venta timestamp;
+
+
+update #ventana_unica
+set  fecha_fin_sg_venta=b.fecha_end_planning
+from #ventana_unica a inner join #ventana_janis b on a.dia_Programado=b.Dia_Programado and a.Transportadora=b.Transportadora and a.Hora_Final=b.Hora_Inicio;
+
+drop table if exists #pedidos_janis;--4 seg
+select
+ o.id																																			as order_id
+,from_unixtime_janis(o.date_created)																											as fechapedido
+,from_unixtime_janis(o.invoice_date)																											as fecha_invoice
+,from_unixtime_janis(o.date_picked)																												as fecha_picked
+,s.title																																		as title
+,o.seq_id																																		as op
+,o.vtex_id																																		as vtex_id
+,o.status																																		as statusorder
+,to_char(from_unixtime_janis(shi.shipping_window_start),'yyyymmdd') as Dia_Programado
+,from_unixtime_janis(shi.shipping_window_start)																									as wstart
+,from_unixtime_janis(shi.shipping_window_end)																									as wend
+,from_unixtime_janis(shi.shipped_date_start)																									as shistart
+,from_unixtime_janis(shi.shipped_date_end)																										as shiend
+,to_char(from_unixtime_janis(shi.shipping_window_start),'HH24:MI')																				as hora_ini
+,to_char(from_unixtime_janis(shi.shipping_window_end),'HH24:MI')																				as hora_fin
+,'['+to_char(from_unixtime_janis(shi.shipping_window_start),'HH24:MI')+'-'+to_char(from_unixtime_janis(shi.shipping_window_end),'HH24:MI')+']'	as ventana_despacho
+,upper(c.type)																																	as tipo
+,shi.id
+,c."name" as Transportadora
+into #pedidos_janis
+from stg_ecommerce_janis_wongio.wms_orders o
+left join stg_ecommerce_janis_wongio.wms_stores s on (s.id=o.store)
+left join stg_ecommerce_janis_wongio.wms_order_shipping shi on (shi.order_id=o.id)
+inner join 	(
+			select
+			order_id
+			, max(id) as id
+			from stg_ecommerce_janis_wongio.wms_order_shipping
+			group by
+			order_id
+			) shi_max on (shi_max.order_id=shi.order_id and shi_max.id=shi.id)
+left join stg_ecommerce_janis_wongio.wms_logistic_carriers c on (c.ref_id=shi.carrier_id)
+where to_char(from_unixtime_janis(shi.shipping_window_start),'yyyymmdd')=var_fecha
+and shi_max.id is not null
+union all 
+select
+ o.id																																			as order_id
+,from_unixtime_janis(o.date_created)																											as fechapedido
+,from_unixtime_janis(o.invoice_date)																											as fecha_invoice
+,from_unixtime_janis(o.date_picked)																												as fecha_picked
+,s.title																																		as title
+,o.seq_id																																		as op
+,o.vtex_id																																		as vtex_id
+,o.status																																		as statusorder
+,to_char(from_unixtime_janis(shi.shipping_window_start),'yyyymmdd') as Dia_Programado
+,from_unixtime_janis(shi.shipping_window_start)																									as wstart
+,from_unixtime_janis(shi.shipping_window_end)																									as wend
+,from_unixtime_janis(shi.shipped_date_start)																									as shistart
+,from_unixtime_janis(shi.shipped_date_end)																										as shiend
+,to_char(from_unixtime_janis(shi.shipping_window_start),'HH24:MI')																				as hora_ini
+,to_char(from_unixtime_janis(shi.shipping_window_end),'HH24:MI')																				as hora_fin
+,'['+to_char(from_unixtime_janis(shi.shipping_window_start),'HH24:MI')+'-'+to_char(from_unixtime_janis(shi.shipping_window_end),'HH24:MI')+']'	as ventana_despacho
+,upper(c.type)																																	as tipo
+,shi.id
+,c."name" as Transportadora
+from stg_ecommerce_janis_metroio.wms_orders o
+left join stg_ecommerce_janis_metroio.wms_stores s on (s.id=o.store)
+left join stg_ecommerce_janis_metroio.wms_order_shipping shi on (shi.order_id=o.id)
+inner join 	(
+			select
+			order_id
+			, max(id) as id
+			from stg_ecommerce_janis_metroio.wms_order_shipping
+			group by
+			order_id
+			) shi_max on (shi_max.order_id=shi.order_id and shi_max.id=shi.id)
+left join stg_ecommerce_janis_metroio.wms_logistic_carriers c on (c.ref_id=shi.carrier_id)
+where to_char(from_unixtime_janis(shi.shipping_window_start),'yyyymmdd')=var_fecha
+and shi_max.id is not null
+union all 
+select
+ o.id																																			as order_id
+,from_unixtime_janis(o.date_created)																											as fechapedido
+,from_unixtime_janis(o.invoice_date)																											as fecha_invoice
+,from_unixtime_janis(o.date_picked)																												as fecha_picked
+,s.title																																		as title
+,o.seq_id																																		as op
+,o.vtex_id																																		as vtex_id
+,o.status																																		as statusorder
+,to_char(from_unixtime_janis(shi.shipping_window_start),'yyyymmdd') as Dia_Programado
+,from_unixtime_janis(shi.shipping_window_start)																									as wstart
+,from_unixtime_janis(shi.shipping_window_end)																									as wend
+,from_unixtime_janis(shi.shipped_date_start)																									as shistart
+,from_unixtime_janis(shi.shipped_date_end)																										as shiend
+,to_char(from_unixtime_janis(shi.shipping_window_start),'HH24:MI')																				as hora_ini
+,to_char(from_unixtime_janis(shi.shipping_window_end),'HH24:MI')																				as hora_fin
+,'['+to_char(from_unixtime_janis(shi.shipping_window_start),'HH24:MI')+'-'+to_char(from_unixtime_janis(shi.shipping_window_end),'HH24:MI')+']'	as ventana_despacho
+,upper(c.type)																																	as tipo
+,shi.id
+,c."name" as Transportadora
+from stg_ecommerce_janis_legacy.wms_orders o
+left join stg_ecommerce_janis_legacy.wms_stores s on (s.id=o.store)
+left join stg_ecommerce_janis_legacy.wms_order_shipping shi on (shi.order_id=o.id)
+inner join 	(
+			select
+			order_id
+			, max(id) as id
+			from stg_ecommerce_janis_legacy.wms_order_shipping
+			group by
+			order_id
+			) shi_max on (shi_max.order_id=shi.order_id and shi_max.id=shi.id)
+left join stg_ecommerce_janis_legacy.wms_logistic_carriers c on (c.ref_id=shi.carrier_id)
+where to_char(from_unixtime_janis(shi.shipping_window_start),'yyyymmdd')=var_fecha
+and shi_max.id is not null
+;
+
+
+
+drop table if exists #pedidos_transportadora_leadtime;
+select a.*,b.id_ventana,fecha_fin_sg_venta,(SPLIT_PART(CAST(FLOOR(abs(datediff(minute,fechapedido,fecha_fin_sg_venta) / 60)) AS VARCHAR) || ':' || LPAD(CAST(abs(datediff(minute,fechapedido,fecha_fin_sg_venta)) % 60 AS VARCHAR), 2, '0')
+, ':', 1) || '.' || SPLIT_PART(CAST(FLOOR(abs(datediff(minute,fechapedido,fecha_fin_sg_venta) / 60)) AS VARCHAR) || ':' || LPAD(CAST(abs(datediff(minute,fechapedido,fecha_fin_sg_venta)) % 60 AS VARCHAR), 2, '0')
+, ':', 2))::DECIMAL(10,2) 
+ AS leadtime,
+ abs(datediff(minute,fechapedido,fecha_fin_sg_venta)) minutos_operativos
+into #pedidos_transportadora_leadtime from #pedidos_janis a 
+left join #ventana_unica b on a.dia_programado=b.dia_programado and a.Transportadora=b.Transportadora and  fechapedido>=fecha_cierre and fechapedido<fecha_programacion_cierre  ;
+
+drop table if exists #pedidos_transportadora_leadtime_global;
+select a.*,b.id_ventana,Fecha_inicio_menos_3h,(SPLIT_PART(CAST(FLOOR(abs(datediff(minute,fechapedido,fecha_fin_ven) / 60)) AS VARCHAR) || ':' || LPAD(CAST(abs(datediff(minute,fechapedido,fecha_fin_ven)) % 60 AS VARCHAR), 2, '0')
+, ':', 1) || '.' || SPLIT_PART(CAST(FLOOR(abs(datediff(minute,fechapedido,fecha_fin_ven) / 60)) AS VARCHAR) || ':' || LPAD(CAST(abs(datediff(minute,fechapedido,fecha_fin_ven)) % 60 AS VARCHAR), 2, '0')
+, ':', 2))::DECIMAL(10,2) 
+ AS leadtime,
+  abs(datediff(minute,fechapedido,fecha_fin_ven)) minutos_globales
+into #pedidos_transportadora_leadtime_global from #pedidos_janis a 
+left join #ventana_unica b on a.dia_programado=b.dia_programado and a.Transportadora=b.Transportadora and  a.ventana_despacho=b.ventana_despacho and  fechapedido>=Fecha_inicio_menos_3h and fechapedido<fecha_fin_ven ;
+
+
+drop table if exists #ventana_leadtime;
+select distinct id_ventana,count(distinct vtex_id)trx,avg(minutos_operativos)minutos_operativos
+,avg(cast(leadtime as numeric(14,2)))leadtime 
+into #ventana_leadtime from #pedidos_transportadora_leadtime 
+group by id_ventana;
+
+drop table if exists #ventana_leadtime_global;
+select distinct id_ventana,count(distinct vtex_id)trx,avg(minutos_globales)minutos_globales
+,avg(cast(leadtime as numeric(14,2)))leadtime 
+into #ventana_leadtime_global from #pedidos_transportadora_leadtime_global 
+group by id_ventana;
+
+
+alter table  #ventana_unica add leadtime numeric(14,2);
+
+alter table  #ventana_unica add leadtime_global numeric(14,2);
+
+alter table  #ventana_unica add pedidos_capacidad int;
+
+alter table  #ventana_unica add minutos_leadtime_operativos numeric(14,2);
+
+alter table  #ventana_unica add minutos_leadtime_globales numeric(14,2);
+
+alter table  #ventana_unica add ventana_abierta_cerrada int;
+
+update   #ventana_unica set DevSt=null 
+where   Estado_ventana in ('Cierre Programado','Abierta');
+
+update   #ventana_unica set minutos_DevSt=null 
+where   Estado_ventana in ('Cierre Programado','Abierta');
+
+update   #ventana_unica 
+set   ventana_abierta_cerrada=1 ;
+
+update   #ventana_unica 
+set   ventana_abierta_cerrada=1
+where  Estado_ventana in ('Abierta');
+
+update   #ventana_unica 
+set   ventana_abierta_cerrada=0
+where  Estado_ventana in ('Cierre Programado','Cierre Capacidad');
+
+update #ventana_unica
+set  leadtime=b.leadtime,pedidos_capacidad=trx,minutos_leadtime_operativos=minutos_operativos
+from #ventana_unica a inner join #ventana_leadtime b on a.id_ventana=b.id_ventana;
+
+update #ventana_unica
+set  leadtime_global=b.leadtime,minutos_leadtime_globales=minutos_globales
+from #ventana_unica a inner join #ventana_leadtime_global b on a.id_ventana=b.id_ventana;
+
+delete #ventana_unica
+where  cod_tienda  IN ('S038','S014','H010','S043','S085','S010','S029','S089','S044','S055','S053','S046','S051');
+
+drop table if exists #ventana_unica_lima;
+select distinct a.* into #ventana_unica_lima from #ventana_unica a
+left join dl_sp_maestras.dim_tienda  b on a.cod_tienda=b.id_tienda
+left join  dl_sp_maestras.dim_region c on b.sk_region=c.sk_region 
+where c.desc_region='LIMA                ';
+
+
+
+delete from dl_sp_dashboards_ecommerce.ventana_leadtime;
+
+insert into dl_sp_dashboards_ecommerce.ventana_leadtime
+select *,convert_timezone('GMT','GMT+5',getdate()) Hora_Act  from #ventana_unica_lima;
+
+
+
+
+
+end
+
+
+
+
+
+
+
+
+
+$$
+;

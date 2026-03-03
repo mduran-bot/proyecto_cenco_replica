@@ -1,0 +1,4 @@
+# file: C:\Users\vicen\OneDrive\Documentos\3HTP\Cencosud\Proyecto Final Cenco\glue\modules\iceberg_writer.py
+# hypothesis_version: 6.151.9
+
+[' AND ', ', ', 'append', 'dynamic', 'glue_catalog', 'merge', 'overwrite', 'overwrite-mode']

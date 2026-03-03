@@ -1,0 +1,1936 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Webhooks Service",
+    "description": "Webhooks Service\n\n **Last update**: 02 feb 26, 10:03 a. m.",
+    "version": "1.13.0",
+    "x-logo": null,
+    "x-janis-keywords": [
+      "subscription",
+      "subscribe",
+      "webhooks",
+      "events",
+      "triggers"
+    ],
+    "lastUpdate": "2026-02-02T13:03:35.349Z"
+  },
+  "tags": [
+    {
+      "name": "Configuration",
+      "x-traitTag": true,
+      "description": "\n## Execution details\n\nEvery webhook is invoked by making a POST request to the configured endpoint. The request body will contain a JSON object with information about the specific event that ocurred.\n\nAdditionally, you can configure custom headers in order to include, for example, authentication tokens.\n\nThe structure of a webhook request body will be the following:\n\n```json\n{\n  \"service\": \"string\",\n  \"entity\": \"string\",\n  \"eventName\": \"string\",\n  \"metadata\": \"object\",\n  \"eventDate\": \"string\"\n}\n```\n\nWhere `service`, `entity` and `eventName` are the ones you subscribed to, and metadata is an object that may contain specific information for each event.\n\nFor example, for an order that is ready for invoicing, the request body will be the following:\n\n```json\n{\n  \"service\": \"oms\",\n  \"entity\": \"order\",\n  \"eventName\": \"ready-for-invoice\",\n  \"metadata\": {\n    \"id\": \"d555345345345as67a342a\"\n  },\n  \"eventDate\": \"2021-02-23T21:53:57.938Z\"\n}\n```\n\n## Endpoint validation\n\nWhen a subscription is configured, a POST request will be sent to the endpoint (including the configured headers) an the following request body:\n\n```json\n{\n  \"setup\": true\n}\n```\n\nYou **MUST** respond to this request with a 2xx HTTP Status Code. Otherwise, subscription will be rejected.\n\n### Expected response\n\nAny webhook message will be considered as delivered if the endpoint returns a 2xx HTTP Status Code. No response body is required nor validated.\n\nAny other response Status Code will be considered as an error and retry policy will be applied.\n"
+    },
+    {
+      "name": "Retry policy",
+      "x-traitTag": true,
+      "description": "Upon delivery failure, the following retry policy will be executed to try to successfully deliver the message:\n\n- 1 minute after\n- 5 minutes after\n- 10 minutes after\n- 15 minutes after (four attempts)\n\nIf none of this attempts can deliver the message, it will be discarded.\n"
+    },
+    {
+      "name": "Subscription filter",
+      "x-traitTag": true,
+      "description": "In order to receive less messages from a given trigger, you can set a subscription filter.\n\nThe filter must be a valid [JSON Schema](https://json-schema.org/learn/getting-started-step-by-step.html) object (or JSON-stringified object).\n\nA subscription with a filter will test it against every message that is triggered. Only events that match the filters will be delivered to the subscription endpoint.\n\n### Quickstart\n\nYou can easily filter webhooks based on the message `metadata`. See below for a couple of common use examples.\n\nGiven the following webhook message:\n\n```json\n{\n  \"service\": \"delivery\",\n  \"entity\": \"shipping\",\n  \"eventName\": \"scheduled\",\n  \"metadata\": {\n    \"id\": \"634eb9fc96cdaa068d8cf42a\",\n    \"status\": \"scheduled\",\n    \"displayId\": \"290922-AHHS10\",\n    \"refId\": \"2RT-90922\",\n    \"trackingId\": \"UHES873NSDA8-01\",\n    \"realTimeId\": \"211004-BDZ82NH1\",\n    \"integ\": \"uber\",\n    \"type\": \"express_delivery\",\n    \"shippingTypeId\": \"633c8e225d10601e4aed2b9d\",\n    \"shippingTypeTitle\": \"Standard delivery\",\n    \"carrierId\": \"633c8e5f1ee1d732b1158bc9\",\n    \"carrierName\": \"Standard delivery Uber\",\n    \"companyId\": \"633c8e80a4915c4ea17ccaca\",\n    \"companyName\": \"Uber Express\",\n    \"price\": 10\n  },\n  \"eventDate\": \"2021-02-23T21:53:57.938Z\"\n}\n```\n\n#### Filter by a property value\n\n```json\n{\n  \"type\": \"object\",\n  \"properties\": {\n    \"integ\": {\n      \"const\": \"uber\"\n    }\n  },\n  \"required\": [\"integ\"]\n}\n```\n\n#### Filter by a property multiple valid values\n\n```json\n{\n  \"type\": \"object\",\n  \"properties\": {\n    \"type\": {\n      \"enum\": [\"express_delivery\", \"delivery\"]\n    }\n  },\n  \"required\": [\"type\"]\n}\n```\n\n#### Filter by an optional numeric minimum value (for example, for filtering non-free shippings)\n\n> Not including the `price` in the `required` array will also match events where the `price` is not set\n\n```json\n{\n  \"type\": \"object\",\n  \"properties\": {\n    \"price\": {\n      \"exclusiveMinimum\": 0\n    }\n  }\n}\n```\n\n#### Filter by a property, excluding one or more values\n\n```json\n{\n  \"type\": \"object\",\n  \"required\": [\"sellerSalesChannelReferenceId\"],\n  \"if\": {\n    \"properties\": {\n      \"sellerSalesChannelReferenceId\": {\n        \"const\": \"sales-channel-to-ignore\" # Replace this with your own sales channel\n        # or for multiple values use \"enum\": [\"sales-channel-to-ignore-1\", \"sales-channel-to-ignore-2\"]\n      }\n    }\n  },\n  \"then\": {\n    \"properties\": {\n      \"sellerSalesChannelReferenceId\": {\n        \"type\": \"string\",\n        \"const\": \"no\"\n      }\n    }\n  },\n  \"else\": {\n    \"properties\": {\n      \"sellerSalesChannelReferenceId\": {\n        \"type\": \"string\"\n      }\n    }\n  }\n}\n```\n"
+    },
+    {
+      "name": "Messages",
+      "description": "To handle webhook messages.\n\nA message is created for each event that occurs and matches against at least one subscription.\n"
+    },
+    {
+      "name": "Subscription",
+      "description": "To handle your subscriptions to the different event triggers.\n\nYou can configure one subscription with multiple triggers for the same endpoint.\n"
+    },
+    {
+      "name": "Settings",
+      "description": "To get Service Settings"
+    }
+  ],
+  "x-tagGroups": [
+    {
+      "name": "Documentation",
+      "tags": [
+        "Configuration",
+        "Retry policy",
+        "Subscription filter"
+      ]
+    },
+    {
+      "name": "Messaging",
+      "tags": [
+        "Subscription",
+        "Events",
+        "Messages"
+      ]
+    },
+    {
+      "name": "Other",
+      "tags": [
+        "Client",
+        "Event Listeners",
+        "Service Registration"
+      ]
+    }
+  ],
+  "servers": [
+    {
+      "url": "https://webhooks.janis.in/api",
+      "description": "The Prod API server",
+      "variables": {
+        "environment": {
+          "default": "prod"
+        }
+      }
+    },
+    {
+      "url": "https://webhooks.janisqa.in/api",
+      "description": "The QA API server",
+      "variables": {
+        "environment": {
+          "default": "qa"
+        }
+      }
+    },
+    {
+      "url": "https://webhooks.janisdev.in/api",
+      "description": "The Beta API server",
+      "variables": {
+        "environment": {
+          "default": "beta"
+        }
+      }
+    },
+    {
+      "url": "http://webhooks.janis.localhost:3074/api",
+      "description": "The Local API server",
+      "variables": {
+        "environment": {
+          "default": "local"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/GetSettings": {
+      "post": {
+        "operationId": "GetSettings",
+        "tags": [
+          "Settings"
+        ],
+        "summary": "GetSettings",
+        "description": "This function allows services to get every entity setting or a single setting for an entity",
+        "requestBody": {
+          "description": "GetSettings",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SettingsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GenericSuccess"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/message/{id}": {
+      "get": {
+        "x-janis-namespace": "message",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "webhooks:message:read"
+        ],
+        "operationId": "getMessage",
+        "tags": [
+          "Messages"
+        ],
+        "summary": "Get a Message",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Message found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Message"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/message": {
+      "get": {
+        "x-janis-namespace": "message",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "webhooks:message:read"
+        ],
+        "operationId": "listMessages",
+        "tags": [
+          "Messages"
+        ],
+        "summary": "List Messages",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/MessageSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/MessageFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Messages listed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/retry-messages": {
+      "post": {
+        "x-janis-namespace": "message",
+        "x-janis-method": "massive-retry",
+        "x-janis-permissions": [
+          "webhooks:message:retry"
+        ],
+        "operationId": "massiveRetryMessage",
+        "tags": [
+          "Messages"
+        ],
+        "summary": "Retry failed messages",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Messages retried",
+            "headers": {
+              "x-janis-total-updated": {
+                "$ref": "#/components/headers/x-janis-total-updated"
+              },
+              "x-janis-total-error": {
+                "$ref": "#/components/headers/x-janis-total-error"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RetriedMessagesIds"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/setting/{entity}": {
+      "get": {
+        "x-janis-namespace": "setting",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "webhooks:setting:read"
+        ],
+        "operationId": "getSetting",
+        "tags": [
+          "Settings"
+        ],
+        "summary": "Get the setting",
+        "description": "Return the setting of an entity",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "entity",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "example": "entityName"
+            },
+            "required": true,
+            "description": "The name of the entity that owns the settings to be retrieved"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The settings were retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OmsSetting"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "x-janis-namespace": "setting",
+        "x-janis-method": "update",
+        "x-janis-permissions": [
+          "webhooks:setting:write"
+        ],
+        "operationId": "updateSetting",
+        "tags": [
+          "Settings"
+        ],
+        "summary": "Update the setting",
+        "description": "Update the settings of an entity",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "entity",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "example": "entityName"
+            },
+            "required": true,
+            "description": "The name of the entity that owns the settings to be updated"
+          }
+        ],
+        "requestBody": {
+          "description": "The settings configurations",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OmsSetting"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The settings were updated"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/subscription/{id}": {
+      "get": {
+        "x-janis-namespace": "subscription",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "webhooks:subscription:read"
+        ],
+        "operationId": "getSubscription",
+        "tags": [
+          "Subscription"
+        ],
+        "summary": "Get a Subscription",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Subscription found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Subscription"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "x-janis-namespace": "subscription",
+        "x-janis-method": "update",
+        "x-janis-permissions": [
+          "webhooks:subscription:write"
+        ],
+        "operationId": "updateSubscription",
+        "tags": [
+          "Subscription"
+        ],
+        "summary": "Update a Subscription",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "example": "d555345345345as67a342a"
+            },
+            "required": true,
+            "description": "The Subscription ID"
+          }
+        ],
+        "requestBody": {
+          "description": "A Subscription",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Subscription"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The Subscription was updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "$ref": "#/components/schemas/Subscription/properties/id"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/subscription": {
+      "get": {
+        "x-janis-namespace": "subscription",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "webhooks:subscription:read"
+        ],
+        "operationId": "listSubscriptions",
+        "tags": [
+          "Subscription"
+        ],
+        "summary": "List Subscriptions",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/SubscriptionSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/SubscriptionFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Subscriptions listed",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "x-janis-namespace": "subscription",
+        "x-janis-method": "create",
+        "x-janis-permissions": [
+          "webhooks:subscription:write"
+        ],
+        "operationId": "createSubscription",
+        "tags": [
+          "Subscription"
+        ],
+        "summary": "Create a Subscription",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "A Subscription",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Subscription"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The Subscription was created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "$ref": "#/components/schemas/Subscription/properties/id"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/subscription-filter-test": {
+      "post": {
+        "x-janis-namespace": "subscription-filter",
+        "x-janis-method": "test",
+        "x-janis-permissions": [
+          "webhooks:subscription:read"
+        ],
+        "operationId": "testSubscriptionFilter",
+        "tags": [
+          "Subscription"
+        ],
+        "summary": "Test a Subscription Filter",
+        "description": "This API allows to test a Subscription Filter against a Sample Event.\n\nThis allows for faster feedback when setting a subscription with a filter, removing the need of generating actual events.\n",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "The subscription filter test case",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubscriptionFilterTestCase"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/TestSubscriptionFilter"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/trigger": {
+      "get": {
+        "x-janis-namespace": "trigger",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "webhooks:subscription:read"
+        ],
+        "operationId": "listTriggers",
+        "tags": [
+          "Subscription"
+        ],
+        "summary": "List Triggers",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TriggerSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/TriggerFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Triggers listed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TriggerList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-key",
+        "description": "The API Key"
+      },
+      "ApiSecret": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-secret",
+        "description": "The API Secret"
+      },
+      "JanisClient": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-client",
+        "description": "The Client Code"
+      }
+    },
+    "parameters": {
+      "id": {
+        "name": "id",
+        "in": "path",
+        "schema": {
+          "type": "string",
+          "example": "d555345345345as67a342a"
+        },
+        "required": true,
+        "description": "The unique identifier of the item"
+      },
+      "ListSortDirection": {
+        "name": "sortDirection",
+        "in": "query",
+        "description": "The direction to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
+        }
+      },
+      "ListPageNumber": {
+        "name": "x-janis-page",
+        "in": "header",
+        "description": "The page to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "default": 1
+        }
+      },
+      "ListPageSize": {
+        "name": "x-janis-page-size",
+        "in": "header",
+        "description": "The page size to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "default": 60
+        }
+      },
+      "JanisEntity": {
+        "name": "janis-entity",
+        "in": "header",
+        "description": "The entity name",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "MessageSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "status",
+            "dateCreated",
+            "dateDelivered"
+          ]
+        }
+      },
+      "MessageFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/Message/properties/id"
+            },
+            "subscriptionId": {
+              "$ref": "#/components/schemas/Message/properties/subscriptionId"
+            },
+            "attempts": {
+              "$ref": "#/components/schemas/Message/properties/attempts"
+            },
+            "content": {
+              "$ref": "#/components/schemas/Message/properties/content"
+            },
+            "status": {
+              "$ref": "#/components/schemas/Message/properties/status"
+            },
+            "lastStatusCode": {
+              "type": "number",
+              "description": "The status code of the last delivery attempt",
+              "example": 1
+            },
+            "dateCreatedRange": {
+              "type": "object",
+              "description": "A range for creation day",
+              "properties": {
+                "from": {
+                  "type": "string",
+                  "description": "The beginning of the range",
+                  "format": "date-time",
+                  "example": "2019-11-27T16:08:24.994Z"
+                },
+                "to": {
+                  "type": "string",
+                  "description": "The end of the range",
+                  "format": "date-time",
+                  "example": "2019-11-30T16:08:24.994Z"
+                }
+              }
+            },
+            "dateDeliveredRange": {
+              "type": "object",
+              "description": "A range for delivery day",
+              "properties": {
+                "from": {
+                  "type": "string",
+                  "description": "The beginning of the range",
+                  "format": "date-time",
+                  "example": "2019-11-27T16:08:24.994Z"
+                },
+                "to": {
+                  "type": "string",
+                  "description": "The end of the range",
+                  "format": "date-time",
+                  "example": "2019-11-30T16:08:24.994Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "SubscriptionSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "name",
+            "status",
+            "dateCreated",
+            "dateModified"
+          ]
+        }
+      },
+      "SubscriptionFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/Subscription/properties/id"
+            },
+            "name": {
+              "$ref": "#/components/schemas/Subscription/properties/name"
+            },
+            "trigger": {
+              "type": "string",
+              "description": "A trigger ID. This will filter all subscriptions that have at least this trigger subscribed.",
+              "example": "d555345345345aa67a340212"
+            },
+            "status": {
+              "$ref": "#/components/schemas/Subscription/properties/status"
+            }
+          }
+        }
+      },
+      "TriggerSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "service",
+            "entity",
+            "eventName"
+          ]
+        }
+      },
+      "TriggerFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "service": {
+              "$ref": "#/components/schemas/Trigger/properties/service"
+            },
+            "entity": {
+              "$ref": "#/components/schemas/Trigger/properties/entity"
+            },
+            "eventName": {
+              "$ref": "#/components/schemas/Trigger/properties/eventName"
+            },
+            "status": {
+              "$ref": "#/components/schemas/status"
+            }
+          }
+        }
+      }
+    },
+    "headers": {
+      "x-janis-total": {
+        "description": "The total amount of records in the list",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "x-janis-total-updated": {
+        "description": "The total amount of updated items",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "x-janis-total-error": {
+        "description": "The total amount of items with error",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "responses": {
+      "SuccessCreateResponse": {
+        "description": "The item was created",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "SuccessUpdateResponse": {
+        "description": "The item was updated",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "GenericSuccess": {
+        "description": "Operation succeeded",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "BadRequest": {
+        "description": "A client error has ocurred.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Authentication missing or invalid",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Not authorized request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "InternalError": {
+        "description": "A server error has ocurred."
+      },
+      "TestSubscriptionFilter": {
+        "description": "The subscription filter test result",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/SubscriptionFilterTestResult"
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "id": {
+        "description": "The unique identifier of the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "d555345345345aa67a342a10"
+      },
+      "status": {
+        "description": "The item status",
+        "type": "string",
+        "default": "active",
+        "enum": [
+          "active",
+          "inactive"
+        ],
+        "example": "active"
+      },
+      "dateCreated": {
+        "description": "The date of creation",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-12T19:00:00.000Z"
+      },
+      "dateModified": {
+        "description": "The date of the last modification",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-20T19:00:00.000Z"
+      },
+      "dateCreatedDay": {
+        "description": "The day of creation",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-08-07T16:00:00.000Z"
+      },
+      "dateModifiedDay": {
+        "description": "The day of last modification",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-08-07T16:00:00.000Z"
+      },
+      "userCreated": {
+        "description": "The ID of the user who created the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "6a1fc1eeb5b68406e0487a10"
+      },
+      "userModified": {
+        "description": "The ID of the user who last modified the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "7e1fc1eeb5b68406e048796"
+      },
+      "CustomHttpHeaders": {
+        "type": "object",
+        "description": "Custom headers to be sent on each request.\n\n**Avoid using custom headers for credentials when possible. Use `security` instead**\n",
+        "additionalProperties": {
+          "type": "string"
+        },
+        "example": {
+          "x-custom-header": "header-value"
+        }
+      },
+      "listenerEvent": {
+        "description": "A JANIS Event object",
+        "type": "object",
+        "properties": {
+          "service": {
+            "description": "The source service name",
+            "type": "string",
+            "example": "id"
+          },
+          "entity": {
+            "description": "The event related entity",
+            "type": "string",
+            "example": "profile"
+          },
+          "event": {
+            "description": "The event name",
+            "type": "string",
+            "example": "created"
+          },
+          "client": {
+            "description": "The source event client",
+            "type": "string",
+            "example": "fizzmod"
+          },
+          "id": {
+            "description": "The event related entity ID",
+            "type": "string",
+            "example": "5d699c1ae8ebb95eaa24aca9"
+          }
+        },
+        "required": [
+          "service",
+          "entity",
+          "event"
+        ]
+      },
+      "SettingsRequest": {
+        "type": "object",
+        "description": "The body of the request",
+        "properties": {
+          "entity": {
+            "type": "string",
+            "description": "The code of the entity",
+            "enum": [
+              "oms",
+              "delivery"
+            ],
+            "example": "oms"
+          },
+          "settingName": {
+            "type": "string",
+            "description": "The setting Name",
+            "enum": [
+              "activeOrderLabelTrigger",
+              "activeShippingLabelTrigger"
+            ],
+            "example": "activeOrderLabelTrigger"
+          }
+        },
+        "required": [
+          "entity"
+        ]
+      },
+      "ServiceTriggersRegistration": {
+        "type": "object",
+        "description": "The body of the request",
+        "properties": {
+          "serviceCode": {
+            "type": "string",
+            "description": "The code of the service",
+            "example": "oms"
+          },
+          "triggers": {
+            "$ref": "#/components/schemas/ServiceTriggers"
+          }
+        }
+      },
+      "ServiceTriggers": {
+        "type": "array",
+        "description": "All the triggers of a service",
+        "items": {
+          "$ref": "#/components/schemas/Trigger"
+        }
+      },
+      "Event": {
+        "type": "object",
+        "description": "A Event",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "clientCode": {
+            "type": "string",
+            "description": "The code of the client that triggered the event",
+            "example": "defaultClient"
+          },
+          "service": {
+            "type": "string",
+            "description": "The code of the service that triggered the event",
+            "example": "oms"
+          },
+          "entity": {
+            "type": "string",
+            "description": "The entity for which the event was triggered",
+            "example": "order"
+          },
+          "eventName": {
+            "type": "string",
+            "description": "The name of the event that was triggered",
+            "example": "picked"
+          },
+          "content": {
+            "type": "string",
+            "description": "The content of the webhook. This is different for each event that is triggered\n\nFor details, see the Webhook section on each service documentation, for example see [Webhook section of OMS](/v2/service/oms#tag/Webhooks).\n",
+            "example": "{\"id\":\"d555345345345as67a342a\"}"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          }
+        },
+        "required": [
+          "id",
+          "clientCode",
+          "service",
+          "entity",
+          "eventName",
+          "content",
+          "dateCreated"
+        ]
+      },
+      "ApiKeyAuthenticatorSecurity": {
+        "description": "API Key in headers Authentication",
+        "type": "object",
+        "properties": {
+          "scheme": {
+            "description": "API Key in headers Authentication\n\nThe `apiKey` will be sent in the `header` header. For example: `x-api-key: the-key`\n",
+            "type": "string",
+            "enum": [
+              "apiKey"
+            ],
+            "example": "apiKey"
+          },
+          "params": {
+            "type": "object",
+            "properties": {
+              "header": {
+                "description": "The header name",
+                "type": "string",
+                "example": "x-api-key"
+              },
+              "apiKey": {
+                "description": "The API Key",
+                "type": "string",
+                "example": "the-key",
+                "writeOnly": true
+              }
+            },
+            "required": [
+              "header",
+              "apiKey"
+            ]
+          }
+        },
+        "required": [
+          "scheme",
+          "params"
+        ]
+      },
+      "SecurityConfiguration": {
+        "description": "The security scheme and parameters of a webhook. This is the secure and preferred way to authenticate a webhook.\n\n**Avoid using custom headers for credentials when possible.**\n",
+        "type": "object",
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/NoneAuthenticatorSecurity"
+          },
+          {
+            "$ref": "#/components/schemas/BasicAuthenticatorSecurity"
+          },
+          {
+            "$ref": "#/components/schemas/ApiKeyAuthenticatorSecurity"
+          },
+          {
+            "$ref": "#/components/schemas/OAuthAuthenticatorSecurity"
+          }
+        ]
+      },
+      "BasicAuthenticatorSecurity": {
+        "description": "Basic HTTP Authentication",
+        "type": "object",
+        "properties": {
+          "scheme": {
+            "description": "Basic HTTP Authentication\n\nUsername and password are sent in base64 in the Authorization header. For example: `Authorization: Basic dXNlcjpwYXNzd29yZA==`\n",
+            "type": "string",
+            "enum": [
+              "basic"
+            ],
+            "example": "basic"
+          },
+          "params": {
+            "type": "object",
+            "properties": {
+              "username": {
+                "description": "The username",
+                "type": "string",
+                "example": "my-username"
+              },
+              "password": {
+                "description": "The password",
+                "type": "string",
+                "example": "my-password",
+                "writeOnly": true
+              }
+            },
+            "required": [
+              "username",
+              "password"
+            ]
+          }
+        },
+        "required": [
+          "scheme",
+          "params"
+        ]
+      },
+      "NoneAuthenticatorSecurity": {
+        "description": "No authentication **Not recommended, use a secure scheme instead.**",
+        "type": "object",
+        "properties": {
+          "scheme": {
+            "description": "\nNo authentication.\n\n**Not recommended, use a secure scheme instead.**\n",
+            "type": "string",
+            "enum": [
+              "none"
+            ],
+            "example": "none"
+          }
+        },
+        "required": [
+          "scheme"
+        ]
+      },
+      "OAuthAuthenticatorSecurity": {
+        "description": "OAuth 2.0 Authentication",
+        "type": "object",
+        "properties": {
+          "scheme": {
+            "description": "OAuth 2.0 Authentication\n\nAccess token will be fetched first from `tokenEndpoint` using `clientId` and `clientSecret` in a `client_credentials` flow.\nResponse **must** contain `access_token` and `expires_in` fields.\n\nThe access token will then be sent in the `accessTokenHeader` header prefixed with `Bearer`. For example `Authorization: Bearer <access-token>`.\n",
+            "type": "string",
+            "enum": [
+              "oauth"
+            ],
+            "example": "oauth"
+          },
+          "params": {
+            "type": "object",
+            "properties": {
+              "tokenEndpoint": {
+                "description": "The endpoint used to fetch the Access Token",
+                "type": "string",
+                "example": "https://example.com/oauth2/token"
+              },
+              "clientId": {
+                "description": "The client ID",
+                "type": "string",
+                "example": "my-client-id"
+              },
+              "clientSecret": {
+                "description": "The client secret",
+                "type": "string",
+                "example": "my-client-secret",
+                "writeOnly": true
+              },
+              "scope": {
+                "description": "The scope requested for the access token (multiple scopes can be separated by spaces)",
+                "type": "string",
+                "example": "orders.read orders.write"
+              },
+              "accessTokenHeader": {
+                "description": "The header name used to send the Access Token",
+                "type": "string",
+                "example": "Authorization"
+              }
+            },
+            "required": [
+              "tokenEndpoint",
+              "clientId",
+              "clientSecret",
+              "accessTokenHeader"
+            ]
+          }
+        },
+        "required": [
+          "scheme",
+          "params"
+        ]
+      },
+      "Message": {
+        "type": "object",
+        "description": "A message to be sent",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "subscriptionId": {
+            "type": "string",
+            "description": "The ID of the [Subscription](#tag/Subscription) that generated this message",
+            "readOnly": true,
+            "example": "d555345345345as67a342b"
+          },
+          "endpoint": {
+            "type": "string",
+            "description": "The endpoint where the message will be delivered",
+            "readOnly": true,
+            "example": "picked"
+          },
+          "security": {
+            "$ref": "#/components/schemas/SecurityConfiguration"
+          },
+          "service": {
+            "type": "string",
+            "description": "The code of the service that triggered the event",
+            "example": "oms"
+          },
+          "entity": {
+            "type": "string",
+            "description": "The entity for which the event was triggered",
+            "example": "order"
+          },
+          "eventName": {
+            "type": "string",
+            "description": "The name of the event that was triggered",
+            "example": "picked"
+          },
+          "content": {
+            "type": "string",
+            "description": "The content of the webhook. This is different for each event that is triggered\n\nFor details, see the Webhook section on each service documentation, for example see [Webhook section of OMS](/v2/service/oms#tag/Webhooks).\n",
+            "example": "{\"id\":\"d555345345345as67a342a\"}"
+          },
+          "headers": {
+            "$ref": "#/components/schemas/CustomHttpHeaders"
+          },
+          "eventDate": {
+            "type": "string",
+            "description": "The date when the event happened",
+            "example": "2021-02-23T21:53:57.938Z",
+            "format": "date-time",
+            "readOnly": true
+          },
+          "lastResponse": {
+            "type": "object",
+            "description": "The last response received from the message endpoint",
+            "readOnly": true,
+            "nullable": true,
+            "properties": {
+              "date": {
+                "type": "string",
+                "description": "The date of the last response",
+                "format": "date-time",
+                "readOnly": true,
+                "example": "2021-02-23T21:53:57.938Z"
+              },
+              "error": {
+                "type": "string",
+                "description": "A possible error message if a hook fails to be sent",
+                "readOnly": true,
+                "example": "Internal network error"
+              },
+              "statusCode": {
+                "type": "number",
+                "description": "The response HTTP Status code",
+                "readOnly": true,
+                "example": 200
+              },
+              "headers": {
+                "type": "object",
+                "description": "The response headers",
+                "readOnly": true,
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "example": {
+                  "x-response-header": "awesome"
+                }
+              },
+              "body": {
+                "type": "string",
+                "description": "The response body",
+                "readOnly": true,
+                "example": "{\"success\":true}"
+              },
+              "responseTime": {
+                "type": "number",
+                "description": "The time taken until the response was returned in ms",
+                "readOnly": true,
+                "example": 854
+              }
+            }
+          },
+          "attempts": {
+            "type": "number",
+            "description": "The quantity of attempts made to deliver the message",
+            "readOnly": true,
+            "default": 0,
+            "example": 1
+          },
+          "status": {
+            "type": "string",
+            "description": "The Event status. It will be `pending` until it succeeds (`delivered`) or definitely fails (`failed`)",
+            "readOnly": true,
+            "default": "pending",
+            "example": "delivered",
+            "enum": [
+              "pending",
+              "delivered",
+              "failed"
+            ]
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateDelivered": {
+            "type": "string",
+            "description": "The date when the event was delivered without errors",
+            "example": "2021-02-23T21:53:57.938Z",
+            "format": "date-time",
+            "readOnly": true,
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "subscriptionId",
+          "endpoint",
+          "service",
+          "entity",
+          "eventName",
+          "content",
+          "attempts",
+          "status",
+          "dateCreated"
+        ]
+      },
+      "MessageList": {
+        "type": "array",
+        "description": "A list of Messages",
+        "items": {
+          "$ref": "#/components/schemas/Message"
+        }
+      },
+      "RetriedMessagesIds": {
+        "description": "Item Batch response",
+        "type": "object",
+        "properties": {
+          "itemsRetried": {
+            "description": "Message IDs that were successfully retried",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "description": "A message `id`"
+            },
+            "example": [
+              "606606782e232624c18f1c18",
+              "6066067ff04765697cdd4d9a"
+            ]
+          },
+          "itemsError": {
+            "description": "Message IDs that failed to be retried",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "description": "A message `id`"
+            },
+            "example": [
+              "Invalid Accounts"
+            ]
+          }
+        }
+      },
+      "OmsSetting": {
+        "type": "object",
+        "description": "OMS Print Server settings",
+        "title": "printServer",
+        "properties": {
+          "activeOrderLabelTrigger": {
+            "type": "boolean",
+            "description": "This setting will be used to determine if Webhooks for Print Order Label is active",
+            "example": true,
+            "default": false
+          },
+          "activePackageLabelTrigger": {
+            "type": "boolean",
+            "description": "This setting will be used to determine if Webhooks for Print Package Label is active",
+            "example": true,
+            "default": false
+          },
+          "activeShippingLabelTrigger": {
+            "type": "boolean",
+            "description": "This setting will be used to determine if Webhooks for Print Shippings Label is active",
+            "example": true,
+            "default": false
+          }
+        }
+      },
+      "Subscription": {
+        "type": "object",
+        "description": "A Subscription",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "name": {
+            "type": "string",
+            "description": "A human friendly name to recognize the subscription quickly",
+            "example": "Order creation"
+          },
+          "triggers": {
+            "type": "array",
+            "description": "A list of [trigger IDs](#operation/listTriggers) to subscribe to",
+            "items": {
+              "type": "string",
+              "description": "A trigger ID",
+              "example": "d555345345345aa67a340212"
+            }
+          },
+          "filter": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              }
+            ],
+            "description": "A filter to apply for each event that is triggered. If an event matches, it is sent to the subscription endpoint. If it does not match, it is discarded.\n\nTo remove a subscription filter, set this to `null` or empty string.\n\nSee [Subscription filter](#tag/Subscription-filter) docs to learn more about setting a filter up.\n",
+            "example": {
+              "type": "object",
+              "properties": {
+                "integ": {
+                  "const": "uber"
+                }
+              },
+              "required": [
+                "integ"
+              ]
+            }
+          },
+          "endpoint": {
+            "type": "string",
+            "description": "The endpoint where the message should be delivered'\n\nSee the [Webhook Configuration](#tag/Configuration) section for more information.\n",
+            "example": "https://api.example.com/webhook-test"
+          },
+          "security": {
+            "$ref": "#/components/schemas/SecurityConfiguration"
+          },
+          "customHeaders": {
+            "$ref": "#/components/schemas/CustomHttpHeaders"
+          },
+          "status": {
+            "$ref": "#/components/schemas/status"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "service",
+          "entity",
+          "eventName",
+          "endpoint",
+          "status",
+          "dateCreated",
+          "userCreated",
+          "dateModified",
+          "userModified"
+        ]
+      },
+      "SubscriptionList": {
+        "type": "array",
+        "description": "A list of Subscriptions",
+        "items": {
+          "$ref": "#/components/schemas/Subscription"
+        }
+      },
+      "SubscriptionFilterTestCase": {
+        "type": "object",
+        "properties": {
+          "filter": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              }
+            ],
+            "description": "The filter to test against the sample event.\n\nSee [Subscription filter](#tag/Subscription-filter) docs to learn more about setting a filter up.\n",
+            "example": {
+              "type": "object",
+              "properties": {
+                "sellerSalesChannelName": {
+                  "const": "Some Sales Channel"
+                }
+              },
+              "required": [
+                "sellerSalesChannelName"
+              ]
+            }
+          },
+          "sampleEvent": {
+            "type": "object",
+            "description": "The sample event to test against the subscription filter",
+            "example": {
+              "service": "oms",
+              "entity": "order",
+              "eventName": "readyForInvoice",
+              "metadata": {
+                "id": "d555345345345as67a342a",
+                "commerceId": "4354534545-01",
+                "commerceSequentialId": "5445422",
+                "orderGroupId": "3aaa00fbfd60ad00111aa000",
+                "orderGroupCommerceId": "4354534545-01",
+                "sellerSalesChannelId": "e555345345345as67a342b",
+                "sellerSalesChannelReferenceId": "sales-channel-sc23",
+                "sellerSalesChannelName": "Some Sales Channel"
+              },
+              "eventDate": "2024-07-18T14:35:00.000Z"
+            }
+          }
+        }
+      },
+      "SubscriptionFilterTestResult": {
+        "type": "object",
+        "properties": {
+          "result": {
+            "type": "boolean",
+            "description": "The result of the test. `true` means that the filter matches the event, `false` means that it is invalid or it doesn't match.\n\nCheck the `message` field for more information.\n",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "description": "A message describing the result",
+            "example": "webhooks.subscriptionFilterTestResult.filterMatches"
+          }
+        }
+      },
+      "Trigger": {
+        "type": "object",
+        "description": "A Webhook Trigger",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "service": {
+            "type": "string",
+            "description": "The code of the service associated to this trigger",
+            "readOnly": true,
+            "example": "oms"
+          },
+          "entity": {
+            "type": "string",
+            "description": "The name of the entity associated to this trigger",
+            "example": "order"
+          },
+          "eventName": {
+            "type": "string",
+            "description": "The name of the event associated to this trigger",
+            "example": "created"
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/status"
+              },
+              {
+                "readOnly": true
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "service",
+          "entity",
+          "eventName",
+          "status"
+        ]
+      },
+      "TriggerList": {
+        "type": "array",
+        "description": "A list of Triggers",
+        "items": {
+          "oneOf": [
+            {
+              "$ref": "#/components/schemas/Trigger"
+            },
+            {
+              "$ref": "#/components/schemas/Trigger"
+            },
+            {
+              "$ref": "#/components/schemas/Trigger"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

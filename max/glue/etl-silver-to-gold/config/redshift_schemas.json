@@ -1,0 +1,1682 @@
+{
+  "_comment": "Esquemas de tablas Gold (Redshift) con campos calculados y validaciones",
+  "_description": "Define la estructura completa de cada tabla en la capa Gold",
+  "tables": {
+    "wms_orders": {
+      "description": "Órdenes de WMS procesadas y enriquecidas",
+      "source_tables": [
+        "metro_orders_clean"
+      ],
+      "primary_key": [
+        "order_id"
+      ],
+      "partition_by": [
+        "date_created"
+      ],
+      "fields": {
+        "order_id": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "ID único de la orden"
+        },
+        "order_group_id": {
+          "type": "VARCHAR(50)",
+          "nullable": true,
+          "description": "ID del grupo de órdenes"
+        },
+        "commerce_sequential_id": {
+          "type": "VARCHAR(50)",
+          "nullable": true,
+          "description": "ID secuencial del comercio"
+        },
+        "commerce_date_created": {
+          "type": "TIMESTAMP",
+          "nullable": true,
+          "description": "Fecha de creación en el comercio"
+        },
+        "commerce_sales_channel": {
+          "type": "VARCHAR(50)",
+          "nullable": true,
+          "description": "Canal de ventas del comercio"
+        },
+        "total_amount": {
+          "type": "DECIMAL(18,2)",
+          "nullable": false,
+          "description": "Monto total de la orden"
+        },
+        "commerce_id": {
+          "type": "VARCHAR(100)",
+          "nullable": true,
+          "description": "ID del comercio"
+        },
+        "status": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "Estado de la orden"
+        },
+        "original_amount": {
+          "type": "DECIMAL(18,2)",
+          "nullable": true,
+          "description": "Monto original antes de cambios"
+        },
+        "raw_total_amount": {
+          "type": "DECIMAL(18,2)",
+          "nullable": true,
+          "description": "Monto total sin procesar"
+        },
+        "currency": {
+          "type": "VARCHAR(10)",
+          "nullable": false,
+          "description": "Moneda de la transacción"
+        },
+        "sales_channel_name": {
+          "type": "VARCHAR(100)",
+          "nullable": true,
+          "description": "Nombre del canal de ventas"
+        },
+        "account_name": {
+          "type": "VARCHAR(100)",
+          "nullable": true,
+          "description": "Nombre de la cuenta"
+        },
+        "account_platform": {
+          "type": "VARCHAR(50)",
+          "nullable": true,
+          "description": "Plataforma de la cuenta (vtex, etc)"
+        },
+        "seller_name": {
+          "type": "VARCHAR(100)",
+          "nullable": true,
+          "description": "Nombre del vendedor"
+        },
+        "date_created": {
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "description": "Fecha de creación del registro"
+        },
+        "date_modified": {
+          "type": "TIMESTAMP",
+          "nullable": true,
+          "description": "Fecha de última modificación"
+        },
+        "total_changes": {
+          "type": "DECIMAL(18,2)",
+          "nullable": true,
+          "description": "Diferencia entre monto total y monto original",
+          "calculated": true,
+          "formula": "total_amount - original_amount"
+        }
+      },
+      "quality_rules": {
+        "critical_fields": [
+          "order_id",
+          "status",
+          "total_amount",
+          "date_created"
+        ],
+        "valid_statuses": [
+          "pending",
+          "processing",
+          "readyForDelivery",
+          "delivered",
+          "cancelled"
+        ],
+        "numeric_ranges": {
+          "total_amount": {
+            "min": 0,
+            "max": 999999
+          }
+        }
+      }
+    },
+    "products": {
+      "description": "Catálogo de productos",
+      "source_tables": [
+        "metro_products_clean"
+      ],
+      "primary_key": [
+        "product_id"
+      ],
+      "partition_by": [
+        "date_created"
+      ],
+      "fields": {
+        "product_id": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "ID único del producto"
+        },
+        "product_name": {
+          "type": "VARCHAR(255)",
+          "nullable": false,
+          "description": "Nombre del producto"
+        },
+        "sku": {
+          "type": "VARCHAR(100)",
+          "nullable": false,
+          "description": "SKU del producto"
+        },
+        "price": {
+          "type": "DECIMAL(18,2)",
+          "nullable": false,
+          "description": "Precio del producto"
+        },
+        "category": {
+          "type": "VARCHAR(100)",
+          "nullable": true,
+          "description": "Categoría del producto"
+        },
+        "brand": {
+          "type": "VARCHAR(100)",
+          "nullable": true,
+          "description": "Marca del producto"
+        },
+        "status": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "Estado del producto"
+        },
+        "date_created": {
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "description": "Fecha de creación"
+        },
+        "date_modified": {
+          "type": "TIMESTAMP",
+          "nullable": true,
+          "description": "Fecha de modificación"
+        }
+      },
+      "quality_rules": {
+        "critical_fields": [
+          "product_id",
+          "product_name",
+          "sku",
+          "price"
+        ],
+        "numeric_ranges": {
+          "price": {
+            "min": 0,
+            "max": 999999
+          }
+        }
+      }
+    },
+    "stock": {
+      "description": "Inventario de productos por almacén",
+      "source_tables": [
+        "metro_stock_clean"
+      ],
+      "primary_key": [
+        "stock_id"
+      ],
+      "partition_by": [
+        "date_created"
+      ],
+      "fields": {
+        "stock_id": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "ID único del registro de stock"
+        },
+        "product_id": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "ID del producto"
+        },
+        "warehouse_id": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "ID del almacén"
+        },
+        "quantity": {
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "Cantidad total"
+        },
+        "available_quantity": {
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "Cantidad disponible"
+        },
+        "reserved_quantity": {
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "Cantidad reservada"
+        },
+        "date_created": {
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "description": "Fecha de creación"
+        },
+        "date_modified": {
+          "type": "TIMESTAMP",
+          "nullable": true,
+          "description": "Fecha de modificación"
+        }
+      },
+      "quality_rules": {
+        "critical_fields": [
+          "stock_id",
+          "product_id",
+          "warehouse_id",
+          "quantity"
+        ],
+        "numeric_ranges": {
+          "quantity": {
+            "min": 0,
+            "max": 999999
+          },
+          "available_quantity": {
+            "min": 0,
+            "max": 999999
+          },
+          "reserved_quantity": {
+            "min": 0,
+            "max": 999999
+          }
+        }
+      }
+    },
+    "wms_order_items": {
+      "description": "Items de órdenes de WMS",
+      "source_tables": [
+        "metro_order_items_clean"
+      ],
+      "primary_key": [
+        "order_item_id"
+      ],
+      "partition_by": [
+        "date_created"
+      ],
+      "fields": {
+        "order_item_id": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "ID único del item"
+        },
+        "order_id": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "ID de la orden padre"
+        },
+        "product_id": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "ID del producto"
+        },
+        "sku": {
+          "type": "VARCHAR(100)",
+          "nullable": false,
+          "description": "SKU del producto"
+        },
+        "quantity": {
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "Cantidad solicitada"
+        },
+        "picked_quantity": {
+          "type": "INTEGER",
+          "nullable": true,
+          "description": "Cantidad pickeada"
+        },
+        "unit_price": {
+          "type": "DECIMAL(18,2)",
+          "nullable": false,
+          "description": "Precio unitario"
+        },
+        "total_price": {
+          "type": "DECIMAL(18,2)",
+          "nullable": false,
+          "description": "Precio total del item"
+        },
+        "status": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "Estado del item"
+        },
+        "date_created": {
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "description": "Fecha de creación"
+        },
+        "date_modified": {
+          "type": "TIMESTAMP",
+          "nullable": true,
+          "description": "Fecha de modificación"
+        },
+        "quantity_difference": {
+          "type": "INTEGER",
+          "nullable": true,
+          "description": "Diferencia entre cantidad solicitada y pickeada",
+          "calculated": true,
+          "formula": "quantity - picked_quantity"
+        }
+      },
+      "quality_rules": {
+        "critical_fields": [
+          "order_item_id",
+          "order_id",
+          "product_id",
+          "quantity"
+        ],
+        "numeric_ranges": {
+          "quantity": {
+            "min": 0,
+            "max": 999999
+          },
+          "unit_price": {
+            "min": 0,
+            "max": 999999
+          },
+          "total_price": {
+            "min": 0,
+            "max": 999999
+          }
+        }
+      }
+    },
+    "skus": {
+      "description": "SKUs de productos",
+      "source_tables": [
+        "metro_skus_clean"
+      ],
+      "primary_key": [
+        "sku_id"
+      ],
+      "partition_by": [
+        "date_created"
+      ],
+      "fields": {
+        "sku_id": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "ID único del SKU"
+        },
+        "sku": {
+          "type": "VARCHAR(100)",
+          "nullable": false,
+          "description": "Código SKU"
+        },
+        "product_id": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "ID del producto"
+        },
+        "barcode": {
+          "type": "VARCHAR(100)",
+          "nullable": true,
+          "description": "Código de barras"
+        },
+        "weight": {
+          "type": "DECIMAL(10,2)",
+          "nullable": true,
+          "description": "Peso del producto"
+        },
+        "dimensions": {
+          "type": "VARCHAR(100)",
+          "nullable": true,
+          "description": "Dimensiones del producto"
+        },
+        "status": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "Estado del SKU"
+        },
+        "date_created": {
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "description": "Fecha de creación"
+        },
+        "date_modified": {
+          "type": "TIMESTAMP",
+          "nullable": true,
+          "description": "Fecha de modificación"
+        }
+      },
+      "quality_rules": {
+        "critical_fields": [
+          "sku_id",
+          "sku",
+          "product_id"
+        ],
+        "numeric_ranges": {
+          "weight": {
+            "min": 0,
+            "max": 999999
+          }
+        }
+      }
+    },
+    "wms_order_shipping": {
+      "description": "Información de envío de órdenes",
+      "source_tables": [
+        "metro_order_shipping_clean"
+      ],
+      "primary_key": [
+        "shipping_id"
+      ],
+      "partition_by": [
+        "date_created"
+      ],
+      "fields": {
+        "shipping_id": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "ID único del envío"
+        },
+        "order_id": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "ID de la orden"
+        },
+        "city": {
+          "type": "VARCHAR(100)",
+          "nullable": true,
+          "description": "Ciudad de entrega"
+        },
+        "neighborhood": {
+          "type": "VARCHAR(100)",
+          "nullable": true,
+          "description": "Barrio de entrega"
+        },
+        "complement": {
+          "type": "VARCHAR(255)",
+          "nullable": true,
+          "description": "Complemento de dirección"
+        },
+        "lat": {
+          "type": "DECIMAL(12,9)",
+          "nullable": true,
+          "description": "Latitud"
+        },
+        "lng": {
+          "type": "DECIMAL(12,9)",
+          "nullable": true,
+          "description": "Longitud"
+        },
+        "shipping_window_start": {
+          "type": "TIMESTAMP",
+          "nullable": true,
+          "description": "Inicio ventana de envío"
+        },
+        "shipping_window_end": {
+          "type": "TIMESTAMP",
+          "nullable": true,
+          "description": "Fin ventana de envío"
+        },
+        "shipped_date_start": {
+          "type": "TIMESTAMP",
+          "nullable": true,
+          "description": "Fecha inicio envío"
+        },
+        "shipped_date_end": {
+          "type": "TIMESTAMP",
+          "nullable": true,
+          "description": "Fecha fin envío"
+        },
+        "date_created": {
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "description": "Fecha de creación"
+        },
+        "date_modified": {
+          "type": "TIMESTAMP",
+          "nullable": true,
+          "description": "Fecha de modificación"
+        },
+        "status": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "Estado del envío"
+        }
+      },
+      "quality_rules": {
+        "critical_fields": [
+          "shipping_id",
+          "order_id",
+          "date_created"
+        ],
+        "numeric_ranges": {
+          "lat": {
+            "min": -90,
+            "max": 90
+          },
+          "lng": {
+            "min": -180,
+            "max": 180
+          }
+        }
+      }
+    },
+    "wms_order_status_changes": {
+      "description": "Cambios de estado de órdenes",
+      "source_tables": [
+        "metro_order_status_changes_clean"
+      ],
+      "primary_key": [
+        "status_change_id"
+      ],
+      "partition_by": [
+        "date_created"
+      ],
+      "fields": {
+        "status_change_id": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "ID único del cambio"
+        },
+        "order_id": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "ID de la orden"
+        },
+        "new_status": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "Nuevo estado"
+        },
+        "user_created": {
+          "type": "VARCHAR(100)",
+          "nullable": true,
+          "description": "Usuario que creó el cambio"
+        },
+        "extra": {
+          "type": "VARCHAR(1000)",
+          "nullable": true,
+          "description": "Información adicional"
+        },
+        "date_created": {
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "description": "Fecha del cambio"
+        }
+      },
+      "quality_rules": {
+        "critical_fields": [
+          "status_change_id",
+          "order_id",
+          "new_status"
+        ]
+      }
+    },
+    "wms_order_payments": {
+      "description": "Pagos de órdenes",
+      "source_tables": [
+        "metro_order_payments_clean"
+      ],
+      "primary_key": [
+        "payment_id"
+      ],
+      "partition_by": [
+        "date_created"
+      ],
+      "fields": {
+        "payment_id": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "ID único del pago"
+        },
+        "order_id": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "ID de la orden"
+        },
+        "payment_method": {
+          "type": "VARCHAR(100)",
+          "nullable": false,
+          "description": "Método de pago"
+        },
+        "payment_system_name": {
+          "type": "VARCHAR(100)",
+          "nullable": true,
+          "description": "Nombre del sistema de pago"
+        },
+        "payment_group": {
+          "type": "VARCHAR(50)",
+          "nullable": true,
+          "description": "Grupo de pago"
+        },
+        "acquirer": {
+          "type": "VARCHAR(100)",
+          "nullable": true,
+          "description": "Adquirente"
+        },
+        "amount": {
+          "type": "DECIMAL(18,2)",
+          "nullable": false,
+          "description": "Monto del pago"
+        },
+        "status": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "Estado del pago"
+        },
+        "date_created": {
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "description": "Fecha de creación"
+        },
+        "date_modified": {
+          "type": "TIMESTAMP",
+          "nullable": true,
+          "description": "Fecha de modificación"
+        }
+      },
+      "quality_rules": {
+        "critical_fields": [
+          "payment_id",
+          "order_id",
+          "amount"
+        ],
+        "numeric_ranges": {
+          "amount": {
+            "min": 0,
+            "max": 999999
+          }
+        }
+      }
+    },
+    "wms_order_payments_connector_responses": {
+      "description": "Respuestas de conectores de pago",
+      "source_tables": [
+        "metro_order_payments_clean"
+      ],
+      "primary_key": [
+        "payment_id",
+        "field"
+      ],
+      "partition_by": [],
+      "fields": {
+        "payment_id": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "ID del pago"
+        },
+        "field": {
+          "type": "VARCHAR(100)",
+          "nullable": false,
+          "description": "Nombre del campo"
+        },
+        "value": {
+          "type": "VARCHAR(1000)",
+          "nullable": true,
+          "description": "Valor del campo"
+        }
+      },
+      "quality_rules": {
+        "critical_fields": [
+          "payment_id",
+          "field"
+        ]
+      }
+    },
+    "wms_order_custom_data_fields": {
+      "description": "Campos personalizados de órdenes",
+      "source_tables": [
+        "metro_orders_clean"
+      ],
+      "primary_key": [
+        "order_id",
+        "field"
+      ],
+      "partition_by": [],
+      "fields": {
+        "order_id": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "ID de la orden"
+        },
+        "field": {
+          "type": "VARCHAR(100)",
+          "nullable": false,
+          "description": "Nombre del campo"
+        },
+        "value": {
+          "type": "VARCHAR(1000)",
+          "nullable": true,
+          "description": "Valor del campo"
+        }
+      },
+      "quality_rules": {
+        "critical_fields": [
+          "order_id",
+          "field"
+        ]
+      }
+    },
+    "wms_order_item_weighables": {
+      "description": "Items pesables de órdenes",
+      "source_tables": [
+        "metro_order_items_clean"
+      ],
+      "primary_key": [
+        "order_item_id"
+      ],
+      "partition_by": [
+        "date_created"
+      ],
+      "fields": {
+        "order_item_id": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "ID del item"
+        },
+        "order_id": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "ID de la orden"
+        },
+        "weight_picked": {
+          "type": "DECIMAL(10,2)",
+          "nullable": true,
+          "description": "Peso pickeado"
+        },
+        "quantity": {
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "Cantidad"
+        },
+        "measurement_unit": {
+          "type": "VARCHAR(20)",
+          "nullable": true,
+          "description": "Unidad de medida"
+        },
+        "date_created": {
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "description": "Fecha de creación"
+        },
+        "date_modified": {
+          "type": "TIMESTAMP",
+          "nullable": true,
+          "description": "Fecha de modificación"
+        }
+      },
+      "quality_rules": {
+        "critical_fields": [
+          "order_item_id",
+          "order_id"
+        ],
+        "numeric_ranges": {
+          "weight_picked": {
+            "min": 0,
+            "max": 999999
+          }
+        }
+      }
+    },
+    "wms_stores": {
+      "description": "Tiendas y almacenes",
+      "source_tables": [
+        "metro_stores_clean"
+      ],
+      "primary_key": [
+        "store_id"
+      ],
+      "partition_by": [],
+      "fields": {
+        "store_id": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "ID de la tienda"
+        },
+        "store_name": {
+          "type": "VARCHAR(255)",
+          "nullable": false,
+          "description": "Nombre de la tienda"
+        },
+        "code": {
+          "type": "VARCHAR(50)",
+          "nullable": true,
+          "description": "Código de la tienda"
+        },
+        "country": {
+          "type": "VARCHAR(10)",
+          "nullable": true,
+          "description": "País"
+        },
+        "city": {
+          "type": "VARCHAR(100)",
+          "nullable": true,
+          "description": "Ciudad"
+        },
+        "address": {
+          "type": "VARCHAR(255)",
+          "nullable": true,
+          "description": "Dirección"
+        },
+        "lat": {
+          "type": "DECIMAL(12,9)",
+          "nullable": true,
+          "description": "Latitud"
+        },
+        "lng": {
+          "type": "DECIMAL(12,9)",
+          "nullable": true,
+          "description": "Longitud"
+        },
+        "apply_quotation": {
+          "type": "BOOLEAN",
+          "nullable": true,
+          "description": "Aplica cotización"
+        },
+        "status": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "Estado"
+        },
+        "date_created": {
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "description": "Fecha de creación"
+        },
+        "date_modified": {
+          "type": "TIMESTAMP",
+          "nullable": true,
+          "description": "Fecha de modificación"
+        }
+      },
+      "quality_rules": {
+        "critical_fields": [
+          "store_id",
+          "store_name"
+        ],
+        "numeric_ranges": {
+          "lat": {
+            "min": -90,
+            "max": 90
+          },
+          "lng": {
+            "min": -180,
+            "max": 180
+          }
+        }
+      }
+    },
+    "wms_logistic_carriers": {
+      "description": "Transportistas logísticos",
+      "source_tables": [
+        "metro_carriers_clean"
+      ],
+      "primary_key": [
+        "carrier_id"
+      ],
+      "partition_by": [],
+      "fields": {
+        "carrier_id": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "ID del transportista"
+        },
+        "carrier_name": {
+          "type": "VARCHAR(255)",
+          "nullable": false,
+          "description": "Nombre del transportista"
+        },
+        "code": {
+          "type": "VARCHAR(50)",
+          "nullable": true,
+          "description": "Código"
+        },
+        "status": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "Estado"
+        },
+        "date_created": {
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "description": "Fecha de creación"
+        },
+        "date_modified": {
+          "type": "TIMESTAMP",
+          "nullable": true,
+          "description": "Fecha de modificación"
+        }
+      },
+      "quality_rules": {
+        "critical_fields": [
+          "carrier_id",
+          "carrier_name"
+        ]
+      }
+    },
+    "wms_logistic_delivery_planning": {
+      "description": "Planificación de entregas",
+      "source_tables": [
+        "metro_delivery_planning_clean"
+      ],
+      "primary_key": [
+        "planning_id"
+      ],
+      "partition_by": [
+        "date_start"
+      ],
+      "fields": {
+        "planning_id": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "ID de planificación"
+        },
+        "store_id": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "ID de la tienda"
+        },
+        "date_start": {
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "description": "Fecha inicio"
+        },
+        "date_end": {
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "description": "Fecha fin"
+        },
+        "capacity": {
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "Capacidad"
+        },
+        "available": {
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "Disponible"
+        },
+        "reserved": {
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "Reservado"
+        },
+        "date_created": {
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "description": "Fecha de creación"
+        },
+        "date_modified": {
+          "type": "TIMESTAMP",
+          "nullable": true,
+          "description": "Fecha de modificación"
+        }
+      },
+      "quality_rules": {
+        "critical_fields": [
+          "planning_id",
+          "store_id"
+        ],
+        "numeric_ranges": {
+          "capacity": {
+            "min": 0,
+            "max": 999999
+          }
+        }
+      }
+    },
+    "wms_logistic_delivery_ranges": {
+      "description": "Rangos horarios de entrega",
+      "source_tables": [
+        "metro_delivery_ranges_clean"
+      ],
+      "primary_key": [
+        "range_id"
+      ],
+      "partition_by": [],
+      "fields": {
+        "range_id": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "ID del rango"
+        },
+        "planning_id": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "ID de planificación"
+        },
+        "time_start": {
+          "type": "VARCHAR(10)",
+          "nullable": false,
+          "description": "Hora inicio (HH:MM)"
+        },
+        "time_end": {
+          "type": "VARCHAR(10)",
+          "nullable": false,
+          "description": "Hora fin (HH:MM)"
+        },
+        "date_created": {
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "description": "Fecha de creación"
+        },
+        "date_modified": {
+          "type": "TIMESTAMP",
+          "nullable": true,
+          "description": "Fecha de modificación"
+        }
+      },
+      "quality_rules": {
+        "critical_fields": [
+          "range_id",
+          "planning_id"
+        ]
+      }
+    },
+    "categories": {
+      "description": "Categorías de productos",
+      "source_tables": [
+        "metro_categories_clean"
+      ],
+      "primary_key": [
+        "category_id"
+      ],
+      "partition_by": [],
+      "fields": {
+        "category_id": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "ID de categoría"
+        },
+        "category_name": {
+          "type": "VARCHAR(255)",
+          "nullable": false,
+          "description": "Nombre de categoría"
+        },
+        "ref_id": {
+          "type": "VARCHAR(50)",
+          "nullable": true,
+          "description": "ID de referencia"
+        },
+        "status": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "Estado"
+        },
+        "date_created": {
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "description": "Fecha de creación"
+        }
+      },
+      "quality_rules": {
+        "critical_fields": [
+          "category_id",
+          "category_name"
+        ]
+      }
+    },
+    "brands": {
+      "description": "Marcas de productos",
+      "source_tables": [
+        "metro_brands_clean"
+      ],
+      "primary_key": [
+        "brand_id"
+      ],
+      "partition_by": [],
+      "fields": {
+        "brand_id": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "ID de marca"
+        },
+        "brand_name": {
+          "type": "VARCHAR(255)",
+          "nullable": false,
+          "description": "Nombre de marca"
+        },
+        "status": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "Estado"
+        },
+        "date_created": {
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "description": "Fecha de creación"
+        }
+      },
+      "quality_rules": {
+        "critical_fields": [
+          "brand_id",
+          "brand_name"
+        ]
+      }
+    },
+    "price": {
+      "description": "Precios de productos",
+      "source_tables": [
+        "metro_prices_clean"
+      ],
+      "primary_key": [
+        "price_id"
+      ],
+      "partition_by": [
+        "date_created"
+      ],
+      "fields": {
+        "price_id": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "ID del precio"
+        },
+        "sku": {
+          "type": "VARCHAR(100)",
+          "nullable": false,
+          "description": "SKU"
+        },
+        "store_id": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "ID de tienda"
+        },
+        "price": {
+          "type": "DECIMAL(18,2)",
+          "nullable": false,
+          "description": "Precio"
+        },
+        "list_price": {
+          "type": "DECIMAL(18,2)",
+          "nullable": true,
+          "description": "Precio de lista"
+        },
+        "currency": {
+          "type": "VARCHAR(10)",
+          "nullable": false,
+          "description": "Moneda"
+        },
+        "date_created": {
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "description": "Fecha de creación"
+        },
+        "date_modified": {
+          "type": "TIMESTAMP",
+          "nullable": true,
+          "description": "Fecha de modificación"
+        },
+        "status": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "Estado"
+        }
+      },
+      "quality_rules": {
+        "critical_fields": [
+          "price_id",
+          "sku",
+          "price"
+        ],
+        "numeric_ranges": {
+          "price": {
+            "min": 0,
+            "max": 999999
+          }
+        }
+      }
+    },
+    "promotional_prices": {
+      "description": "Precios promocionales",
+      "source_tables": [
+        "metro_promotional_prices_clean"
+      ],
+      "primary_key": [
+        "promo_price_id"
+      ],
+      "partition_by": [
+        "date_start"
+      ],
+      "fields": {
+        "promo_price_id": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "ID del precio promocional"
+        },
+        "sku": {
+          "type": "VARCHAR(100)",
+          "nullable": false,
+          "description": "SKU"
+        },
+        "store_id": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "ID de tienda"
+        },
+        "promotional_price": {
+          "type": "DECIMAL(18,2)",
+          "nullable": false,
+          "description": "Precio promocional"
+        },
+        "original_price": {
+          "type": "DECIMAL(18,2)",
+          "nullable": false,
+          "description": "Precio original"
+        },
+        "discount_percentage": {
+          "type": "DECIMAL(5,2)",
+          "nullable": true,
+          "description": "Porcentaje de descuento"
+        },
+        "date_start": {
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "description": "Fecha inicio"
+        },
+        "date_end": {
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "description": "Fecha fin"
+        },
+        "status": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "Estado"
+        },
+        "date_created": {
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "description": "Fecha de creación"
+        },
+        "date_modified": {
+          "type": "TIMESTAMP",
+          "nullable": true,
+          "description": "Fecha de modificación"
+        }
+      },
+      "quality_rules": {
+        "critical_fields": [
+          "promo_price_id",
+          "sku"
+        ],
+        "numeric_ranges": {
+          "promotional_price": {
+            "min": 0,
+            "max": 999999
+          }
+        }
+      }
+    },
+    "promotions": {
+      "description": "Promociones",
+      "source_tables": [
+        "metro_promotions_clean"
+      ],
+      "primary_key": [
+        "promotion_id"
+      ],
+      "partition_by": [
+        "date_start"
+      ],
+      "fields": {
+        "promotion_id": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "ID de promoción"
+        },
+        "promotion_name": {
+          "type": "VARCHAR(255)",
+          "nullable": false,
+          "description": "Nombre de promoción"
+        },
+        "description": {
+          "type": "VARCHAR(1000)",
+          "nullable": true,
+          "description": "Descripción"
+        },
+        "discount_type": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "Tipo de descuento"
+        },
+        "discount_value": {
+          "type": "DECIMAL(18,2)",
+          "nullable": false,
+          "description": "Valor de descuento"
+        },
+        "date_start": {
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "description": "Fecha inicio"
+        },
+        "date_end": {
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "description": "Fecha fin"
+        },
+        "status": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "Estado"
+        },
+        "date_created": {
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "description": "Fecha de creación"
+        },
+        "date_modified": {
+          "type": "TIMESTAMP",
+          "nullable": true,
+          "description": "Fecha de modificación"
+        }
+      },
+      "quality_rules": {
+        "critical_fields": [
+          "promotion_id",
+          "promotion_name"
+        ]
+      }
+    },
+    "admins": {
+      "description": "Administradores del sistema",
+      "source_tables": [
+        "metro_admins_clean"
+      ],
+      "primary_key": [
+        "admin_id"
+      ],
+      "partition_by": [],
+      "fields": {
+        "admin_id": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "ID del administrador"
+        },
+        "first_name": {
+          "type": "VARCHAR(100)",
+          "nullable": false,
+          "description": "Nombre"
+        },
+        "last_name": {
+          "type": "VARCHAR(100)",
+          "nullable": false,
+          "description": "Apellido"
+        },
+        "email": {
+          "type": "VARCHAR(255)",
+          "nullable": false,
+          "description": "Email"
+        },
+        "document": {
+          "type": "VARCHAR(50)",
+          "nullable": true,
+          "description": "Documento"
+        },
+        "status": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "Estado"
+        },
+        "date_created": {
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "description": "Fecha de creación"
+        }
+      },
+      "quality_rules": {
+        "critical_fields": [
+          "admin_id",
+          "email"
+        ]
+      }
+    },
+    "customers": {
+      "description": "Clientes",
+      "source_tables": [
+        "metro_customers_clean"
+      ],
+      "primary_key": [
+        "customer_id"
+      ],
+      "partition_by": [
+        "date_created"
+      ],
+      "fields": {
+        "customer_id": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "ID del cliente"
+        },
+        "first_name": {
+          "type": "VARCHAR(100)",
+          "nullable": false,
+          "description": "Nombre"
+        },
+        "last_name": {
+          "type": "VARCHAR(100)",
+          "nullable": false,
+          "description": "Apellido"
+        },
+        "email": {
+          "type": "VARCHAR(255)",
+          "nullable": false,
+          "description": "Email"
+        },
+        "phone": {
+          "type": "VARCHAR(50)",
+          "nullable": true,
+          "description": "Teléfono"
+        },
+        "document": {
+          "type": "VARCHAR(50)",
+          "nullable": true,
+          "description": "Documento"
+        },
+        "document_type": {
+          "type": "VARCHAR(20)",
+          "nullable": true,
+          "description": "Tipo de documento"
+        },
+        "status": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "Estado"
+        },
+        "date_created": {
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "description": "Fecha de creación"
+        },
+        "date_modified": {
+          "type": "TIMESTAMP",
+          "nullable": true,
+          "description": "Fecha de modificación"
+        }
+      },
+      "quality_rules": {
+        "critical_fields": [
+          "customer_id",
+          "email"
+        ]
+      }
+    },
+    "wms_order_picking": {
+      "description": "Sesiones de picking",
+      "source_tables": [
+        "metro_picking_sessions_clean"
+      ],
+      "primary_key": [
+        "session_id"
+      ],
+      "partition_by": [
+        "pick_start_time"
+      ],
+      "fields": {
+        "session_id": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "ID de sesión"
+        },
+        "order_id": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "ID de orden"
+        },
+        "picker": {
+          "type": "VARCHAR(100)",
+          "nullable": true,
+          "description": "Picker"
+        },
+        "pick_start_time": {
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "description": "Hora inicio picking"
+        },
+        "pick_end_time": {
+          "type": "TIMESTAMP",
+          "nullable": true,
+          "description": "Hora fin picking"
+        },
+        "status": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "Estado"
+        }
+      },
+      "quality_rules": {
+        "critical_fields": [
+          "session_id",
+          "order_id"
+        ]
+      }
+    },
+    "picking_round_orders": {
+      "description": "Órdenes en rondas de picking",
+      "source_tables": [
+        "metro_picking_round_orders_clean"
+      ],
+      "primary_key": [
+        "session_id",
+        "order_id"
+      ],
+      "partition_by": [],
+      "fields": {
+        "session_id": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "ID de sesión"
+        },
+        "order_id": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "ID de orden"
+        }
+      },
+      "quality_rules": {
+        "critical_fields": [
+          "session_id",
+          "order_id"
+        ]
+      }
+    },
+    "invoices": {
+      "description": "Facturas",
+      "source_tables": [
+        "metro_invoices_clean"
+      ],
+      "primary_key": [
+        "invoice_id"
+      ],
+      "partition_by": [
+        "date_created"
+      ],
+      "fields": {
+        "invoice_id": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "ID de factura"
+        },
+        "order_id": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "ID de orden"
+        },
+        "invoice_number": {
+          "type": "VARCHAR(100)",
+          "nullable": false,
+          "description": "Número de factura"
+        },
+        "amount": {
+          "type": "DECIMAL(18,2)",
+          "nullable": false,
+          "description": "Monto"
+        },
+        "status": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "Estado"
+        },
+        "date_created": {
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "description": "Fecha de creación"
+        }
+      },
+      "quality_rules": {
+        "critical_fields": [
+          "invoice_id",
+          "order_id"
+        ],
+        "numeric_ranges": {
+          "amount": {
+            "min": 0,
+            "max": 999999
+          }
+        }
+      }
+    },
+    "ff_comments": {
+      "description": "Comentarios de fulfillment",
+      "source_tables": [
+        "metro_comments_clean"
+      ],
+      "primary_key": [
+        "comment_id"
+      ],
+      "partition_by": [
+        "date_created"
+      ],
+      "fields": {
+        "comment_id": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "ID del comentario"
+        },
+        "order_id": {
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "description": "ID de orden"
+        },
+        "user_id": {
+          "type": "VARCHAR(50)",
+          "nullable": true,
+          "description": "ID de usuario"
+        },
+        "comment_text": {
+          "type": "VARCHAR(2000)",
+          "nullable": false,
+          "description": "Texto del comentario"
+        },
+        "comment_type": {
+          "type": "VARCHAR(50)",
+          "nullable": true,
+          "description": "Tipo de comentario"
+        },
+        "date_created": {
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "description": "Fecha de creación"
+        },
+        "date_modified": {
+          "type": "TIMESTAMP",
+          "nullable": true,
+          "description": "Fecha de modificación"
+        }
+      },
+      "quality_rules": {
+        "critical_fields": [
+          "comment_id",
+          "order_id"
+        ]
+      }
+    }
+  }
+}

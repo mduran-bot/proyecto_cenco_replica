@@ -1,0 +1,90 @@
+{
+    "input": {
+        "path": "s3a://data-lake-silver/ventas_procesadas",
+        "format": "json"
+    },
+    "output": {
+        "path": "s3a://data-lake-gold/ventas_agregadas",
+        "format": "json",
+        "write_mode": "overwrite"
+    },
+    "incremental": {
+        "enabled": true,
+        "timestamp_column": "fecha_venta",
+        "metadata_bucket": "data-lake-metadata",
+        "metadata_key": "silver-to-gold/last_processed_timestamp.json"
+    },
+    "aggregations": {
+        "date_column": "fecha_venta",
+        "dimensions": [
+            "metadata_sucursal",
+            "estado"
+        ],
+        "metrics": [
+            {
+                "column": "monto",
+                "functions": [
+                    "sum",
+                    "avg",
+                    "min",
+                    "max"
+                ]
+            },
+            {
+                "column": "*",
+                "functions": [
+                    "count"
+                ]
+            }
+        ]
+    },
+    "denormalization": {
+        "enabled": false,
+        "joins": []
+    },
+    "quality": {
+        "critical_columns": [
+            "estado",
+            "metadata_sucursal"
+        ],
+        "valid_values": {
+            "estado": [
+                "completado",
+                "pendiente",
+                "cancelado",
+                "rechazado"
+            ]
+        },
+        "numeric_ranges": {
+            "monto": {
+                "min": 0,
+                "max": 99999999
+            }
+        },
+        "consistency_rules": [
+            {
+                "when_column": "estado",
+                "when_value": "completado",
+                "then_column": "monto",
+                "then_not_null": true
+            }
+        ],
+        "quality_gate": false,
+        "threshold": 0.8
+    },
+    "error_handler": {
+        "dlq_enabled": true,
+        "dlq_bucket": "data-lake-dlq",
+        "dlq_prefix": "silver-to-gold/failed",
+        "recovery_mode": "flag",
+        "endpoint_url": "http://localhost:4566"
+    },
+    "lineage": {
+        "enabled": true,
+        "pipeline_id": "silver-to-gold-ventas",
+        "source_path": "s3a://data-lake-silver/ventas_procesadas",
+        "track_hash": true,
+        "metadata_bucket": "data-lake-metadata",
+        "endpoint_url": "http://localhost:4566"
+    }
+}

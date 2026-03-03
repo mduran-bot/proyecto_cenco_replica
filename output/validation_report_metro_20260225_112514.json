@@ -1,0 +1,50 @@
+{
+  "timestamp": "2026-02-25T11:25:14.014090",
+  "client": "metro",
+  "entities": [
+    "orders",
+    "products",
+    "stock"
+  ],
+  "results": {
+    "orders": {
+      "status": "SUCCESS",
+      "metrics": {
+        "records_bronze": 0,
+        "records_silver": 0,
+        "transformations": []
+      },
+      "output": "root\n |-- _processing_timestamp: string (nullable = true)\n\n+-----------------------------+\n|_processing_timestamp        |\n+-----------------------------+\n|2026-02-25T11:24:20.916-04:00|\n|2026-02-25T11:24:20.916-04:00|\n|2026-02-25T11:24:20.916-04:00|\n|2026-02-25T11:24:20.916-04:00|\n|2026-02-25T11:24:20.916-04:00|\n+-----------------------------+\nonly showing top 5 rows\nCORRECTO: el proceso con PID 21524 (proceso secundario de PID 5196)\nha sido terminado.\nCORRECTO: el proceso con PID 5196 (proceso secundario de PID 13260)\nha sido terminado.\nCORRECTO: el proceso con PID 13260 (proceso secundario de PID 14960)\nha sido terminado.\n",
+      "silver_verified": true,
+      "conversions_verified": false
+    },
+    "products": {
+      "status": "SUCCESS",
+      "metrics": {
+        "records_bronze": 0,
+        "records_silver": 0,
+        "transformations": []
+      },
+      "output": "root\n |-- _processing_timestamp: string (nullable = true)\n\n+-----------------------------+\n|_processing_timestamp        |\n+-----------------------------+\n|2026-02-25T11:24:45.340-04:00|\n|2026-02-25T11:24:45.340-04:00|\n|2026-02-25T11:24:45.340-04:00|\n|2026-02-25T11:24:45.340-04:00|\n|2026-02-25T11:24:45.340-04:00|\n+-----------------------------+\nonly showing top 5 rows\nCORRECTO: el proceso con PID 1672 (proceso secundario de PID 11140)\nha sido terminado.\nCORRECTO: el proceso con PID 11140 (proceso secundario de PID 24472)\nha sido terminado.\nCORRECTO: el proceso con PID 24472 (proceso secundario de PID 1404)\nha sido terminado.\n",
+      "silver_verified": true,
+      "conversions_verified": false
+    },
+    "stock": {
+      "status": "SUCCESS",
+      "metrics": {
+        "records_bronze": 0,
+        "records_silver": 0,
+        "transformations": []
+      },
+      "output": "root\n |-- _processing_timestamp: string (nullable = true)\n\n+-----------------------------+\n|_processing_timestamp        |\n+-----------------------------+\n|2026-02-25T11:25:09.627-04:00|\n|2026-02-25T11:25:09.627-04:00|\n|2026-02-25T11:25:09.627-04:00|\n|2026-02-25T11:25:09.627-04:00|\n|2026-02-25T11:25:09.627-04:00|\n+-----------------------------+\nonly showing top 5 rows\nCORRECTO: el proceso con PID 25088 (proceso secundario de PID 14372)\nha sido terminado.\nCORRECTO: el proceso con PID 14372 (proceso secundario de PID 5796)\nha sido terminado.\nCORRECTO: el proceso con PID 5796 (proceso secundario de PID 25596)\nha sido terminado.\n",
+      "silver_verified": true,
+      "conversions_verified": false
+    }
+  },
+  "summary": {
+    "total": 3,
+    "successful": 3,
+    "failed": 0,
+    "success_rate": 100.0
+  }
+}

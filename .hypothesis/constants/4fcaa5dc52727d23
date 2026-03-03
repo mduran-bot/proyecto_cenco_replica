@@ -1,0 +1,4 @@
+# file: C:\Users\maxim\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\prompt_toolkit\document.py
+# hypothesis_version: 6.151.9
+
+['()', '([^\\s]+)', '0123456789_', '<>', 'Document', '[]', '^([^\\s]+)', '^([^\\s]+\\s*)', '_DocumentCache', '_cache', '_cursor_position', '_selection', '_text', '{}']

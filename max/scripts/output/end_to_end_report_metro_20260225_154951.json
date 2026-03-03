@@ -1,0 +1,178 @@
+{
+  "timestamp": "2026-02-25T15:49:51.597357",
+  "client": "metro",
+  "test_entities": [
+    "orders",
+    "order-items",
+    "products",
+    "skus",
+    "stock"
+  ],
+  "entity_to_gold_table": {
+    "orders": "wms_orders",
+    "order-items": "wms_order_items",
+    "products": "products",
+    "skus": "skus",
+    "stock": "stock"
+  },
+  "results": {
+    "bronze_to_silver": {
+      "orders": {
+        "status": "SUCCESS",
+        "records_loaded": 3,
+        "metrics": {
+          "records_read": 0,
+          "records_written": 0,
+          "transformations_applied": 0
+        },
+        "silver_verified": true
+      },
+      "order-items": {
+        "status": "SUCCESS",
+        "records_loaded": 4,
+        "metrics": {
+          "records_read": 0,
+          "records_written": 0,
+          "transformations_applied": 0
+        },
+        "silver_verified": true
+      },
+      "products": {
+        "status": "SUCCESS",
+        "records_loaded": 4,
+        "metrics": {
+          "records_read": 0,
+          "records_written": 0,
+          "transformations_applied": 0
+        },
+        "silver_verified": true
+      },
+      "skus": {
+        "status": "SUCCESS",
+        "records_loaded": 4,
+        "metrics": {
+          "records_read": 0,
+          "records_written": 0,
+          "transformations_applied": 0
+        },
+        "silver_verified": true
+      },
+      "stock": {
+        "status": "SUCCESS",
+        "records_loaded": 5,
+        "metrics": {
+          "records_read": 0,
+          "records_written": 0,
+          "transformations_applied": 0
+        },
+        "silver_verified": true
+      }
+    },
+    "silver_to_gold": {
+      "wms_orders": {
+        "status": "SUCCESS",
+        "metrics": {
+          "records_read": 0,
+          "records_written": 0,
+          "fields_mapped": 0
+        },
+        "gold_verified": false
+      },
+      "wms_order_items": {
+        "status": "FAILED",
+        "error": "2026-02-25 15:48:48,887 [INFO] ============================================================\n2026-02-25 15:48:48,887 [INFO] PIPELINE SILVER \u2192 GOLD: wms_order_items\n2026-02-25 15:48:48,887 [INFO] Cliente: metro\n2026-02-25 15:48:48,887 [INFO] ============================================================\nTraceback (most recent call last):\n  File \"C:\\Users\\maxim\\Desktop\\3htp\\cencosud-janis\\local-stack\\Proyecto_Cenco\\max\\glue\\etl-silver-to-gold\\run_pipeline_to_gold.py\", line 245, in <module>\n    sys.exit(main())\n             ^^^^^^\n  File \"C:\\Users\\maxim\\Desktop\\3htp\\cencosud-janis\\local-stack\\Proyecto_Cenco\\max\\glue\\etl-silver-to-gold\\run_pipeline_to_gold.py\", line 149, in main\n    table_config = get_table_config(args.gold_table, schemas)\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\maxim\\Desktop\\3htp\\cencosud-janis\\local-stack\\Proyecto_Cenco\\max\\glue\\etl-silver-to-gold\\run_pipeline_to_gold.py\", line 72, in get_table_config\n    raise ValueError(f\"Tabla Gold '{gold_table}' no encontrada en redshift_schemas.json\")\nValueError: Tabla Gold 'wms_order_items' no encontrada en redshift_schemas.json\n"
+      },
+      "products": {
+        "status": "SUCCESS",
+        "metrics": {
+          "records_read": 0,
+          "records_written": 0,
+          "fields_mapped": 0
+        },
+        "gold_verified": false
+      },
+      "skus": {
+        "status": "FAILED",
+        "error": "2026-02-25 15:49:20,226 [INFO] ============================================================\n2026-02-25 15:49:20,226 [INFO] PIPELINE SILVER \u2192 GOLD: skus\n2026-02-25 15:49:20,226 [INFO] Cliente: metro\n2026-02-25 15:49:20,226 [INFO] ============================================================\nTraceback (most recent call last):\n  File \"C:\\Users\\maxim\\Desktop\\3htp\\cencosud-janis\\local-stack\\Proyecto_Cenco\\max\\glue\\etl-silver-to-gold\\run_pipeline_to_gold.py\", line 245, in <module>\n    sys.exit(main())\n             ^^^^^^\n  File \"C:\\Users\\maxim\\Desktop\\3htp\\cencosud-janis\\local-stack\\Proyecto_Cenco\\max\\glue\\etl-silver-to-gold\\run_pipeline_to_gold.py\", line 149, in main\n    table_config = get_table_config(args.gold_table, schemas)\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\maxim\\Desktop\\3htp\\cencosud-janis\\local-stack\\Proyecto_Cenco\\max\\glue\\etl-silver-to-gold\\run_pipeline_to_gold.py\", line 72, in get_table_config\n    raise ValueError(f\"Tabla Gold '{gold_table}' no encontrada en redshift_schemas.json\")\nValueError: Tabla Gold 'skus' no encontrada en redshift_schemas.json\n"
+      },
+      "stock": {
+        "status": "SUCCESS",
+        "metrics": {
+          "records_read": 0,
+          "records_written": 0,
+          "fields_mapped": 0
+        },
+        "gold_verified": false
+      }
+    },
+    "validations": {
+      "wms_orders": {
+        "schema_validation": "PASSED",
+        "expected_fields": 18,
+        "record_count_validation": "WARNING",
+        "counts": {
+          "bronze": 0,
+          "silver": 0,
+          "gold": 0
+        },
+        "calculated_fields_validation": "PASSED",
+        "calculated_fields": [
+          "total_changes"
+        ]
+      },
+      "products": {
+        "schema_validation": "PASSED",
+        "expected_fields": 9,
+        "record_count_validation": "WARNING",
+        "counts": {
+          "bronze": 0,
+          "silver": 0,
+          "gold": 0
+        }
+      },
+      "stock": {
+        "schema_validation": "PASSED",
+        "expected_fields": 8,
+        "record_count_validation": "WARNING",
+        "counts": {
+          "bronze": 0,
+          "silver": 0,
+          "gold": 0
+        }
+      },
+      "wms_order_items": {
+        "record_count_validation": "WARNING",
+        "counts": {
+          "bronze": 0,
+          "silver": 0,
+          "gold": 0
+        }
+      },
+      "skus": {
+        "record_count_validation": "WARNING",
+        "counts": {
+          "bronze": 0,
+          "silver": 0,
+          "gold": 0
+        }
+      }
+    }
+  },
+  "summary": {
+    "bronze_to_silver": {
+      "total": 5,
+      "successful": 5,
+      "success_rate": 100.0
+    },
+    "silver_to_gold": {
+      "total": 5,
+      "successful": 3,
+      "success_rate": 60.0
+    },
+    "validations": {
+      "total": 5,
+      "passed": 3,
+      "success_rate": 60.0
+    }
+  }
+}

@@ -1,0 +1,1292 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "OmsPublic Service",
+    "description": "OmsPublic Service\n\n **Last update**: 12 ene 26, 04:07 p. m.",
+    "version": "1.9.0",
+    "x-logo": null,
+    "x-janis-keywords": [
+      "oms-public"
+    ],
+    "lastUpdate": "2026-01-12T19:07:02.443Z"
+  },
+  "tags": [
+    {
+      "name": "Order Items Candidates",
+      "description": "For managing minimum Order data with items candidates that can be shown for customers, and decide the substitutes."
+    }
+  ],
+  "servers": [
+    {
+      "url": "https://public.oms.janis.in/api",
+      "description": "The Prod API server",
+      "variables": {
+        "environment": {
+          "default": "prod"
+        }
+      }
+    },
+    {
+      "url": "https://public.oms.janisqa.in/api",
+      "description": "The QA API server",
+      "variables": {
+        "environment": {
+          "default": "qa"
+        }
+      }
+    },
+    {
+      "url": "https://public.oms.janisdev.in/api",
+      "description": "The Beta API server",
+      "variables": {
+        "environment": {
+          "default": "beta"
+        }
+      }
+    },
+    {
+      "url": "http://oms-public.janis.localhost:3113/api",
+      "description": "The Local API server",
+      "variables": {
+        "environment": {
+          "default": "local"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/order-items-candidates": {
+      "get": {
+        "x-janis-namespace": "order-items-candidates",
+        "x-janis-method": "get",
+        "x-janis-permissions": [],
+        "operationId": "getOrderItemsCandidates",
+        "tags": [
+          "Order Items Candidates"
+        ],
+        "summary": "Get Order Items Candidates",
+        "description": "Returns an Order Items Candidates based on an Authentication Token.\n",
+        "security": [
+          {
+            "BearerJWT": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderItemsCandidates"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "description": "Order not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "description": "A message explaining the error",
+                      "type": "string",
+                      "example": "Order not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "x-janis-namespace": "order",
+        "x-janis-method": "post",
+        "x-janis-permissions": [],
+        "operationId": "confirmCandidatesOrder",
+        "tags": [
+          "Order Items Candidates"
+        ],
+        "summary": "Confirm Items candidates for an Order",
+        "description": "Receive the items candidates choices for an Order\n",
+        "security": [
+          {
+            "BearerJWT": []
+          }
+        ],
+        "requestBody": {
+          "description": "The List of items to be replace",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ItemsToReplaceList"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Order",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "$ref": "#/components/schemas/OrderItemsCandidates/properties/id"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "description": "Order not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "description": "A message explaining the error",
+                      "type": "string",
+                      "example": "Order not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/order-reschedule-delivery-date": {
+      "post": {
+        "x-janis-namespace": "order-reschedule-delivery-date",
+        "x-janis-method": "post",
+        "x-janis-permissions": [],
+        "operationId": "postOrderRescheduleDeliveryDate",
+        "tags": [
+          "Order Reschedule Delivery Date"
+        ],
+        "summary": "Order reschedule delivery date",
+        "description": "Order reschedule delivery date",
+        "security": [
+          {
+            "BearerJWT": []
+          }
+        ],
+        "requestBody": {
+          "description": "The required body",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "deliveryWindow": {
+                    "type": "object",
+                    "description": "The time window to deliver the items",
+                    "properties": {
+                      "initialDate": {
+                        "type": "string",
+                        "description": "The initial date of the delivery",
+                        "format": "date-time",
+                        "example": "2019-09-06T00:00:00.000Z"
+                      },
+                      "finalDate": {
+                        "type": "string",
+                        "description": "The final date of the delivery",
+                        "format": "date-time",
+                        "example": "2019-09-06T23:30:00.000Z"
+                      }
+                    }
+                  },
+                  "timeSlotId": {
+                    "type": "string",
+                    "description": "The timeSlotId related with deliveryWidow",
+                    "example": "644994685b4e445c5c20eaed"
+                  },
+                  "deliveryEstimateDate": {
+                    "type": "string",
+                    "description": "An estimate of when the items will be delivered",
+                    "format": "date-time",
+                    "example": "2019-09-06T00:00:00.000Z"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GenericSuccess"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "description": "Order or Carrier not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "description": "A message explaining the error",
+                      "type": "string",
+                      "example": "Order not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/order-reschedule-token": {
+      "get": {
+        "x-janis-namespace": "order-reschedule-token",
+        "x-janis-method": "get",
+        "x-janis-permissions": [],
+        "operationId": "getOrderRescheduleToken",
+        "tags": [
+          "Order Reschedule Token"
+        ],
+        "summary": "Get Token Info",
+        "description": "Get Order Reschedule Token Info",
+        "security": [
+          {
+            "BearerJWT": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order info",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "orderId": {
+                      "type": "string",
+                      "description": "The order id",
+                      "example": "644994685b4e445c5c20eaeb"
+                    },
+                    "maximumReschedules": {
+                      "type": "number",
+                      "description": "The maximum reschedule attemps for an order",
+                      "default": 1,
+                      "example": 3
+                    },
+                    "maximumReschedulingTimeInDays": {
+                      "type": "number",
+                      "description": "The maximum time in days for rescheduling an order",
+                      "default": 7,
+                      "example": 5
+                    },
+                    "rescheduleAttemps": {
+                      "type": "number",
+                      "description": "The customer reschedule attemps",
+                      "example": 1
+                    },
+                    "deliveryEstimateDate": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "The order shipping delivery estimate date",
+                      "example": "2024-01-05T12:00:00.000Z"
+                    },
+                    "deliveryWindow": {
+                      "type": "object",
+                      "description": "The time window to deliver the items",
+                      "properties": {
+                        "initialDate": {
+                          "type": "string",
+                          "description": "The initial date of the delivery",
+                          "format": "date-time",
+                          "example": "2019-09-06T00:00:00.000Z"
+                        },
+                        "finalDate": {
+                          "type": "string",
+                          "description": "The final date of the delivery",
+                          "format": "date-time",
+                          "example": "2019-09-06T23:30:00.000Z"
+                        }
+                      }
+                    },
+                    "availableDatesToReschedule": {
+                      "description": "The available dates to reschedule",
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2019-09-06T23:30:00.000Z"
+                      }
+                    },
+                    "availableWindowsToReschedule": {
+                      "description": "The available windows to reschedule",
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "timeSlotId": {
+                            "type": "string",
+                            "description": "This refer to the `id` of the **TimeSlot** Entity. This property may not be present. See [Time-Slot](/v2/service/delivery#tag/Time-Slot)."
+                          },
+                          "initialDate": {
+                            "type": "string",
+                            "format": "date-time",
+                            "example": "2019-09-06T20:30:00.000Z"
+                          },
+                          "finalDate": {
+                            "type": "string",
+                            "format": "date-time",
+                            "example": "2019-09-06T23:30:00.000Z"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "description": "Order not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "description": "A message explaining the error",
+                      "type": "string",
+                      "example": "Order not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "x-janis-namespace": "order-reschedule-token",
+        "x-janis-method": "post",
+        "x-janis-permissions": [],
+        "operationId": "postOrderRescheduleToken",
+        "tags": [
+          "Order Reschedule Token"
+        ],
+        "summary": "Send reschedule token to order customer",
+        "description": "Send reschedule token to order customer",
+        "security": [],
+        "requestBody": {
+          "description": "The required body",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "commerceId": {
+                    "description": "The order commerce id. The commerceId or trackingId is required to find the order.",
+                    "type": "string",
+                    "example": "4354534545-01"
+                  },
+                  "trackingId": {
+                    "description": "The shipping tracking id. The commerceId or trackingId is required to find the order.",
+                    "type": "string",
+                    "example": "TR3432423432A"
+                  },
+                  "clientCode": {
+                    "description": "The client code",
+                    "type": "string",
+                    "example": "client-code"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GenericSuccess"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "description": "Order not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "description": "A message explaining the error",
+                      "type": "string",
+                      "example": "Order not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/setting/{entity}": {
+      "get": {
+        "x-janis-namespace": "setting",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "oms-public:setting:read"
+        ],
+        "operationId": "getSetting",
+        "tags": [
+          "Settings"
+        ],
+        "summary": "Get the setting of an entity",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "entity",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "example": "order"
+            },
+            "required": true,
+            "description": "The name of the entity that owns the settings to be retrieved"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The settings were retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/OmsPublicOrderSettings"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "put": {
+        "x-janis-namespace": "setting",
+        "x-janis-method": "update",
+        "x-janis-permissions": [
+          "oms-public:setting:write"
+        ],
+        "operationId": "updateSetting",
+        "tags": [
+          "Settings"
+        ],
+        "summary": "Update the setting of an entity",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "entity",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "example": "order"
+            },
+            "required": true,
+            "description": "The name of the entity that owns the settings to be updated"
+          }
+        ],
+        "requestBody": {
+          "description": "The settings configurations",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/OmsPublicOrderSettings"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The settings were updated"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/listener/oms/order/confirmed-candidates": {
+      "post": {
+        "x-janis-namespace": "oms-order",
+        "x-janis-method": "confirmed-candidates-listener",
+        "x-janis-permissions": [],
+        "operationId": "omsOrderConfirmedCandidatesListener",
+        "tags": [
+          "Event Listeners"
+        ],
+        "summary": "OMS Order Confirmed Candidates Event Listener",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "The Event",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/listenerEvent"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GenericSuccess"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-key",
+        "description": "The API Key"
+      },
+      "ApiSecret": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-secret",
+        "description": "The API Secret"
+      },
+      "JanisClient": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-client",
+        "description": "The Client Code"
+      },
+      "BearerJWT": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "The Authorization Token"
+      }
+    },
+    "parameters": {
+      "id": {
+        "name": "id",
+        "in": "path",
+        "schema": {
+          "type": "string",
+          "example": "631fb04c8fe08f51a8ee5949"
+        },
+        "required": true,
+        "description": "The unique identifier of the item"
+      },
+      "ListSortDirection": {
+        "name": "sortDirection",
+        "in": "query",
+        "description": "The direction to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
+        }
+      },
+      "ListPageNumber": {
+        "name": "x-janis-page",
+        "in": "header",
+        "description": "The page to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "default": 1
+        }
+      },
+      "ListPageSize": {
+        "name": "x-janis-page-size",
+        "in": "header",
+        "description": "The page size to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "default": 60
+        }
+      },
+      "JanisEntity": {
+        "name": "janis-entity",
+        "in": "header",
+        "description": "The entity name",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      }
+    },
+    "headers": {
+      "x-janis-total": {
+        "description": "The total amount of records in the list",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "responses": {
+      "SuccessCreateResponse": {
+        "description": "The item was created",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "SuccessUpdateResponse": {
+        "description": "The item was updated",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "GenericSuccess": {
+        "description": "Operation succeeded",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "BadRequest": {
+        "description": "A client error has ocurred.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Authentication missing or invalid",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Not authorized request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "InternalError": {
+        "description": "A server error has ocurred."
+      }
+    },
+    "schemas": {
+      "id": {
+        "description": "The unique identifier of the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "631fb04c8fe08f51a8ee5949"
+      },
+      "status": {
+        "description": "The item status",
+        "type": "string",
+        "default": "active",
+        "enum": [
+          "active",
+          "inactive"
+        ],
+        "example": "active"
+      },
+      "dateCreated": {
+        "description": "The date of creation",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-12T19:00:00.000Z"
+      },
+      "dateModified": {
+        "description": "The date of the last modification",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-20T19:00:00.000Z"
+      },
+      "dateCreatedDay": {
+        "description": "The day of creation",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-08-07T16:00:00.000Z"
+      },
+      "dateModifiedDay": {
+        "description": "The day of last modification",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-08-07T16:00:00.000Z"
+      },
+      "userCreated": {
+        "description": "The ID of the user who created the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "6a1fc1eeb5b68406e0487a10"
+      },
+      "userModified": {
+        "description": "The ID of the user who last modified the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "7e1fc1eeb5b68406e048796"
+      },
+      "OrderItemsCandidates": {
+        "type": "object",
+        "description": "An Order with only candidate items data that can be shown to the customers. For more details of each property watch it in [Order](/v2/service/oms#tag/Orders)",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "commerceId": {
+            "type": "string",
+            "description": "The order commerce id.",
+            "example": "4354534545-01"
+          },
+          "commerceSequentialId": {
+            "type": "string",
+            "description": "The order commerce sequential id.",
+            "example": "5445422"
+          },
+          "currency": {
+            "type": "string",
+            "description": "The ISO3 Code of the order's currency.",
+            "example": "ARS"
+          },
+          "items": {
+            "type": "array",
+            "description": "The order items detail",
+            "items": {
+              "$ref": "#/components/schemas/PublicOrderItem"
+            }
+          },
+          "customer": {
+            "$ref": "#/components/schemas/PublicOrderCustomer"
+          }
+        }
+      },
+      "PublicOrderItem": {
+        "type": "object",
+        "description": "An order item",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The ID of the item. It must be alphanumeric and unique among all the items or the order.",
+            "example": "590BFDDC88AC4006B7A6A841192A8D91"
+          },
+          "name": {
+            "type": "string",
+            "description": "The order item name",
+            "example": "Coca Cola 1.5L"
+          },
+          "refId": {
+            "type": "string",
+            "description": "The order item Ref ID.",
+            "example": "54987145487"
+          },
+          "ean": {
+            "type": "string",
+            "description": "The order item purchased **EAN**.",
+            "example": "7002454588878"
+          },
+          "purchasedPrice": {
+            "type": "number",
+            "description": "The order item purchased price",
+            "example": 78.5
+          },
+          "purchasedListPrice": {
+            "type": "number",
+            "description": "The order item purchased list price",
+            "example": 78.5
+          },
+          "purchasedPricePerMeasurementUnit": {
+            "type": "number",
+            "description": "The order item purchased price per measurement unit",
+            "example": 78.5
+          },
+          "purchasedQuantity": {
+            "type": "number",
+            "description": "The order item purchased quantity",
+            "example": 2
+          },
+          "sellingMeasurementUnit": {
+            "type": "string",
+            "description": "The order item **Measurement Unit**",
+            "example": "un"
+          },
+          "sellingUnitMultiplier": {
+            "type": "number",
+            "description": "The order item **Unit Multiplier**",
+            "example": 1
+          },
+          "imageUrl": {
+            "type": "string",
+            "description": "The order item image URL",
+            "example": "https://s3-eu-west-1.amazonaws.com/images.linnlive.com/b4cd1a0cb6423a903a87b5635027e08b/f40c553b-33a5-460f-9962-a4e660c7ef02.jpg"
+          },
+          "shippingPrice": {
+            "type": "number",
+            "description": "The order item shipping price",
+            "example": 1.5
+          },
+          "brandName": {
+            "type": "string",
+            "description": "The order item's **Brand** name",
+            "example": "La Campagnola"
+          },
+          "categories": {
+            "type": "array",
+            "description": "The **Categories** that applied to the item",
+            "items": {
+              "type": "object",
+              "description": "An order **Category**",
+              "properties": {
+                "commerceId": {
+                  "type": "string",
+                  "description": "The **Category** commerce id",
+                  "example": "1"
+                },
+                "name": {
+                  "type": "string",
+                  "description": "The **Category** commerce name",
+                  "example": "Food"
+                }
+              }
+            }
+          },
+          "pickingResult": {
+            "type": "array",
+            "description": "A list of picked items. This can be sent when creating an order if the picking process happened before the creation of the order in Janis\n",
+            "items": {
+              "$ref": "#/components/schemas/PublicOrderItemPickingResultItem"
+            }
+          }
+        }
+      },
+      "PublicOrderItemPickingResultItem": {
+        "type": "object",
+        "description": "Picked item",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "A unique identifier for the current picking result item.",
+            "example": "590BFDDC88AC4006B7A6A841192A8D91-0"
+          },
+          "name": {
+            "type": "string",
+            "description": "The item name",
+            "example": "Coca Cola 1.5L"
+          },
+          "refId": {
+            "type": "string",
+            "description": "The picked product reference ID.",
+            "example": "54987145487"
+          },
+          "ean": {
+            "type": "string",
+            "description": "The order item picked **EAN**",
+            "example": "7002454588878"
+          },
+          "isSubstitute": {
+            "type": "boolean",
+            "description": "Indicates if the picked item is a substitute for the original order item",
+            "example": true
+          },
+          "isCandidate": {
+            "type": "boolean",
+            "description": "Indicates if an item is a candidate for the customer's final choice",
+            "example": true
+          },
+          "eanCount": {
+            "type": "number",
+            "description": "The amount of items with the same EAN that were picked",
+            "example": 2
+          },
+          "quantityPerEan": {
+            "type": "number",
+            "description": "The quantity of the current picked item for each picked EAN (the measurement unit of this field is the one in `measurementUnit`)",
+            "example": 1
+          },
+          "realQuantity": {
+            "type": "number",
+            "description": "The total amount quantity of the current picked item (the measurement unit of this field is the one in `measurementUnit`)",
+            "example": 1
+          },
+          "price": {
+            "type": "number",
+            "description": "The price of each quantity of `measurementUnit`s of the picked item.",
+            "example": 78.5
+          },
+          "sellingMeasurementUnit\"": {
+            "type": "string",
+            "description": "The item **Measurement Unit** that is used for selling the product.",
+            "example": "un"
+          },
+          "sellingUnitMultiplier": {
+            "type": "number",
+            "description": "The item **Unit Multiplier** that is used for selling the product.",
+            "example": 1
+          },
+          "measurementUnit": {
+            "type": "string",
+            "description": "The item **Measurement Unit** of the product.",
+            "example": "un"
+          },
+          "unitMultiplier": {
+            "type": "number",
+            "description": "The item **Unit Multiplier** of the product.",
+            "example": 1
+          },
+          "imageUrl": {
+            "type": "string",
+            "description": "The item image URL.",
+            "example": "https://s3-eu-west-1.amazonaws.com/images.linnlive.com/b4cd1a0cb6423a903a87b5635027e08b/f40c553b-33a5-460f-9962-a4e660c7ef02.jpg"
+          },
+          "time": {
+            "type": "number",
+            "description": "The time in seconds spent in the picking process of this item",
+            "example": 10
+          }
+        }
+      },
+      "PublicOrderCustomer": {
+        "type": "object",
+        "description": "A customer of the order",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "The customer's email",
+            "example": "john.doe@example.com"
+          },
+          "fullname": {
+            "type": "string",
+            "description": "The customer's fullname",
+            "example": "John Doe"
+          }
+        }
+      },
+      "ItemsToReplaceList": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/ItemToReplace"
+        }
+      },
+      "ItemToReplace": {
+        "type": "object",
+        "description": "The original item to be replaced and the choices candidates",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/PublicOrderItem/properties/id"
+          },
+          "candidates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ItemChoose"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "candidates"
+        ]
+      },
+      "ItemChoose": {
+        "type": "object",
+        "description": "The candidate item choose",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/PublicOrderItemPickingResultItem/properties/id"
+          },
+          "quantity": {
+            "type": "number",
+            "description": "The total amount quantity of the current picked item",
+            "example": 1
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "OmsPublicOrderSettings": {
+        "type": "object",
+        "description": "Order settings",
+        "title": "Order",
+        "properties": {
+          "customerSessionDuration": {
+            "type": "number",
+            "description": "Duration in minutes of the customer permissions to see and make changes to a public order",
+            "example": 15,
+            "default": 60
+          },
+          "orderItemsCandidatesExpirationBehavior": {
+            "type": "string",
+            "description": "Determines the action to do once the public order expires and there are not confirmed candidates",
+            "example": "nothing",
+            "enum": [
+              "nothing",
+              "markItemsAsMissing"
+            ]
+          },
+          "maximumReschedules": {
+            "type": "number",
+            "description": "Determines the maximum reschedules for an order",
+            "example": 2,
+            "default": 1
+          },
+          "maximumReschedulingTimeInDays": {
+            "type": "number",
+            "description": "Determines the maximum time in days for rescheduling an order",
+            "example": 3,
+            "default": 7
+          },
+          "deliveryMethodsEnabledToReschedule": {
+            "type": "array",
+            "description": "Determines the delivery methods enabled to reschedule an order",
+            "items": {
+              "type": "string",
+              "enum": [
+                "delivery",
+                "store_pickup",
+                "drive_through",
+                "express_delivery"
+              ]
+            }
+          },
+          "carriersEnabledToReschedule": {
+            "type": "array",
+            "description": "Determines carriers enabled to reschedule an order",
+            "items": {
+              "type": "string",
+              "example": "1555345345345as67a342a"
+            }
+          }
+        }
+      },
+      "listenerEvent": {
+        "description": "A JANIS Event object",
+        "type": "object",
+        "properties": {
+          "service": {
+            "description": "The source service name",
+            "type": "string",
+            "example": "id"
+          },
+          "entity": {
+            "description": "The event related entity",
+            "type": "string",
+            "example": "profile"
+          },
+          "event": {
+            "description": "The event name",
+            "type": "string",
+            "example": "created"
+          },
+          "client": {
+            "description": "The source event client",
+            "type": "string",
+            "example": "fizzmod"
+          },
+          "id": {
+            "description": "The event related entity ID",
+            "type": "string",
+            "example": "5d699c1ae8ebb95eaa24aca9"
+          }
+        },
+        "required": [
+          "service",
+          "entity",
+          "event"
+        ]
+      },
+      "FunctionError": {
+        "type": "object",
+        "description": "The error message",
+        "properties": {
+          "message": {
+            "description": "The error message",
+            "type": "string",
+            "readOnly": true,
+            "example": "An error occurred"
+          }
+        }
+      }
+    }
+  }
+}

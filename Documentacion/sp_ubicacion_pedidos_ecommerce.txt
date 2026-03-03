@@ -1,0 +1,403 @@
+CREATE OR REPLACE PROCEDURE dl_sp_temporal.sp_ubicacion_pedidos_ecommerce()
+	LANGUAGE plpgsql
+AS $$
+	
+
+DECLARE
+
+    fechaini varchar(8);
+    fechafin varchar(8);
+
+BEGIN
+
+        fechaini := TO_CHAR(DATE_TRUNC('month', current_date) - INTERVAL '3 month', 'YYYYMMDD'); -- primer dia de hace 3 meses 
+        fechafin := TO_CHAR(DATE_TRUNC('month', current_date) - INTERVAL '1 day', 'YYYYMMDD') ; -- ultimo dia del mes cerrado
+      --  fechaini := '20250123';
+     --   fechafin := '20250130';
+
+-- Crear tabla temporal con datos seleccionados
+
+CREATE TEMPORARY TABLE fecha AS
+SELECT
+    sk_dia AS codfecha,
+    sk_semana AS semana,
+    desc_abrv_dia_sem AS nom_dia
+FROM dl_sp_maestras.dim_dia 
+WHERE sk_dia >= fechaini AND sk_dia <= fechafin;
+
+
+-- Crear tabla temporal con datos seleccionados
+
+CREATE TEMPORARY TABLE pedidos2 AS
+SELECT  
+    SUBSTRING(TO_CHAR(a.creationdate,'YYYYMMDD'),1,6) AS mes,
+    semana,
+    SUBSTRING(TO_CHAR(a.creationdate,'YYYYMMDD'),1,8) AS dia,
+    clientdocument AS dni,
+    referencecode AS cod_mat,
+    RIGHT('000000000000000000' + referencecode,18) AS cod_material,
+    ordernum AS vtex_id,
+    skuname AS material,
+    discountsnames,
+    statusorder AS estado,
+    SUM(quantity_sku) AS q_sku,
+    skutotalprice AS selling_price,
+    SUM(skutotalprice * quantity_sku) AS venta_bruta,
+    ((SUM(skutotalprice * quantity_sku))/1.18) AS venta_neta,
+    CASE 
+        WHEN (sellername IN ('wongfood','metrofood','app','appmetro') OR sellername LIKE '%wongiot%' OR sellername LIKE '%metroios%' OR sellername LIKE '%metroioh%')
+        THEN 'TIENDA' 
+        ELSE 'ALMACEN' 
+    END AS operacion,
+    CASE 
+        WHEN (sellername NOT IN ('wongfood','metrofood','appmetro','app') AND sellername NOT LIKE '%wongiot%' AND sellername NOT LIKE '%metroios%' AND sellername NOT LIKE '%metroioh%') 
+        AND (host LIKE '%metro%' OR host='appmetro')  
+        THEN 'S129' 
+        WHEN (sellername NOT IN ('wongfood','metrofood','appmetro','app') AND sellername NOT LIKE '%wongiot%' AND sellername NOT LIKE '%metroios%' AND sellername NOT LIKE '%metroioh%') 
+        AND (host LIKE '%wong%' OR host='app') 
+        THEN 'T129'
+        WHEN SUBSTRING(courrier,1,4) = 'TH12' THEN 'W101' 
+        ELSE SUBSTRING(courrier,1,4) 
+    END AS cod_tienda,
+    CASE 
+        WHEN utmsource LIKE '%AppMetro%' OR utmsource LIKE '%AppWong%' THEN 'APP' 
+        ELSE 'WEB' 
+    END AS canal_eco,
+    CASE 
+        WHEN courrier LIKE '%REC%' OR courrier LIKE '%RETIRO%' OR courrier LIKE '%AUTO%' THEN 'RETIRO EN TIENDA' 
+        ELSE 'DELIVERY' 
+    END AS despacho,
+    prime_order,
+    cod_lat,
+    cod_lng
+FROM stg_ecommerce_vtex.eco_oms a
+INNER JOIN fecha b 
+    ON TO_CHAR(a.creationdate,'YYYYMMDD') = b.codfecha
+WHERE quantity_sku <> 0 
+    AND courrier NOT IN ('Transportadora Donación','Transportadora Donacion')
+GROUP BY 
+    SUBSTRING(TO_CHAR(a.creationdate,'YYYYMMDD'),1,6),
+    semana,
+    SUBSTRING(TO_CHAR(a.creationdate,'YYYYMMDD'),1,8),
+    clientdocument,
+    referencecode,
+    RIGHT('000000000000000000' + referencecode,18),
+    ordernum,
+    skuname,
+    discountsnames,
+    statusorder,
+    skutotalprice,
+    CASE 
+        WHEN (sellername IN ('wongfood','metrofood','app','appmetro') OR sellername LIKE '%wongiot%' OR sellername LIKE '%metroios%' OR sellername LIKE '%metroioh%')
+        THEN 'TIENDA' 
+        ELSE 'ALMACEN' 
+    END,
+    CASE 
+        WHEN (sellername NOT IN ('wongfood','metrofood','appmetro','app') AND sellername NOT LIKE '%wongiot%' AND sellername NOT LIKE '%metroios%' AND sellername NOT LIKE '%metroioh%') 
+        AND (host LIKE '%metro%' OR host='appmetro')  
+        THEN 'S129' 
+        WHEN (sellername NOT IN ('wongfood','metrofood','appmetro','app') AND sellername NOT LIKE '%wongiot%' AND sellername NOT LIKE '%metroios%' AND sellername NOT LIKE '%metroioh%') 
+        AND (host LIKE '%wong%' OR host='app') 
+        THEN 'T129'
+        WHEN SUBSTRING(courrier,1,4) = 'TH12' THEN 'W101' 
+        ELSE SUBSTRING(courrier,1,4) 
+    END,
+    CASE 
+        WHEN utmsource LIKE '%AppMetro%' OR utmsource LIKE '%AppWong%' THEN 'APP' 
+        ELSE 'WEB' 
+    END,
+    CASE 
+        WHEN courrier LIKE '%REC%' OR courrier LIKE '%RETIRO%' OR courrier LIKE '%AUTO%' THEN 'RETIRO EN TIENDA' 
+        ELSE 'DELIVERY' 
+    END,
+    prime_order,
+    cod_lat,
+    cod_lng;
+
+
+CREATE TEMPORARY TABLE estados_ubi__legado_sql AS 
+SELECT
+
+     TO_CHAR(CONVERT_TIMEZONE('GMT', '+05:00', DATEADD(SECOND,CAST(COALESCE( o.date_created) AS BIGINT ), '1970-01-01 00:00:00')) , 'YYYYMMDD') AS fechapedido,
+     o.seq_id AS pedido,
+     o.vtex_id AS vtex_id,
+     seller_ecom_id AS seller,
+     o.status AS statusorder
+FROM stg_ecommerce_janis_legacy.wms_orders o
+WHERE 
+ TO_CHAR(CONVERT_TIMEZONE('GMT', '+05:00', DATEADD(SECOND,CAST(COALESCE( o.date_created) AS BIGINT ), '1970-01-01 00:00:00')) , 'YYYYMMDD') >= fechaini
+AND TO_CHAR(CONVERT_TIMEZONE('GMT', '+05:00', DATEADD(SECOND,CAST(COALESCE( o.date_created) AS BIGINT ), '1970-01-01 00:00:00')), 'YYYYMMDD') <= fechafin;
+
+
+CREATE  TEMPORARY TABLE estados_ubi__legado_wong_io_sql AS 
+SELECT
+
+ TO_CHAR(CONVERT_TIMEZONE('GMT', '+05:00', DATEADD(SECOND,CAST(COALESCE( o.date_created) AS BIGINT ), '1970-01-01 00:00:00')) , 'YYYYMMDD') AS fechapedido,
+     o.seq_id AS pedido,
+     o.vtex_id AS vtex_id,
+     seller_ecom_id AS seller,
+     o.status AS statusorder
+FROM stg_ecommerce_janis_wongio.wms_orders o
+WHERE 
+ TO_CHAR(CONVERT_TIMEZONE('GMT', '+05:00', DATEADD(SECOND,CAST(COALESCE( o.date_created) AS BIGINT ), '1970-01-01 00:00:00')) , 'YYYYMMDD') >= fechaini
+AND TO_CHAR(CONVERT_TIMEZONE('GMT', '+05:00', DATEADD(SECOND,CAST(COALESCE( o.date_created) AS BIGINT ), '1970-01-01 00:00:00')), 'YYYYMMDD') <= fechafin;
+
+
+CREATE  TEMPORARY TABLE estados_ubi__legado_metro_io_sql AS 
+SELECT
+
+ TO_CHAR(CONVERT_TIMEZONE('GMT', '+05:00', DATEADD(SECOND,CAST(COALESCE( o.date_created) AS BIGINT ), '1970-01-01 00:00:00')) , 'YYYYMMDD') AS fechapedido,
+     o.seq_id AS pedido,
+     o.vtex_id AS vtex_id,
+     seller_ecom_id AS seller,
+     o.status AS statusorder
+FROM stg_ecommerce_janis_metroio.wms_orders o
+WHERE 
+ TO_CHAR(CONVERT_TIMEZONE('GMT', '+05:00', DATEADD(SECOND,CAST(COALESCE( o.date_created) AS BIGINT ), '1970-01-01 00:00:00')) , 'YYYYMMDD') >= fechaini
+AND TO_CHAR(CONVERT_TIMEZONE('GMT', '+05:00', DATEADD(SECOND,CAST(COALESCE( o.date_created) AS BIGINT ), '1970-01-01 00:00:00')), 'YYYYMMDD') <= fechafin;
+
+
+
+CREATE  TEMPORARY TABLE data_janis AS 
+SELECT * 
+FROM estados_ubi__legado_sql
+UNION ALL
+SELECT *
+FROM estados_ubi__legado_wong_io_sql
+UNION ALL
+SELECT *  
+FROM estados_ubi__legado_metro_io_sql;
+
+
+ALTER TABLE data_janis
+ADD desc_estado_orden_online_agrupado VARCHAR(200);
+
+UPDATE data_janis
+SET desc_estado_orden_online_agrupado = b.desc_estado_orden_online_agrupado
+FROM data_janis a 
+INNER JOIN dl_sp_maestras.dim_estado_orden_online b 
+    ON a.statusorder = b.sk_estado_orden_online;
+
+
+
+CREATE TEMPORARY TABLE pedidos_t129  AS 
+
+SELECT DISTINCT n_ped_ecommerce seller,
+    SUBSTRING(n_ped_ecommerce, 5, 21) vtex_id,
+    estado,
+    fec_pedido fechapedido,
+    desc_estado_orden_online_agrupado
+ 
+FROM per_super_pd_int.transacciones_nonfood a
+LEFT JOIN dl_sp_maestras.dim_estado_orden_online b 
+    ON upper(a.estado) = b.desc_estado_orden_online
+WHERE fec_pedido >= fechaini AND fec_pedido <= fechafin 
+AND cod_material <> 'FLETE ECOMMERCE';
+
+
+
+CREATE TEMPORARY TABLE estados_ubi__origen AS 
+SELECT DISTINCT fechapedido, seller, vtex_id, desc_estado_orden_online_agrupado 
+FROM data_janis
+UNION ALL
+SELECT DISTINCT fechapedido, seller, vtex_id, desc_estado_orden_online_agrupado 
+FROM pedidos_t129;
+
+ALTER TABLE pedidos2
+ADD estado_agrupado VARCHAR(100);
+
+UPDATE pedidos2
+SET estado_agrupado = desc_estado_orden_online_agrupado
+FROM pedidos2 a 
+INNER JOIN estados_ubi__origen b 
+ON a.vtex_id = b.vtex_id;
+
+
+CREATE  TEMPORARY TABLE pedido_mat AS 
+SELECT e.*, 
+       m.desc_material,
+       m.desc_marca as marca,
+       m.desc_grupo_articulo as grupo_articulo,
+       m.desc_categoria as categoria,
+       desc_gerente as gerente,
+       m.desc_unidad_negocio as unidad_negocio,
+       m.desc_seccion as seccion,
+       m.desc_departamento as departamento,
+       m.desc_gerencia_comercial as gerencia_comercial
+FROM pedidos2 e
+INNER JOIN dl_sp_temporal.vw_details_material_tmp m ON e.cod_material = m.id_material;
+
+
+--AGREGAR CADENA Y SOLO PEDIDOS CON TARJETAS
+
+CREATE TEMPORARY TABLE pedidos_cadena AS 
+
+SELECT DISTINCT a.*, 
+       CASE WHEN sk_cadena = 1 THEN 'WONG' WHEN sk_cadena = 2 THEN 'METRO' END cadena,
+       sk_trimestre trimestre
+
+FROM pedido_mat a 
+LEFT JOIN dl_sp_maestras.dim_tienda b 
+ON a.cod_tienda = b.id_tienda
+LEFT JOIN dl_sp_maestras.dim_dia c 
+ON c.sk_dia = a.dia;
+
+
+--Consultar si los dato son fijos o siguen una regla 
+
+UPDATE pedidos_cadena
+SET trimestre = 202103
+WHERE mes = 202107;
+
+UPDATE pedidos_cadena
+SET trimestre = 202203
+WHERE mes = 202207;
+
+
+DELETE FROM pedidos_cadena
+WHERE despacho LIKE '%RETIRO%';
+
+ALTER TABLE pedidos_cadena
+DROP COLUMN cod_lat;
+
+ALTER TABLE pedidos_cadena
+DROP COLUMN  cod_lng;
+
+
+ALTER TABLE pedidos_cadena
+ADD cod_lat NUMERIC(14, 10);
+
+ALTER TABLE pedidos_cadena
+ADD cod_lng NUMERIC(14, 10);
+
+
+
+CREATE TEMPORARY TABLE pedidos_tienda_11_17 AS 
+    SELECT 
+          TO_CHAR(CONVERT_TIMEZONE('GMT', '+05:00', DATEADD(SECOND,CAST(COALESCE( O.date_created) AS BIGINT ) , '1970-01-01 00:00:00')),'YYYYMMDD') AS  codfecha,
+          CONVERT_TIMEZONE('GMT', '+05:00', DATEADD(SECOND,CAST(COALESCE( O.date_created) AS BIGINT ) , '1970-01-01 00:00:00')) AS  fechapedido,
+          o.vtex_id,
+          o.seq_id,
+          sh.lat,
+          sh.lng
+    FROM stg_ecommerce_janis_legacy.wms_orders AS o
+    INNER JOIN stg_ecommerce_janis_legacy.wms_stores s 
+        ON s.id = o.store
+    INNER JOIN stg_ecommerce_janis_legacy.customers c 
+        ON o.customer = c.id
+    INNER JOIN stg_ecommerce_janis_legacy.wms_order_shipping sh 
+        ON sh.order_id = o.id
+    WHERE TO_CHAR(CONVERT_TIMEZONE('GMT', '+05:00', DATEADD(SECOND,CAST(COALESCE( O.date_created) AS BIGINT ) , '1970-01-01 00:00:00')),'YYYYMMDD')  >= fechaini
+        AND TO_CHAR(CONVERT_TIMEZONE('GMT', '+05:00', DATEADD(SECOND,CAST(COALESCE( O.date_created) AS BIGINT ) , '1970-01-01 00:00:00')),'YYYYMMDD') <= fechafin;
+
+
+
+CREATE TEMPORARY TABLE pedidos_tienda_11_17_io AS 
+    SELECT 
+          TO_CHAR(CONVERT_TIMEZONE('GMT', '+05:00', DATEADD(SECOND,CAST(COALESCE( O.date_created) AS BIGINT ) , '1970-01-01 00:00:00')),'YYYYMMDD') AS  codfecha,
+          CONVERT_TIMEZONE('GMT', '+05:00', DATEADD(SECOND,CAST(COALESCE( O.date_created) AS BIGINT ) , '1970-01-01 00:00:00')) AS  fechapedido,
+          o.vtex_id,
+          o.seq_id,
+          sh.lat,
+          sh.lng
+    FROM stg_ecommerce_janis_wongio.wms_orders AS o
+    INNER JOIN stg_ecommerce_janis_wongio.wms_stores s 
+        ON s.id = o.store
+    INNER JOIN stg_ecommerce_janis_wongio.customers c 
+        ON o.customer = c.id
+    INNER JOIN stg_ecommerce_janis_wongio.wms_order_shipping sh 
+        ON sh.order_id = o.id
+    WHERE TO_CHAR(CONVERT_TIMEZONE('GMT', '+05:00', DATEADD(SECOND,CAST(COALESCE( O.date_created) AS BIGINT ) , '1970-01-01 00:00:00')),'YYYYMMDD')  >= fechaini
+        AND TO_CHAR(CONVERT_TIMEZONE('GMT', '+05:00', DATEADD(SECOND,CAST(COALESCE( O.date_created) AS BIGINT ) , '1970-01-01 00:00:00')),'YYYYMMDD') <= fechafin;
+
+
+
+CREATE  TEMPORARY TABLE pedidos_tienda_11_17_io_metro AS 
+    SELECT 
+          TO_CHAR(CONVERT_TIMEZONE('GMT', '+05:00', DATEADD(SECOND,CAST(COALESCE( O.date_created) AS BIGINT ) , '1970-01-01 00:00:00')),'YYYYMMDD') AS  codfecha,
+          CONVERT_TIMEZONE('GMT', '+05:00', DATEADD(SECOND,CAST(COALESCE( O.date_created) AS BIGINT ) , '1970-01-01 00:00:00')) AS  fechapedido,
+          o.vtex_id,
+          o.seq_id,
+          sh.lat,
+          sh.lng
+    FROM stg_ecommerce_janis_metroio.wms_orders AS o
+    INNER JOIN stg_ecommerce_janis_metroio.wms_stores s 
+        ON s.id = o.store
+    INNER JOIN stg_ecommerce_janis_metroio.customers c 
+        ON o.customer = c.id
+    INNER JOIN stg_ecommerce_janis_metroio.wms_order_shipping sh 
+        ON sh.order_id = o.id
+    WHERE TO_CHAR(CONVERT_TIMEZONE('GMT', '+05:00', DATEADD(SECOND,CAST(COALESCE( O.date_created) AS BIGINT ) , '1970-01-01 00:00:00')),'YYYYMMDD')  >= fechaini
+        AND TO_CHAR(CONVERT_TIMEZONE('GMT', '+05:00', DATEADD(SECOND,CAST(COALESCE( O.date_created) AS BIGINT ) , '1970-01-01 00:00:00')),'YYYYMMDD') <= fechafin;
+
+
+
+
+CREATE TEMPORARY  TABLE total  AS 
+SELECT * FROM pedidos_tienda_11_17
+UNION ALL
+SELECT * FROM pedidos_tienda_11_17_io
+UNION ALL
+SELECT * FROM pedidos_tienda_11_17_io_metro;
+
+CREATE  TEMPORARY TABLE ubicacion  AS 
+select vtex_id, lat, lng from ( 
+SELECT DISTINCT vtex_id, lat, lng , row_number() 
+over(partition by vtex_id order by lat desc ) as rank
+FROM total
+) A 
+where a.rank = 1 ;
+
+
+UPDATE pedidos_cadena
+SET cod_lat = b.lat, cod_lng = b.lng
+FROM pedidos_cadena a 
+INNER JOIN ubicacion b 
+ON a.vtex_id = b.vtex_id
+WHERE a.operacion = 'TIENDA';
+
+DELETE FROM pedidos_cadena 
+WHERE cod_lat = '0' OR cod_lat = '0.000000000';
+
+DELETE FROM pedidos_cadena 
+WHERE cod_lat IS NULL;
+
+
+CREATE TEMPORARY TABLE pedidos_cab  AS 
+
+SELECT DISTINCT cadena, mes, dia, a.cod_tienda, desc_abrv2_tienda desc_tienda, canal_eco canal, operacion, vtex_id, cod_lat lat, cod_lng lng,
+       SUM(venta_bruta) venta_bruta
+FROM pedidos_cadena a 
+LEFT JOIN dl_sp_maestras.dim_tienda b 
+ON a.cod_tienda = b.id_tienda
+WHERE estado_agrupado IN ('ENTREGADO', 'EN PROCESO')
+GROUP BY cadena, mes, dia, a.cod_tienda, desc_abrv2_tienda, canal_eco, operacion, vtex_id, cod_lat, cod_lng;
+
+
+TRUNCATE TABLE dl_sp_temporal.pedido_canal_3_meses_ecommerce;
+
+INSERT INTO dl_sp_temporal.pedido_canal_3_meses_ecommerce 
+SELECT * FROM pedidos_cab;
+
+
+DROP TABLE IF EXISTS fecha;
+DROP TABLE IF EXISTS pedidos2;
+DROP TABLE IF EXISTS estados_ubi__legado_sql;
+DROP TABLE IF EXISTS estados_ubi__legado_wong_io_sql;
+DROP TABLE IF EXISTS estados_ubi__legado_metro_io_sql;
+DROP TABLE IF EXISTS data_janis;
+DROP TABLE IF EXISTS pedidos_t129;
+DROP TABLE IF EXISTS estados_ubi__origen;
+DROP TABLE IF EXISTS pedido_mat;
+DROP TABLE IF EXISTS pedidos_cadena;
+DROP TABLE IF EXISTS pedidos_tienda_11_17;
+DROP TABLE IF EXISTS pedidos_tienda_11_17_io;
+DROP TABLE IF EXISTS pedidos_tienda_11_17_io_metro;
+DROP TABLE IF EXISTS total;
+DROP TABLE IF EXISTS ubicación;
+DROP TABLE IF EXISTS pedidos_cab;
+
+END;
+
+$$
+;

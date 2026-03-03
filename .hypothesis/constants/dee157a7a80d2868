@@ -1,0 +1,4 @@
+# file: C:\Users\maxim\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\pyspark\sql\streaming\listener.py
+# hypothesis_version: 6.151.9
+
+['JavaObject', 'QueryIdleEvent', 'QueryProgressEvent', 'QueryStartedEvent', 'QueryTerminatedEvent', 'SPARK_HOME', 'SinkProgress', 'SourceProgress', 'SparkSession', '__main__', '_jlistenerobj', '_sparkSession', 'allRemovalsTimeMs', 'allUpdatesTimeMs', 'batchDuration', 'batchId', 'commitTimeMs', 'customMetrics', 'description', 'durationMs', 'endOffset', 'eventTime', 'exception', 'id', 'inputRowsPerSecond', 'jobTags', 'latestOffset', 'memoryUsedBytes', 'metrics', 'name', 'numInputRows', 'numOutputRows', 'numRowsRemoved', 'numRowsTotal', 'numRowsUpdated', 'numShufflePartitions', 'observedMetrics', 'operatorName', 'progress', 'runId', 'sink', 'sources', 'spark', 'startOffset', 'stateOperators', 'timestamp']

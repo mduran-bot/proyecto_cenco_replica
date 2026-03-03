@@ -1,0 +1,1451 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Batch Service",
+    "description": "Service in charge of allowing users to massively export and import documents about an entity\n\n **Last update**: 16 feb 26, 10:48 a. m.",
+    "version": "1.22.0",
+    "x-logo": null,
+    "x-janis-keywords": [
+      "batch",
+      "import",
+      "export",
+      "report",
+      "csv",
+      "excel",
+      "json"
+    ],
+    "lastUpdate": "2026-02-16T13:48:02.016Z"
+  },
+  "tags": [
+    {
+      "name": "Import",
+      "description": "Entity in charge of the files to be imported from clients"
+    },
+    {
+      "name": "Export",
+      "description": "Manages export processes for Janis Services"
+    }
+  ],
+  "servers": [
+    {
+      "url": "https://batch.janis.in/api",
+      "description": "The Prod API server",
+      "variables": {
+        "environment": {
+          "default": "prod"
+        }
+      }
+    },
+    {
+      "url": "https://batch.janisqa.in/api",
+      "description": "The QA API server",
+      "variables": {
+        "environment": {
+          "default": "qa"
+        }
+      }
+    },
+    {
+      "url": "https://batch.janisdev.in/api",
+      "description": "The Beta API server",
+      "variables": {
+        "environment": {
+          "default": "beta"
+        }
+      }
+    },
+    {
+      "url": "http://batch.janis.localhost:3069/api",
+      "description": "The Local API server",
+      "variables": {
+        "environment": {
+          "default": "local"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/import/{id}": {
+      "get": {
+        "x-janis-namespace": "import",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "batch:import:read"
+        ],
+        "operationId": "importGet",
+        "tags": [
+          "Import"
+        ],
+        "summary": "Get an import",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Import found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/Import"
+                    }
+                  ],
+                  "properties": {
+                    "importFile": {
+                      "$ref": "#/components/schemas/ImportFile"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/import": {
+      "get": {
+        "x-janis-namespace": "import",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "batch:import:read"
+        ],
+        "operationId": "importList",
+        "tags": [
+          "Import"
+        ],
+        "summary": "List imports",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ImportSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ImportFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Imports listed",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "x-janis-namespace": "import",
+        "x-janis-method": "create",
+        "x-janis-permissions": [
+          "batch:import:write"
+        ],
+        "operationId": "importCreate",
+        "tags": [
+          "Import"
+        ],
+        "summary": "Upload a file to import",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "The import file",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImportCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "date": {
+                "$ref": "#/components/headers/date"
+              },
+              "content-type": {
+                "$ref": "#/components/headers/content-type"
+              },
+              "content-length": {
+                "$ref": "#/components/headers/content-length"
+              },
+              "access-control-allow-origin": {
+                "$ref": "#/components/headers/access-control-allow-origin"
+              },
+              "access-control-allow-credentials": {
+                "$ref": "#/components/headers/access-control-allow-credentials"
+              },
+              "x-amzn-requestid": {
+                "$ref": "#/components/headers/x-amzn-requestid"
+              },
+              "x-amz-apigw-id": {
+                "$ref": "#/components/headers/x-amz-apigw-id"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/id"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/import-url": {
+      "get": {
+        "x-janis-namespace": "import",
+        "x-janis-method": "upload",
+        "operationId": "importUpload",
+        "tags": [
+          "Import"
+        ],
+        "summary": "Get signed data to upload a file",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "fileName",
+            "description": "The name of the file",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "file.csv"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "date": {
+                "$ref": "#/components/headers/date"
+              },
+              "content-type": {
+                "$ref": "#/components/headers/content-type"
+              },
+              "content-length": {
+                "$ref": "#/components/headers/content-length"
+              },
+              "access-control-allow-origin": {
+                "$ref": "#/components/headers/access-control-allow-origin"
+              },
+              "access-control-allow-credentials": {
+                "$ref": "#/components/headers/access-control-allow-credentials"
+              },
+              "x-amzn-requestid": {
+                "$ref": "#/components/headers/x-amzn-requestid"
+              },
+              "x-amz-apigw-id": {
+                "$ref": "#/components/headers/x-amz-apigw-id"
+              },
+              "x-amzn-trace-id": {
+                "$ref": "#/components/headers/x-amzn-trace-id"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportContent"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/export/{id}": {
+      "get": {
+        "x-janis-namespace": "export",
+        "x-janis-method": "get",
+        "operationId": "exportGet",
+        "tags": [
+          "Export"
+        ],
+        "summary": "Get an export by ID",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/Export"
+                    }
+                  ],
+                  "properties": {
+                    "exportedFiles": {
+                      "$ref": "#/components/schemas/ExportedFiles"
+                    },
+                    "currentItemsUrl": {
+                      "$ref": "#/components/schemas/ExportedViewLink"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/export": {
+      "get": {
+        "x-janis-namespace": "export",
+        "x-janis-method": "list",
+        "operationId": "exportList",
+        "tags": [
+          "Export"
+        ],
+        "summary": "Get a list of export entries",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ExportSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ExportFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "A list of export entries",
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Export"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "x-janis-namespace": "export",
+        "x-janis-method": "create",
+        "x-janis-permissions": [
+          "batch:export:write"
+        ],
+        "operationId": "createExport",
+        "tags": [
+          "Export"
+        ],
+        "summary": "Create an export entry",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/JanisEntity"
+          }
+        ],
+        "requestBody": {
+          "description": "The export to create",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExportCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessCreateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/export/{id}/error": {
+      "post": {
+        "x-janis-namespace": "export",
+        "x-janis-method": "error",
+        "x-janis-permissions": [
+          "batch:export:write"
+        ],
+        "operationId": "exportError",
+        "tags": [
+          "Export"
+        ],
+        "summary": "Set an export to error status",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-key",
+        "description": "The API Key"
+      },
+      "ApiSecret": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-secret",
+        "description": "The API Secret"
+      },
+      "JanisClient": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-client",
+        "description": "The Client Code"
+      }
+    },
+    "parameters": {
+      "id": {
+        "name": "id",
+        "in": "path",
+        "schema": {
+          "type": "string",
+          "example": "d555345345345as67a342a"
+        },
+        "required": true,
+        "description": "The unique identifier of the item"
+      },
+      "ListSortDirection": {
+        "name": "sortDirection",
+        "in": "query",
+        "description": "The direction to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
+        }
+      },
+      "ListPageNumber": {
+        "name": "x-janis-page",
+        "in": "header",
+        "description": "The page to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "default": 1
+        }
+      },
+      "ListPageSize": {
+        "name": "x-janis-page-size",
+        "in": "header",
+        "description": "The page size to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "default": 60
+        }
+      },
+      "JanisEntity": {
+        "name": "janis-entity",
+        "in": "header",
+        "description": "The entity name",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "ImportSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "service",
+            "entity",
+            "totals.total",
+            "totals.created",
+            "totals.updated",
+            "totals.notModified",
+            "totals.error",
+            "dateStart",
+            "dateEnd",
+            "status"
+          ]
+        }
+      },
+      "ImportFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/Import/properties/id"
+            },
+            "service": {
+              "$ref": "#/components/schemas/Import/properties/service"
+            },
+            "entity": {
+              "$ref": "#/components/schemas/Import/properties/entity"
+            },
+            "totalGreater": {
+              "description": "Items which total amount of received items to import is greter than the specified value",
+              "type": "number",
+              "example": 27500
+            },
+            "totalLesser": {
+              "description": "Items which total amount of received items to import is lesser than the specified value",
+              "type": "number",
+              "example": 4295
+            },
+            "dateStart": {
+              "$ref": "#/components/schemas/Import/properties/dateStart"
+            },
+            "dateEnd": {
+              "$ref": "#/components/schemas/Import/properties/dateEnd"
+            },
+            "dateCreatedDay": {
+              "$ref": "#/components/schemas/dateCreatedDay"
+            },
+            "dateCreatedFrom": {
+              "$ref": "#/components/schemas/dateCreatedFrom"
+            },
+            "dateCreatedTo": {
+              "$ref": "#/components/schemas/dateCreatedTo"
+            },
+            "userCreated": {
+              "$ref": "#/components/schemas/Import/properties/userCreated"
+            },
+            "status": {
+              "$ref": "#/components/schemas/Import/properties/status"
+            }
+          }
+        }
+      },
+      "ExportSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "service",
+            "entity",
+            "format",
+            "total",
+            "sortBy",
+            "sortDirection",
+            "userCreated",
+            "userModified",
+            "dateCreated",
+            "dateModified",
+            "status"
+          ]
+        }
+      },
+      "ExportFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/Export/properties/id"
+            },
+            "service": {
+              "$ref": "#/components/schemas/Export/properties/service"
+            },
+            "entity": {
+              "$ref": "#/components/schemas/Export/properties/entity"
+            },
+            "format": {
+              "$ref": "#/components/schemas/Export/properties/format"
+            },
+            "sortBy": {
+              "$ref": "#/components/schemas/Export/properties/sortBy"
+            },
+            "sortDirection": {
+              "$ref": "#/components/schemas/Export/properties/sortDirection"
+            },
+            "userCreated": {
+              "$ref": "#/components/schemas/Export/properties/userCreated"
+            },
+            "dateCreated": {
+              "$ref": "#/components/schemas/Export/properties/dateCreated"
+            },
+            "dateCreatedDay": {
+              "$ref": "#/components/schemas/dateCreatedDay"
+            },
+            "dateCreatedFrom": {
+              "$ref": "#/components/schemas/dateCreatedFrom"
+            },
+            "dateCreatedTo": {
+              "$ref": "#/components/schemas/dateCreatedTo"
+            },
+            "userModified": {
+              "$ref": "#/components/schemas/Export/properties/userModified"
+            },
+            "dateModified": {
+              "$ref": "#/components/schemas/dateModified"
+            },
+            "dateModifiedDay": {
+              "$ref": "#/components/schemas/dateModifiedDay"
+            },
+            "status": {
+              "$ref": "#/components/schemas/Export/properties/status"
+            }
+          }
+        }
+      }
+    },
+    "headers": {
+      "x-janis-total": {
+        "description": "The total amount of records in the list",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "date": {
+        "description": "The request date",
+        "schema": {
+          "type": "string",
+          "example": "Thu, 19 Nov 2020 20:55:16 GMT"
+        }
+      },
+      "content-type": {
+        "description": "The request response content type",
+        "schema": {
+          "type": "string",
+          "example": "application/json"
+        }
+      },
+      "content-length": {
+        "description": "length of the content received",
+        "schema": {
+          "type": "integer",
+          "example": 2793
+        }
+      },
+      "access-control-allow-origin": {
+        "description": "Indicates whether the response can be shared with requesting code from the given",
+        "schema": {
+          "type": "string",
+          "example": "*"
+        }
+      },
+      "access-control-allow-credentials": {
+        "schema": {
+          "type": "boolean",
+          "example": true
+        }
+      },
+      "x-amzn-requestid": {
+        "description": "Amazon request UUID",
+        "schema": {
+          "type": "string",
+          "example": "fae05544-4301-4eda-97ad-d6fb37df6408"
+        }
+      },
+      "x-amz-apigw-id": {
+        "description": "Amazon api gateway ID",
+        "schema": {
+          "type": "string",
+          "example": "WRdEBEIuIAMF8Nw="
+        }
+      },
+      "x-amzn-trace-id": {
+        "description": "Amazon trace ID",
+        "schema": {
+          "type": "string",
+          "example": "Root=1-5fb6dbb3-6d1d9bcd1942a3811470d8ae;Sampled=0"
+        }
+      }
+    },
+    "responses": {
+      "SuccessCreateResponse": {
+        "description": "The item was created",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "SuccessUpdateResponse": {
+        "description": "The item was updated",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "GenericSuccess": {
+        "description": "Operation succeeded",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "BadRequest": {
+        "description": "A client error has ocurred.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Authentication missing or invalid",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Not authorized request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "The item was not found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "TooManyRequests": {
+        "description": "User has sent too many requests in the established time range",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string",
+                  "example": "Too many requests, try again later."
+                }
+              }
+            }
+          }
+        }
+      },
+      "InternalError": {
+        "description": "A server error has ocurred."
+      }
+    },
+    "schemas": {
+      "id": {
+        "description": "The unique identifier of the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "d555345345345as67a342a"
+      },
+      "status": {
+        "description": "The item status",
+        "type": "string",
+        "default": "active",
+        "enum": [
+          "active",
+          "inactive"
+        ],
+        "example": "active"
+      },
+      "dateCreated": {
+        "description": "The date of creation",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-12T19:00:00.000Z"
+      },
+      "dateModified": {
+        "description": "The date of the last modification",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-20T19:00:00.000Z"
+      },
+      "dateCreatedDay": {
+        "description": "The day of creation",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-08-07T16:00:00.000Z"
+      },
+      "dateCreatedFrom": {
+        "description": "The date of creation as starting point",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-08-07T16:00:00.000Z"
+      },
+      "dateCreatedTo": {
+        "description": "The date of creation as ending point",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-09-07T16:00:00.000Z"
+      },
+      "dateModifiedDay": {
+        "description": "The day of last modification",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-08-07T16:00:00.000Z"
+      },
+      "userCreated": {
+        "description": "The ID of the user who created the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "6a1fc1eeb5b68406e0487a10"
+      },
+      "userModified": {
+        "description": "The ID of the user who last modified the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "7e1fc1eeb5b68406e048796"
+      },
+      "Import": {
+        "description": "An import file",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "service": {
+            "description": "The service name to import",
+            "type": "string",
+            "example": "catalog"
+          },
+          "entity": {
+            "description": "The entity name to import",
+            "type": "string",
+            "example": "product"
+          },
+          "name": {
+            "description": "The name of the file to import",
+            "type": "string",
+            "example": "products.csv"
+          },
+          "path": {
+            "description": "The path on the bucket of the file to import",
+            "type": "string",
+            "example": "client-code/imports/5dea9fc691240d00084083f8/file.csv"
+          },
+          "type": {
+            "description": "The import type",
+            "type": "string",
+            "example": "sheet"
+          },
+          "totals": {
+            "description": "The import process totals",
+            "type": "object",
+            "properties": {
+              "total": {
+                "description": "The total amount of received items to import",
+                "type": "number",
+                "example": 10000
+              },
+              "created": {
+                "description": "The total amount of items created",
+                "type": "number",
+                "example": 2400
+              },
+              "updated": {
+                "description": "The total amount of items updated",
+                "type": "number",
+                "example": 3500
+              },
+              "notModified": {
+                "description": "The total amount of items not modified",
+                "type": "number",
+                "example": 1200
+              },
+              "error": {
+                "description": "The total amount of items failed to import",
+                "type": "number",
+                "example": 500
+              }
+            },
+            "readOnly": true
+          },
+          "dateStart": {
+            "description": "The ISO date when the import should start",
+            "type": "string",
+            "format": "date-time",
+            "example": "2019-07-12T19:00:00.000Z",
+            "nullable": true
+          },
+          "dateEnd": {
+            "description": "The ISO date when the import finished",
+            "type": "string",
+            "format": "date-time",
+            "example": "2019-07-12T19:30:00.000Z",
+            "readOnly": true
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          },
+          "status": {
+            "description": "The status of the import",
+            "type": "string",
+            "enum": [
+              "pending",
+              "processing",
+              "processed",
+              "error"
+            ],
+            "example": "processed",
+            "readOnly": true
+          }
+        }
+      },
+      "ImportCreate": {
+        "description": "Import Create Request Body",
+        "type": "object",
+        "properties": {
+          "service": {
+            "$ref": "#/components/schemas/Import/properties/service"
+          },
+          "entity": {
+            "$ref": "#/components/schemas/Import/properties/entity"
+          },
+          "fileName": {
+            "$ref": "#/components/schemas/Import/properties/name"
+          },
+          "fileSource": {
+            "$ref": "#/components/schemas/Import/properties/path"
+          },
+          "dateStart": {
+            "$ref": "#/components/schemas/Import/properties/dateStart"
+          }
+        },
+        "required": [
+          "service",
+          "entity",
+          "fileName",
+          "fileSource"
+        ]
+      },
+      "ImportFile": {
+        "description": "Import file name and S3 signed URL",
+        "type": "object",
+        "properties": {
+          "fileName": {
+            "description": "Import file name",
+            "type": "string",
+            "example": "price-1.csv"
+          },
+          "url": {
+            "description": "Import file S3 signed URL",
+            "type": "string",
+            "example": "https://s3.amazonaws.com/imports/some-client/468745646876"
+          }
+        }
+      },
+      "ImportList": {
+        "type": "array",
+        "description": "A list of imports",
+        "items": {
+          "$ref": "#/components/schemas/Import"
+        }
+      },
+      "ImportContent": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "description": "The url to the bucket",
+            "type": "string",
+            "example": "https://s3.amazonaws.com/janis-batch-service-beta"
+          },
+          "fields": {
+            "description": "The response fields",
+            "type": "object",
+            "properties": {
+              "Content-Type": {
+                "description": "Type of the file sended",
+                "type": "string",
+                "example": "file.csv"
+              },
+              "key": {
+                "description": "Path to the file on the bucket",
+                "type": "string",
+                "example": "fizzmodarg/imports/file.csv/6f5bd593-3fb6-47f4-acf4-9a8654429982.csv"
+              },
+              "bucket": {
+                "description": "The bucket name",
+                "type": "string",
+                "example": "janis-batch-service-beta"
+              },
+              "X-Amz-Algorithm": {
+                "description": "Amazon algorithm",
+                "type": "string",
+                "example": "AWS4-HMAC-SHA256"
+              },
+              "X-Amz-Credential": {
+                "description": "Amazon credentials",
+                "type": "string",
+                "example": "ASIAUIRT5BX7SEROP3HR/20201119/us-east-1/s3/aws4_request"
+              },
+              "X-Amz-Date": {
+                "description": "Amazon date",
+                "type": "string",
+                "example": "20201119T205516Z"
+              },
+              "X-Amz-Security-Token": {
+                "description": "Amazon security token",
+                "type": "string",
+                "example": "IQoJb3JpZ2luX2VjEO3//////////wEaCXVzLWVhc3QtMSJGMEQCIDB/o5QIbb618boNCouEm0z2xvJBy/kfTbQZWOCYbgasAiA6F2NHEna/oOFV3om6b3IvgmCej0Psfmfl4NOsVmMKZSreAQhmEAAaDDI5MzI0MDM3NjgzMSIMpiHvxj"
+              },
+              "Policy": {
+                "description": "Policy token",
+                "type": "string",
+                "example": "eyJleHBpcmF0aW9uIjoiMjAyMC0xMS0xOVQyMDo1NjoxNloiLCJjb25kaXRpb25zIjpbWyJjb250ZW50LWxlbmd0aC1yYW5nZSIsMSwxMDQ4NTc2MF0seyJDb250ZW50LVR5cGUiOiJ0ZXh0L2NzcyJ9LHsia2V5IjoiZml"
+              },
+              "X-Amz-Signature": {
+                "description": "Amazon signature",
+                "type": "string",
+                "example": "5203c9cf9bfd1df42d9e54b23b1a4c6b8cad69da0643ee0eb127e4853c9baf64"
+              }
+            }
+          }
+        }
+      },
+      "Export": {
+        "description": "An export entry",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "service": {
+            "description": "The service where to export",
+            "type": "string",
+            "example": "Pricing"
+          },
+          "entity": {
+            "description": "The entity to export",
+            "type": "string",
+            "example": "price"
+          },
+          "total": {
+            "description": "The total amount of exported items",
+            "type": "number",
+            "example": 2500,
+            "readOnly": true
+          },
+          "format": {
+            "description": "The export file format",
+            "type": "string",
+            "enum": [
+              "json",
+              "csv",
+              "xlsx"
+            ],
+            "example": "json"
+          },
+          "filters": {
+            "description": "The filters to apply to data to export",
+            "type": "object",
+            "example": {
+              "status": "active",
+              "name": "someName"
+            }
+          },
+          "sortBy": {
+            "description": "The export sort by field",
+            "type": "string",
+            "example": "status"
+          },
+          "sortDirection": {
+            "description": "The export sort direction",
+            "type": "string",
+            "enum": [
+              "asc",
+              "desc"
+            ],
+            "example": "asc"
+          },
+          "timezone": {
+            "description": "The export timezone, this will be the timezone used to export date fields that uses formatting.\nThis refers to the field `name` of the **timezone** entity of [i18n Service](/v2/service/i18n#tag/Timezone)\n\nIf not present, it will use UTC by default.\n",
+            "type": "string",
+            "example": "America/Argentina/Buenos_Aires"
+          },
+          "dateStart": {
+            "description": "The export process date start",
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true,
+            "example": "2021-12-13T14:35:00.000Z"
+          },
+          "dateEnd": {
+            "description": "The export process date end",
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true,
+            "example": "2021-12-13T14:40:00.000Z"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "status": {
+            "description": "The export process status",
+            "type": "string",
+            "enum": [
+              "pending",
+              "processing",
+              "processed",
+              "sent",
+              "sendError",
+              "error"
+            ],
+            "example": "processed",
+            "readOnly": true
+          }
+        }
+      },
+      "ExportCreate": {
+        "description": "An export to create",
+        "type": "object",
+        "properties": {
+          "service": {
+            "$ref": "#/components/schemas/Export/properties/service"
+          },
+          "entity": {
+            "$ref": "#/components/schemas/Export/properties/entity"
+          },
+          "format": {
+            "$ref": "#/components/schemas/Export/properties/format"
+          },
+          "filters": {
+            "$ref": "#/components/schemas/Export/properties/filters"
+          },
+          "sortBy": {
+            "$ref": "#/components/schemas/Export/properties/sortBy"
+          },
+          "sortDirection": {
+            "$ref": "#/components/schemas/Export/properties/sortDirection"
+          },
+          "timezone": {
+            "$ref": "#/components/schemas/Export/properties/timezone"
+          }
+        },
+        "required": [
+          "service",
+          "entity"
+        ]
+      },
+      "ExportedFile": {
+        "description": "Exported file name and S3 signed URL",
+        "type": "object",
+        "properties": {
+          "fileName": {
+            "description": "Exported file name",
+            "type": "string",
+            "example": "price-1.xlsx"
+          },
+          "url": {
+            "description": "Exported file S3 signed URL",
+            "type": "string",
+            "example": "https://s3.amazonaws.com/exports/some-client/468745646876"
+          }
+        }
+      },
+      "ExportedFiles": {
+        "description": "Exported file names and S3 signed URLs",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/ExportedFile"
+        }
+      },
+      "ExportedViewLink": {
+        "description": "The exported entity browse view link, including filters and sorting",
+        "type": "string",
+        "readOnly": true,
+        "example": "https://app.janis.in/pricing/price/browse?sortBy=sku"
+      }
+    }
+  }
+}

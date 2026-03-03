@@ -1,0 +1,22 @@
+{
+  "timestamp": "2026-02-26T11:54:54.610361",
+  "validation_status": "incomplete",
+  "entities_mapping": {
+    "valid": false,
+    "count": 0,
+    "expected": 41,
+    "entities": []
+  },
+  "field_mappings": {
+    "valid": false,
+    "count": 0,
+    "expected": 26,
+    "tables": []
+  },
+  "redshift_schemas": {
+    "valid": false,
+    "count": 0,
+    "expected": 26,
+    "tables": []
+  }
+}

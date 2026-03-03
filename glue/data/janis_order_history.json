@@ -1,0 +1,190 @@
+[
+  {
+    "dateCreated": "2025-11-12T03:19:18.221Z",
+    "userCreated": null,
+    "type": "statusChange",
+    "name": "new",
+    "icon": "check_bold",
+    "customData": {}
+  },
+  {
+    "dateCreated": "2025-11-12T03:19:20.271Z",
+    "userCreated": null,
+    "type": "statusChange",
+    "name": "needsIntervention",
+    "icon": "check_bold",
+    "customData": {}
+  },
+  {
+    "dateCreated": "2025-11-12T04:30:23.832Z",
+    "userCreated": "637543a63a7aa8262251e37d",
+    "type": "statusChange",
+    "name": "new",
+    "icon": "check_bold",
+    "customData": {}
+  },
+  {
+    "dateCreated": "2025-11-12T04:30:25.302Z",
+    "userCreated": null,
+    "type": "statusChange",
+    "name": "needsIntervention",
+    "icon": "check_bold",
+    "customData": {}
+  },
+  {
+    "dateCreated": "2025-11-12T04:41:17.529Z",
+    "userCreated": null,
+    "type": "statusChange",
+    "name": "needsIntervention",
+    "icon": "check_bold",
+    "customData": {}
+  },
+  {
+    "dateCreated": "2025-11-12T04:41:15.953Z",
+    "userCreated": "637543a63a7aa8262251e37d",
+    "type": "statusChange",
+    "name": "new",
+    "icon": "check_bold",
+    "customData": {}
+  },
+  {
+    "dateCreated": "2025-11-12T21:10:55.214Z",
+    "userCreated": "637543a63a7aa8262251e37d",
+    "type": "statusChange",
+    "name": "new",
+    "icon": "check_bold",
+    "customData": {}
+  },
+  {
+    "dateCreated": "2025-11-12T21:10:57.385Z",
+    "userCreated": null,
+    "type": "statusChange",
+    "name": "readyForPicking",
+    "icon": "check_bold",
+    "customData": {}
+  },
+  {
+    "dateCreated": "2025-11-13T00:14:20.728Z",
+    "userCreated": null,
+    "type": "statusChange",
+    "name": "picking",
+    "icon": "check_bold",
+    "customData": {}
+  },
+  {
+    "dateCreated": "2025-11-13T00:14:21.726Z",
+    "userCreated": null,
+    "type": "milestone",
+    "name": "packageAssignment",
+    "icon": "box",
+    "customData": {}
+  },
+  {
+    "dateCreated": "2025-11-13T00:14:21.926Z",
+    "userCreated": null,
+    "type": "statusChange",
+    "name": "processingPicking",
+    "icon": "check_bold",
+    "customData": {}
+  },
+  {
+    "dateCreated": "2025-11-13T00:14:22.386Z",
+    "userCreated": null,
+    "type": "statusChange",
+    "name": "readyForInvoice",
+    "icon": "check_bold",
+    "customData": {}
+  },
+  {
+    "dateCreated": "2025-11-13T00:14:23.015Z",
+    "userCreated": null,
+    "type": "milestone",
+    "name": "invoiceFormsCreated",
+    "icon": "pos",
+    "customData": {
+      "invoiceForms": [
+        {
+          "id": "691522de82943ad5f7e27a87",
+          "value": 23.83,
+          "itemsQuantity": 2
+        }
+      ]
+    }
+  },
+  {
+    "dateCreated": "2025-11-13T00:14:21.570Z",
+    "userCreated": null,
+    "type": "statusChange",
+    "name": "readyToProcessPicking",
+    "icon": "check_bold",
+    "customData": {}
+  },
+  {
+    "dateCreated": "2025-11-13T00:14:22.100Z",
+    "userCreated": null,
+    "type": "statusChange",
+    "name": "processingPicking",
+    "icon": "check_bold",
+    "customData": {}
+  },
+  {
+    "dateCreated": "2025-11-13T00:14:42.764Z",
+    "userCreated": null,
+    "type": "milestone",
+    "name": "invoiceReceived",
+    "icon": "electronic_bill",
+    "customData": {
+      "invoiceNumber": "112098161",
+      "invoiceCurrency": "PEN",
+      "invoiceValue": 23.95
+    }
+  },
+  {
+    "dateCreated": "2025-11-13T00:14:49.631Z",
+    "userCreated": null,
+    "type": "statusChange",
+    "name": "readyForInvoice",
+    "icon": "check_bold",
+    "customData": {}
+  },
+  {
+    "dateCreated": "2025-11-13T00:14:50.071Z",
+    "userCreated": null,
+    "type": "statusChange",
+    "name": "preparingInternalDistribution",
+    "icon": "check_bold",
+    "customData": {}
+  },
+  {
+    "dateCreated": "2025-11-13T00:14:50.824Z",
+    "userCreated": null,
+    "type": "statusChange",
+    "name": "validatingPayments",
+    "icon": "check_bold",
+    "customData": {}
+  },
+  {
+    "dateCreated": "2025-11-13T00:14:51.106Z",
+    "userCreated": null,
+    "type": "statusChange",
+    "name": "readyForDelivery",
+    "icon": "check_bold",
+    "customData": {}
+  },
+  {
+    "dateCreated": "2025-11-13T00:14:48.812Z",
+    "userCreated": null,
+    "type": "statusChange",
+    "name": "processingRepacking",
+    "icon": "check_bold",
+    "customData": {}
+  },
+  {
+    "dateCreated": "2025-11-13T00:14:49.806Z",
+    "userCreated": null,
+    "type": "statusChange",
+    "name": "invoiced",
+    "icon": "check_bold",
+    "customData": {}
+  }
+]

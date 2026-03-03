@@ -1,0 +1,104 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "prices",
+  "title": "Price",
+  "description": "Schema de validación para precios de Janis (Pricing Service)",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Identificador único del precio",
+      "example": "631fb04c8fe08f51a8ee5949"
+    },
+    "skuCatalogId": {
+      "type": "string",
+      "description": "ID del SKU en el catálogo de Janis",
+      "example": "SKU_CAT_001"
+    },
+    "pricingId": {
+      "type": ["string", "null"],
+      "description": "ID en el servicio de pricing de Janis",
+      "example": "5fe39f06b91fed3cbf9f551f"
+    },
+    "accountId": {
+      "type": "string",
+      "description": "ID de la cuenta a la que pertenece el precio",
+      "example": "631fb04c8fe08f51a8ee5949"
+    },
+    "price": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Precio de venta",
+      "example": 99.99
+    },
+    "listPrice": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "description": "Precio de lista (sin descuentos)",
+      "example": 120.0
+    },
+    "priceSheet": {
+      "type": ["string", "null"],
+      "description": "ID de la hoja de precios",
+      "example": "507f1f77bcf86cd799439011"
+    },
+    "salesChannelIds": {
+      "type": "array",
+      "description": "IDs de canales de venta a los que aplica el precio",
+      "items": {
+        "type": "string"
+      },
+      "example": ["631fb04c8fe08f51a8ee5949"]
+    },
+    "minQuantity": {
+      "type": ["number", "null"],
+      "minimum": 1,
+      "description": "Cantidad mínima para aplicar este precio",
+      "example": 1
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "inactive"],
+      "description": "Estado del precio",
+      "example": "active"
+    },
+    "validFrom": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "Fecha desde la que el precio es válido",
+      "example": "2023-01-01T00:00:00.000Z"
+    },
+    "validTo": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "Fecha hasta la que el precio es válido",
+      "example": "2023-12-31T23:59:59.000Z"
+    },
+    "lastPricingUpdateDate": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "Fecha de la última actualización de precio",
+      "example": "2023-01-01T00:00:00.000Z"
+    },
+    "dateCreated": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Fecha de creación del registro de precio"
+    },
+    "dateModified": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Fecha de última modificación del registro de precio"
+    }
+  },
+  "required": [
+    "id",
+    "skuCatalogId",
+    "accountId",
+    "price",
+    "status",
+    "dateCreated",
+    "dateModified"
+  ],
+  "additionalProperties": true
+}

@@ -1,0 +1,4 @@
+# file: C:\Users\maxim\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\pyspark\core\context.py
+# hypothesis_version: 6.151.9
+
+[100, 1024, 8192, '%d.%d', ',', '.egg', '.jar', '.zip', '0', 'AccumulatorParam[T]', 'Accumulator[T]', 'Broadcast[T]', 'DataType', 'MASTER_URL_NOT_SET', 'PYSPARK_PYTHON', 'PYSPARK_UDS_MODE', 'PYTHONHASHSEED', 'SPARK_BUFFER_SIZE', 'SPARK_LOCAL_REMOTE', 'Serializer', 'SparkContext', 'StructType', 'T', 'True', 'U', '__len__', '__main__', '_accumulatorServer', '_jsc', 'context tests', 'false', 'java.io.tmpdir', 'java.lang.System', 'java.util.HashMap', 'local[4]', 'pyspark', 'python3', 'sc', 'spark.app.name', 'spark.executorEnv.', 'spark.home', 'spark.master', 'spark.python.profile', 'spark.rdd.compress', 'spark.submit.pyFiles', 'spark.ui.enabled', 'true']

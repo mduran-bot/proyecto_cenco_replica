@@ -1,0 +1,4 @@
+# file: C:\Users\maxim\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\pyspark\sql\readwriter.py
+# hypothesis_version: 6.151.9
+
+['CANNOT_SET_TOGETHER', 'ColumnOrName', 'DataFrame', 'DataFrameReader', 'DataFrameWriter', 'DataFrameWriterV2', 'JavaObject', 'NOT_INT', 'NOT_LIST_OF_STR', 'NOT_STR_OR_STRUCT', 'PythonTest', 'RDD[str]', 'SPARK_HOME', 'SparkSession', 'StreamingQuery', '__main__', 'append', 'arg_list', 'arg_name', 'arg_type', 'col', 'cols', 'datetimeRebaseMode', 'int96RebaseMode', 'java.lang.String', 'java.util.Properties', 'local[4]', 'mergeSchema', 'modifiedAfter', 'modifiedBefore', 'numBuckets', 'overwrite', 'path', 'pathGlobFilter', 'recursiveFileLookup', 'schema', 'spark', 'utf-8']

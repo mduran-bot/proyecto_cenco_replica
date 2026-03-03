@@ -1,0 +1,3526 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Control Tower Service",
+    "description": "Coordinates business operations across multiple entities and processes, managing real-time metrics, multi-timezone operations, and data synchronization for efficient operational control and monitoring.\n\n **Last update**: 19 ene 26, 06:06 p. m.",
+    "version": "1.2.1",
+    "x-logo": null,
+    "x-janis-keywords": [
+      "jct",
+      "synchronization",
+      "warehouse",
+      "picking",
+      "fulfillment",
+      "orders",
+      "logistics",
+      "metrics",
+      "real-time"
+    ],
+    "lastUpdate": "2026-01-19T21:06:54.147Z"
+  },
+  "tags": [
+    {
+      "name": "Client",
+      "description": "For managing Clients"
+    },
+    {
+      "name": "Warehouse",
+      "description": "Warehouse control and management operations for order picking and fulfillment.\n\n### Purpose\nManage warehouse operations including picking processes, order assignments, and real-time status monitoring across different warehouse locations.\n\n### Key Features\n- **Picking Control**: Monitor active picking slots and order statuses\n- **Real-time Metrics**: Track progress, completion rates, and performance indicators\n- **Time Zone Support**: Handle operations across different geographical locations\n- **Status Management**: Track order states from pending through prepared stages\n\nEssential for warehouse operational efficiency and order fulfillment management.\n"
+    },
+    {
+      "name": "Shipping",
+      "description": "Warehouse-based shipping analytics for Control Tower operations.\n\n### Purpose\nProvides aggregated metrics of shipments by warehouse to enable real-time monitoring of delivery operations and driver distribution across the logistics network.\n\n### Key Features\n- **Warehouse Performance Metrics**: shipments, pending, ready, started, delivered and not delivered counts\n- **Driver Distribution**: Total drivers assigned per warehouse with unique counting\n- **Time-based Analysis**: Configurable schedule ranges with validation (max 24 hours)\n- **Delivery Status Tracking**: Comprehensive status grouping for operational visibility\n"
+    }
+  ],
+  "servers": [
+    {
+      "url": "https://jct.janis.in/api",
+      "description": "The Prod API server",
+      "variables": {
+        "environment": {
+          "default": "prod"
+        }
+      }
+    },
+    {
+      "url": "https://jct.janisqa.in/api",
+      "description": "The QA API server",
+      "variables": {
+        "environment": {
+          "default": "qa"
+        }
+      }
+    },
+    {
+      "url": "https://jct.janisdev.in/api",
+      "description": "The Beta API server",
+      "variables": {
+        "environment": {
+          "default": "beta"
+        }
+      }
+    },
+    {
+      "url": "http://jct.janis.localhost:3146/api",
+      "description": "The Local API server",
+      "variables": {
+        "environment": {
+          "default": "local"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/shipping": {
+      "get": {
+        "x-janis-namespace": "shipping",
+        "x-janis-method": "list",
+        "operationId": "listShippings",
+        "x-janis-permissions": [
+          "jct:shipping:read"
+        ],
+        "tags": [
+          "Shipping"
+        ],
+        "summary": "Get a shipping grouped by warehouse with metrics and states",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ShippingSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ShippingFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShippingSummaryByWarehouseList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/shipping-preview": {
+      "get": {
+        "x-janis-namespace": "shipping-preview",
+        "x-janis-method": "list",
+        "operationId": "listShippingPreview",
+        "x-janis-permissions": [
+          "jct:shipping:read"
+        ],
+        "tags": [
+          "Shipping"
+        ],
+        "summary": "Get a detailed shipping grouped by driver for a specific warehouse",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ShippingPreviewFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShippingPreviewList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/warehouse-control/{id}": {
+      "get": {
+        "x-janis-namespace": "warehouse-control",
+        "x-janis-method": "get",
+        "operationId": "getWarehouseControl",
+        "x-janis-permissions": [
+          "jct:warehouse-control:read"
+        ],
+        "tags": [
+          "Warehouse"
+        ],
+        "summary": "Get warehouse operational dashboard with real-time metrics and status",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          },
+          {
+            "$ref": "#/components/parameters/timezone"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WarehouseControl"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/warehouse-control/{id}/orders": {
+      "get": {
+        "x-janis-namespace": "warehouse-control-orders",
+        "x-janis-method": "list",
+        "operationId": "listWarehouseControlOrders",
+        "x-janis-permissions": [
+          "jct:warehouse-control:read"
+        ],
+        "tags": [
+          "Warehouse"
+        ],
+        "summary": "Get detailed order information from warehouse metrics",
+        "description": "Retrieve the complete list of orders behind warehouse control dashboard metrics.\n\nThis endpoint provides the detailed order data that corresponds to the statistics\nshown in the warehouse control dashboard. See the [Warehouse Control](/v2/service/jct#tag/Warehouse-Control/operation/getWarehouseControl) for more information.\n\n**How it works:**\n\n1. Dashboard shows aggregated metrics (e.g., \"15 orders in packing phase\")\n2. User clicks on a metric to see details\n3. This endpoint returns the actual orders with complete information\n4. User can view customer details, shipping info, and order status\n\n**Available Filters:**\n\nFilters mirror the dashboard metrics structure:\n- **section + status + stage:** Drill down into specific workflow phases (e.g., picking/inProgress/packing)\n- **section + window:** View orders scheduled for specific time slots\n- **alert:** Quick access to orders requiring immediate action\n\n**Response:**\n\nReturns full order details including customer information, shipping data, and order summary.\nEach order appears only once, even if it exists in multiple workflow stages.\n",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          },
+          {
+            "$ref": "#/components/parameters/WarehouseControlFilters"
+          },
+          {
+            "$ref": "#/components/parameters/timezone"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WarehouseControlOrdersList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-key",
+        "description": "The API Key"
+      },
+      "ApiSecret": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-secret",
+        "description": "The API Secret"
+      },
+      "JanisClient": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-client",
+        "description": "The Client Code"
+      }
+    },
+    "parameters": {
+      "id": {
+        "name": "id",
+        "in": "path",
+        "schema": {
+          "type": "string",
+          "example": "631fb04c8fe08f51a8ee5949"
+        },
+        "required": true,
+        "description": "The unique identifier of the item"
+      },
+      "ListSortDirection": {
+        "name": "sortDirection",
+        "in": "query",
+        "description": "The direction to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
+        }
+      },
+      "ListPageNumber": {
+        "name": "x-janis-page",
+        "in": "header",
+        "description": "The page to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "default": 1
+        }
+      },
+      "ListPageSize": {
+        "name": "x-janis-page-size",
+        "in": "header",
+        "description": "The page size to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "default": 60
+        }
+      },
+      "JanisEntity": {
+        "name": "janis-entity",
+        "in": "header",
+        "description": "The entity name",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "ShippingSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "warehouseName"
+          ]
+        }
+      },
+      "ShippingFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "$ref": "#/components/schemas/Filters"
+        }
+      },
+      "ShippingPreviewFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "warehouseId": {
+              "type": "string",
+              "description": "The warehouse ID to filter the shippings",
+              "example": "6201999546aa1f3b37a7c580"
+            },
+            "scheduleRange": {
+              "type": "object",
+              "description": "The range of dates to filter by scheduled time",
+              "properties": {
+                "from": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "The start date and time of the range",
+                  "example": "2024-01-01T12:00:00.000Z"
+                },
+                "to": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "The end date and time of the range",
+                  "example": "2024-01-01T12:00:00.000Z"
+                }
+              },
+              "required": [
+                "from",
+                "to"
+              ]
+            },
+            "shippingTypeId": {
+              "type": "string",
+              "description": "The shipping type ID",
+              "example": "6201999546aa1f3b37a7c580"
+            },
+            "carrierId": {
+              "type": "string",
+              "description": "The carrier ID",
+              "example": "6201999546aa1f3b37a7c580"
+            }
+          },
+          "required": [
+            "scheduleRange",
+            "warehouseId"
+          ]
+        }
+      },
+      "SyncStateSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "clientCode",
+            "orders.lastDiscoveredAt",
+            "orders.lastRunAt",
+            "dateModified"
+          ]
+        }
+      },
+      "SyncStateFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/id"
+            },
+            "clientCode": {
+              "$ref": "#/components/schemas/SyncState/properties/clientCode"
+            }
+          }
+        }
+      },
+      "timezone": {
+        "in": "query",
+        "name": "timezone",
+        "schema": {
+          "type": "string",
+          "description": "IANA timezone name to use for date calculations (e.g., `America/New_York`, `Europe/Madrid`). If not provided, the client's timezone from session will be used.",
+          "example": "America/New_York"
+        }
+      },
+      "WarehouseControlFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "oneOf": [
+            {
+              "$ref": "#/components/schemas/PickingFilters"
+            },
+            {
+              "$ref": "#/components/schemas/DeliveryFilters"
+            },
+            {
+              "$ref": "#/components/schemas/AlertFilters"
+            },
+            {
+              "$ref": "#/components/schemas/GeneralFilters"
+            }
+          ]
+        }
+      }
+    },
+    "headers": {
+      "x-janis-total": {
+        "description": "The total amount of records in the list",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "responses": {
+      "SuccessCreateResponse": {
+        "description": "The item was created",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "SuccessUpdateResponse": {
+        "description": "The item was updated",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "GenericSuccess": {
+        "description": "Operation succeeded",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "BadRequest": {
+        "description": "A client error has ocurred.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Authentication missing or invalid",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Not authorized request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "InternalError": {
+        "description": "A server error has ocurred."
+      }
+    },
+    "schemas": {
+      "id": {
+        "description": "The unique identifier of the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "631fb04c8fe08f51a8ee5949"
+      },
+      "status": {
+        "description": "The item status",
+        "type": "string",
+        "default": "active",
+        "enum": [
+          "active",
+          "inactive"
+        ],
+        "example": "active"
+      },
+      "dateCreated": {
+        "description": "The date of creation",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-12T19:00:00.000Z"
+      },
+      "dateModified": {
+        "description": "The date of the last modification",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-20T19:00:00.000Z"
+      },
+      "dateCreatedDay": {
+        "description": "The day of creation",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-08-07T16:00:00.000Z"
+      },
+      "dateModifiedDay": {
+        "description": "The day of last modification",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-08-07T16:00:00.000Z"
+      },
+      "dateCreatedRange": {
+        "description": "Creation date range",
+        "type": "object",
+        "properties": {
+          "from": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/dateCreated"
+              }
+            ],
+            "description": "Date range from"
+          },
+          "to": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/dateCreated"
+              }
+            ],
+            "description": "Date range to"
+          }
+        }
+      },
+      "userCreated": {
+        "description": "The ID of the user who created the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "6a1fc1eeb5b68406e0487a10"
+      },
+      "userModified": {
+        "description": "The ID of the user who last modified the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "7e1fc1eeb5b68406e048796"
+      },
+      "listenerEvent": {
+        "description": "A JANIS Event object",
+        "type": "object",
+        "properties": {
+          "service": {
+            "description": "The source service name",
+            "type": "string",
+            "example": "id"
+          },
+          "entity": {
+            "description": "The event related entity",
+            "type": "string",
+            "example": "profile"
+          },
+          "event": {
+            "description": "The event name",
+            "type": "string",
+            "example": "created"
+          },
+          "client": {
+            "description": "The source event client",
+            "type": "string",
+            "example": "fizzmod"
+          },
+          "id": {
+            "description": "The event related entity ID",
+            "type": "string",
+            "example": "5d699c1ae8ebb95eaa24aca9"
+          }
+        },
+        "required": [
+          "service",
+          "entity",
+          "event"
+        ]
+      },
+      "ShippingSummaryByWarehouse": {
+        "type": "object",
+        "description": "The shipping grouped by warehouse with metrics and states",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "A warehouse identifier. This must be the `id` of a [WMS Warehouse](/v2/service/wms#tag/Warehouse)",
+            "example": "6201999546aa1f3b37a7c580"
+          },
+          "warehouseName": {
+            "type": "string",
+            "description": "A warehouse name. This must be the `name` of a [WMS Warehouse](/v2/service/wms#tag/Warehouse)",
+            "example": "Palermo"
+          },
+          "totals": {
+            "type": "object",
+            "description": "The total metrics of shippings for the warehouse",
+            "properties": {
+              "totalShippings": {
+                "type": "integer",
+                "description": "The total number of shippings associated with the warehouse",
+                "example": 100,
+                "minimum": 0
+              },
+              "totalDrivers": {
+                "type": "integer",
+                "description": "The total number of unique drivers assigned to shippings of the warehouse",
+                "example": 10,
+                "minimum": 0
+              },
+              "pendingShippings": {
+                "$ref": "#/components/schemas/PendingShippings"
+              },
+              "readyForDeliveryShippings": {
+                "$ref": "#/components/schemas/ReadyForDeliveryShippings"
+              },
+              "startedShippings": {
+                "$ref": "#/components/schemas/StartedShippings"
+              },
+              "deliveredShippings": {
+                "$ref": "#/components/schemas/DeliveredShippings"
+              },
+              "notDeliveredShippings": {
+                "$ref": "#/components/schemas/NotDeliveredShippings"
+              },
+              "averageDeliveryTime": {
+                "type": "number",
+                "description": "The average delivery time of the shippings",
+                "example": 10,
+                "minimum": 0
+              }
+            }
+          },
+          "rowCollapse": {
+            "type": "array",
+            "description": "The row collapse of the shippings",
+            "items": {
+              "$ref": "#/components/schemas/RowCollapse"
+            }
+          },
+          "filters": {
+            "$ref": "#/components/schemas/Filters"
+          }
+        }
+      },
+      "ShippingsTotals": {
+        "description": "The totals of shippings",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "description": "The total number of shippings",
+            "example": 10,
+            "minimum": 0
+          },
+          "withDriver": {
+            "type": "integer",
+            "description": "The number of shippings with a driver assigned",
+            "example": 10,
+            "minimum": 0
+          }
+        }
+      },
+      "PendingShippings": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ShippingsTotals"
+          }
+        ],
+        "description": "Shippings pending to be ready for delivery"
+      },
+      "ReadyForDeliveryShippings": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ShippingsTotals"
+          }
+        ],
+        "description": "Shippings ready for delivery",
+        "properties": {
+          "withoutDriver": {
+            "type": "integer",
+            "description": "The number of ready for delivery shippings without a driver assigned and without integration",
+            "minimum": 0
+          }
+        }
+      },
+      "StartedShippings": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ShippingsTotals"
+          }
+        ],
+        "description": "Shippings in progress"
+      },
+      "DeliveredShippings": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ShippingsTotals"
+          }
+        ],
+        "description": "Delivered shippings (includes complete and partial deliveries)",
+        "properties": {
+          "onTimePercentage": {
+            "type": "number",
+            "description": "The percentage of delivered shippings on time",
+            "minimum": 0,
+            "maximum": 100
+          }
+        }
+      },
+      "NotDeliveredShippings": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ShippingsTotals"
+          }
+        ],
+        "description": "Not delivered shippings"
+      },
+      "RowCollapse": {
+        "type": "object",
+        "description": "This property is used to display an expanded report for each row in the warehouse shipment report list. \n\n**Note:** Contains the status of shipments and the total number of shipments in each status\n",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The status of the shipping in the report",
+            "example": "pending",
+            "enum": [
+              "pending",
+              "readyForDelivery",
+              "started",
+              "delivered",
+              "notDelivered"
+            ],
+            "x-enumDescriptions": {
+              "pending": "Shippings pending to be ready for delivery",
+              "readyForDelivery": "Shippings ready for delivery",
+              "started": "Shippings in progress",
+              "delivered": "Delivered shippings",
+              "notDelivered": "Not delivered shippings"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "description": "The total of shippings in the status",
+            "example": 10,
+            "minimum": 0
+          }
+        }
+      },
+      "Filters": {
+        "type": "object",
+        "description": "The filters of the shippings report. Contains the filters applied to the report.\n\n**Note:** These filters are used to redirect to the delivery browser and list shipments by status.\n",
+        "properties": {
+          "warehouseIds": {
+            "type": "array",
+            "description": "A list of warehouse identifiers. This must be the `id` of a [WMS Warehouse](/v2/service/wms#tag/Warehouse)",
+            "items": {
+              "type": "string",
+              "description": "A warehouse identifier. This must be the `id` of a [WMS Warehouse](/v2/service/wms#tag/Warehouse)",
+              "example": "6201999546aa1f3b37a7c580"
+            }
+          },
+          "scheduleRange": {
+            "type": "object",
+            "description": "The range of dates to filter by scheduled time",
+            "properties": {
+              "from": {
+                "type": "string",
+                "format": "date-time",
+                "description": "The start date and time of the range",
+                "example": "2024-01-01T12:00:00.000Z"
+              },
+              "to": {
+                "type": "string",
+                "format": "date-time",
+                "description": "The end date and time of the range",
+                "example": "2024-01-01T12:00:00.000Z"
+              }
+            }
+          },
+          "shippingTypeId": {
+            "type": "string",
+            "description": "A shipping type identifier. This must be the `id` of a [Delivery Shipping Type](/v2/service/delivery#tag/Shipping-Type)",
+            "example": "6201999546aa1f3b37a7c580"
+          },
+          "carrierId": {
+            "type": "string",
+            "description": "A carrier identifier. This must be the `id` of a [Delivery Carrier](/v2/service/delivery#tag/Carrier)",
+            "example": "6201999546aa1f3b37a7c580"
+          }
+        }
+      },
+      "ShippingSummaryByWarehouseList": {
+        "description": "The list of shippings grouped by warehouse",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/ShippingSummaryByWarehouse"
+        }
+      },
+      "ShippingPreviewList": {
+        "description": "List of shippings grouped by driver for a specific warehouse",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/ShippingPreview"
+        }
+      },
+      "ShippingPreview": {
+        "type": "object",
+        "description": "Shipping grouped by driver with detailed metrics",
+        "properties": {
+          "driverId": {
+            "type": "string",
+            "description": "Unique driver ID"
+          },
+          "totalShippings": {
+            "type": "integer",
+            "description": "Total number of shippings assigned to the driver",
+            "minimum": 0
+          },
+          "totalPendingShippings": {
+            "type": "integer",
+            "description": "Total number of shippings pending to be ready for delivery",
+            "minimum": 0
+          },
+          "totalReadyForDeliveryShippings": {
+            "type": "integer",
+            "description": "Total number of shippings ready for delivery",
+            "minimum": 0
+          },
+          "totalStartedShippings": {
+            "type": "integer",
+            "description": "Total number of shippings in progress",
+            "minimum": 0
+          },
+          "totalDeliveredShippings": {
+            "type": "integer",
+            "description": "Total number of delivered shippings (includes complete and partial deliveries)",
+            "minimum": 0
+          },
+          "totalNotDeliveredShippings": {
+            "type": "integer",
+            "description": "Total number of undelivered shippings",
+            "minimum": 0
+          },
+          "averageDeliveryTime": {
+            "type": "number",
+            "description": "The average delivery time of the shippings in minutes",
+            "minimum": 0,
+            "example": 10
+          }
+        }
+      },
+      "SyncStateList": {
+        "description": "Sync state list",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/SyncState"
+        }
+      },
+      "SyncState": {
+        "type": "object",
+        "description": "Sync state information for order synchronization",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "clientCode": {
+            "type": "string",
+            "description": "The client code for synchronization",
+            "example": "client-001"
+          },
+          "orders": {
+            "$ref": "#/components/schemas/OrdersSyncInfo"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          }
+        }
+      },
+      "OrdersSyncInfo": {
+        "type": "object",
+        "description": "Order synchronization information",
+        "properties": {
+          "lastDiscoveredAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last date when orders were discovered",
+            "example": "2022-02-04T03:00:12.671Z"
+          },
+          "lastOrderId": {
+            "type": "string",
+            "description": "ID of the last processed order",
+            "example": "6e065d2834b0234d0e3ddef5"
+          },
+          "lastOrderCount": {
+            "type": "integer",
+            "description": "Number of orders processed in the last run",
+            "minimum": 0,
+            "example": 5
+          },
+          "lastRunAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last execution date of the sync process",
+            "example": "2022-02-04T03:05:30.123Z"
+          },
+          "lastDurationMs": {
+            "type": "integer",
+            "description": "Duration of the last sync execution in milliseconds",
+            "minimum": 0,
+            "example": 317452
+          }
+        }
+      },
+      "slotKey": {
+        "type": "string",
+        "description": "Unique identifier for the time slot with different formats based on slot type:\n- **Scheduled slots**: `<warehouseId>|<windowStartTime>|<windowEndTime>`\n- **Unscheduled slots**: `<warehouseId>|<dateTime>`\n",
+        "example": "631fb04c8fe08f51a8ee5949|2025-09-05T10:00:00.000Z|2025-09-05T12:00:00.000Z"
+      },
+      "timeWindow": {
+        "type": "object",
+        "description": "Time window information",
+        "properties": {
+          "start": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Start time of the time window",
+            "example": "2025-09-05T10:00:00.000Z"
+          },
+          "end": {
+            "type": "string",
+            "format": "date-time",
+            "description": "End time of the time window",
+            "example": "2025-09-05T12:00:00.000Z"
+          }
+        }
+      },
+      "WarehouseControl": {
+        "type": "object",
+        "description": "Comprehensive warehouse control dashboard with operational metrics and KPIs",
+        "properties": {
+          "summary": {
+            "$ref": "#/components/schemas/SummaryData"
+          },
+          "picking": {
+            "$ref": "#/components/schemas/PickingData"
+          },
+          "delivery": {
+            "$ref": "#/components/schemas/DeliveryData"
+          }
+        },
+        "example": {
+          "summary": {
+            "ordersToProcess": {
+              "value": 2538,
+              "variations": [
+                {
+                  "period": "previousDay",
+                  "value": 2404,
+                  "percentage": 5.3,
+                  "trend": "up",
+                  "capped": false
+                },
+                {
+                  "period": "previousWeek",
+                  "value": 2759,
+                  "percentage": 8,
+                  "trend": "down",
+                  "capped": false
+                }
+              ],
+              "drilldownQuery": []
+            },
+            "alerts": [
+              {
+                "name": "substitutionReview",
+                "value": 12,
+                "drilldownQuery": [
+                  {
+                    "name": "alert",
+                    "value": "substitutionReview"
+                  }
+                ]
+              },
+              {
+                "name": "preparationRisk",
+                "value": 5,
+                "drilldownQuery": [
+                  {
+                    "name": "alert",
+                    "value": "preparationRisk"
+                  }
+                ]
+              },
+              {
+                "name": "auditValidation",
+                "value": 2,
+                "drilldownQuery": [
+                  {
+                    "name": "alert",
+                    "value": "auditValidation"
+                  }
+                ]
+              }
+            ]
+          },
+          "picking": {
+            "windowMode": "slots",
+            "activeSlot": {
+              "slotKey": "631fb04c8fe08f51a8ee5949|2025-09-05T10:00:00.000Z|2025-09-05T12:00:00.000Z",
+              "window": {
+                "start": "2025-09-05T10:00:00.000Z",
+                "end": "2025-09-05T12:00:00.000Z"
+              },
+              "statuses": [
+                {
+                  "name": "pending",
+                  "value": 70,
+                  "risk": {
+                    "level": "high",
+                    "ordersAtRisk": 40,
+                    "percentage": 57.1
+                  },
+                  "drilldownQuery": [
+                    {
+                      "name": "section",
+                      "value": "picking"
+                    },
+                    {
+                      "name": "status",
+                      "value": "pending"
+                    }
+                  ]
+                },
+                {
+                  "name": "inProgress",
+                  "value": 15,
+                  "risk": {
+                    "level": "high",
+                    "ordersAtRisk": 10,
+                    "percentage": 66.7
+                  },
+                  "drilldownQuery": [
+                    {
+                      "name": "section",
+                      "value": "picking"
+                    },
+                    {
+                      "name": "status",
+                      "value": "inProgress"
+                    }
+                  ],
+                  "stages": [
+                    {
+                      "name": "picking",
+                      "value": 8,
+                      "risk": {
+                        "level": "high",
+                        "ordersAtRisk": 8,
+                        "percentage": 100
+                      },
+                      "drilldownQuery": [
+                        {
+                          "name": "section",
+                          "value": "picking"
+                        },
+                        {
+                          "name": "status",
+                          "value": "inProgress"
+                        },
+                        {
+                          "name": "stage",
+                          "value": "picking"
+                        }
+                      ]
+                    },
+                    {
+                      "name": "packing",
+                      "value": 7,
+                      "risk": {
+                        "level": "high",
+                        "ordersAtRisk": 2,
+                        "percentage": 28.6
+                      },
+                      "drilldownQuery": [
+                        {
+                          "name": "section",
+                          "value": "picking"
+                        },
+                        {
+                          "name": "status",
+                          "value": "inProgress"
+                        },
+                        {
+                          "name": "stage",
+                          "value": "packing"
+                        }
+                      ]
+                    },
+                    {
+                      "name": "billing",
+                      "value": 0,
+                      "drilldownQuery": [
+                        {
+                          "name": "section",
+                          "value": "picking"
+                        },
+                        {
+                          "name": "status",
+                          "value": "inProgress"
+                        },
+                        {
+                          "name": "stage",
+                          "value": "billing"
+                        }
+                      ]
+                    },
+                    {
+                      "name": "audit",
+                      "value": 0,
+                      "drilldownQuery": [
+                        {
+                          "name": "section",
+                          "value": "picking"
+                        },
+                        {
+                          "name": "status",
+                          "value": "inProgress"
+                        },
+                        {
+                          "name": "stage",
+                          "value": "audit"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "prepared",
+                  "value": 15,
+                  "drilldownQuery": [
+                    {
+                      "name": "section",
+                      "value": "picking"
+                    },
+                    {
+                      "name": "status",
+                      "value": "prepared"
+                    }
+                  ]
+                }
+              ],
+              "progress": {
+                "percentage": 15,
+                "completed": 15,
+                "total": 100
+              },
+              "metrics": [
+                {
+                  "name": "productsPicked",
+                  "value": 103234,
+                  "total": 412936,
+                  "percentage": 25,
+                  "breakdown": [
+                    {
+                      "name": "picked",
+                      "value": 103234,
+                      "percentage": 25
+                    },
+                    {
+                      "name": "pending",
+                      "value": 309702,
+                      "percentage": 75
+                    }
+                  ]
+                },
+                {
+                  "name": "productivity",
+                  "value": 120,
+                  "variations": [
+                    {
+                      "period": "previousHour",
+                      "value": 100,
+                      "percentage": 20,
+                      "trend": "up",
+                      "capped": false
+                    }
+                  ]
+                },
+                {
+                  "name": "productivityPerPicker",
+                  "value": 30,
+                  "activePickers": 4
+                },
+                {
+                  "name": "estimatedTimePerPicker",
+                  "value": 4
+                }
+              ],
+              "risk": {
+                "level": "high",
+                "deficitProducts": 500,
+                "estimatedCapacity": 800
+              }
+            },
+            "carryover": {
+              "total": 45,
+              "window": {
+                "start": "2025-09-04T10:00:00.000Z",
+                "end": "2025-09-05T10:00:00.000Z"
+              },
+              "drilldownQuery": [
+                {
+                  "name": "section",
+                  "value": "picking"
+                },
+                {
+                  "name": "status",
+                  "value": [
+                    "pending",
+                    "inProgress"
+                  ]
+                },
+                {
+                  "name": "fullfillmentDateRange",
+                  "value": {
+                    "start": "2025-09-04T10:00:00.000Z",
+                    "end": "2025-09-05T10:00:00.000Z"
+                  }
+                }
+              ],
+              "byStatus": [
+                {
+                  "name": "pending",
+                  "value": 30,
+                  "drilldownQuery": [
+                    {
+                      "name": "section",
+                      "value": "picking"
+                    },
+                    {
+                      "name": "status",
+                      "value": "pending"
+                    },
+                    {
+                      "name": "fullfillmentDateRange",
+                      "value": {
+                        "start": "2025-09-04T10:00:00.000Z",
+                        "end": "2025-09-05T10:00:00.000Z"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "name": "inProgress",
+                  "value": 15,
+                  "drilldownQuery": [
+                    {
+                      "name": "section",
+                      "value": "picking"
+                    },
+                    {
+                      "name": "status",
+                      "value": "inProgress"
+                    },
+                    {
+                      "name": "fullfillmentDateRange",
+                      "value": {
+                        "start": "2025-09-04T10:00:00.000Z",
+                        "end": "2025-09-05T10:00:00.000Z"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "delivery": {
+            "scheduled": {
+              "activeSlots": [
+                {
+                  "slotKey": "631fb04c8fe08f51a8ee5949|2025-09-05T15:00:00.000Z|2025-09-05T17:00:00.000Z",
+                  "window": {
+                    "start": "2025-09-05T15:00:00.000Z",
+                    "end": "2025-09-05T17:00:00.000Z"
+                  },
+                  "shippingMode": "mixed",
+                  "statuses": [
+                    {
+                      "name": "pending",
+                      "value": 16,
+                      "risk": {
+                        "level": "high",
+                        "ordersAtRisk": 16,
+                        "percentage": 100
+                      },
+                      "drilldownQuery": [
+                        {
+                          "name": "section",
+                          "value": "delivery"
+                        },
+                        {
+                          "name": "status",
+                          "value": "pending"
+                        },
+                        {
+                          "name": "window",
+                          "value": {
+                            "start": "2025-09-05T15:00:00.000Z",
+                            "end": "2025-09-05T17:00:00.000Z"
+                          }
+                        }
+                      ],
+                      "stages": [
+                        {
+                          "name": "delivery",
+                          "value": 12,
+                          "drilldownQuery": [
+                            {
+                              "name": "section",
+                              "value": "delivery"
+                            },
+                            {
+                              "name": "status",
+                              "value": "pending"
+                            },
+                            {
+                              "name": "stage",
+                              "value": "delivery"
+                            },
+                            {
+                              "name": "window",
+                              "value": {
+                                "start": "2025-09-05T15:00:00.000Z",
+                                "end": "2025-09-05T17:00:00.000Z"
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "name": "pickup",
+                          "value": 4,
+                          "drilldownQuery": [
+                            {
+                              "name": "section",
+                              "value": "delivery"
+                            },
+                            {
+                              "name": "status",
+                              "value": "pending"
+                            },
+                            {
+                              "name": "stage",
+                              "value": "pickup"
+                            },
+                            {
+                              "name": "window",
+                              "value": {
+                                "start": "2025-09-05T15:00:00.000Z",
+                                "end": "2025-09-05T17:00:00.000Z"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "name": "prepared",
+                      "value": 8,
+                      "risk": {
+                        "level": "medium",
+                        "ordersAtRisk": 5,
+                        "percentage": 62.5
+                      },
+                      "drilldownQuery": [
+                        {
+                          "name": "section",
+                          "value": "delivery"
+                        },
+                        {
+                          "name": "status",
+                          "value": "prepared"
+                        },
+                        {
+                          "name": "window",
+                          "value": {
+                            "start": "2025-09-05T15:00:00.000Z",
+                            "end": "2025-09-05T17:00:00.000Z"
+                          }
+                        }
+                      ],
+                      "stages": [
+                        {
+                          "name": "delivery",
+                          "value": 5,
+                          "drilldownQuery": [
+                            {
+                              "name": "section",
+                              "value": "delivery"
+                            },
+                            {
+                              "name": "status",
+                              "value": "prepared"
+                            },
+                            {
+                              "name": "stage",
+                              "value": "delivery"
+                            },
+                            {
+                              "name": "window",
+                              "value": {
+                                "start": "2025-09-05T15:00:00.000Z",
+                                "end": "2025-09-05T17:00:00.000Z"
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "name": "pickup",
+                          "value": 3,
+                          "drilldownQuery": [
+                            {
+                              "name": "section",
+                              "value": "delivery"
+                            },
+                            {
+                              "name": "status",
+                              "value": "prepared"
+                            },
+                            {
+                              "name": "stage",
+                              "value": "pickup"
+                            },
+                            {
+                              "name": "window",
+                              "value": {
+                                "start": "2025-09-05T15:00:00.000Z",
+                                "end": "2025-09-05T17:00:00.000Z"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "name": "inProgress",
+                      "value": 60,
+                      "drilldownQuery": [
+                        {
+                          "name": "section",
+                          "value": "delivery"
+                        },
+                        {
+                          "name": "status",
+                          "value": "inProgress"
+                        },
+                        {
+                          "name": "window",
+                          "value": {
+                            "start": "2025-09-05T15:00:00.000Z",
+                            "end": "2025-09-05T17:00:00.000Z"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "name": "finished",
+                      "value": 104,
+                      "drilldownQuery": [
+                        {
+                          "name": "section",
+                          "value": "delivery"
+                        },
+                        {
+                          "name": "status",
+                          "value": "finished"
+                        },
+                        {
+                          "name": "window",
+                          "value": {
+                            "start": "2025-09-05T15:00:00.000Z",
+                            "end": "2025-09-05T17:00:00.000Z"
+                          }
+                        }
+                      ],
+                      "stages": [
+                        {
+                          "name": "delivered",
+                          "value": 93,
+                          "drilldownQuery": [
+                            {
+                              "name": "section",
+                              "value": "delivery"
+                            },
+                            {
+                              "name": "status",
+                              "value": "finished"
+                            },
+                            {
+                              "name": "stage",
+                              "value": "delivered"
+                            },
+                            {
+                              "name": "window",
+                              "value": {
+                                "start": "2025-09-05T15:00:00.000Z",
+                                "end": "2025-09-05T17:00:00.000Z"
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "name": "notDelivered",
+                          "value": 11,
+                          "drilldownQuery": [
+                            {
+                              "name": "section",
+                              "value": "delivery"
+                            },
+                            {
+                              "name": "status",
+                              "value": "finished"
+                            },
+                            {
+                              "name": "stage",
+                              "value": "notDelivered"
+                            },
+                            {
+                              "name": "window",
+                              "value": {
+                                "start": "2025-09-05T15:00:00.000Z",
+                                "end": "2025-09-05T17:00:00.000Z"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "progress": {
+                    "percentage": 89,
+                    "completed": 104,
+                    "total": 188
+                  },
+                  "risk": {
+                    "level": "medium",
+                    "deficitOrders": 13,
+                    "estimatedCapacity": 11
+                  }
+                }
+              ],
+              "closedSlots": [
+                {
+                  "slotKey": "631fb04c8fe08f51a8ee5949|2025-09-05T13:00:00.000Z|2025-09-05T15:00:00.000Z",
+                  "window": {
+                    "start": "2025-09-05T13:00:00.000Z",
+                    "end": "2025-09-05T15:00:00.000Z"
+                  },
+                  "shippingMode": "delivery",
+                  "statuses": [
+                    {
+                      "name": "pending",
+                      "value": 2,
+                      "drilldownQuery": [
+                        {
+                          "name": "section",
+                          "value": "delivery"
+                        },
+                        {
+                          "name": "status",
+                          "value": "pending"
+                        },
+                        {
+                          "name": "window",
+                          "value": {
+                            "start": "2025-09-05T13:00:00.000Z",
+                            "end": "2025-09-05T15:00:00.000Z"
+                          }
+                        }
+                      ],
+                      "stages": [
+                        {
+                          "name": "delivery",
+                          "value": 1,
+                          "drilldownQuery": [
+                            {
+                              "name": "section",
+                              "value": "delivery"
+                            },
+                            {
+                              "name": "status",
+                              "value": "pending"
+                            },
+                            {
+                              "name": "stage",
+                              "value": "delivery"
+                            },
+                            {
+                              "name": "window",
+                              "value": {
+                                "start": "2025-09-05T13:00:00.000Z",
+                                "end": "2025-09-05T15:00:00.000Z"
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "name": "pickup",
+                          "value": 1,
+                          "drilldownQuery": [
+                            {
+                              "name": "section",
+                              "value": "delivery"
+                            },
+                            {
+                              "name": "status",
+                              "value": "pending"
+                            },
+                            {
+                              "name": "stage",
+                              "value": "pickup"
+                            },
+                            {
+                              "name": "window",
+                              "value": {
+                                "start": "2025-09-05T13:00:00.000Z",
+                                "end": "2025-09-05T15:00:00.000Z"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "name": "prepared",
+                      "value": 1,
+                      "drilldownQuery": [
+                        {
+                          "name": "section",
+                          "value": "delivery"
+                        },
+                        {
+                          "name": "status",
+                          "value": "prepared"
+                        },
+                        {
+                          "name": "window",
+                          "value": {
+                            "start": "2025-09-05T13:00:00.000Z",
+                            "end": "2025-09-05T15:00:00.000Z"
+                          }
+                        }
+                      ],
+                      "stages": [
+                        {
+                          "name": "delivery",
+                          "value": 1,
+                          "drilldownQuery": [
+                            {
+                              "name": "section",
+                              "value": "delivery"
+                            },
+                            {
+                              "name": "status",
+                              "value": "prepared"
+                            },
+                            {
+                              "name": "stage",
+                              "value": "delivery"
+                            },
+                            {
+                              "name": "window",
+                              "value": {
+                                "start": "2025-09-05T13:00:00.000Z",
+                                "end": "2025-09-05T15:00:00.000Z"
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "name": "pickup",
+                          "value": 0,
+                          "drilldownQuery": [
+                            {
+                              "name": "section",
+                              "value": "delivery"
+                            },
+                            {
+                              "name": "status",
+                              "value": "prepared"
+                            },
+                            {
+                              "name": "stage",
+                              "value": "pickup"
+                            },
+                            {
+                              "name": "window",
+                              "value": {
+                                "start": "2025-09-05T13:00:00.000Z",
+                                "end": "2025-09-05T15:00:00.000Z"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "name": "inProgress",
+                      "value": 3,
+                      "drilldownQuery": [
+                        {
+                          "name": "section",
+                          "value": "delivery"
+                        },
+                        {
+                          "name": "status",
+                          "value": "inProgress"
+                        },
+                        {
+                          "name": "window",
+                          "value": {
+                            "start": "2025-09-05T13:00:00.000Z",
+                            "end": "2025-09-05T15:00:00.000Z"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "name": "finished",
+                      "value": 84,
+                      "drilldownQuery": [
+                        {
+                          "name": "section",
+                          "value": "delivery"
+                        },
+                        {
+                          "name": "status",
+                          "value": "finished"
+                        },
+                        {
+                          "name": "window",
+                          "value": {
+                            "start": "2025-09-05T13:00:00.000Z",
+                            "end": "2025-09-05T15:00:00.000Z"
+                          }
+                        }
+                      ],
+                      "stages": [
+                        {
+                          "name": "delivered",
+                          "value": 78,
+                          "drilldownQuery": [
+                            {
+                              "name": "section",
+                              "value": "delivery"
+                            },
+                            {
+                              "name": "status",
+                              "value": "finished"
+                            },
+                            {
+                              "name": "stage",
+                              "value": "delivered"
+                            },
+                            {
+                              "name": "window",
+                              "value": {
+                                "start": "2025-09-05T13:00:00.000Z",
+                                "end": "2025-09-05T15:00:00.000Z"
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "name": "notDelivered",
+                          "value": 6,
+                          "drilldownQuery": [
+                            {
+                              "name": "section",
+                              "value": "delivery"
+                            },
+                            {
+                              "name": "status",
+                              "value": "finished"
+                            },
+                            {
+                              "name": "stage",
+                              "value": "notDelivered"
+                            },
+                            {
+                              "name": "window",
+                              "value": {
+                                "start": "2025-09-05T13:00:00.000Z",
+                                "end": "2025-09-05T15:00:00.000Z"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "progress": {
+                    "percentage": 93,
+                    "completed": 84,
+                    "total": 90
+                  }
+                }
+              ]
+            },
+            "unscheduled": {
+              "activeSlot": {
+                "slotKey": "631fb04c8fe08f51a8ee5949|2025-09-05T00:00:00.000Z",
+                "window": {
+                  "start": "2025-09-05T00:00:00.000Z",
+                  "end": "2025-09-05T23:59:59.999Z"
+                },
+                "shippingMode": "delivery",
+                "statuses": [
+                  {
+                    "name": "pending",
+                    "value": 25,
+                    "drilldownQuery": [
+                      {
+                        "name": "section",
+                        "value": "delivery"
+                      },
+                      {
+                        "name": "status",
+                        "value": "pending"
+                      }
+                    ],
+                    "stages": [
+                      {
+                        "name": "delivery",
+                        "value": 18,
+                        "drilldownQuery": [
+                          {
+                            "name": "section",
+                            "value": "delivery"
+                          },
+                          {
+                            "name": "status",
+                            "value": "pending"
+                          },
+                          {
+                            "name": "stage",
+                            "value": "delivery"
+                          }
+                        ]
+                      },
+                      {
+                        "name": "pickup",
+                        "value": 7,
+                        "drilldownQuery": [
+                          {
+                            "name": "section",
+                            "value": "delivery"
+                          },
+                          {
+                            "name": "status",
+                            "value": "pending"
+                          },
+                          {
+                            "name": "stage",
+                            "value": "pickup"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "name": "prepared",
+                    "value": 12,
+                    "drilldownQuery": [
+                      {
+                        "name": "section",
+                        "value": "delivery"
+                      },
+                      {
+                        "name": "status",
+                        "value": "prepared"
+                      }
+                    ],
+                    "stages": [
+                      {
+                        "name": "delivery",
+                        "value": 8,
+                        "drilldownQuery": [
+                          {
+                            "name": "section",
+                            "value": "delivery"
+                          },
+                          {
+                            "name": "status",
+                            "value": "prepared"
+                          },
+                          {
+                            "name": "stage",
+                            "value": "delivery"
+                          }
+                        ]
+                      },
+                      {
+                        "name": "pickup",
+                        "value": 4,
+                        "drilldownQuery": [
+                          {
+                            "name": "section",
+                            "value": "delivery"
+                          },
+                          {
+                            "name": "status",
+                            "value": "prepared"
+                          },
+                          {
+                            "name": "stage",
+                            "value": "pickup"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "name": "inProgress",
+                    "value": 8,
+                    "drilldownQuery": [
+                      {
+                        "name": "section",
+                        "value": "delivery"
+                      },
+                      {
+                        "name": "status",
+                        "value": "inProgress"
+                      }
+                    ]
+                  },
+                  {
+                    "name": "finished",
+                    "value": 45,
+                    "drilldownQuery": [
+                      {
+                        "name": "section",
+                        "value": "delivery"
+                      },
+                      {
+                        "name": "status",
+                        "value": "finished"
+                      }
+                    ],
+                    "stages": [
+                      {
+                        "name": "delivered",
+                        "value": 40,
+                        "drilldownQuery": [
+                          {
+                            "name": "section",
+                            "value": "delivery"
+                          },
+                          {
+                            "name": "status",
+                            "value": "finished"
+                          },
+                          {
+                            "name": "stage",
+                            "value": "delivered"
+                          }
+                        ]
+                      },
+                      {
+                        "name": "notDelivered",
+                        "value": 5,
+                        "drilldownQuery": [
+                          {
+                            "name": "section",
+                            "value": "delivery"
+                          },
+                          {
+                            "name": "status",
+                            "value": "finished"
+                          },
+                          {
+                            "name": "stage",
+                            "value": "notDelivered"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "progress": {
+                  "percentage": 89,
+                  "completed": 40,
+                  "total": 90
+                }
+              }
+            }
+          }
+        }
+      },
+      "PickingData": {
+        "type": "object",
+        "description": "Complete picking operations dashboard with real-time status tracking and performance metrics across all picking workflows.",
+        "properties": {
+          "windowMode": {
+            "type": "string",
+            "enum": [
+              "slots",
+              "allDay"
+            ],
+            "description": "Picking window operation mode indicating how the warehouse manages picking operations.\n\n**Presence:**\nThis property is only present when there is active picking data (either `activeSlot` or `carryover`).\nWhen no picking data is available, this property is omitted and the `picking` object is empty.\n",
+            "x-enumDescriptions": {
+              "slots": "Warehouse uses scheduled picking time windows (slots) with predefined time ranges for order fulfillment",
+              "allDay": "Warehouse operates picking throughout the entire day without fixed time windows"
+            },
+            "example": "slots"
+          },
+          "activeSlot": {
+            "$ref": "#/components/schemas/PickingSlot"
+          },
+          "carryover": {
+            "$ref": "#/components/schemas/Carryover"
+          }
+        }
+      },
+      "DeliveryData": {
+        "type": "object",
+        "description": "Complete delivery operations dashboard with real-time status tracking and performance metrics across scheduled and unscheduled delivery workflows.",
+        "properties": {
+          "scheduled": {
+            "$ref": "#/components/schemas/ScheduledDelivery"
+          },
+          "unscheduled": {
+            "$ref": "#/components/schemas/UnscheduledDelivery"
+          }
+        }
+      },
+      "ScheduledDelivery": {
+        "type": "object",
+        "description": "Scheduled delivery operations with predefined time windows for customer appointments and logistics coordination.",
+        "properties": {
+          "activeSlots": {
+            "type": "array",
+            "description": "Currently active delivery time windows where current time falls within the delivery window (`start ≤ currentTime ≤ end`).",
+            "items": {
+              "$ref": "#/components/schemas/DeliverySlot"
+            }
+          },
+          "closedSlots": {
+            "type": "array",
+            "description": "Recently closed delivery time windows (within the last `2 hours`) for performance analysis and operational continuity.",
+            "items": {
+              "$ref": "#/components/schemas/DeliverySlot"
+            }
+          }
+        }
+      },
+      "UnscheduledDelivery": {
+        "type": "object",
+        "description": "Unscheduled delivery operations providing flexible fulfillment without fixed time constraints for same-day and express deliveries.",
+        "properties": {
+          "activeSlot": {
+            "$ref": "#/components/schemas/DeliverySlot"
+          }
+        }
+      },
+      "DeliverySlot": {
+        "type": "object",
+        "description": "Delivery time slot with comprehensive operational data including status distribution, progress tracking, and delivery outcome metrics.",
+        "properties": {
+          "slotKey": {
+            "$ref": "#/components/schemas/slotKey"
+          },
+          "window": {
+            "$ref": "#/components/schemas/timeWindow"
+          },
+          "statuses": {
+            "type": "array",
+            "description": "Order status distribution across the delivery workflow stages with detailed outcome breakdown for finished status.",
+            "items": {
+              "$ref": "#/components/schemas/DeliveryStatus"
+            }
+          },
+          "progress": {
+            "$ref": "#/components/schemas/Progress"
+          },
+          "shippingMode": {
+            "type": "string",
+            "enum": [
+              "delivery",
+              "pickup",
+              "mixed"
+            ],
+            "description": "Identifies the shipping mode of the delivery slot based on shipping types of all orders in the slot.",
+            "x-enumDescriptions": {
+              "delivery": "All orders have shipping type `delivery` or `express_delivery`",
+              "pickup": "All orders have shipping type `store_pickup` or `drive_through`",
+              "mixed": "Slot contains orders with both delivery and pickup shipping types"
+            },
+            "example": "delivery"
+          },
+          "risk": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/RiskAssessment"
+              }
+            ],
+            "description": "Risk assessment evaluating completion probability for the delivery slot.\nOnly present when productivity analysis indicates insufficient capacity to complete all pending deliveries.\n"
+          }
+        }
+      },
+      "DeliveryStatus": {
+        "type": "object",
+        "description": "Order count aggregation by delivery workflow status category with detailed outcome breakdown for finished status.",
+        "properties": {
+          "name": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "prepared",
+              "inProgress",
+              "finished"
+            ],
+            "description": "Name of the delivery status category",
+            "x-enumDescriptions": {
+              "pending": "Orders in the fulfillment pipeline before being ready for delivery",
+              "prepared": "Orders ready for pickup by delivery personnel, fully processed and packaged",
+              "inProgress": "Orders currently being delivered by drivers, in transit to customers",
+              "finished": "Orders where delivery attempt has been completed, with outcome recorded"
+            },
+            "example": "finished"
+          },
+          "value": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Total count of orders in this delivery status category",
+            "example": 104
+          },
+          "risk": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/StatusRiskAssessment"
+              }
+            ],
+            "description": "Risk assessment for this specific status.\nOnly present for `pending` and `prepared` statuses when risk is detected.\n\nFor delivery risk calculation:\n- ALL pending orders are automatically considered at risk (100%).\n- PREPARED orders with shipping types `store_pickup` or `drive_through` are excluded from risk calculation\n  (they are ready for customer pickup and no longer require delivery capacity).\n- The remaining deficit (after accounting for all pending orders) is then distributed to prepared orders\n  proportionally, considering only PREPARED orders that are not ready for pickup.\n\nNote: The `value` field shows the total count including all PREPARED orders (for display purposes),\nbut the risk calculation only considers PREPARED orders that require delivery capacity.\n"
+          },
+          "drilldownQuery": {
+            "type": "array",
+            "description": "Filter parameters to query detailed orders behind this status metric",
+            "items": {
+              "$ref": "#/components/schemas/DrilldownQueryFilter"
+            }
+          },
+          "stages": {
+            "type": "array",
+            "description": "Detailed breakdown of orders by operational stage.\n- For `pending` and `prepared` statuses: shows breakdown by shipping type (`delivery`/`pickup`)\n- For `finished` status: shows breakdown by delivery outcome (`delivered`/`notDelivered`)\n",
+            "items": {
+              "$ref": "#/components/schemas/DeliveryStage"
+            }
+          }
+        }
+      },
+      "DeliveryStage": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/DeliveryPendingAndPreparedStage"
+          },
+          {
+            "$ref": "#/components/schemas/DeliveryFinishedStage"
+          }
+        ]
+      },
+      "DeliveryPendingAndPreparedStage": {
+        "title": "Pending and Prepared",
+        "type": "object",
+        "description": "Shipping type stage within the `pending` or `prepared` workflows, representing orders grouped by delivery method.\nTracks order counts for delivery (shipping to customer) and pickup (customer picks up at store).\nUsed for both `pending` and `prepared` statuses to show breakdown by shipping type.\n",
+        "properties": {
+          "name": {
+            "type": "string",
+            "enum": [
+              "delivery",
+              "pickup"
+            ],
+            "description": "Name of the shipping type stage",
+            "x-enumDescriptions": {
+              "delivery": "Orders that will be shipped to customers (includes `delivery` and `express_delivery`)",
+              "pickup": "Orders that customers will pick up at store (includes `store_pickup` and `drive_through`)"
+            },
+            "example": "delivery"
+          },
+          "value": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Number of orders in this shipping type category",
+            "example": 12
+          },
+          "drilldownQuery": {
+            "type": "array",
+            "description": "Filter parameters to query detailed orders behind this stage metric",
+            "items": {
+              "$ref": "#/components/schemas/DrilldownQueryFilter"
+            }
+          }
+        }
+      },
+      "DeliveryFinishedStage": {
+        "title": "Finished",
+        "type": "object",
+        "description": "Delivery outcome stage within the `finished` workflow, representing the final result of delivery attempts.\nTracks order counts for success measurement and failure analysis.\n",
+        "properties": {
+          "name": {
+            "type": "string",
+            "enum": [
+              "delivered",
+              "notDelivered"
+            ],
+            "description": "Name of the delivery outcome stage",
+            "x-enumDescriptions": {
+              "delivered": "Successfully completed deliveries where orders reached customers (includes both fully delivered and partially delivered orders)",
+              "notDelivered": "Failed delivery attempts due to customer unavailability, address issues, or other delivery obstacles"
+            },
+            "example": "delivered"
+          },
+          "value": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Number of orders that resulted in this specific delivery outcome",
+            "example": 93
+          },
+          "drilldownQuery": {
+            "type": "array",
+            "description": "Filter parameters to query detailed orders behind this stage metric",
+            "items": {
+              "$ref": "#/components/schemas/DrilldownQueryFilter"
+            }
+          }
+        }
+      },
+      "PickingSlot": {
+        "type": "object",
+        "description": "Current picking slot with comprehensive operational data including status distribution, progress tracking, and performance metrics",
+        "properties": {
+          "slotKey": {
+            "$ref": "#/components/schemas/slotKey"
+          },
+          "window": {
+            "$ref": "#/components/schemas/timeWindow"
+          },
+          "statuses": {
+            "type": "array",
+            "description": "Order status distribution across the main picking workflow categories: `pending`, `inProgress`, and `prepared`.\n",
+            "items": {
+              "$ref": "#/components/schemas/PickingStatus"
+            }
+          },
+          "progress": {
+            "$ref": "#/components/schemas/Progress"
+          },
+          "metrics": {
+            "type": "array",
+            "description": "Performance metrics for operational monitoring and efficiency tracking.\nIncludes quantitative indicators such as items picked, productivity rates, coverage estimates, and resource requirements.\nSome metrics include completion percentages for trend analysis, while others provide absolute operational values.\n",
+            "items": {
+              "$ref": "#/components/schemas/Metric"
+            }
+          },
+          "risk": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/RiskAssessment"
+              }
+            ],
+            "description": "Risk assessment evaluating completion probability for the active slot.\nOnly present when productivity analysis indicates insufficient capacity to complete all pending work.\n"
+          }
+        }
+      },
+      "PickingStatus": {
+        "type": "object",
+        "description": "Order count aggregation by workflow status category (`pending`, `inProgress`, `prepared`).\nThe inProgress status includes detailed stage breakdown for granular operational tracking.\n",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the status category",
+            "enum": [
+              "pending",
+              "inProgress",
+              "prepared"
+            ],
+            "x-enumDescriptions": {
+              "pending": "Orders in the fulfillment pipeline before being ready for delivery",
+              "inProgress": "Orders currently being picked from warehouse inventory locations",
+              "prepared": "Orders ready for pickup by delivery personnel, fully processed and packaged"
+            },
+            "example": "inProgress"
+          },
+          "value": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Total count of orders in this status",
+            "example": 15
+          },
+          "risk": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/StatusRiskAssessment"
+              }
+            ],
+            "description": "Risk assessment for this specific status.\nOnly present for `pending` and `inProgress` statuses when risk is detected and productivity data is available.\nDistribution follows priority: pending orders are impacted first, then inProgress orders.\n"
+          },
+          "drilldownQuery": {
+            "type": "array",
+            "description": "Filter parameters to query detailed orders behind this status metric",
+            "items": {
+              "$ref": "#/components/schemas/DrilldownQueryFilter"
+            }
+          },
+          "stages": {
+            "type": "array",
+            "description": "Detailed breakdown of orders by operational stage.",
+            "items": {
+              "$ref": "#/components/schemas/PickingStage"
+            }
+          }
+        }
+      },
+      "PickingStage": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/PickingInProgressStage"
+          }
+        ]
+      },
+      "PickingInProgressStage": {
+        "title": "In Progress",
+        "type": "object",
+        "description": "Operational stage within the `inProgress` workflow, representing specific phases of order fulfillment.\nEach stage tracks order counts at different points in the picking-to-delivery pipeline.\n",
+        "properties": {
+          "name": {
+            "type": "string",
+            "enum": [
+              "picking",
+              "packing",
+              "billing",
+              "audit"
+            ],
+            "description": "Name of the stage",
+            "x-enumDescriptions": {
+              "picking": "Physical collection and retrieval of items from warehouse inventory locations",
+              "packing": "Order consolidation, packaging, and preparation for shipment or delivery",
+              "billing": "Invoice generation, payment capture, and financial transaction processing",
+              "audit": "Quality control verification, order validation, and compliance checks"
+            },
+            "example": "picking"
+          },
+          "value": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Number of orders currently in this operational stage",
+            "example": 5
+          },
+          "risk": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/StageRiskAssessment"
+              }
+            ],
+            "description": "Risk assessment for this specific stage.\nOnly present when the parent `inProgress` status has risk, productivity data is available, and this stage has orders at risk.\nRisk is distributed sequentially following the stage order (picking → packing → billing → audit).\nOrders at risk are assigned to each stage until exhausted, respecting the stage order priority.\nThe risk level is inherited from the parent status, while the percentage reflects the proportion of orders at risk within this specific stage.\n"
+          },
+          "drilldownQuery": {
+            "type": "array",
+            "description": "Filter parameters to query detailed orders behind this stage metric",
+            "items": {
+              "$ref": "#/components/schemas/DrilldownQueryFilter"
+            }
+          }
+        }
+      },
+      "Progress": {
+        "type": "object",
+        "description": "Progress tracking for the current slot, providing a comprehensive view of order fulfillment status.\nIncludes percentage completion, completed orders, and total orders in the slot.\n",
+        "properties": {
+          "percentage": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Overall fulfillment completion rate for the current time slot",
+            "example": 15
+          },
+          "completed": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Number of orders that have reached prepared status and are ready for delivery",
+            "example": 15
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Total number of orders assigned to this time slot, including all status categories",
+            "example": 100
+          }
+        }
+      },
+      "RiskAssessment": {
+        "type": "object",
+        "description": "Risk assessment evaluating capacity constraints and workload completion probability for active operations.\nProvides operational visibility into potential delays and resource allocation needs.\nOnly present when insufficient capacity is detected based on current productivity performance.\nRisk is only considered when the capacity deficit is 5% or higher of the total workload.\n",
+        "properties": {
+          "level": {
+            "type": "string",
+            "enum": [
+              "noData",
+              "low",
+              "medium",
+              "high"
+            ],
+            "description": "Risk severity level based on capacity deficit relative to total workload",
+            "x-enumDescriptions": {
+              "noData": "Insufficient data to reliably assess operational risk - typically occurs at the start of the working period or during low activity",
+              "medium": "Capacity deficit is between 5% and 30% of total workload - moderate risk requiring attention",
+              "high": "Capacity deficit exceeds 30% of total workload - critical risk requiring immediate action"
+            },
+            "example": "high"
+          },
+          "deficitProducts": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Number of products that cannot be completed within the available timeframe given current productivity rates.\nOnly present in picking operations.\n",
+            "example": 500
+          },
+          "deficitOrders": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Number of orders that cannot be completed within the available timeframe based on average delivery time.\nOnly present in delivery operations.\n",
+            "example": 13
+          },
+          "estimatedCapacity": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Projected capacity based on current performance:\n- For picking: number of products that can be completed\n- For delivery: number of orders that can be delivered\n",
+            "example": 800
+          }
+        }
+      },
+      "StatusRiskAssessment": {
+        "type": "object",
+        "required": [
+          "level",
+          "ordersAtRisk",
+          "percentage"
+        ],
+        "description": "Risk assessment for an individual status group, evaluating the proportion of orders within this status\nthat are at risk of not being completed within the available timeframe.\nOnly present when orders in this status are identified as at risk.\nRisk is only considered when the percentage of orders at risk is 5% or higher.\n",
+        "properties": {
+          "level": {
+            "type": "string",
+            "enum": [
+              "low",
+              "medium",
+              "high"
+            ],
+            "description": "Risk severity level based on percentage of orders at risk within this status",
+            "x-enumDescriptions": {
+              "medium": "Between 5% and 30% of orders in this status are at risk",
+              "high": "More than 30% of orders in this status are at risk"
+            },
+            "example": "high"
+          },
+          "ordersAtRisk": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Number of orders at risk within this specific status group",
+            "example": 15
+          },
+          "percentage": {
+            "type": "number",
+            "format": "float",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Percentage of orders at risk relative to total orders in this status (ordersAtRisk / totalOrders * 100)",
+            "example": 75
+          }
+        }
+      },
+      "StageRiskAssessment": {
+        "type": "object",
+        "required": [
+          "level",
+          "ordersAtRisk",
+          "percentage"
+        ],
+        "description": "Risk assessment for an individual stage within a status group.\nRisk is distributed sequentially: orders at risk are assigned to stages in order (picking → packing → billing → audit)\nuntil all orders at risk are allocated. Each stage receives orders at risk up to its capacity before moving to the next stage.\nOnly present when the parent status has risk and this stage has orders at risk assigned to it.\n",
+        "properties": {
+          "level": {
+            "type": "string",
+            "enum": [
+              "low",
+              "medium",
+              "high"
+            ],
+            "description": "Risk severity level inherited from the parent status risk assessment.\nAll stages with orders at risk will share the same risk level as their parent status,\nensuring consistent risk evaluation across the workflow stages.\n",
+            "x-enumDescriptions": {
+              "medium": "Inherited from parent status with medium risk level",
+              "high": "Inherited from parent status with high risk level"
+            },
+            "example": "high"
+          },
+          "ordersAtRisk": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Number of orders at risk within this specific stage",
+            "example": 8
+          },
+          "percentage": {
+            "type": "number",
+            "format": "float",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Percentage of orders at risk within this specific stage.\nThis percentage reflects the proportion of orders in this stage that are at risk,\nindependent of the parent status risk level.\n",
+            "example": 100
+          }
+        }
+      },
+      "Carryover": {
+        "type": "object",
+        "description": "Orders from previous time periods that have not been completed and are carried over into the current operational window.\nRepresents pending and in-progress orders from the lookback period (24 hours before the active slot window start).\nOnly includes orders with `pending` or `inProgress` status (excludes `prepared` orders).\n\n**Window Calculation:**\nThe carryover window represents a 24-hour lookback period ending at the start of the current operational context:\n- **For scheduled picking operations**: The window ends at the start of the active picking time slot\n- **For unscheduled picking operations**: The window ends at the start of the current date range\n- **When no active operations exist**: The window ends at the current time\n\nThe carryover window always spans the 24 hours immediately preceding the end point, capturing incomplete orders from the previous operational period that need to be carried forward.\n",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Total number of carryover orders from the lookback period",
+            "example": 45
+          },
+          "window": {
+            "$ref": "#/components/schemas/timeWindow"
+          },
+          "drilldownQuery": {
+            "type": "array",
+            "description": "Filter parameters to query all carryover orders across both status categories",
+            "items": {
+              "$ref": "#/components/schemas/DrilldownQueryFilter"
+            }
+          },
+          "byStatus": {
+            "type": "array",
+            "description": "Order count breakdown by status category (pending and inProgress)",
+            "items": {
+              "$ref": "#/components/schemas/CarryoverStatus"
+            }
+          }
+        }
+      },
+      "CarryoverStatus": {
+        "type": "object",
+        "description": "Order count aggregation for a specific carryover status category",
+        "properties": {
+          "name": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "inProgress"
+            ],
+            "description": "Name of the carryover status category",
+            "x-enumDescriptions": {
+              "pending": "Carryover orders in the fulfillment pipeline before being ready for picking",
+              "inProgress": "Carryover orders currently being picked from warehouse inventory locations"
+            },
+            "example": "pending"
+          },
+          "value": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Number of carryover orders in this status category",
+            "example": 30
+          },
+          "drilldownQuery": {
+            "type": "array",
+            "description": "Filter parameters to query detailed carryover orders for this specific status",
+            "items": {
+              "$ref": "#/components/schemas/DrilldownQueryFilter"
+            }
+          }
+        }
+      },
+      "Metric": {
+        "type": "object",
+        "description": "Performance metric providing operational insights for efficiency tracking and resource planning.\nIncludes various types of measurements: item counts with completion rates and breakdowns, productivity rates,\nproductivity per picker, and estimated time calculations for optimal warehouse operations.\n",
+        "properties": {
+          "name": {
+            "type": "string",
+            "enum": [
+              "productsPicked",
+              "productivity",
+              "productivityPerPicker",
+              "estimatedTimePerPicker"
+            ],
+            "description": "Name of the metric",
+            "x-enumDescriptions": {
+              "productsPicked": "Number of items picked from warehouse inventory locations",
+              "productivity": "Products picked per hour, measuring operational efficiency. May include variations comparing current performance to previous periods.",
+              "productivityPerPicker": "Average products picked per hour by a single picker, calculated from total productivity divided by active pickers",
+              "estimatedTimePerPicker": "Estimated time in hours that a single picker would take to complete the pending products, calculated as pending products divided by productivity per picker"
+            },
+            "example": "productsPicked"
+          },
+          "value": {
+            "type": "integer",
+            "minimum": 0,
+            "nullable": true,
+            "description": "Absolute measurement value for this metric.\nUnits vary by metric type: items for productsPicked, products/hour for productivity,\nproducts/hour for productivityPerPicker, and hours for estimatedTimePerPicker.\nReturns `null` for `productivityPerPicker` and `estimatedTimePerPicker` when productivity data is not available.\n",
+            "example": 103234
+          },
+          "percentage": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Completion rate as a percentage of the total possible value.\nOnly present for metrics that have a measurable completion target (e.g., productsPicked).\nNot applicable for absolute metrics like `productivity`, `productivityPerPicker`, or `estimatedTimePerPicker`.\n",
+            "example": 25
+          },
+          "variations": {
+            "type": "array",
+            "description": "Performance variations comparing current metric value to previous periods.\nOnly present for metrics that support historical comparison (e.g., productivity).\nProvides trend analysis and percentage change for operational insights.\n",
+            "items": {
+              "$ref": "#/components/schemas/MetricVariation"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Total number of items for the metric.\nOnly present for the `productsPicked` metric.\n",
+            "example": 137645
+          },
+          "breakdown": {
+            "type": "array",
+            "description": "Breakdown of the metric by categories (e.g., picked and pending items).\nOnly present for the `productsPicked` metric.\n",
+            "items": {
+              "$ref": "#/components/schemas/MetricBreakdown"
+            }
+          },
+          "activePickers": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Number of active pickers used in the calculation.\nOnly present for the `productivityPerPicker` metric.\n",
+            "example": 10
+          }
+        }
+      },
+      "MetricBreakdown": {
+        "type": "object",
+        "description": "Individual breakdown item showing a category within a metric with its value and percentage.\n",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the breakdown category (e.g., `picked`, `pending`)",
+            "example": "picked"
+          },
+          "value": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Value for this breakdown category",
+            "example": 103234
+          },
+          "percentage": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Percentage that this breakdown category represents of the total",
+            "example": 75
+          }
+        }
+      },
+      "MetricVariation": {
+        "type": "object",
+        "description": "Performance variation comparing current metric value to a previous period.\nProvides historical context and trend analysis for operational decision-making.\n",
+        "properties": {
+          "period": {
+            "type": "string",
+            "enum": [
+              "previousHour",
+              "previousDay",
+              "previousWeek"
+            ],
+            "description": "Time period used for comparison with current metric value",
+            "x-enumDescriptions": {
+              "previousHour": "Comparison with the previous hour's performance",
+              "previousDay": "Comparison with the previous day's performance",
+              "previousWeek": "Comparison with the previous week's performance"
+            },
+            "example": "previousHour"
+          },
+          "value": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Previous period's metric value used as baseline for comparison",
+            "example": 100
+          },
+          "percentage": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Absolute percentage change between current and previous values.\nAlways positive - use trend field to determine direction of change.\n",
+            "example": 20
+          },
+          "trend": {
+            "type": "string",
+            "enum": [
+              "up",
+              "down",
+              "stable"
+            ],
+            "description": "Direction of change from previous period to current period",
+            "x-enumDescriptions": {
+              "up": "Current value is higher than previous period (improvement/increase)",
+              "down": "Current value is lower than previous period (decline/decrease)",
+              "stable": "Current value is equal to previous period (no change)"
+            },
+            "example": "up"
+          },
+          "capped": {
+            "type": "boolean",
+            "description": "Indicates whether the percentage change exceeded the maximum allowed limit (300%) and was capped.\nWhen `true`, the original calculated percentage was greater than 300% and was limited to 300% for display purposes.\nWhen `false`, the percentage change did not exceed the limit and represents the actual calculated value.\n",
+            "example": false
+          }
+        }
+      },
+      "AlertMetric": {
+        "type": "object",
+        "description": "Alert metric indicating orders requiring manual attention or intervention",
+        "properties": {
+          "name": {
+            "type": "string",
+            "enum": [
+              "substitutionReview",
+              "preparationRisk",
+              "auditValidation"
+            ],
+            "description": "Type of alert requiring manual intervention",
+            "x-enumDescriptions": {
+              "substitutionReview": "Orders requiring review for product substitutions or candidate confirmations",
+              "preparationRisk": "Orders requiring intervention during preparation processes due to operational issues",
+              "auditValidation": "Orders requiring manual validation during audit processes"
+            },
+            "example": "substitutionReview"
+          },
+          "value": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Number of orders requiring this type of manual intervention",
+            "example": 12
+          },
+          "drilldownQuery": {
+            "type": "array",
+            "description": "Filter parameters to query detailed orders behind this alert metric",
+            "items": {
+              "$ref": "#/components/schemas/DrilldownQueryFilter"
+            }
+          }
+        }
+      },
+      "SummaryData": {
+        "type": "object",
+        "description": "Summary dashboard data with key operational metrics and historical comparisons",
+        "properties": {
+          "ordersToProcess": {
+            "$ref": "#/components/schemas/OrdersToProcessMetric"
+          },
+          "alerts": {
+            "type": "array",
+            "description": "List of alert metrics requiring manual attention and intervention",
+            "items": {
+              "$ref": "#/components/schemas/AlertMetric"
+            }
+          }
+        }
+      },
+      "OrdersToProcessMetric": {
+        "type": "object",
+        "description": "Orders to process metric with current value and historical variations for trend analysis",
+        "properties": {
+          "value": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Current number of orders that need to be processed (picking or delivery)",
+            "example": 2538
+          },
+          "variations": {
+            "type": "array",
+            "description": "Historical variations comparing current value to previous periods for trend analysis",
+            "items": {
+              "$ref": "#/components/schemas/MetricVariation"
+            }
+          },
+          "drilldownQuery": {
+            "type": "array",
+            "description": "Filter parameters to query detailed orders (empty array = no filters, returns all orders)",
+            "items": {
+              "$ref": "#/components/schemas/DrilldownQueryFilter"
+            }
+          }
+        }
+      },
+      "DrilldownQueryFilter": {
+        "description": "Individual filter parameter for the order list endpoint drilldown query",
+        "anyOf": [
+          {
+            "title": "Section",
+            "type": "object",
+            "description": "Section filter",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Section filter to specify the workflow area (`picking` or `delivery`).\n\n**Dependencies:**\n- Required when using status, stage, or window filters\n- Cannot be used together with alert filter (alert is exclusive)\n",
+                "enum": [
+                  "section"
+                ],
+                "example": "section"
+              },
+              "value": {
+                "type": "string",
+                "enum": [
+                  "picking",
+                  "delivery"
+                ],
+                "x-enumDescriptions": {
+                  "picking": "Use to filter orders in the picking workflow",
+                  "delivery": "Use to filter orders in the delivery workflow"
+                },
+                "example": "picking"
+              }
+            }
+          },
+          {
+            "title": "Status",
+            "type": "object",
+            "description": "Status filter",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Status filter to narrow down orders by their current status within a workflow.\n\n**Dependencies:**\n- Requires section filter to be specified\n- Cannot be used with alert filter (alert is exclusive)\n",
+                "enum": [
+                  "status"
+                ],
+                "example": "status"
+              },
+              "value": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "description": "Single status value",
+                    "enum": [
+                      "pending",
+                      "inProgress",
+                      "prepared",
+                      "finished"
+                    ],
+                    "example": "finished"
+                  },
+                  {
+                    "type": "array",
+                    "description": "Multiple status values (array of status strings)",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "pending",
+                        "inProgress",
+                        "prepared",
+                        "finished"
+                      ]
+                    },
+                    "example": [
+                      "pending",
+                      "inProgress"
+                    ]
+                  }
+                ],
+                "description": "Status filter value by section. Can be a single status string or an array of status strings to filter multiple statuses at once:\n- **Picking section:** `pending`, `inProgress`, `prepared`\n- **Delivery section:** `finished`\n"
+              }
+            }
+          },
+          {
+            "title": "Stage",
+            "type": "object",
+            "description": "Stage filter",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Stage filter to get orders in a specific stage within their current status.\n\n**Dependencies:**\n- Requires both section and status filters to be specified\n- Cannot be used with alert filter (alert is exclusive)\n",
+                "enum": [
+                  "stage"
+                ],
+                "example": "stage"
+              },
+              "value": {
+                "type": "string",
+                "description": "Stage filter value by section:\n- **Picking section:** `picking`, `packing`, `billing`, `audit`\n- **Delivery section:**\n  - For `pending` and `prepared` statuses: `delivery`, `pickup`\n  - For `finished` status: `delivered`, `notDelivered`\n",
+                "enum": [
+                  "picking",
+                  "packing",
+                  "billing",
+                  "audit",
+                  "delivery",
+                  "pickup",
+                  "delivered",
+                  "notDelivered"
+                ],
+                "example": "picking"
+              }
+            }
+          },
+          {
+            "title": "Alert",
+            "type": "object",
+            "description": "Alert filter",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Alert filter to get orders that require specific attention or validation.\n\n**Dependencies:**\n- This is an exclusive filter - cannot be combined with section, status, stage, or window filters\n- When alert is used, it queries across all sections automatically\n",
+                "enum": [
+                  "alert"
+                ],
+                "example": "alert"
+              },
+              "value": {
+                "type": "string",
+                "enum": [
+                  "substitutionReview",
+                  "preparationRisk",
+                  "auditValidation"
+                ],
+                "x-enumDescriptions": {
+                  "substitutionReview": "Use to filter orders with product substitutions pending review",
+                  "preparationRisk": "Use to filter orders requiring intervention during preparation processes",
+                  "auditValidation": "Use to filter orders requiring audit validation"
+                },
+                "example": "substitutionReview"
+              }
+            }
+          },
+          {
+            "title": "Window",
+            "type": "object",
+            "description": "Window filter",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Window filter for scheduled deliveries with specific time ranges.\n\n**Dependencies:**\n- Requires section filter to be specified\n- Only applicable for delivery section with scheduled time windows\n- For picking points with window schema configured, this filter is required\n- Cannot be used with alert filter (alert is exclusive)\n",
+                "enum": [
+                  "window"
+                ],
+                "example": "window"
+              },
+              "value": {
+                "$ref": "#/components/schemas/timeWindow"
+              }
+            }
+          },
+          {
+            "title": "Fulfillment Date Range",
+            "type": "object",
+            "description": "Fulfillment date range filter",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Fulfillment date range filter to query orders by their fulfillment date within a specific time period.\nUsed primarily for carryover orders and general date-based filtering across picking and delivery workflows.\n\n**Dependencies:**\n- Requires section filter to be specified\n- Cannot be used with alert filter (alert is exclusive)\n",
+                "enum": [
+                  "fullfillmentDateRange"
+                ],
+                "example": "fullfillmentDateRange"
+              },
+              "value": {
+                "$ref": "#/components/schemas/timeWindow"
+              }
+            }
+          }
+        ]
+      },
+      "PickingFilters": {
+        "type": "object",
+        "description": "Get orders behind picking metrics from dashboard",
+        "required": [
+          "section"
+        ],
+        "properties": {
+          "section": {
+            "type": "string",
+            "enum": [
+              "picking"
+            ],
+            "description": "Filter orders in the picking process"
+          },
+          "status": {
+            "type": "string",
+            "description": "Order status within picking workflow",
+            "enum": [
+              "pending",
+              "inProgress",
+              "prepared"
+            ],
+            "x-enumDescriptions": {
+              "pending": "Orders waiting to start the picking process",
+              "inProgress": "Orders actively being processed in warehouse (use stage filter for specific phase)",
+              "prepared": "Orders completed and ready for next step"
+            }
+          },
+          "stage": {
+            "type": "string",
+            "description": "Specific workflow phase for orders in progress (requires `status=inProgress`)",
+            "enum": [
+              "picking",
+              "packing",
+              "billing",
+              "audit"
+            ],
+            "x-enumDescriptions": {
+              "picking": "Collecting items from warehouse shelves",
+              "packing": "Preparing packages for shipment",
+              "billing": "Processing invoices and payments",
+              "audit": "Quality control and order verification"
+            }
+          },
+          "window": {
+            "type": "object",
+            "description": "Filter orders scheduled within a specific time range",
+            "required": [
+              "start",
+              "end"
+            ],
+            "properties": {
+              "start": {
+                "type": "string",
+                "format": "date-time",
+                "description": "Beginning of the time window",
+                "example": "2025-09-30T10:00:00.000Z"
+              },
+              "end": {
+                "type": "string",
+                "format": "date-time",
+                "description": "End of the time window",
+                "example": "2025-09-30T12:00:00.000Z"
+              }
+            }
+          },
+          "fullfillmentDateRange": {
+            "type": "object",
+            "description": "Filter orders by their fulfillment date within a specific time period. Used primarily for carryover orders and general date-based filtering. Cannot be used together with window filter.",
+            "required": [
+              "start",
+              "end"
+            ],
+            "properties": {
+              "start": {
+                "type": "string",
+                "format": "date-time",
+                "description": "Beginning of the fulfillment date range",
+                "example": "2025-09-04T10:00:00.000Z"
+              },
+              "end": {
+                "type": "string",
+                "format": "date-time",
+                "description": "End of the fulfillment date range",
+                "example": "2025-09-05T10:00:00.000Z"
+              }
+            }
+          }
+        }
+      },
+      "DeliveryFilters": {
+        "type": "object",
+        "description": "Get orders behind delivery metrics from dashboard",
+        "required": [
+          "section"
+        ],
+        "properties": {
+          "section": {
+            "type": "string",
+            "enum": [
+              "delivery"
+            ],
+            "description": "Filter orders in the delivery process"
+          },
+          "status": {
+            "type": "string",
+            "description": "Order status within delivery workflow",
+            "enum": [
+              "pending",
+              "prepared",
+              "inProgress",
+              "finished"
+            ],
+            "x-enumDescriptions": {
+              "pending": "Orders still being processed in warehouse",
+              "prepared": "Orders ready for dispatch",
+              "inProgress": "Orders out for delivery",
+              "finished": "Orders with completed delivery attempt (use stage filter for outcome)"
+            }
+          },
+          "stage": {
+            "type": "string",
+            "description": "Delivery stage breakdown:\n- For `status=pending` or `status=prepared`: Use `delivery` or `pickup` to filter by shipping type\n- For `status=finished`: Use `delivered` or `notDelivered` to filter by delivery outcome\n",
+            "enum": [
+              "delivery",
+              "pickup",
+              "delivered",
+              "notDelivered"
+            ],
+            "x-enumDescriptions": {
+              "delivery": "Orders with delivery shipping type (requires `status=pending` or `status=prepared`)",
+              "pickup": "Orders with pickup shipping type (requires `status=pending` or `status=prepared`)",
+              "delivered": "Successfully received by customer (requires `status=finished`)",
+              "notDelivered": "Could not be delivered to customer (requires `status=finished`)"
+            }
+          },
+          "window": {
+            "type": "object",
+            "description": "Filter orders scheduled within a specific time range",
+            "required": [
+              "start",
+              "end"
+            ],
+            "properties": {
+              "start": {
+                "type": "string",
+                "format": "date-time",
+                "description": "Beginning of the time window",
+                "example": "2025-09-30T10:00:00.000Z"
+              },
+              "end": {
+                "type": "string",
+                "format": "date-time",
+                "description": "End of the time window",
+                "example": "2025-09-30T12:00:00.000Z"
+              }
+            }
+          },
+          "fullfillmentDateRange": {
+            "type": "object",
+            "description": "Filter orders by their fulfillment date within a specific time period. Used primarily for carryover orders and general date-based filtering. Cannot be used together with window filter.",
+            "required": [
+              "start",
+              "end"
+            ],
+            "properties": {
+              "start": {
+                "type": "string",
+                "format": "date-time",
+                "description": "Beginning of the fulfillment date range",
+                "example": "2025-09-04T10:00:00.000Z"
+              },
+              "end": {
+                "type": "string",
+                "format": "date-time",
+                "description": "End of the fulfillment date range",
+                "example": "2025-09-05T10:00:00.000Z"
+              }
+            }
+          }
+        }
+      },
+      "AlertFilters": {
+        "type": "object",
+        "description": "Get orders requiring immediate attention (shown in dashboard alerts)",
+        "required": [
+          "alert"
+        ],
+        "properties": {
+          "alert": {
+            "type": "string",
+            "description": "Filter orders requiring immediate attention",
+            "enum": [
+              "substitutionReview",
+              "preparationRisk",
+              "auditValidation"
+            ],
+            "x-enumDescriptions": {
+              "substitutionReview": "Product substitutions awaiting approval",
+              "preparationRisk": "Orders requiring preparation intervention",
+              "auditValidation": "Orders needing manual review"
+            }
+          }
+        }
+      },
+      "GeneralFilters": {
+        "type": "object",
+        "description": "Get all warehouse orders without specific filters (overview mode)"
+      },
+      "WarehouseControlOrdersList": {
+        "type": "array",
+        "description": "Array of order objects with complete information",
+        "items": {
+          "$ref": "#/components/schemas/WarehouseControlOrder"
+        },
+        "example": [
+          {
+            "id": "631fb04c8fe08f51a8ee594a",
+            "status": "picking",
+            "salesChannelPrefix": "WEB",
+            "commerceId": "2024001234",
+            "customer": {
+              "firstName": "Juan",
+              "lastName": "Pérez",
+              "email": "juan.perez@example.com"
+            },
+            "shipping": {
+              "type": "delivery",
+              "slaName": "Envío Express",
+              "companyName": "Express Delivery Co.",
+              "deliveryEstimateDate": "2024-01-20T14:00:00.000Z"
+            },
+            "summary": {
+              "totalProducts": 3,
+              "totalUnits": 5
+            }
+          },
+          {
+            "id": "631fb04c8fe08f51a8ee594b",
+            "status": "inDelivery",
+            "salesChannelPrefix": "ML",
+            "commerceId": "2024005678",
+            "customer": {
+              "firstName": "María",
+              "lastName": "González",
+              "email": "maria.gonzalez@example.com"
+            },
+            "shipping": {
+              "type": "pickup",
+              "slaName": "Retiro en tienda",
+              "companyName": "Store Pickup Service",
+              "deliveryWindow": {
+                "initialDate": "2024-01-21T10:00:00.000Z",
+                "finalDate": "2024-01-21T12:00:00.000Z"
+              }
+            },
+            "summary": {
+              "totalProducts": 2,
+              "totalUnits": 3
+            }
+          }
+        ]
+      },
+      "WarehouseControlOrder": {
+        "type": "object",
+        "description": "Order details including customer and shipping information",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The refers to the `id` field of the order. See the [Order](/v2/service/oms#tag/Orders) for more information.",
+            "example": "631fb04c8fe08f51a8ee594a"
+          },
+          "status": {
+            "type": "string",
+            "description": "The refers to the `status` field of the order. See the [Order](/v2/service/oms#tag/Orders) for more information.",
+            "example": "picking"
+          },
+          "salesChannelPrefix": {
+            "type": "string",
+            "description": "This refers to the `salesChannelPrefix` field of the order. See the [Order](/v2/service/oms#tag/Orders) for more information.",
+            "example": "WEB"
+          },
+          "commerceId": {
+            "type": "string",
+            "description": "This refers to the `commerceId` field of the order. See the [Order](/v2/service/oms#tag/Orders) for more information.",
+            "example": "2024001234"
+          },
+          "customer": {
+            "type": "object",
+            "description": "This refers to the `customer` field of the order. See the [Order](/v2/service/oms#tag/Orders) for more information.",
+            "properties": {
+              "firstName": {
+                "type": "string",
+                "description": "This refers to the `firstName` field of the customer. See the [Order](/v2/service/oms#tag/Orders) for more information.",
+                "example": "Juan"
+              },
+              "lastName": {
+                "type": "string",
+                "description": "This refers to the `lastName` field of the customer. See the [Order](/v2/service/oms#tag/Orders) for more information.",
+                "example": "Pérez"
+              },
+              "email": {
+                "type": "string",
+                "description": "This refers to the `email` field of the customer. See the [Order](/v2/service/oms#tag/Orders) for more information.",
+                "example": "juan.perez@example.com"
+              }
+            }
+          },
+          "shipping": {
+            "type": "object",
+            "description": "This refers to the `shipping` field of the order. See the [Order](/v2/service/oms#tag/Orders) for more information.",
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "This refers to the `type` field of the shipping. See the [Order](/v2/service/oms#tag/Orders) for more information.",
+                "example": "delivery"
+              },
+              "slaName": {
+                "type": "string",
+                "description": "This refers to the `slaName` field of the shipping. See the [Order](/v2/service/oms#tag/Orders) for more information.",
+                "example": "Envío Express"
+              },
+              "companyName": {
+                "type": "string",
+                "description": "This refers to the `companyName` field of the shipping. See the [Order](/v2/service/oms#tag/Orders) for more information.",
+                "example": "Express Delivery Co."
+              },
+              "deliveryEstimateDate": {
+                "type": "string",
+                "format": "date-time",
+                "description": "This refers to the `deliveryEstimateDate` field of the shipping. See the [Order](/v2/service/oms#tag/Orders) for more information.",
+                "example": "2024-01-20T14:00:00.000Z"
+              },
+              "deliveryWindow": {
+                "type": "object",
+                "description": "This refers to the `deliveryWindow` field of the shipping. See the [Order](/v2/service/oms#tag/Orders) for more information.",
+                "properties": {
+                  "initialDate": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2024-01-21T10:00:00.000Z"
+                  },
+                  "finalDate": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2024-01-21T12:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "summary": {
+            "type": "object",
+            "description": "Order summary information",
+            "properties": {
+              "totalProducts": {
+                "type": "integer",
+                "description": "Total number of different products",
+                "example": 3
+              },
+              "totalUnits": {
+                "type": "integer",
+                "description": "Total quantity of all units purchased",
+                "example": 5
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

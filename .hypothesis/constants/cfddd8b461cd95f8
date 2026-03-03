@@ -1,0 +1,4 @@
+# file: C:\Users\maxim\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\libcst\helpers\node_fields.py
+# hypothesis_version: 6.151.9
+
+['AssignEqual', 'Colon', 'Comma', 'Dot', 'Semicolon', 'Sentinel', '_', 'default_indent', 'default_newline', 'encoding', 'footer', 'has_trailing_newline', 'header', 'indent', 'leading_lines', 'posonly_ind', 'star', 'star_arg', 'whitespace']

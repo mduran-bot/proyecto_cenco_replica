@@ -1,0 +1,4 @@
+# file: C:\Users\vicen\OneDrive\Documentos\3HTP\Cencosud\Proyecto Final Cenco\glue\conftest.py
+# hypothesis_version: 6.151.9
+
+['1g', 'ERROR', 'HADOOP_HOME', 'IcebergPropertyTests', 'false', 'hadoop', 'hadoop_home', 'local[2]', 'session', 'spark.driver.memory', 'spark.jars.packages', 'spark.sql.extensions', 'spark.ui.enabled']

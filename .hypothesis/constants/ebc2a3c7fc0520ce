@@ -1,0 +1,4 @@
+# file: C:\Users\maxim\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\pyspark\sql\variant_utils.py
+# hypothesis_version: 6.151.9
+
+[-9223372036854775808, -2147483648, -32768, -128, 127, 255, 1024, 1970, 32767, 65535, 16777215, 2147483647, 9223372036854775807, '"', ',', '-', '.', ':', '<d', '<f', 'MALFORMED_VARIANT', 'UTC', '[', ']', 'false', 'little', 'null', 'true', 'utf-8', '{', '}']

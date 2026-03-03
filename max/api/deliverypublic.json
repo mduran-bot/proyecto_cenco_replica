@@ -1,0 +1,2741 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Delivery Public Service",
+    "description": "Public APIs to fetch data from Janis Delivery Service\n\n **Last update**: 06 feb 26, 05:59 p. m.",
+    "version": "2.7.3",
+    "x-logo": null,
+    "x-janis-keywords": [
+      "delivery public",
+      "simulation",
+      "checkout",
+      "coverage"
+    ],
+    "lastUpdate": "2026-02-06T20:59:35.080Z"
+  },
+  "tags": [
+    {
+      "name": "Delivery shipping tracking",
+      "description": "To see shipping tracking in real time"
+    },
+    {
+      "name": "Delivery simulation",
+      "description": "To simulate delivery options"
+    },
+    {
+      "name": "Orders",
+      "description": "To manage orders"
+    }
+  ],
+  "servers": [
+    {
+      "url": "https://public.delivery.janis.in/api",
+      "description": "The Prod API server",
+      "variables": {
+        "environment": {
+          "default": "prod"
+        }
+      }
+    },
+    {
+      "url": "https://public.delivery.janisqa.in/api",
+      "description": "The QA API server",
+      "variables": {
+        "environment": {
+          "default": "qa"
+        }
+      }
+    },
+    {
+      "url": "https://public.delivery.janisdev.in/api",
+      "description": "The Beta API server",
+      "variables": {
+        "environment": {
+          "default": "beta"
+        }
+      }
+    },
+    {
+      "url": "http://delivery-public.janis.localhost:3099/api",
+      "description": "The Local API server",
+      "variables": {
+        "environment": {
+          "default": "local"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/coverage": {
+      "get": {
+        "x-janis-namespace": "coverage",
+        "x-janis-method": "get",
+        "x-janis-permissions": [],
+        "operationId": "getCoverage",
+        "tags": [
+          "Delivery simulation"
+        ],
+        "summary": "Get coverage by Postal code or Coordinates",
+        "description": "Check if a ZIP Code / Postal Code **or** a geopoint has delivery coverage.\n\n**Important:** One and only one of `postalCode` and `coordinates` must be sent.\n",
+        "security": [
+          {
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PostalCode"
+          },
+          {
+            "$ref": "#/components/parameters/Coordinates"
+          },
+          {
+            "$ref": "#/components/parameters/SlaName"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/CoverageResult"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/order-receiver": {
+      "get": {
+        "x-janis-namespace": "order-receiver",
+        "x-janis-method": "get",
+        "x-janis-permissions": [],
+        "operationId": "orderReceiver",
+        "tags": [
+          "Orders"
+        ],
+        "summary": "Get Orders",
+        "description": "Get orders with related shipping information",
+        "security": [
+          {
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/OrderReceiverFilters"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Orders listed",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderReceiverList"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/shipping-tracking": {
+      "get": {
+        "x-janis-namespace": "shippingTracking",
+        "x-janis-method": "get",
+        "x-janis-permissions": [],
+        "operationId": "getShippingTracking",
+        "tags": [
+          "Delivery shipping tracking"
+        ],
+        "summary": "Get shipping by janis tracking identifier",
+        "security": [
+          {
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TrackingId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ShippingTrackingResult"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/ShippingNotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/simulate": {
+      "post": {
+        "x-janis-namespace": "simulation",
+        "x-janis-method": "simulate",
+        "x-janis-permissions": [],
+        "operationId": "bySimulation",
+        "tags": [
+          "Delivery simulation"
+        ],
+        "summary": "Simulate delivery",
+        "security": [
+          {
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "The simulation constraints",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Simulation"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SimulationResult"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/simulate-by-sla": {
+      "post": {
+        "x-janis-namespace": "simulation",
+        "x-janis-method": "by-sla",
+        "x-janis-permissions": [],
+        "operationId": "bySlaSimulation",
+        "tags": [
+          "Delivery simulation"
+        ],
+        "summary": "Simulate delivery by SLA",
+        "security": [
+          {
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "The simulation constraints",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SimulationBySLARequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SimulationBySLA"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-key",
+        "description": "The API Key"
+      },
+      "ApiSecret": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-secret",
+        "description": "The API Secret"
+      },
+      "JanisClient": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-client",
+        "description": "The Client Code"
+      }
+    },
+    "parameters": {
+      "id": {
+        "name": "id",
+        "in": "path",
+        "schema": {
+          "type": "string",
+          "example": "d555345345345ab67a342aaa"
+        },
+        "required": true,
+        "description": "The unique identifier of the item"
+      },
+      "ListSortDirection": {
+        "name": "sortDirection",
+        "in": "query",
+        "description": "The direction to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
+        }
+      },
+      "ListPageNumber": {
+        "name": "x-janis-page",
+        "in": "header",
+        "description": "The page to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "default": 1
+        }
+      },
+      "ListPageSize": {
+        "name": "x-janis-page-size",
+        "in": "header",
+        "description": "The page size to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "default": 60
+        }
+      },
+      "JanisEntity": {
+        "name": "janis-entity",
+        "in": "header",
+        "description": "The entity name",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "CarrierSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "carrierName",
+            "dateModified"
+          ]
+        }
+      },
+      "CarrierFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "carrierId": {
+              "$ref": "#/components/schemas/Carrier/properties/carrierId"
+            },
+            "carrierName": {
+              "$ref": "#/components/schemas/Carrier/properties/carrierName"
+            },
+            "slaId": {
+              "$ref": "#/components/schemas/Carrier/properties/slaId"
+            },
+            "slaType": {
+              "$ref": "#/components/schemas/Carrier/properties/slaType"
+            },
+            "slaName": {
+              "$ref": "#/components/schemas/Carrier/properties/slaName"
+            },
+            "dateModifiedRange": {
+              "$ref": "#/components/schemas/DateModifiedRangeFilter"
+            }
+          }
+        }
+      },
+      "PostalCode": {
+        "name": "postalCode",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "description": "The ZIP Code / Postal Code of the location",
+          "example": "1425"
+        },
+        "required": false,
+        "description": "The ZIP Code / Postal Code of the location"
+      },
+      "Coordinates": {
+        "name": "coordinates",
+        "in": "query",
+        "schema": {
+          "type": "array",
+          "description": "The longitude and latitude",
+          "items": {
+            "type": "number"
+          },
+          "example": [
+            -58.381631,
+            -34.603686
+          ],
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "required": false,
+        "description": "The longitude and latitude"
+      },
+      "SlaName": {
+        "name": "slaName",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "description": "The preferred shipping SLA name. This must be the `title` of a [Shipping Type](/v2/service/delivery#operation/getShippingType).",
+          "example": "Same day"
+        },
+        "required": false,
+        "description": "The preferred shipping SLA name. This must be the `title` of a [Shipping Type](/v2/service/delivery#operation/getShippingType)."
+      },
+      "DeliveryAreaAvailabilitySortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "dateModified"
+          ]
+        }
+      },
+      "DeliveryAreaAvailabilityFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "search": {
+              "type": "string",
+              "description": "This filter will apply to the `location.value.street`, `location.value.city`, `location.value.state` and `location.value.country` fields.\n"
+            },
+            "dateModifiedRange": {
+              "$ref": "#/components/schemas/DateModifiedRangeFilter"
+            }
+          }
+        }
+      },
+      "OrderReceiverFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "email": {
+              "description": "The receiver's `email` of the shipping in Delivery service",
+              "type": "string",
+              "example": "john@doe.com"
+            },
+            "commerceId": {
+              "description": "The order's `commerceId` of the shipping in Delivery service",
+              "type": "string",
+              "example": "1308830520303-01"
+            },
+            "commerceSequentialId": {
+              "description": "The order's `commerceSequentialId` of the shipping in Delivery service",
+              "type": "string",
+              "example": "528888"
+            },
+            "warehouseId": {
+              "description": "The sender `warehouseId` of the shipping in Delivery Service"
+            }
+          }
+        }
+      },
+      "ProductSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "productReferenceId",
+            "skuReferenceId",
+            "name",
+            "dateModified"
+          ]
+        }
+      },
+      "ProductFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "productId": {
+              "$ref": "#/components/schemas/Product/properties/productId"
+            },
+            "skuId": {
+              "$ref": "#/components/schemas/Product/properties/skuId"
+            },
+            "productReferenceId": {
+              "$ref": "#/components/schemas/Product/properties/productReferenceId"
+            },
+            "skuReferenceId": {
+              "$ref": "#/components/schemas/Product/properties/skuReferenceId"
+            },
+            "name": {
+              "$ref": "#/components/schemas/Product/properties/name"
+            },
+            "eans": {
+              "$ref": "#/components/schemas/Product/properties/eans/items"
+            },
+            "productGroups": {
+              "$ref": "#/components/schemas/ProductGroup/properties/id"
+            },
+            "dateModifiedRange": {
+              "$ref": "#/components/schemas/DateModifiedRangeFilter"
+            }
+          }
+        }
+      },
+      "SalesChannelSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "dateModified",
+            "name",
+            "referenceId",
+            "shortIdentifier"
+          ]
+        }
+      },
+      "SalesChannelFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "salesChannelId": {
+              "$ref": "#/components/schemas/SalesChannel/properties/salesChannelId"
+            },
+            "name": {
+              "$ref": "#/components/schemas/SalesChannel/properties/name"
+            },
+            "referenceId": {
+              "$ref": "#/components/schemas/SalesChannel/properties/referenceId"
+            },
+            "shortIdentifier": {
+              "$ref": "#/components/schemas/SalesChannel/properties/shortIdentifier"
+            }
+          }
+        }
+      },
+      "TrackingId": {
+        "name": "trackingId",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "description": "The shipping's real time ID",
+          "example": "221004-1TY6423Y"
+        },
+        "required": true,
+        "description": "The shipping's real time ID"
+      },
+      "StockSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "dateModified"
+          ]
+        }
+      },
+      "StockFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "stockId": {
+              "$ref": "#/components/schemas/Stock/properties/stockId"
+            },
+            "skuId": {
+              "$ref": "#/components/schemas/Stock/properties/skuId"
+            },
+            "warehouseId": {
+              "$ref": "#/components/schemas/Stock/properties/warehouseId"
+            },
+            "dateModifiedRange": {
+              "$ref": "#/components/schemas/DateModifiedRangeFilter"
+            }
+          }
+        }
+      },
+      "TimeSlotSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "dateStart",
+            "dateEnd",
+            "dateModified"
+          ]
+        }
+      },
+      "TimeSlotFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "carrierId": {
+              "$ref": "#/components/schemas/TimeSlot/properties/carrierId"
+            },
+            "dateRange": {
+              "type": "object",
+              "description": "A range for the time slot date",
+              "properties": {
+                "from": {
+                  "type": "string",
+                  "description": "The beginning of the range",
+                  "format": "date-time",
+                  "example": "2019-11-27T16:08:24.994Z"
+                },
+                "to": {
+                  "type": "string",
+                  "description": "The end of the range",
+                  "format": "date-time",
+                  "example": "2019-11-30T16:08:24.994Z"
+                }
+              }
+            },
+            "dateModifiedRange": {
+              "$ref": "#/components/schemas/DateModifiedRangeFilter"
+            }
+          }
+        }
+      }
+    },
+    "headers": {
+      "x-janis-total": {
+        "description": "The total amount of records in the list",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "responses": {
+      "SuccessCreateResponse": {
+        "description": "The item was created",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "SuccessUpdateResponse": {
+        "description": "The item was updated",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "GenericSuccess": {
+        "description": "Operation succeeded",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "BadRequest": {
+        "description": "A client error has ocurred.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Authentication missing or invalid",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Not authorized request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "InternalError": {
+        "description": "A server error has ocurred."
+      },
+      "CoverageResult": {
+        "description": "The simulation result",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/CoverageResult"
+            }
+          }
+        }
+      },
+      "ShippingTrackingResult": {
+        "description": "The shipping tracking result",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ShippingTrackingResult"
+            }
+          }
+        }
+      },
+      "ShippingNotFound": {
+        "description": "Shipping not found.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "SimulationResult": {
+        "description": "The simulation result",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/SimulationResponse"
+            }
+          }
+        }
+      },
+      "SimulationBySLA": {
+        "description": "The simulation result",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/SimulationBySLAResponse"
+            }
+          }
+        }
+      },
+      "GetSyncStatusStats": {
+        "description": "The sync status statistics",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "description": "The sync stats for each entity",
+              "properties": {
+                "products": {
+                  "type": "number",
+                  "description": "The quantity of products synced",
+                  "example": 10
+                },
+                "stocks": {
+                  "type": "number",
+                  "description": "The quantity of stocks synced",
+                  "example": 20
+                },
+                "carriers": {
+                  "type": "number",
+                  "description": "The quantity of carriers synced",
+                  "example": 5
+                },
+                "timeSlots": {
+                  "type": "number",
+                  "description": "The quantity of timeSlots synced",
+                  "example": 3
+                },
+                "salesChannels": {
+                  "type": "number",
+                  "description": "The quantity of salesChannels synced",
+                  "example": 2
+                },
+                "deliveryAreaAvailability": {
+                  "type": "number",
+                  "description": "The quantity of deliveryAreaAvailability synced",
+                  "example": 1
+                }
+              },
+              "required": [
+                "products",
+                "stocks",
+                "carriers",
+                "timeSlots",
+                "salesChannels",
+                "deliveryAreaAvailability"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "id": {
+        "description": "The unique identifier of the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "d555345345345ab67a342aaa"
+      },
+      "status": {
+        "description": "The item status",
+        "type": "string",
+        "default": "active",
+        "enum": [
+          "active",
+          "inactive"
+        ],
+        "example": "active"
+      },
+      "dateCreated": {
+        "description": "The date of creation",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-12T19:00:00.000Z"
+      },
+      "dateModified": {
+        "description": "The date of the last modification",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-20T19:00:00.000Z"
+      },
+      "dateCreatedDay": {
+        "description": "The day of creation",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-08-07T16:00:00.000Z"
+      },
+      "dateModifiedDay": {
+        "description": "The day of last modification",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-08-07T16:00:00.000Z"
+      },
+      "userCreated": {
+        "description": "The ID of the user who created the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "6a1fc1eeb5b68406e0487a10"
+      },
+      "userModified": {
+        "description": "The ID of the user who last modified the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "7e1fc1eeb5b68406e048796"
+      },
+      "DateModifiedRangeFilter": {
+        "type": "object",
+        "description": "A range for modified date",
+        "properties": {
+          "from": {
+            "type": "string",
+            "description": "The beginning of the range",
+            "format": "date-time",
+            "example": "2019-11-27T16:08:24.994Z"
+          },
+          "to": {
+            "type": "string",
+            "description": "The end of the range",
+            "format": "date-time",
+            "example": "2019-11-30T16:08:24.994Z"
+          }
+        }
+      },
+      "Carrier": {
+        "type": "object",
+        "description": "A Carrier\n\nA carrier with multiple coverage areas will be represented as multiple carriers\n",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "carrierId": {
+            "type": "string",
+            "description": "The ID of the Carrier in Delivery Service",
+            "example": "a555345345345ab67a342aaa"
+          },
+          "carrierName": {
+            "type": "string",
+            "description": "The name of the Carrier",
+            "example": "Express delivery"
+          },
+          "coverageAreaType": {
+            "description": "The type of coverage area",
+            "type": "string",
+            "enum": [
+              "postalCode",
+              "linearDistance",
+              "polygon"
+            ],
+            "example": "polygon"
+          },
+          "coverageArea": {
+            "type": "object",
+            "description": "The details of the coverage area",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/PostalCodeCoverageArea"
+              },
+              {
+                "$ref": "#/components/schemas/LinearDistanceCoverageArea"
+              },
+              {
+                "$ref": "#/components/schemas/PolygonCoverageArea"
+              }
+            ]
+          },
+          "slaId": {
+            "type": "string",
+            "description": "The ID of the Shipping Type in Delivery Service",
+            "example": "a555345345345ab67a342aaa"
+          },
+          "slaType": {
+            "type": "string",
+            "description": "The code of the Shipping Type",
+            "example": "expressDelivery",
+            "enum": [
+              "expressDelivery",
+              "delivery",
+              "storePickup",
+              "driveThrough"
+            ]
+          },
+          "slaName": {
+            "type": "string",
+            "description": "The name of the Shipping Type",
+            "example": "Same day delivery"
+          },
+          "minDeliveryTime": {
+            "type": "number",
+            "description": "The minimum hours required to deliver a shipping",
+            "example": 4
+          },
+          "maxDeliveryTime": {
+            "type": "number",
+            "description": "The maximum hours available to deliver a shipping",
+            "example": 24
+          },
+          "minWeightAllowed": {
+            "type": "number",
+            "description": "The minimum weight required to deliver a shipping",
+            "example": 0
+          },
+          "maxWeightAllowed": {
+            "type": "number",
+            "description": "The maximum weight available to deliver a shipping",
+            "example": 1500
+          },
+          "minVolumeAllowed": {
+            "type": "number",
+            "description": "The minimum volume required to deliver a shipping",
+            "example": 0
+          },
+          "maxVolumeAllowed": {
+            "type": "number",
+            "description": "The maximum volume available to deliver a shipping",
+            "example": 10000
+          },
+          "timezone": {
+            "type": "string",
+            "description": "The timezone of the carrier",
+            "example": "America/Argentina/Buenos_Aires"
+          },
+          "windows": {
+            "type": "array",
+            "description": "The windows of a scheduled carrier",
+            "items": {
+              "type": "object",
+              "description": "A window"
+            },
+            "example": []
+          },
+          "warehouses": {
+            "type": "array",
+            "description": "The warehouses related to the carrier",
+            "items": {
+              "type": "object",
+              "description": "A warehouse"
+            },
+            "example": []
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          }
+        },
+        "required": [
+          "carrierId",
+          "carrierName",
+          "coverageAreaType",
+          "coverageArea",
+          "slaId",
+          "slaType",
+          "slaName",
+          "warehouses",
+          "dateModified"
+        ]
+      },
+      "PostalCodeCoverageArea": {
+        "type": "object",
+        "description": "The detail of a Postal Code coverage area",
+        "properties": {
+          "start": {
+            "type": "string",
+            "description": "The start of the postal code range (inclusive)",
+            "example": "00001000"
+          },
+          "end": {
+            "type": "string",
+            "description": "The end of the postal code range (inclusive)",
+            "example": "00004000"
+          }
+        }
+      },
+      "LinearDistanceCoverageArea": {
+        "type": "object",
+        "description": "The detail of a Linear Distance coverage area",
+        "properties": {
+          "linearDistance": {
+            "type": "number",
+            "description": "The maximum linear distance of the coverage area (inclusive)",
+            "example": 100
+          }
+        }
+      },
+      "PolygonCoverageArea": {
+        "type": "object",
+        "description": "The detail of a Polygon or MultiPolygon coverage area",
+        "properties": {
+          "polygon": {
+            "type": "object",
+            "description": "A GeoJSON polygon object",
+            "example": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [
+                    -58.43595250638917,
+                    -34.59509816045706
+                  ],
+                  [
+                    -58.385543716742774,
+                    -34.583565245743394
+                  ],
+                  [
+                    -58.468247830766444,
+                    -34.57054025469026
+                  ],
+                  [
+                    -58.43595250638917,
+                    -34.59509816045706
+                  ]
+                ]
+              ]
+            }
+          }
+        }
+      },
+      "CarrierList": {
+        "type": "array",
+        "description": "A list of Carriers",
+        "items": {
+          "$ref": "#/components/schemas/Carrier"
+        }
+      },
+      "CoverageResult": {
+        "type": "object",
+        "description": "The coverage result",
+        "properties": {
+          "hasShippingCoverage": {
+            "type": "boolean",
+            "description": "Indicates if there is delivery coverage for the given location"
+          }
+        }
+      },
+      "DeliveryAreaLocationAddress": {
+        "title": "Address",
+        "description": "A delivery area location address",
+        "type": "object",
+        "properties": {
+          "type": {
+            "description": "The location type",
+            "type": "string",
+            "example": "address",
+            "enum": [
+              "address"
+            ]
+          },
+          "value": {
+            "description": "The address of the delivery area.\n\n> It is important that each address data is normalized and expressed with the long name.\n>\n> To achieve normalization, it is recommended to use the Google Maps APIs: [API Places](https://developers.google.com/maps/documentation/places/web-service?hl=es-419).\n",
+            "type": "object",
+            "properties": {
+              "street": {
+                "description": "The street",
+                "type": "string",
+                "example": "Main St"
+              },
+              "number": {
+                "description": "The street number represented in a range with a start and end.\n\n> The range limits are not inclusive to exclude deliveries.\n>\n> **Example**: If the delivery area is unavailable from **09:00** to **10:00**, it is possible to schedule deliveries starting from **10:00**.\n",
+                "type": "object",
+                "properties": {
+                  "start": {
+                    "description": "The start number",
+                    "type": "integer",
+                    "example": 100
+                  },
+                  "end": {
+                    "description": "The end number",
+                    "type": "integer",
+                    "example": 200
+                  }
+                },
+                "required": [
+                  "start",
+                  "end"
+                ]
+              },
+              "city": {
+                "description": "The city.\n\n> It is required if the `state` field is passed.\n",
+                "type": "string",
+                "nullable": true,
+                "example": "Buenos Aires"
+              },
+              "state": {
+                "description": "The state.\n\n> It is required if the `city` field is passed.\n",
+                "type": "string",
+                "nullable": true,
+                "example": "State"
+              },
+              "country": {
+                "description": "The country",
+                "type": "string",
+                "example": "Argentina"
+              },
+              "lat": {
+                "description": "The latitude.\n\n> It is required if the `lng` field is passed.\n",
+                "type": "number",
+                "nullable": true,
+                "example": -54.67676
+              },
+              "lng": {
+                "description": "The longitude.\n\n> It is required if the `lat` field is passed.\n",
+                "type": "number",
+                "nullable": true,
+                "example": -34.5667
+              }
+            },
+            "required": [
+              "street",
+              "number",
+              "country"
+            ]
+          }
+        },
+        "required": [
+          "type",
+          "value"
+        ]
+      },
+      "DeliveryAreaUnavailableWindows": {
+        "description": "A key-value object containing the unavailable windows for the delivery area.",
+        "type": "object",
+        "readOnly": true,
+        "additionalProperties": {
+          "description": "The day of the week with the windows in which the delivery area will not be available.\n\n> **Example**: monday, tuesday, wednesday, thursday, friday, saturday or sunday.\n",
+          "x-additionalPropertiesName": "<day>",
+          "type": "array",
+          "items": {
+            "description": "The unavailable windows for a given day",
+            "type": "object",
+            "properties": {
+              "start": {
+                "description": "The start time of the intervals is in **hh:mm** (24hrs) UTC format.",
+                "type": "string",
+                "example": "08:00"
+              },
+              "end": {
+                "description": "The end time of the intervals is in **hh:mm** (24hrs) UTC format.",
+                "type": "string",
+                "example": "12:00"
+              }
+            }
+          }
+        },
+        "example": {
+          "monday": [
+            {
+              "start": "08:00",
+              "end": "12:00"
+            },
+            {
+              "start": "14:00",
+              "end": "18:00"
+            }
+          ],
+          "tuesday": [
+            {
+              "start": "08:00",
+              "end": "12:00"
+            },
+            {
+              "start": "14:00",
+              "end": "18:00"
+            }
+          ]
+        }
+      },
+      "DeliveryAreaAvailability": {
+        "type": "object",
+        "description": "A Delivery Area Availability",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "timezone": {
+            "description": "The timezone",
+            "type": "string",
+            "example": "America/Argentina/Buenos_Aires"
+          },
+          "availability": {
+            "description": "The availability",
+            "type": "string",
+            "enum": [
+              "available",
+              "notAvailable"
+            ],
+            "example": "available"
+          },
+          "location": {
+            "$ref": "#/components/schemas/DeliveryAreaLocationAddress"
+          },
+          "unavailableWindows": {
+            "$ref": "#/components/schemas/DeliveryAreaUnavailableWindows"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          }
+        }
+      },
+      "DeliveryAreaAvailabilityList": {
+        "type": "array",
+        "description": "A list of Delivery Area Availabilities",
+        "items": {
+          "$ref": "#/components/schemas/DeliveryAreaAvailability"
+        }
+      },
+      "OrderConfirm": {
+        "type": "object",
+        "description": "A order confirm payload",
+        "properties": {
+          "orderIds": {
+            "description": "The order identifiers to announce. This must be the `id` of a [Order](/v2/service/oms#operation/getOrder)",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "64d41ce4927d594419cecf19"
+            ]
+          },
+          "position": {
+            "type": "string",
+            "description": "The position in which the customer is waiting for the order",
+            "example": "AGHJH-349567"
+          },
+          "pickupCheckedIn": {
+            "type": "boolean",
+            "description": "indicates if the customer announced to pick up an order",
+            "example": true
+          }
+        },
+        "required": [
+          "orderIds",
+          "pickupCheckedIn"
+        ]
+      },
+      "OrderReceiverList": {
+        "type": "array",
+        "description": "A list of orders with related shippings",
+        "items": {
+          "$ref": "#/components/schemas/OrderReceiverResponse"
+        }
+      },
+      "OrderReceiverResponse": {
+        "description": "The order response with related shipping data",
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "description": "The order identifier",
+            "type": "string",
+            "example": "64be9f4f4eb9d6b2dd843e5a"
+          },
+          "commerceId": {
+            "description": "The order commerce identifier",
+            "type": "string",
+            "example": "1308830520303-01"
+          },
+          "commerceSequentialId": {
+            "description": "The order commerce sequential identifier",
+            "type": "string",
+            "example": "528888"
+          },
+          "shippings": {
+            "description": "The related order's shippings",
+            "type": "array",
+            "items": {
+              "description": "The related order shipping",
+              "type": "object",
+              "properties": {
+                "shippingId": {
+                  "description": "The shipping's identifier",
+                  "type": "string",
+                  "example": "64be9f15466c5f6f09625dd5"
+                },
+                "status": {
+                  "description": "The shipping's status",
+                  "type": "string",
+                  "example": "scheduled"
+                },
+                "schedule": {
+                  "description": "The shipping's schedule",
+                  "type": "object",
+                  "properties": {
+                    "start": {
+                      "description": "The shipping's schedule start",
+                      "type": "string",
+                      "example": "2023-02-06T18:32:27.336Z"
+                    },
+                    "end": {
+                      "description": "The shipping's schedule end",
+                      "type": "string",
+                      "example": "2023-02-06T21:32:27.336Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "Product": {
+        "type": "object",
+        "description": "A Product",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "productId": {
+            "type": "string",
+            "description": "The ID of the product in Catalog Service",
+            "example": "a555345345345ab67a342aaa"
+          },
+          "skuId": {
+            "type": "string",
+            "description": "The ID of the SKU in Catalog Service",
+            "example": "b555345345345ab67a342aaa"
+          },
+          "productReferenceId": {
+            "type": "string",
+            "description": "The Reference ID of the product",
+            "example": "prod001"
+          },
+          "skuReferenceId": {
+            "type": "string",
+            "description": "The Reference ID of the SKU",
+            "example": "sku001"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the SKU",
+            "example": "Spaghetti White Label 500gr"
+          },
+          "eans": {
+            "type": "array",
+            "description": "The list of EANs of the SKU",
+            "items": {
+              "type": "string",
+              "description": "An EAN of the SKU"
+            },
+            "example": [
+              "4646546545464",
+              "6568798415621"
+            ]
+          },
+          "height": {
+            "type": "number",
+            "description": "The height of the SKU",
+            "example": 10
+          },
+          "width": {
+            "type": "number",
+            "description": "The width of the SKU",
+            "example": 10
+          },
+          "depth": {
+            "type": "number",
+            "description": "The depth of the SKU",
+            "example": 10
+          },
+          "volume": {
+            "type": "number",
+            "description": "The volume of the SKU",
+            "example": 1000
+          },
+          "weight": {
+            "type": "number",
+            "description": "The weight of the SKU",
+            "example": 25
+          },
+          "productGroups": {
+            "type": "array",
+            "description": "The list of Product Groups of the SKU",
+            "items": {
+              "$ref": "#/components/schemas/ProductGroup"
+            }
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          }
+        },
+        "required": [
+          "id",
+          "productId",
+          "skuId",
+          "productReferenceId",
+          "skuReferenceId",
+          "name",
+          "eans",
+          "height",
+          "width",
+          "depth",
+          "volume",
+          "weight",
+          "productGroups",
+          "dateModified"
+        ]
+      },
+      "ProductGroup": {
+        "type": "object",
+        "description": "A Product",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the Product Group",
+            "example": "Pickuponly products"
+          },
+          "behaviors": {
+            "type": "object",
+            "description": "The behaviors of the products in the group",
+            "properties": {
+              "shippingTypes": {
+                "type": "array",
+                "description": "A list of shipping type IDs that can deliver the products. No restriction is applied if this is empty",
+                "items": {
+                  "type": "string",
+                  "description": "A shipping type ID"
+                },
+                "default": []
+              },
+              "shippingTypeCodes": {
+                "type": "array",
+                "description": "A list of shipping type codes that can deliver the products. No restriction is applied if this is empty",
+                "items": {
+                  "type": "string",
+                  "description": "A shipping type code",
+                  "enum": [
+                    "expressDelivery",
+                    "delivery",
+                    "storePickup",
+                    "driveThrough"
+                  ]
+                },
+                "default": []
+              },
+              "preparationDaysOffset": {
+                "type": "number",
+                "description": "The quantity of days that the products in the group need to be ready for delivery.",
+                "example": 2,
+                "default": 0
+              }
+            },
+            "example": {
+              "shippingTypeCodes": [
+                "storePickup"
+              ]
+            }
+          },
+          "conditionals": {
+            "type": "object",
+            "description": "The conditions where the product group behaviors should be considered",
+            "properties": {
+              "warehousesIds": {
+                "type": "array",
+                "description": "A list of Warehouse IDs where the product group should be accounted for. Every warehouse is matched if this is empty.",
+                "items": {
+                  "type": "string",
+                  "description": "A Warehouse ID"
+                },
+                "default": []
+              }
+            },
+            "example": {
+              "warehousesIds": [
+                "c555345345345ab67a342aaa",
+                "d555345345345ab67a342aaa"
+              ]
+            }
+          },
+          "status": {
+            "$ref": "#/components/schemas/status"
+          }
+        }
+      },
+      "ProductList": {
+        "type": "array",
+        "description": "A list of Products",
+        "items": {
+          "$ref": "#/components/schemas/Product"
+        }
+      },
+      "SalesChannel": {
+        "type": "object",
+        "description": "A Sales Channel\n",
+        "properties": {
+          "salesChannelId": {
+            "$ref": "#/components/schemas/id"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the sales channel in Commerce Service",
+            "example": "SC-Buenos-Aires"
+          },
+          "referenceId": {
+            "type": "string",
+            "description": "The referenceId of the sales channel in Commerce Service",
+            "example": "sc-0120120"
+          },
+          "shortIdentifier": {
+            "type": "string",
+            "description": "The shortIdentifier of the sales channel in Commerce Service",
+            "example": "active"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "referenceId",
+          "status"
+        ]
+      },
+      "SalesChannelList": {
+        "type": "array",
+        "description": "A list of SalesChannels",
+        "items": {
+          "$ref": "#/components/schemas/SalesChannel"
+        }
+      },
+      "ShippingTrackingType": {
+        "description": "The shipping type code",
+        "type": "string",
+        "enum": [
+          "delivery",
+          "express_delivery",
+          "drive_through",
+          "store_pickup"
+        ],
+        "example": "delivery"
+      },
+      "ShippingTrackingSchedule": {
+        "type": "object",
+        "description": "The shipping's schedule",
+        "properties": {
+          "start": {
+            "description": "This refer the schedule `start` of the shipping",
+            "type": "string",
+            "example": "2022-01-22T11:23:58.000Z"
+          },
+          "end": {
+            "description": "This refer the schedule `end` of the shipping",
+            "type": "string",
+            "example": "2022-01-23T19:23:58.000Z"
+          }
+        }
+      },
+      "ShippingTrackingReceiver": {
+        "description": "The information about the receiver of the shipping",
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "description": "The first name of the receiver",
+            "type": "string",
+            "example": "John"
+          }
+        }
+      },
+      "ShippingTrackingIsScheduled": {
+        "description": "Indicates if the shipping is scheduled or not",
+        "type": "boolean",
+        "example": true
+      },
+      "ShippingTrackingExternalUrl": {
+        "description": "The URL of a delivery operator external tracking URL",
+        "type": "string",
+        "example": "https://example.com/track/12345678"
+      },
+      "ShippingTrackingStatuses": {
+        "description": "A list of tracking status updates",
+        "type": "array",
+        "items": {
+          "description": "The shipping generic status information",
+          "type": "object",
+          "properties": {
+            "status": {
+              "description": "The shipping status",
+              "type": "string",
+              "enum": [
+                "created",
+                "scheduled",
+                "dispatched",
+                "started",
+                "arrived",
+                "delivered",
+                "notDelivered",
+                "partiallyDelivered",
+                "returnedToSender",
+                "cancelled"
+              ],
+              "example": "created"
+            },
+            "date": {
+              "description": "The date of the tracking status change",
+              "type": "string",
+              "format": "date-time",
+              "example": "2023-03-23T19:13:58.000Z"
+            }
+          }
+        }
+      },
+      "DeliveryShippingTrackingResult": {
+        "description": "A delivery tracking result",
+        "title": "Delivery shipping",
+        "type": "object",
+        "properties": {
+          "type": {
+            "description": "The shipping type code",
+            "type": "string",
+            "enum": [
+              "delivery",
+              "express_delivery"
+            ],
+            "example": "delivery"
+          },
+          "receiver": {
+            "$ref": "#/components/schemas/ShippingTrackingReceiver"
+          },
+          "schedule": {
+            "$ref": "#/components/schemas/ShippingTrackingSchedule"
+          },
+          "isScheduled": {
+            "$ref": "#/components/schemas/ShippingTrackingIsScheduled"
+          },
+          "externalTrackingUrl": {
+            "$ref": "#/components/schemas/ShippingTrackingExternalUrl"
+          },
+          "statuses": {
+            "$ref": "#/components/schemas/ShippingTrackingStatuses"
+          },
+          "dropoff": {
+            "description": "A public version of the shipping dropoff (only present when the shipping is not pickup nor drive through)",
+            "type": "object",
+            "properties": {
+              "country": {
+                "description": "The dropoff country code",
+                "type": "string",
+                "example": "ARG"
+              },
+              "state": {
+                "description": "The dropoff state",
+                "type": "string",
+                "example": "Ciudad Autónoma de Buenos Aires"
+              },
+              "city": {
+                "description": "The dropoff city",
+                "type": "string",
+                "example": "Ciudad Autónoma de Buenos Aires"
+              },
+              "approximateLocation": {
+                "description": "An approximate location of the dropoff point",
+                "type": "object",
+                "properties": {
+                  "lat": {
+                    "description": "The approximate latitude",
+                    "type": "number",
+                    "example": -34.603
+                  },
+                  "lng": {
+                    "description": "The approximate longitude",
+                    "type": "number",
+                    "example": -58.381
+                  }
+                },
+                "required": [
+                  "lat",
+                  "lng"
+                ]
+              }
+            },
+            "required": [
+              "country",
+              "state"
+            ]
+          },
+          "companyName": {
+            "description": "The name of the delivery company name",
+            "type": "string",
+            "example": "DHL"
+          },
+          "driverName": {
+            "description": "The firstname of the delivery driver",
+            "type": "string",
+            "example": "DHL"
+          },
+          "vehiclePlate": {
+            "description": "A redacted version of the delivery vehicle plate number",
+            "type": "string",
+            "example": "****123"
+          },
+          "currentLocation": {
+            "description": "The last known location of the shipping. This may be available only if the shipping is on the way to dropoff point.",
+            "type": "object",
+            "properties": {
+              "date": {
+                "description": "The date of the last update",
+                "type": "string",
+                "format": "date-time",
+                "example": "2023-03-23T19:13:58.000Z"
+              },
+              "lat": {
+                "description": "The last known  (approximate)",
+                "type": "number",
+                "example": -34.593
+              },
+              "lng": {
+                "description": "The last known longitude (approximate)",
+                "type": "number",
+                "example": -58.391
+              }
+            }
+          },
+          "rescheduleValidation": {
+            "type": "object",
+            "description": "Indicates whether the orders associated with the shipping can be rescheduled",
+            "properties": {
+              "isValid": {
+                "type": "boolean",
+                "example": false
+              },
+              "validationError": {
+                "type": "string",
+                "example": "Order status \"inDelivery\" is not valid for rescheduling"
+              }
+            }
+          }
+        }
+      },
+      "PickupShippingTrackingResult": {
+        "description": "A pickup tracking result",
+        "title": "Pickup shipping",
+        "type": "object",
+        "properties": {
+          "type": {
+            "description": "The shipping type code",
+            "type": "string",
+            "enum": [
+              "store_pickup",
+              "drive_through"
+            ],
+            "example": "store_pickup"
+          },
+          "receiver": {
+            "$ref": "#/components/schemas/ShippingTrackingReceiver"
+          },
+          "schedule": {
+            "$ref": "#/components/schemas/ShippingTrackingSchedule"
+          },
+          "isScheduled": {
+            "$ref": "#/components/schemas/ShippingTrackingIsScheduled"
+          },
+          "externalTrackingUrl": {
+            "$ref": "#/components/schemas/ShippingTrackingExternalUrl"
+          },
+          "statuses": {
+            "$ref": "#/components/schemas/ShippingTrackingStatuses"
+          },
+          "pickupPoint": {
+            "description": "The information of the pickup point where the shipping should be picked up (only present when the shipping is pickup or drive through)",
+            "type": "object",
+            "properties": {
+              "country": {
+                "description": "The pickup point country code",
+                "type": "string",
+                "example": "ARG"
+              },
+              "state": {
+                "description": "The pickup point state",
+                "type": "string",
+                "example": "Ciudad Autónoma de Buenos Aires"
+              },
+              "city": {
+                "description": "The pickup point city",
+                "type": "string",
+                "example": "Ciudad Autónoma de Buenos Aires"
+              },
+              "neighborhood": {
+                "description": "The pickup point city",
+                "type": "string",
+                "example": "San Nicolás"
+              },
+              "street": {
+                "description": "The pickup point street",
+                "type": "string",
+                "example": "Av. Corrientes"
+              },
+              "number": {
+                "description": "The pickup point street number",
+                "type": "string",
+                "example": "1000"
+              },
+              "postalCode": {
+                "description": "The pickup point postal code",
+                "type": "string",
+                "example": "1035"
+              },
+              "lat": {
+                "description": "The pickup point latitude",
+                "type": "number",
+                "example": -34.603
+              },
+              "lng": {
+                "description": "The pickup point longitude",
+                "type": "number",
+                "example": -58.381
+              }
+            },
+            "required": [
+              "country",
+              "state",
+              "street",
+              "number",
+              "lat",
+              "lng"
+            ]
+          }
+        }
+      },
+      "ShippingTrackingResult": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/ShippingTrackingType"
+          }
+        },
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/DeliveryShippingTrackingResult"
+          },
+          {
+            "$ref": "#/components/schemas/PickupShippingTrackingResult"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "type",
+          "mapping": {
+            "delivery": "#/components/schemas/DeliveryShippingTrackingResult",
+            "express_delivery": "#/components/schemas/DeliveryShippingTrackingResult",
+            "store_pickup": "#/components/schemas/PickupShippingTrackingResult",
+            "drive_through": "#/components/schemas/PickupShippingTrackingResult"
+          }
+        }
+      },
+      "Simulation": {
+        "type": "object",
+        "description": "The constraints for a simulation by shipping SLA",
+        "properties": {
+          "slaName": {
+            "description": "The SLA names to simulate. This must be the `title` of a [Shipping Type](/v2/service/delivery#operation/getShippingType).",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "description": "The preferred shipping SLA name to simulate",
+              "example": "Same day delivery"
+            }
+          },
+          "dropoff": {
+            "type": "object",
+            "description": "The dropoff location of the shipping.\n\nIf it is required to validate the shipping options with the availability of the delivery area, it is necessary to provide the address details (`street`, `number`, `city`, `state` and `country`).\n\nTime slots that overlap with the unavailability times of the delivery area will be excluded. [See Delivery Area Availability](/v2/service/delivery#tag/Delivery-Area-Availability).\n\n> It is important that each address data is normalized and expressed with the long name.\n>\n> To achieve normalization, it is recommended to use the Google Maps APIs: [API Places](https://developers.google.com/maps/documentation/places/web-service?hl=es-419).\n",
+            "properties": {
+              "coordinates": {
+                "type": "array",
+                "description": "An array with longitude and latitude of the dropoff location.\n\n> It is required if the `postalCode` field is not passed.\n",
+                "items": {
+                  "type": "number",
+                  "description": "The longitude and latitude."
+                },
+                "example": [
+                  -58.381631,
+                  -34.603686
+                ],
+                "minItems": 2,
+                "maxItems": 2
+              },
+              "postalCode": {
+                "type": "string",
+                "description": "The ZIP Code / Postal Code of the dropoff location.\n\n> It is required if the `coordinates` field is not passed.\n",
+                "example": "1425"
+              },
+              "street": {
+                "type": "string",
+                "description": "The street of the dropoff location.\n\nThe equivalent to the `route` field in **GMaps**.\n",
+                "example": "Av. Pres. Roque Sáenz Peña 1118"
+              },
+              "number": {
+                "type": "number",
+                "description": "The number of the dropoff location.\n\nThe equivalent to the `street_number` field in **GMaps**.\n",
+                "example": 1425
+              },
+              "city": {
+                "type": "string",
+                "description": "The city of the dropoff location.\n\nThe equivalent to the `locality` field in **GMaps**.\n\n> It is required if the `state` field is not passed.\n",
+                "example": "Buenos Aires"
+              },
+              "state": {
+                "type": "string",
+                "description": "The state of the dropoff location.\n\nThe equivalent to the `administrative_area_level_1` field in **GMaps**.\n\n> It is required if the `city` field is not passed.\n",
+                "example": "Ciudad Autónoma de Buenos Aires"
+              },
+              "country": {
+                "type": "string",
+                "description": "The country of the dropoff location.\n\nThe equivalent to the `country` field in **GMaps**.\n",
+                "example": "Argentina"
+              }
+            }
+          }
+        },
+        "required": [
+          "slaName",
+          "dropoff"
+        ]
+      },
+      "SimulationBaseOption": {
+        "allOf": [
+          {
+            "type": "object",
+            "description": "A shipping option for express delivery",
+            "properties": {
+              "availableSalesChannels": {
+                "description": "The available sale channels.",
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "description": "The available sale channel",
+                  "example": "6519f282ed8a33f9b42d9328"
+                }
+              }
+            }
+          },
+          {
+            "$ref": "#/components/schemas/SimulationBaseOption"
+          }
+        ]
+      },
+      "SimulationExpressDeliveryOption": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/SimulationBySLAExpressDeliveryOption"
+          },
+          {
+            "$ref": "#/components/schemas/SimulationBaseOption"
+          }
+        ]
+      },
+      "SimulationDeliveryOption": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/SimulationBySLADeliveryOption"
+          },
+          {
+            "$ref": "#/components/schemas/SimulationBaseOption"
+          }
+        ]
+      },
+      "SimulationStorePickupDeliveryOption": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/SimulationBySLAStorePickupDeliveryOption"
+          },
+          {
+            "$ref": "#/components/schemas/SimulationBaseOption"
+          }
+        ]
+      },
+      "SimulationResponse": {
+        "type": "object",
+        "description": "The simulation result",
+        "properties": {
+          "shippingOptions": {
+            "type": "array",
+            "description": "The shipping options",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/SimulationExpressDeliveryOption"
+                },
+                {
+                  "$ref": "#/components/schemas/SimulationDeliveryOption"
+                },
+                {
+                  "$ref": "#/components/schemas/SimulationStorePickupDeliveryOption"
+                }
+              ],
+              "discriminator": {
+                "propertyName": "shippingType",
+                "mapping": {
+                  "expressDelivery": "#/components/schemas/SimulationExpressDeliveryOption",
+                  "delivery": "#/components/schemas/SimulationDeliveryOption",
+                  "storePickup": "#/components/schemas/SimulationStorePickupDeliveryOption"
+                }
+              },
+              "required": [
+                "shippingOptions"
+              ]
+            }
+          },
+          "availableSlas": {
+            "description": "The available SLA with delivery options",
+            "type": "array",
+            "items": {
+              "description": "The SLA name",
+              "type": "string",
+              "example": "Same day delivery"
+            }
+          },
+          "availableSaleChannels": {
+            "description": "The available sales channels with delivery options",
+            "type": "array",
+            "items": {
+              "description": "The available sales channels",
+              "type": "object",
+              "properties": {
+                "id": {
+                  "description": "The Janis internal ID of the sales channel",
+                  "type": "string",
+                  "example": "6519f282ed8a33f9b42d9328"
+                },
+                "referenceId": {
+                  "description": "The Janis (external) reference ID of the sales channel",
+                  "type": "string",
+                  "example": "Principal-01"
+                },
+                "name": {
+                  "description": "The sales channel name",
+                  "type": "string",
+                  "example": "Principal Store"
+                }
+              }
+            }
+          }
+        }
+      },
+      "SimulationBySLARequest": {
+        "type": "object",
+        "description": "The constraints for a simulation by shipping SLA",
+        "properties": {
+          "slaName": {
+            "type": "string",
+            "description": "The preferred shipping SLA name to simulate. This must be the `title` of a [Shipping Type](/v2/service/delivery#operation/getShippingType).",
+            "example": "Same day delivery"
+          },
+          "dropoff": {
+            "type": "object",
+            "description": "The dropoff location of the shipping",
+            "properties": {
+              "coordinates": {
+                "type": "array",
+                "description": "An array with longitude and latitude of the dropoff location",
+                "items": {
+                  "type": "number",
+                  "description": "The longitude and latitude"
+                },
+                "example": [
+                  -58.381631,
+                  -34.603686
+                ],
+                "minItems": 2,
+                "maxItems": 2
+              },
+              "postalCode": {
+                "type": "string",
+                "description": "The ZIP Code / Postal Code of the dropoff location",
+                "example": "1425"
+              }
+            },
+            "minProperties": 1
+          },
+          "salesChannel": {
+            "type": "object",
+            "description": "The shipping order sales channel",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "The Janis internal ID of the sales channel"
+              },
+              "referenceId": {
+                "type": "string",
+                "description": "The Janis (external) reference ID of the sales channel"
+              }
+            },
+            "example": {
+              "referenceId": "64654"
+            },
+            "maxProperties": 1
+          },
+          "skus": {
+            "type": "array",
+            "description": "The SKUs that need to be simulated",
+            "items": {
+              "$ref": "#/components/schemas/SimulationBySLASku"
+            },
+            "minItems": 1
+          }
+        },
+        "required": [
+          "slaName",
+          "dropoff",
+          "skus"
+        ]
+      },
+      "SimulationBySLASku": {
+        "type": "object",
+        "description": "An SKU to be simulated",
+        "properties": {
+          "referenceId": {
+            "type": "string",
+            "description": "The Janis (external) reference ID of the SKU",
+            "example": "S1234"
+          },
+          "quantity": {
+            "type": "number",
+            "description": "The amount of SKUs to simulate",
+            "example": 1
+          },
+          "externalId": {
+            "type": "string",
+            "description": "An external ID that can be passed and will be returned in the response",
+            "example": "4"
+          }
+        },
+        "required": [
+          "referenceId",
+          "quantity"
+        ]
+      },
+      "SimulationBySLABaseOption": {
+        "type": "object",
+        "description": "A shipping option",
+        "properties": {
+          "carrierId": {
+            "type": "string",
+            "description": "The Janis internal ID of the carrier",
+            "example": "c555345345345ab67a342aaa"
+          },
+          "carrierName": {
+            "type": "string",
+            "description": "The name of the carrier",
+            "example": "Same day delivery"
+          },
+          "slaName": {
+            "type": "string",
+            "description": "The SLA name",
+            "example": "Same day delivery"
+          },
+          "shippingType": {
+            "type": "string",
+            "description": "The shipping type of the carrier",
+            "enum": [
+              "expressDelivery"
+            ],
+            "example": "expressDelivery"
+          },
+          "price": {
+            "type": "number",
+            "description": "The price of the shipping option",
+            "example": 100
+          }
+        },
+        "required": [
+          "carrierId",
+          "carrierName",
+          "slaName",
+          "shippingType",
+          "price"
+        ]
+      },
+      "SimulationBySLAExpressDeliveryOption": {
+        "allOf": [
+          {
+            "type": "object",
+            "description": "A shipping option for express delivery",
+            "properties": {
+              "price": {
+                "type": "number",
+                "description": "The price of the shipping option",
+                "example": 100
+              },
+              "minEstimatedDeliveryTimeInHours": {
+                "type": "number",
+                "description": "The minimum estimated time for delivery in hours",
+                "example": 24,
+                "default": 168
+              },
+              "maxEstimatedDeliveryTimeInHours": {
+                "type": "number",
+                "description": "The maximum estimated time for delivery in hours",
+                "example": 48,
+                "default": 168
+              }
+            },
+            "required": [
+              "price",
+              "minEstimatedDeliveryTimeInHours",
+              "maxEstimatedDeliveryTimeInHours"
+            ]
+          },
+          {
+            "$ref": "#/components/schemas/SimulationBySLABaseOption"
+          }
+        ]
+      },
+      "SimulationBySLADeliveryOption": {
+        "allOf": [
+          {
+            "type": "object",
+            "description": "A shipping option for scheduled delivery",
+            "properties": {
+              "windows": {
+                "type": "array",
+                "description": "The delivery windows available for the shipping option. Available for carriers with windows.",
+                "items": {
+                  "type": "object",
+                  "description": "A delivery window available for the shipping option",
+                  "properties": {
+                    "start": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "The start of the delivery window",
+                      "example": "2021-10-15T08:00:00.000Z"
+                    },
+                    "end": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "The end of the delivery window",
+                      "example": "2021-10-15T12:00:00.000Z"
+                    },
+                    "price": {
+                      "type": "number",
+                      "description": "The extra price for this delivery window",
+                      "example": 10
+                    }
+                  },
+                  "required": [
+                    "start",
+                    "end"
+                  ]
+                },
+                "minItems": 1
+              }
+            },
+            "required": [
+              "windows"
+            ]
+          },
+          {
+            "$ref": "#/components/schemas/SimulationBySLABaseOption"
+          }
+        ]
+      },
+      "SimulationBySLAStorePickupDeliveryOption": {
+        "allOf": [
+          {
+            "type": "object",
+            "description": "A shipping option for store pickup",
+            "properties": {
+              "price": {
+                "type": "number",
+                "description": "The price of the shipping option",
+                "example": 100
+              },
+              "minEstimatedDeliveryTimeInHours": {
+                "type": "number",
+                "description": "The minimum estimated time for delivery in hours",
+                "example": 24,
+                "default": 168
+              },
+              "maxEstimatedDeliveryTimeInHours": {
+                "type": "number",
+                "description": "The maximum estimated time for delivery in hours",
+                "example": 48,
+                "default": 168
+              },
+              "pickupPoints": {
+                "type": "array",
+                "description": "The pickup points allowed. Available for carriers with shipping type `storePickup`",
+                "items": {
+                  "$ref": "#/components/schemas/SimulationBySLAPickupPoint"
+                },
+                "minItems": 1
+              }
+            },
+            "required": [
+              "price",
+              "minEstimatedDeliveryTimeInHours",
+              "maxEstimatedDeliveryTimeInHours"
+            ]
+          },
+          {
+            "$ref": "#/components/schemas/SimulationBySLABaseOption"
+          }
+        ]
+      },
+      "SimulationBySLAResponse": {
+        "type": "object",
+        "description": "The simulation result",
+        "properties": {
+          "carts": {
+            "type": "array",
+            "description": "A list of carts to partition the order",
+            "items": {
+              "type": "object",
+              "description": "A cart partition",
+              "properties": {
+                "skus": {
+                  "type": "array",
+                  "description": "The SKUs that are part of the partition",
+                  "items": {
+                    "$ref": "#/components/schemas/SimulationBySLASku"
+                  },
+                  "minItems": 1
+                },
+                "shippingOptions": {
+                  "type": "array",
+                  "description": "The shipping options for the cart partition",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/SimulationBySLAExpressDeliveryOption"
+                      },
+                      {
+                        "$ref": "#/components/schemas/SimulationBySLADeliveryOption"
+                      },
+                      {
+                        "$ref": "#/components/schemas/SimulationBySLAStorePickupDeliveryOption"
+                      }
+                    ],
+                    "discriminator": {
+                      "propertyName": "shippingType",
+                      "mapping": {
+                        "expressDelivery": "#/components/schemas/SimulationBySLAExpressDeliveryOption",
+                        "delivery": "#/components/schemas/SimulationBySLADeliveryOption",
+                        "storePickup": "#/components/schemas/SimulationBySLAStorePickupDeliveryOption"
+                      }
+                    }
+                  }
+                }
+              },
+              "required": [
+                "skus",
+                "shippingOptions"
+              ]
+            }
+          }
+        },
+        "required": [
+          "carts"
+        ]
+      },
+      "SimulationBySLAPickupPoint": {
+        "type": "object",
+        "description": "A pickup point for store pickup delivery",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "referenceId": {
+            "type": "string",
+            "description": "The Janis (external) reference ID of the Pickup Point",
+            "example": "PP1234"
+          },
+          "name": {
+            "type": "string",
+            "description": "The friendly name of the pickup point",
+            "example": "Downtown store"
+          },
+          "address": {
+            "type": "string",
+            "description": "The formatted address of the pickup point",
+            "example": "Av. Pres. Roque Sáenz Peña 1118, Buenos Aires"
+          },
+          "coordinates": {
+            "type": "array",
+            "description": "An array with longitude and latitude of the pickup point",
+            "items": {
+              "type": "number",
+              "description": "The longitude and latitude"
+            },
+            "example": [
+              -58.381631,
+              -34.603686
+            ],
+            "minItems": 2,
+            "maxItems": 2
+          },
+          "schedule": {
+            "type": "array",
+            "description": "A list of open schedules of the pickup point",
+            "items": {
+              "type": "object",
+              "description": "An open schedule of the pickup point",
+              "properties": {
+                "day": {
+                  "type": "string",
+                  "description": "The day of the schedule",
+                  "enum": [
+                    "sunday",
+                    "monday",
+                    "tuesday",
+                    "wednesday",
+                    "thursday",
+                    "friday",
+                    "saturday"
+                  ],
+                  "example": "monday"
+                },
+                "hours": {
+                  "type": "array",
+                  "description": "The open ranges for the day",
+                  "items": {
+                    "type": "object",
+                    "description": "An open range for the day",
+                    "properties": {
+                      "open": {
+                        "type": "string",
+                        "description": "The start time of the range",
+                        "example": "08:00Z"
+                      },
+                      "close": {
+                        "type": "string",
+                        "description": "The end time of the range",
+                        "example": "12:00Z"
+                      }
+                    },
+                    "required": [
+                      "open",
+                      "close"
+                    ]
+                  },
+                  "minItems": 1
+                }
+              },
+              "required": [
+                "day",
+                "hours"
+              ]
+            },
+            "minItems": 1
+          }
+        },
+        "required": [
+          "id",
+          "referenceId",
+          "name",
+          "address",
+          "coordinates"
+        ]
+      },
+      "Stock": {
+        "type": "object",
+        "description": "A Stock",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "stockId": {
+            "type": "string",
+            "description": "The ID of the stock in WMS Service",
+            "example": "a555345345345ab67a342aaa"
+          },
+          "skuId": {
+            "type": "string",
+            "description": "The ID of the SKU in Catalog Service",
+            "example": "b555345345345ab67a342aaa"
+          },
+          "warehouseId": {
+            "type": "string",
+            "description": "The ID of the Warehouse in WMS Service",
+            "example": "cb555345345345ab67a342aaa"
+          },
+          "quantity": {
+            "type": "number",
+            "description": "The quantity of items in stock. If product has infinite stock, this will be set as `999999999`.",
+            "example": 10
+          },
+          "hasInfiniteStock": {
+            "type": "boolean",
+            "description": "Whether the SKU has infinite stock or not",
+            "example": false
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          }
+        },
+        "required": [
+          "id",
+          "stockId",
+          "skuId",
+          "warehouseId",
+          "quantity",
+          "hasInfiniteStock",
+          "dateModified"
+        ]
+      },
+      "StockList": {
+        "type": "array",
+        "description": "A list of Stocks",
+        "items": {
+          "$ref": "#/components/schemas/Stock"
+        }
+      },
+      "SyncStatus": {
+        "type": "object",
+        "description": "The Delivery Simulation Sync Status",
+        "properties": {
+          "status": {
+            "description": "The current sync status",
+            "type": "string",
+            "default": "inactive",
+            "enum": [
+              "active",
+              "inactive",
+              "enabling",
+              "disabling",
+              "error"
+            ],
+            "example": "inactive"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          },
+          "userCreated": {
+            "$ref": "#/components/schemas/userCreated"
+          },
+          "userModified": {
+            "$ref": "#/components/schemas/userModified"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "TimeSlot": {
+        "type": "object",
+        "description": "A Time slot",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "carrierId": {
+            "type": "string",
+            "description": "The ID of the Carrier in Delivery Service",
+            "example": "a555345345345ab67a342aaa"
+          },
+          "dateStart": {
+            "description": "The date when the time slot starts",
+            "type": "string",
+            "format": "date-time",
+            "example": "2019-07-12T19:00:00.00Z"
+          },
+          "dateEnd": {
+            "description": "The date when the time slot ends",
+            "type": "string",
+            "format": "date-time",
+            "example": "2019-07-12T19:00:00.00Z"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          }
+        },
+        "required": [
+          "id",
+          "carrierId",
+          "dateStart",
+          "dateEnd",
+          "dateModified"
+        ]
+      },
+      "TimeSlotList": {
+        "type": "array",
+        "description": "A list of Time Slots",
+        "items": {
+          "$ref": "#/components/schemas/TimeSlot"
+        }
+      }
+    }
+  }
+}

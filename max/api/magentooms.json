@@ -1,0 +1,1599 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Magento Oms Service",
+    "description": "The integration service for Magento Order Management\n\n **Last update**: 13 feb 26, 12:56 p. m.",
+    "version": "1.2.0",
+    "x-janis-private": true,
+    "x-logo": null,
+    "x-janis-keywords": [
+      "magento",
+      "adobe",
+      "orders",
+      "hook",
+      "ecommerce",
+      "integration"
+    ],
+    "lastUpdate": "2026-02-13T15:56:24.303Z"
+  },
+  "tags": [
+    {
+      "name": "Account",
+      "description": "For listen Accounts changes in Magento-Commerce Service"
+    },
+    {
+      "name": "Order",
+      "description": "To Handle Order's Status Changes"
+    },
+    {
+      "name": "Orders Delivery",
+      "description": "To Handle the Delivery Notifications between Magento and Janis"
+    },
+    {
+      "name": "Orders Invoice",
+      "description": "To Handle the Invoices Notifications between Magento and Janis"
+    },
+    {
+      "name": "Store",
+      "description": "For listen Stores changes in Magento-Commerce Service"
+    }
+  ],
+  "x-tagGroups": [
+    {
+      "name": "Orders",
+      "tags": [
+        "Order",
+        "Orders Delivery",
+        "Orders Invoice"
+      ]
+    },
+    {
+      "name": "Event Listeners",
+      "tags": [
+        "Account",
+        "Store"
+      ]
+    }
+  ],
+  "servers": [
+    {
+      "url": "https://magento.oms.janis.in/api",
+      "description": "The Prod API server",
+      "variables": {
+        "environment": {
+          "default": "prod"
+        }
+      }
+    },
+    {
+      "url": "https://magento.oms.janisqa.in/api",
+      "description": "The QA API server",
+      "variables": {
+        "environment": {
+          "default": "qa"
+        }
+      }
+    },
+    {
+      "url": "https://magento.oms.janisdev.in/api",
+      "description": "The Beta API server",
+      "variables": {
+        "environment": {
+          "default": "beta"
+        }
+      }
+    },
+    {
+      "url": "http://magento-oms.janis.localhost:3097/api",
+      "description": "The Local API server",
+      "variables": {
+        "environment": {
+          "default": "local"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/integration-order": {
+      "get": {
+        "x-janis-namespace": "integration-order",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "magento-oms:order:read"
+        ],
+        "operationId": "getIntegrationOrder",
+        "tags": [
+          "Order"
+        ],
+        "summary": "Get order from integration",
+        "description": "Retrieve an order from the integration system",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "integrationOrderId",
+            "in": "query",
+            "description": "The integration order ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "accountId",
+            "in": "query",
+            "description": "The account ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Integration order found"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/magento-order": {
+      "get": {
+        "x-janis-namespace": "magento-order",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "magento-oms:order:read"
+        ],
+        "operationId": "getMagentoOrder",
+        "tags": [
+          "Order"
+        ],
+        "summary": "Get MAGENTO Order",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "magentoId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "2783"
+            },
+            "required": true,
+            "description": "The unique identifier of magento resource, is required if magentoSeqId does not exist"
+          },
+          {
+            "name": "magentoSeqId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "000054431"
+            },
+            "required": true,
+            "description": "The unique sequence identifier of magento resource, is required if magentoId does not exist"
+          },
+          {
+            "$ref": "#/components/parameters/accountIdOptional"
+          },
+          {
+            "$ref": "#/components/parameters/accountNameOptional"
+          },
+          {
+            "name": "field",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "paymentData.transactions"
+            },
+            "description": "Specifies which order property should be returned in the response. It accepts nested properties using (.) dot notation"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The MAGENTO Order"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/order/{id}": {
+      "get": {
+        "x-janis-namespace": "order",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "magento-oms:order:read"
+        ],
+        "operationId": "getOrder",
+        "tags": [
+          "Order"
+        ],
+        "summary": "Get an Order",
+        "description": "Retrieve a specific order record",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/order": {
+      "get": {
+        "x-janis-namespace": "order",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "magento-oms:order:read"
+        ],
+        "operationId": "listOrder",
+        "tags": [
+          "Order"
+        ],
+        "summary": "List Orders",
+        "description": "Retrieve a list of order records",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/OrderSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/OrderFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order listed",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/order/{id}/cancel": {
+      "post": {
+        "x-janis-namespace": "order",
+        "x-janis-method": "cancel",
+        "x-janis-permissions": [],
+        "operationId": "cancelOrder",
+        "tags": [
+          "Order"
+        ],
+        "summary": "Cancel an order in Magento",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "example": "The OMS order ID"
+            },
+            "required": true,
+            "description": "5d1fc1eeb5b68406e0487a06"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GenericSuccess"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/order/{id}/invoice": {
+      "post": {
+        "x-janis-namespace": "order",
+        "x-janis-method": "invoice",
+        "operationId": "invoiceOrder",
+        "tags": [
+          "Orders Invoice"
+        ],
+        "summary": "Request changes and invoicing of an Order",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "example": "The OMS order ID"
+            },
+            "required": true,
+            "description": "5d1fc1eeb5b68406e0487a06"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GenericSuccess"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/order-status-change/{id}": {
+      "get": {
+        "x-janis-namespace": "order-status-change",
+        "x-janis-method": "get",
+        "x-janis-permissions": [
+          "magento-oms:order-status-change:read"
+        ],
+        "operationId": "getOrderStatusChange",
+        "tags": [
+          "Order"
+        ],
+        "summary": "Get an Order Status Change",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order Status Change found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderStatusChange"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/order-status-change": {
+      "get": {
+        "x-janis-namespace": "order-status-change",
+        "x-janis-method": "list",
+        "x-janis-permissions": [
+          "magento-oms:order-status-change:read"
+        ],
+        "operationId": "listOrderStatusChanges",
+        "tags": [
+          "Order"
+        ],
+        "summary": "List Order Status Changes",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/OrderStatusChangeSortBy"
+          },
+          {
+            "$ref": "#/components/parameters/ListSortDirection"
+          },
+          {
+            "$ref": "#/components/parameters/OrderStatusChangeFilters"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageNumber"
+          },
+          {
+            "$ref": "#/components/parameters/ListPageSize"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order Status Changes listed",
+            "headers": {
+              "x-janis-total": {
+                "$ref": "#/components/headers/x-janis-total"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderStatusChangeList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/order-status-change/{id}/retry": {
+      "post": {
+        "x-janis-namespace": "order-status-change",
+        "x-janis-method": "retry",
+        "x-janis-permissions": [
+          "magento-oms:order-status-change:write"
+        ],
+        "operationId": "retryOrderStatusChange",
+        "tags": [
+          "Order"
+        ],
+        "summary": "Retry the processing of an order status change",
+        "description": "**IMPORTANT**: Processing will happen asynchronously. To check the status call [Get an Order Status Change API](#operation/getOrderStatusChange).\n",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GenericSuccess"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/order-status-change-hook": {
+      "post": {
+        "x-janis-namespace": "order-status-change",
+        "x-janis-method": "hook",
+        "x-janis-permissions": [
+          "magento-oms:order-status-change:write"
+        ],
+        "operationId": "orderStatusChangeHook",
+        "tags": [
+          "Order"
+        ],
+        "summary": "Submit a new order status change",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "The status change data",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrderStatusChangeHookItem"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/HookOrderStatusChange"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/listener/magento-commerce/account/saved": {
+      "post": {
+        "x-janis-namespace": "magento-commerce-account",
+        "x-janis-method": "saved-listener",
+        "operationId": "magentoCommerceAccountSavedListener",
+        "tags": [
+          "Account"
+        ],
+        "summary": "Magento Commerce Account Saved Event Listener",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/listenerEvent"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GenericSuccess"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/listener/magento-commerce/store/saved": {
+      "post": {
+        "x-janis-namespace": "magento-commerce-store",
+        "x-janis-method": "saved-listener",
+        "operationId": "magentoCommerceStoreSavedListener",
+        "tags": [
+          "Store"
+        ],
+        "summary": "Magento Commerce Store Saved Event Listener",
+        "security": [
+          {
+            "ApiKey": [],
+            "ApiSecret": [],
+            "JanisClient": []
+          }
+        ],
+        "requestBody": {
+          "description": "The event",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/listenerEvent"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GenericSuccess"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-key",
+        "description": "The API Key"
+      },
+      "ApiSecret": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-api-secret",
+        "description": "The API Secret"
+      },
+      "JanisClient": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "janis-client",
+        "description": "The Client Code"
+      }
+    },
+    "parameters": {
+      "id": {
+        "name": "id",
+        "in": "path",
+        "schema": {
+          "type": "string",
+          "example": "d555345345345as67a342a"
+        },
+        "required": true,
+        "description": "The unique identifier of the item"
+      },
+      "ListSortDirection": {
+        "name": "sortDirection",
+        "in": "query",
+        "description": "The direction to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
+        }
+      },
+      "ListPageNumber": {
+        "name": "x-janis-page",
+        "in": "header",
+        "description": "The page to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "default": 1
+        }
+      },
+      "ListPageSize": {
+        "name": "x-janis-page-size",
+        "in": "header",
+        "description": "The page size to get",
+        "required": false,
+        "schema": {
+          "type": "number",
+          "minimum": 0,
+          "default": 60
+        }
+      },
+      "JanisEntity": {
+        "name": "janis-entity",
+        "in": "header",
+        "description": "The entity name",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "accountIdOptional": {
+        "name": "accountId",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "example": "631faca9d04d04341a7b7611"
+        },
+        "description": "The account id of the magento resource"
+      },
+      "accountNameOptional": {
+        "name": "accountName",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "example": "fizzmodarg"
+        },
+        "description": "The account name of the magento resource"
+      },
+      "OrderSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "dateCreated",
+            "dateModified"
+          ]
+        }
+      },
+      "OrderFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/Order/properties/id"
+            },
+            "integrationOrderId": {
+              "$ref": "#/components/schemas/Order/properties/integrationOrderId"
+            },
+            "accountId": {
+              "$ref": "#/components/schemas/Order/properties/accountId"
+            },
+            "status": {
+              "$ref": "#/components/schemas/Order/properties/status"
+            },
+            "dateCreatedRange": {
+              "$ref": "#/components/schemas/dateCreatedRange"
+            },
+            "dateModifiedRange": {
+              "$ref": "#/components/schemas/dateModifiedRange"
+            }
+          }
+        }
+      },
+      "OrderStatusChangeSortBy": {
+        "name": "sortBy",
+        "in": "query",
+        "description": "The field to sort by",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "dateCreated"
+          ]
+        }
+      },
+      "OrderStatusChangeFilters": {
+        "name": "filters",
+        "in": "query",
+        "description": "The filters to apply to the list",
+        "required": false,
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/OrderStatusChange/properties/id"
+            },
+            "source": {
+              "$ref": "#/components/schemas/OrderStatusChange/properties/source"
+            },
+            "orderId": {
+              "$ref": "#/components/schemas/OrderStatusChange/properties/orderId"
+            },
+            "externalRef": {
+              "$ref": "#/components/schemas/OrderStatusChange/properties/externalRef"
+            },
+            "state": {
+              "$ref": "#/components/schemas/OrderStatusChange/properties/state"
+            },
+            "account": {
+              "$ref": "#/components/schemas/OrderStatusChange/properties/account"
+            },
+            "status": {
+              "$ref": "#/components/schemas/OrderStatusChange/properties/status"
+            },
+            "dateCreatedRange": {
+              "type": "object",
+              "description": "A range for creation date",
+              "properties": {
+                "from": {
+                  "type": "string",
+                  "description": "The beginning of the range",
+                  "format": "date-time",
+                  "example": "2019-11-27T16:08:24.994Z"
+                },
+                "to": {
+                  "type": "string",
+                  "description": "The end of the range",
+                  "format": "date-time",
+                  "example": "2019-11-30T16:08:24.994Z"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "headers": {
+      "x-janis-total": {
+        "description": "The total amount of records in the list",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "responses": {
+      "SuccessCreateResponse": {
+        "description": "The item was created",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "SuccessUpdateResponse": {
+        "description": "The item was updated",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "GenericSuccess": {
+        "description": "Operation succeeded",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "BadRequest": {
+        "description": "A client error has ocurred.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Authentication missing or invalid",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Not authorized request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "description": "A message explaining the error",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "InternalError": {
+        "description": "A server error has ocurred."
+      },
+      "HookOrderStatusChange": {
+        "description": "The status change was submitted",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "number",
+                  "description": "The status change id"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "id": {
+        "description": "The unique identifier of the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "d555345345345as67a342a"
+      },
+      "status": {
+        "description": "The item status",
+        "type": "string",
+        "default": "active",
+        "enum": [
+          "active",
+          "inactive"
+        ],
+        "example": "active"
+      },
+      "dateCreated": {
+        "description": "The date of creation",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-12T19:00:00.000Z"
+      },
+      "dateModified": {
+        "description": "The date of the last modification",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-07-20T19:00:00.000Z"
+      },
+      "dateCreatedDay": {
+        "description": "The day of creation",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-08-07T16:00:00.000Z"
+      },
+      "dateModifiedDay": {
+        "description": "The day of last modification",
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true,
+        "example": "2019-08-07T16:00:00.000Z"
+      },
+      "dateCreatedRange": {
+        "description": "Creation date range",
+        "type": "object",
+        "properties": {
+          "from": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/dateCreated"
+              }
+            ],
+            "description": "Date range from"
+          },
+          "to": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/dateCreated"
+              }
+            ],
+            "description": "Date range to"
+          }
+        }
+      },
+      "dateModifiedRange": {
+        "description": "Last modification date range",
+        "type": "object",
+        "properties": {
+          "from": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/dateModified"
+              }
+            ],
+            "description": "Date range from"
+          },
+          "to": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/dateModified"
+              }
+            ],
+            "description": "Date range to"
+          }
+        }
+      },
+      "userCreated": {
+        "description": "The ID of the user who created the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "6a1fc1eeb5b68406e0487a10"
+      },
+      "userModified": {
+        "description": "The ID of the user who last modified the item",
+        "type": "string",
+        "readOnly": true,
+        "example": "7e1fc1eeb5b68406e048796"
+      },
+      "Order": {
+        "type": "object",
+        "description": "An order",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "integrationOrderId": {
+            "type": "string",
+            "description": "The integration order id",
+            "example": "V1StGXR8Z5jdHi6B"
+          },
+          "accountId": {
+            "type": "string",
+            "description": "The id of the account associated with the order",
+            "example": "672cdadd1849404bde3d0c70"
+          },
+          "deliveryId": {
+            "type": "string",
+            "description": "The id associated with order shipping",
+            "example": "672cdadd1849404bde3d0c80"
+          },
+          "accountName": {
+            "type": "string",
+            "description": "The name of the account associated with the order",
+            "example": "fizzmodarg"
+          },
+          "status": {
+            "description": "The order status",
+            "type": "string",
+            "enum": [
+              "accepted",
+              "cancelled"
+            ],
+            "example": "accepted"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          }
+        },
+        "required": [
+          "id",
+          "integrationOrderId",
+          "accountId",
+          "accountName",
+          "status"
+        ]
+      },
+      "OrderList": {
+        "type": "array",
+        "description": "A list of orders",
+        "items": {
+          "$ref": "#/components/schemas/Order"
+        }
+      },
+      "DataDelivered": {
+        "type": "object",
+        "description": "Order data for inform to Magento that it is delivered",
+        "properties": {
+          "order": {
+            "$ref": "#/components/schemas/OrderDelivered"
+          }
+        },
+        "required": [
+          "order"
+        ]
+      },
+      "OrderDelivered": {
+        "type": "object",
+        "description": "Order data for inform to Magento that it is shipped",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The `id` of an **Order** in [OMS Service](/v2/service/oms#tag/Order)",
+            "example": "6000798c6b464000084d8d40"
+          },
+          "commerceId": {
+            "type": "string",
+            "description": "The Magento Order ID. Refers to `commerceId` of an **Order** in [OMS Service](/v2/service/oms#tag/Order)",
+            "example": "4354534545-01"
+          },
+          "orderGroupCommerceId": {
+            "type": "string",
+            "description": "The Magento Order Group Commerce-ID. Refers to `orderGroupCommerceId` of an **Order** in [OMS Service](/v2/service/oms#tag/Order)",
+            "example": "4354534545"
+          },
+          "account": {
+            "type": "object",
+            "description": "The Account related to the Order",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "The `id` of an **Account** in [Commerce Service](/v2/service/commerce#tag/Account)",
+                "example": "6000798c6b464000084d8d40"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "commerceId",
+          "account"
+        ]
+      },
+      "DataReadyForPickup": {
+        "type": "object",
+        "description": "The data of the order ready for pickup",
+        "properties": {
+          "order": {
+            "$ref": "#/components/schemas/OrderReadyForPickup"
+          }
+        },
+        "required": [
+          "order"
+        ]
+      },
+      "OrderReadyForPickup": {
+        "type": "object",
+        "description": "Order data for inform to Magento that it is ready for pickup",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The `id` of an **Order** in [OMS Service](/v2/service/oms#tag/Order)",
+            "example": "6000798c6b464000084d8d40"
+          },
+          "commerceId": {
+            "type": "string",
+            "description": "The Magento Order ID. Refers to `commerceId` of an **Order** in [OMS Service](/v2/service/oms#tag/Order)",
+            "example": "4354534545-01"
+          },
+          "orderGroupCommerceId": {
+            "type": "string",
+            "description": "The Magento Order Group Commerce-ID. Refers to `orderGroupCommerceId` of an **Order** in [OMS Service](/v2/service/oms#tag/Order)",
+            "example": "4354534545"
+          },
+          "shipping": {
+            "type": "object",
+            "description": "The order's shipping to notify",
+            "properties": {
+              "isPickUp": {
+                "type": "boolean",
+                "description": "Indicates if the Shipping type is Pickup. The `isPickUp` of a `shipping` in an **Order** in [OMS Service](/v2/service/oms#tag/Order)",
+                "example": false
+              }
+            },
+            "required": [
+              "isPickUp"
+            ]
+          },
+          "account": {
+            "type": "object",
+            "description": "The Account related to the Order",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "The `id` of an **Account** in [Commerce Service](/v2/service/commerce#tag/Account)",
+                "example": "6000798c6b464000084d8d40"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "commerceId",
+          "shipping",
+          "account"
+        ]
+      },
+      "DataShipped": {
+        "type": "object",
+        "description": "The data of the shipped order",
+        "properties": {
+          "order": {
+            "$ref": "#/components/schemas/OrderShipped"
+          },
+          "trackingId": {
+            "type": "string",
+            "description": "The tracking number of the Shipping",
+            "example": "771717172"
+          },
+          "trackingUrl": {
+            "type": "string",
+            "description": "The tracking URL of the Shipping",
+            "example": "http://routeoftracking.com"
+          }
+        },
+        "required": [
+          "order"
+        ]
+      },
+      "OrderShipped": {
+        "type": "object",
+        "description": "Order data for inform to Magento that it is shipped",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The `id` of an **Order** in [OMS Service](/v2/service/oms#tag/Order)",
+            "example": "6000798c6b464000084d8d40"
+          },
+          "commerceId": {
+            "type": "string",
+            "description": "The Magento Order ID. Refers to `commerceId` of an **Order** in [OMS Service](/v2/service/oms#tag/Order)",
+            "example": "4354534545-01"
+          },
+          "orderGroupCommerceId": {
+            "type": "string",
+            "description": "The Magento Order Group Commerce-ID. Refers to `orderGroupCommerceId` of an **Order** in [OMS Service](/v2/service/oms#tag/Order)",
+            "example": "4354534545"
+          },
+          "shipping": {
+            "type": "object",
+            "description": "The order's shipping to notify",
+            "properties": {
+              "companyName": {
+                "type": "string",
+                "description": "The `companyName` of a `shipping` in an **Order** in [OMS Service](/v2/service/oms#tag/Order)",
+                "example": "E-Delivery"
+              },
+              "isPickUp": {
+                "type": "boolean",
+                "description": "Indicates if the Shipping is Pickup Type. The `isPickUp` of a `shipping` in an **Order** in [OMS Service](/v2/service/oms#tag/Order)",
+                "example": false
+              },
+              "warehouseId": {
+                "type": "string",
+                "description": "This refers to the `id` in the **Warehouse** Entity. See [Warehouse](/v2/service/wms#tag/Warehouse).",
+                "example": "6b8bdac48ba45b0011913909"
+              }
+            },
+            "required": [
+              "companyName",
+              "isPickUp"
+            ]
+          },
+          "account": {
+            "type": "object",
+            "description": "The Account related to the Order",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "The `id` of an **Account** in [Commerce Service](/v2/service/commerce#tag/Account)",
+                "example": "6000798c6b464000084d8d40"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "commerceId",
+          "shipping",
+          "account"
+        ]
+      },
+      "OrderStatusChange": {
+        "type": "object",
+        "description": "An Order Status Change",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "source": {
+            "type": "string",
+            "description": "The source of the status change",
+            "enum": [
+              "magento"
+            ],
+            "example": "magento"
+          },
+          "orderId": {
+            "type": "string",
+            "description": "The Magento ID of the order",
+            "example": "130"
+          },
+          "state": {
+            "type": "string",
+            "description": "The new state of the order",
+            "example": "pending"
+          },
+          "account": {
+            "type": "string",
+            "description": "The name of the Magento account that originated the status change",
+            "example": "fizzmod"
+          },
+          "externalRef": {
+            "type": "string",
+            "description": "An External Reference for the Order",
+            "example": "000000024"
+          },
+          "stateMessage": {
+            "type": "string",
+            "description": "The State Explanation",
+            "example": "A New Order"
+          },
+          "loggingData": {
+            "type": "array",
+            "description": "A list of logging information of the status change process",
+            "readOnly": true,
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "Saved status change in DB",
+              "Fetched order data from Magento OMS"
+            ]
+          },
+          "requestData": {
+            "type": "object",
+            "description": "The request data used when fetching data from Magento during the order status change process"
+          },
+          "requestResponse": {
+            "type": "object",
+            "description": "The response data used when fetching data from Magento during the order status change process"
+          },
+          "status": {
+            "description": "The order status change processing status",
+            "type": "string",
+            "default": "pending",
+            "enum": [
+              "pending",
+              "processing",
+              "processed",
+              "error"
+            ],
+            "example": "pending"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/dateCreated"
+          },
+          "dateModified": {
+            "$ref": "#/components/schemas/dateModified"
+          }
+        },
+        "required": [
+          "id",
+          "orderId",
+          "state",
+          "account",
+          "externalRef"
+        ]
+      },
+      "OrderStatusChangeList": {
+        "type": "array",
+        "description": "A list of Order Status Changes",
+        "items": {
+          "$ref": "#/components/schemas/OrderStatusChange"
+        }
+      },
+      "OrderStatusChangeHookItem": {
+        "type": "object",
+        "description": "A Magento order status change hook record",
+        "properties": {
+          "accountName": {
+            "type": "string",
+            "description": "The order's account name"
+          },
+          "orderId": {
+            "type": "string",
+            "description": "The Magento Order Incremental ID"
+          },
+          "externalRef": {
+            "type": "string",
+            "description": "The Magento Order External ID"
+          },
+          "status": {
+            "type": "string",
+            "description": "The current order status name"
+          },
+          "statusCode": {
+            "type": "string",
+            "description": "The current order status code"
+          }
+        },
+        "required": [
+          "accountName",
+          "orderId",
+          "externalRef",
+          "status",
+          "statusCode"
+        ]
+      },
+      "listenerEvent": {
+        "description": "A JANIS Event object",
+        "type": "object",
+        "properties": {
+          "service": {
+            "description": "The source service name",
+            "type": "string",
+            "example": "id"
+          },
+          "entity": {
+            "description": "The event related entity",
+            "type": "string",
+            "example": "profile"
+          },
+          "event": {
+            "description": "The event name",
+            "type": "string",
+            "example": "created"
+          },
+          "client": {
+            "description": "The source event client",
+            "type": "string",
+            "example": "fizzmod"
+          },
+          "id": {
+            "description": "The event related entity ID",
+            "type": "string",
+            "example": "5d699c1ae8ebb95eaa24aca9"
+          }
+        },
+        "required": [
+          "service",
+          "entity",
+          "event"
+        ]
+      }
+    }
+  }
+}

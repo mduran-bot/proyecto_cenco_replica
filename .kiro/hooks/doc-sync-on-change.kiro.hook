@@ -1,0 +1,22 @@
+{
+  "enabled": true,
+  "name": "Documentation Sync",
+  "description": "Monitors changes to source files (Terraform .tf files, Python .py files, Markdown .md files, and configuration files) and prompts the agent to update relevant documentation in README or docs folder to keep documentation in sync with code changes",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "*.tf",
+      "*.py",
+      "*.md",
+      "*.yaml",
+      "*.yml",
+      "*.json",
+      "*.tfvars"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "I've made changes to source files in the repository. Please review these changes and update the relevant documentation. If there's a /docs folder or Documentación Cenco folder, update documentation there. Otherwise, update the README or other relevant markdown files. Ensure the documentation accurately reflects the current state of the code, configuration, and architecture."
+  }
+}

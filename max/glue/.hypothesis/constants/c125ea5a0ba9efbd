@@ -1,0 +1,4 @@
+# file: C:\Users\maxim\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\IPython\utils\terminal.py
+# hypothesis_version: 6.151.9
+
+['\x1b[22;0t', '\x1b[23;0t', '\x1b]0;%s\x07', 'TERM', 'clear', 'cls', 'posix', 'win32', 'xterm']

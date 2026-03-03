@@ -1,0 +1,4 @@
+# file: C:\Users\maxim\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\py4j\clientserver.py
+# hypothesis_version: 6.151.9
+
+['%s\n', '127.0.0.1', 'Answer received: {0}', 'Close connection', 'Command to send: {0}', 'Connection is closed', 'Error while sending', 'Object ID unknown', 'Unknown command {0}', '__shutdown__', 'py4j.clientserver', 'rb', 'utf-8', 'y', 'z\n', '{0}\n{1}\n']

@@ -1,0 +1,4 @@
+# file: C:\Users\maxim\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\py4j\java_gateway.py
+# hypothesis_version: 6.151.9
+
+[b'ii', 0.0001, 4096, 25333, 25334, '\ne\n', '$', '(*', '--die-on-broken-pipe', '--enable-auth', '-classpath', '.', '../../../py4j-java/', '../share/py4j/', '1.0', '127.0.0.1', 'Answer received: {0}', 'Command to send: {0}', 'DEFAULT', 'Error while sending', 'Error while sending.', 'GatewayClient.port', 'GatewayParameters', 'JAVA_HOME', 'JavaObject id=', 'Object ID unknown', 'Unknown command {0}', '__', '__call__', '__dir__', '_detach', '_fqn', '_get_object_id', '_java_lang_class', 'bin', 'container', 'creationflags', 'custom jvm', 'java', 'name', 'nt', 'preexec_fn', 'py4j', 'py4j-{0}.jar', 'py4j.GatewayServer', 'py4j.java_gateway', 'py4j{0}.jar', 'rb', 'share/py4j/', 'shell', 't', 'true', 'utf-8', 'w', 'write', 'y', 'yes', '{0}\n{1}\n']

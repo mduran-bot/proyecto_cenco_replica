@@ -1,0 +1,4 @@
+# file: C:\Users\maxim\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\pyspark\sql\observation.py
+# hypothesis_version: 6.151.9
+
+['JavaObject', 'NOT_STR', 'Observation', 'PythonTest', 'REUSE_OBSERVATION', '__main__', 'arg_name', 'arg_type', 'arg_value', 'local[4]', 'name', 'spark']

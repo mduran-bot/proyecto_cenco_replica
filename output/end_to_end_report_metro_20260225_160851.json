@@ -1,0 +1,185 @@
+{
+  "timestamp": "2026-02-25T16:08:51.581050",
+  "client": "metro",
+  "test_entities": [
+    "orders",
+    "order-items",
+    "products",
+    "skus",
+    "stock"
+  ],
+  "entity_to_gold_table": {
+    "orders": "wms_orders",
+    "order-items": "wms_order_items",
+    "products": "products",
+    "skus": "skus",
+    "stock": "stock"
+  },
+  "results": {
+    "bronze_to_silver": {
+      "orders": {
+        "status": "SUCCESS",
+        "records_loaded": 3,
+        "metrics": {
+          "records_read": 0,
+          "records_written": 0,
+          "transformations_applied": 0
+        },
+        "silver_verified": true
+      },
+      "order-items": {
+        "status": "SUCCESS",
+        "records_loaded": 4,
+        "metrics": {
+          "records_read": 0,
+          "records_written": 0,
+          "transformations_applied": 0
+        },
+        "silver_verified": true
+      },
+      "products": {
+        "status": "SUCCESS",
+        "records_loaded": 4,
+        "metrics": {
+          "records_read": 0,
+          "records_written": 0,
+          "transformations_applied": 0
+        },
+        "silver_verified": true
+      },
+      "skus": {
+        "status": "SUCCESS",
+        "records_loaded": 4,
+        "metrics": {
+          "records_read": 0,
+          "records_written": 0,
+          "transformations_applied": 0
+        },
+        "silver_verified": true
+      },
+      "stock": {
+        "status": "SUCCESS",
+        "records_loaded": 5,
+        "metrics": {
+          "records_read": 0,
+          "records_written": 0,
+          "transformations_applied": 0
+        },
+        "silver_verified": true
+      }
+    },
+    "silver_to_gold": {
+      "wms_orders": {
+        "status": "SUCCESS",
+        "metrics": {
+          "records_read": 0,
+          "records_written": 0,
+          "fields_mapped": 0
+        },
+        "gold_verified": false
+      },
+      "wms_order_items": {
+        "status": "FAILED",
+        "error": "2026-02-25 16:07:02,280 [INFO] ============================================================\n2026-02-25 16:07:02,280 [INFO] PIPELINE SILVER \u2192 GOLD: wms_order_items\n2026-02-25 16:07:02,280 [INFO] Cliente: metro\n2026-02-25 16:07:02,280 [INFO] ============================================================\n2026-02-25 16:07:02,281 [INFO] Tabla: wms_order_items\n2026-02-25 16:07:02,281 [INFO] Entidad fuente: order-items\n2026-02-25 16:07:02,281 [INFO] Particionamiento: none\n2026-02-25 16:07:02,281 [INFO] Input: ['s3a://data-lake-silver/metro_order-items_clean']\n2026-02-25 16:07:02,281 [INFO] Output: s3a://data-lake-gold/metro/order-items\nWARNING: Using incubator modules: jdk.incubator.vector\n:: loading settings :: url = jar:file:/C:/Users/maxim/AppData/Local/Packages/PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0/LocalCache/local-packages/Python311/site-packages/pyspark/jars/ivy-2.5.3.jar!/org/apache/ivy/core/settings/ivysettings.xml\nIvy Default Cache set to: C:\\Users\\maxim\\.ivy2.5.2\\cache\nThe jars for the packages stored in: C:\\Users\\maxim\\.ivy2.5.2\\jars\norg.apache.hadoop#hadoop-aws added as a dependency\ncom.amazonaws#aws-java-sdk-bundle added as a dependency\n:: resolving dependencies :: org.apache.spark#spark-submit-parent-585bd777-a606-4910-a7e4-0d52a5e27679;1.0\n\tconfs: [default]\n\tfound org.apache.hadoop#hadoop-aws;3.3.4 in central\n\tfound com.amazonaws#aws-java-sdk-bundle;1.12.262 in central\n\tfound org.wildfly.openssl#wildfly-openssl;1.0.7.Final in central\n:: resolution report :: resolve 163ms :: artifacts dl 40ms\n\t:: modules in use:\n\tcom.amazonaws#aws-java-sdk-bundle;1.12.262 from central in [default]\n\torg.apache.hadoop#hadoop-aws;3.3.4 from central in [default]\n\torg.wildfly.openssl#wildfly-openssl;1.0.7.Final from central in [default]\n\t---------------------------------------------------------------------\n\t|                  |            modules            ||   artifacts   |\n\t|       conf       | number| search|dwnlded|evicted|| number|dwnlded|\n\t---------------------------------------------------------------------\n\t|      default     |   3   |   0   |   0   |   0   ||   3   |   0   |\n\t---------------------------------------------------------------------\n:: retrieving :: org.apache.spark#spark-submit-parent-585bd777-a606-4910-a7e4-0d52a5e27679\n\tconfs: [default]\n\t0 artifacts copied, 3 already retrieved (0kB/19ms)\nUsing Spark's default log4j profile: org/apache/spark/log4j2-defaults.properties\nSetting default log level to \"WARN\".\nTo adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).\n2026-02-25 16:07:19,765 [INFO] [SchemaMapper] Cargados mapeos para 5 tablas\n2026-02-25 16:07:19,765 [INFO] [CalculatedFieldsEngine] Cargados esquemas para 5 tablas\n2026-02-25 16:07:19,973 [WARNING] [DataQualityValidator] Archivo no encontrado: max/src/config/redshift_schemas.json\n2026-02-25 16:07:19,973 [INFO] Leyendo datos de Silver...\n2026-02-25 16:07:19,973 [INFO]   Leyendo: s3a://data-lake-silver/metro_order-items_clean\n26/02/25 16:07:21 WARN FileStreamSink: Assume no metadata directory. Error while looking for metadata directory in the path: s3a://data-lake-silver/metro_order-items_clean.\njava.io.FileNotFoundException: No such file or directory: s3a://data-lake-silver/metro_order-items_clean\n\tat org.apache.hadoop.fs.s3a.S3AFileSystem.s3GetFileStatus(S3AFileSystem.java:3866)\n\tat org.apache.hadoop.fs.s3a.S3AFileSystem.innerGetFileStatus(S3AFileSystem.java:3688)\n\tat org.apache.hadoop.fs.s3a.S3AFileSystem.lambda$getFileStatus$24(S3AFileSystem.java:3556)\n\tat org.apache.hadoop.fs.statistics.impl.IOStatisticsBinding.invokeTrackingDuration(IOStatisticsBinding.java:547)\n\tat org.apache.hadoop.fs.statistics.impl.IOStatisticsBinding.lambda$trackDurationOfOperation$5(IOStatisticsBinding.java:528)\n\tat org.apache.hadoop.fs.statistics.impl.IOStatisticsBinding.trackDuration(IOStatisticsBinding.java:449)\n\tat org.apache.hadoop.fs.s3a.S3AFileSystem.trackDurationAndSpan(S3AFileSystem.java:2337)\n\tat org.apache.hadoop.fs.s3a.S3AFileSystem.trackDurationAndSpan(S3AFileSystem.java:2356)\n\tat org.apache.hadoop.fs.s3a.S3AFileSystem.getFileStatus(S3AFileSystem.java:3554)\n\tat org.apache.spark.sql.execution.streaming.sinks.FileStreamSink$.hasMetadata(FileStreamSink.scala:58)\n\tat org.apache.spark.sql.execution.datasources.DataSource.resolveRelation(DataSource.scala:384)\n\tat org.apache.spark.sql.catalyst.analysis.ResolveDataSource.org$apache$spark$sql$catalyst$analysis$ResolveDataSource$$loadV1BatchSource(ResolveDataSource.scala:143)\n\tat org.apache.spark.sql.catalyst.analysis.ResolveDataSource$$anonfun$apply$1.$anonfun$applyOrElse$2(ResolveDataSource.scala:61)\n\tat scala.Option.getOrElse(Option.scala:201)\n\tat org.apache.spark.sql.catalyst.analysis.ResolveDataSource$$anonfun$apply$1.applyOrElse(ResolveDataSource.scala:61)\n\tat org.apache.spark.sql.catalyst.analysis.ResolveDataSource$$anonfun$apply$1.applyOrElse(ResolveDataSource.scala:45)\n\tat org.apache.spark.sql.catalyst.plans.logical.AnalysisHelper.$anonfun$resolveOperatorsUpWithPruning$3(AnalysisHelper.scala:139)\n\tat org.apache.spark.sql.catalyst.trees.CurrentOrigin$.withOrigin(origin.scala:107)\n\tat org.apache.spark.sql.catalyst.plans.logical.AnalysisHelper.$anonfun$resolveOperatorsUpWithPruning$1(AnalysisHelper.scala:139)\n\tat org.apache.spark.sql.catalyst.plans.logical.AnalysisHelper$.allowInvokingTransformsInAnalyzer(AnalysisHelper.scala:416)\n\tat org.apache.spark.sql.catalyst.plans.logical.AnalysisHelper.resolveOperatorsUpWithPruning(AnalysisHelper.scala:135)\n\tat org.apache.spark.sql.catalyst.plans.logical.AnalysisHelper.resolveOperatorsUpWithPruning$(AnalysisHelper.scala:131)\n\tat org.apache.spark.sql.catalyst.plans.logical.LogicalPlan.resolveOperatorsUpWithPruning(LogicalPlan.scala:37)\n\tat org.apache.spark.sql.catalyst.plans.logical.AnalysisHelper.resolveOperatorsUp(AnalysisHelper.scala:112)\n\tat org.apache.spark.sql.catalyst.plans.logical.AnalysisHelper.resolveOperatorsUp$(AnalysisHelper.scala:111)\n\tat org.apache.spark.sql.catalyst.plans.logical.LogicalPlan.resolveOperatorsUp(LogicalPlan.scala:37)\n\tat org.apache.spark.sql.catalyst.analysis.ResolveDataSource.apply(ResolveDataSource.scala:45)\n\tat org.apache.spark.sql.catalyst.analysis.ResolveDataSource.apply(ResolveDataSource.scala:43)\n\tat org.apache.spark.sql.catalyst.rules.RuleExecutor.$anonfun$execute$2(RuleExecutor.scala:248)\n\tat scala.collection.LinearSeqOps.foldLeft(LinearSeq.scala:183)\n\tat scala.collection.LinearSeqOps.foldLeft$(LinearSeq.scala:179)\n\tat scala.collection.immutable.List.foldLeft(List.scala:79)\n\tat org.apache.spark.sql.catalyst.rules.RuleExecutor.$anonfun$execute$1(RuleExecutor.scala:245)\n\tat org.apache.spark.sql.catalyst.rules.RuleExecutor.$anonfun$execute$1$adapted(RuleExecutor.scala:237)\n\tat scala.collection.immutable.List.foreach(List.scala:323)\n\tat org.apache.spark.sql.catalyst.rules.RuleExecutor.execute(RuleExecutor.scala:237)\n\tat org.apache.spark.sql.catalyst.analysis.Analyzer.org$apache$spark$sql$catalyst$analysis$Analyzer$$executeSameContext(Analyzer.scala:343)\n\tat org.apache.spark.sql.catalyst.analysis.Analyzer.$anonfun$execute$1(Analyzer.scala:339)\n\tat org.apache.spark.sql.catalyst.analysis.AnalysisContext$.withNewAnalysisContext(Analyzer.scala:224)\n\tat org.apache.spark.sql.catalyst.analysis.Analyzer.execute(Analyzer.scala:339)\n\tat org.apache.spark.sql.catalyst.analysis.Analyzer.execute(Analyzer.scala:289)\n\tat org.apache.spark.sql.catalyst.rules.RuleExecutor.$anonfun$executeAndTrack$1(RuleExecutor.scala:207)\n\tat org.apache.spark.sql.catalyst.QueryPlanningTracker$.withTracker(QueryPlanningTracker.scala:89)\n\tat org.apache.spark.sql.catalyst.rules.RuleExecutor.executeAndTrack(RuleExecutor.scala:207)\n\tat org.apache.spark.sql.catalyst.analysis.resolver.HybridAnalyzer.resolveInFixedPoint(HybridAnalyzer.scala:236)\n\tat org.apache.spark.sql.catalyst.analysis.resolver.HybridAnalyzer.$anonfun$apply$1(HybridAnalyzer.scala:91)\n\tat org.apache.spark.sql.catalyst.analysis.resolver.HybridAnalyzer.withTrackedAnalyzerBridgeState(HybridAnalyzer.scala:122)\n\tat org.apache.spark.sql.catalyst.analysis.resolver.HybridAnalyzer.apply(HybridAnalyzer.scala:84)\n\tat org.apache.spark.sql.catalyst.analysis.Analyzer.$anonfun$executeAndCheck$1(Analyzer.scala:322)\n\tat org.apache.spark.sql.catalyst.plans.logical.AnalysisHelper$.markInAnalyzer(AnalysisHelper.scala:423)\n\tat org.apache.spark.sql.catalyst.analysis.Analyzer.executeAndCheck(Analyzer.scala:322)\n\tat org.apache.spark.sql.execution.QueryExecution.$anonfun$lazyAnalyzed$2(QueryExecution.scala:139)\n\tat org.apache.spark.sql.catalyst.QueryPlanningTracker.measurePhase(QueryPlanningTracker.scala:148)\n\tat org.apache.spark.sql.execution.QueryExecution.$anonfun$executePhase$2(QueryExecution.scala:330)\n\tat org.apache.spark.sql.execution.QueryExecution$.withInternalError(QueryExecution.scala:717)\n\tat org.apache.spark.sql.execution.QueryExecution.$anonfun$executePhase$1(QueryExecution.scala:330)\n\tat org.apache.spark.sql.SparkSession.withActive(SparkSession.scala:804)\n\tat org.apache.spark.sql.execution.QueryExecution.executePhase(QueryExecution.scala:329)\n\tat org.apache.spark.sql.execution.QueryExecution.$anonfun$lazyAnalyzed$1(QueryExecution.scala:139)\n\tat scala.util.Try$.apply(Try.scala:217)\n\tat org.apache.spark.util.Utils$.doTryWithCallerStacktrace(Utils.scala:1392)\n\tat org.apache.spark.util.LazyTry.tryT$lzycompute(LazyTry.scala:46)\n\tat org.apache.spark.util.LazyTry.tryT(LazyTry.scala:46)\n\tat org.apache.spark.util.LazyTry.get(LazyTry.scala:58)\n\tat org.apache.spark.sql.execution.QueryExecution.analyzed(QueryExecution.scala:150)\n\tat org.apache.spark.sql.execution.QueryExecution.assertAnalyzed(QueryExecution.scala:90)\n\tat org.apache.spark.sql.classic.Dataset$.$anonfun$ofRows$1(Dataset.scala:114)\n\tat org.apache.spark.sql.SparkSession.withActive(SparkSession.scala:804)\n\tat org.apache.spark.sql.classic.Dataset$.ofRows(Dataset.scala:112)\n\tat org.apache.spark.sql.classic.DataFrameReader.load(DataFrameReader.scala:108)\n\tat org.apache.spark.sql.classic.DataFrameReader.load(DataFrameReader.scala:57)\n\tat org.apache.spark.sql.DataFrameReader.json(DataFrameReader.scala:296)\n\tat org.apache.spark.sql.classic.DataFrameReader.json(DataFrameReader.scala:149)\n\tat java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)\n\tat java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)\n\tat java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)\n\tat java.base/java.lang.reflect.Method.invoke(Method.java:568)\n\tat py4j.reflection.MethodInvoker.invoke(MethodInvoker.java:244)\n\tat py4j.reflection.ReflectionEngine.invoke(ReflectionEngine.java:374)\n\tat py4j.Gateway.invoke(Gateway.java:282)\n\tat py4j.commands.AbstractCommand.invokeMethod(AbstractCommand.java:132)\n\tat py4j.commands.CallCommand.execute(CallCommand.java:79)\n\tat py4j.ClientServerConnection.waitForCommands(ClientServerConnection.java:184)\n\tat py4j.ClientServerConnection.run(ClientServerConnection.java:108)\n\tat java.base/java.lang.Thread.run(Thread.java:842)\nTraceback (most recent call last):\n  File \"C:\\Users\\maxim\\Desktop\\3htp\\cencosud-janis\\local-stack\\Proyecto_Cenco\\max\\glue\\etl-silver-to-gold\\run_pipeline_to_gold.py\", line 245, in <module>\n    sys.exit(main())\n             ^^^^^^\n  File \"C:\\Users\\maxim\\Desktop\\3htp\\cencosud-janis\\local-stack\\Proyecto_Cenco\\max\\glue\\etl-silver-to-gold\\run_pipeline_to_gold.py\", line 176, in main\n    df_temp = spark.read.json(input_path)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\maxim\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\pyspark\\sql\\readwriter.py\", line 468, in json\n    return self._df(self._jreader.json(self._spark._sc._jvm.PythonUtils.toSeq(path)))\n                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\maxim\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\py4j\\java_gateway.py\", line 1362, in __call__\n    return_value = get_return_value(\n                   ^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\maxim\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\pyspark\\errors\\exceptions\\captured.py\", line 269, in deco\n    raise converted from None\npyspark.errors.exceptions.captured.AnalysisException: [PATH_NOT_FOUND] Path does not exist: s3a://data-lake-silver/metro_order-items_clean. SQLSTATE: 42K03\n2026-02-25 16:07:21,272 [INFO] Closing down clientserver connection\n"
+      },
+      "products": {
+        "status": "SUCCESS",
+        "metrics": {
+          "records_read": 0,
+          "records_written": 0,
+          "fields_mapped": 0
+        },
+        "gold_verified": false
+      },
+      "skus": {
+        "status": "SUCCESS",
+        "metrics": {
+          "records_read": 0,
+          "records_written": 0,
+          "fields_mapped": 0
+        },
+        "gold_verified": false
+      },
+      "stock": {
+        "status": "SUCCESS",
+        "metrics": {
+          "records_read": 0,
+          "records_written": 0,
+          "fields_mapped": 0
+        },
+        "gold_verified": false
+      }
+    },
+    "validations": {
+      "wms_orders": {
+        "schema_validation": "PASSED",
+        "expected_fields": 18,
+        "record_count_validation": "WARNING",
+        "counts": {
+          "bronze": 0,
+          "silver": 0,
+          "gold": 0
+        },
+        "calculated_fields_validation": "PASSED",
+        "calculated_fields": [
+          "total_changes"
+        ]
+      },
+      "products": {
+        "schema_validation": "PASSED",
+        "expected_fields": 9,
+        "record_count_validation": "WARNING",
+        "counts": {
+          "bronze": 0,
+          "silver": 0,
+          "gold": 0
+        }
+      },
+      "skus": {
+        "schema_validation": "PASSED",
+        "expected_fields": 9,
+        "record_count_validation": "WARNING",
+        "counts": {
+          "bronze": 0,
+          "silver": 0,
+          "gold": 0
+        }
+      },
+      "stock": {
+        "schema_validation": "PASSED",
+        "expected_fields": 8,
+        "record_count_validation": "WARNING",
+        "counts": {
+          "bronze": 0,
+          "silver": 0,
+          "gold": 0
+        }
+      },
+      "wms_order_items": {
+        "record_count_validation": "WARNING",
+        "counts": {
+          "bronze": 0,
+          "silver": 0,
+          "gold": 0
+        }
+      }
+    }
+  },
+  "summary": {
+    "bronze_to_silver": {
+      "total": 5,
+      "successful": 5,
+      "success_rate": 100.0
+    },
+    "silver_to_gold": {
+      "total": 5,
+      "successful": 4,
+      "success_rate": 80.0
+    },
+    "validations": {
+      "total": 5,
+      "passed": 4,
+      "success_rate": 80.0
+    }
+  }
+}

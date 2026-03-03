@@ -1,0 +1,100 @@
+[
+  {
+    "id": "item_001",
+    "order_id": "test_order_001",
+    "sku": "SKU001",
+    "name": "Product A",
+    "quantity": 2,
+    "quantity_picked": 2,
+    "price": 50.25,
+    "listPrice": 60.00,
+    "imageUrl": "https://example.com/product-a.jpg",
+    "dateCreated": 1706025600,
+    "dateModified": 1706029200,
+    "dimensions": {
+      "width": 10.5,
+      "height": 20.0,
+      "length": 15.0,
+      "weight": 500
+    },
+    "categories": [
+      {
+        "id": "cat_001",
+        "name": "Electronics"
+      }
+    ],
+    "brandId": "brand_001",
+    "brandName": "BrandA"
+  },
+  {
+    "id": "item_002",
+    "order_id": "test_order_001",
+    "sku": "SKU002",
+    "name": "Product B",
+    "quantity": 1,
+    "quantity_picked": 1,
+    "price": 50.00,
+    "listPrice": 50.00,
+    "imageUrl": "https://example.com/product-b.jpg",
+    "dateCreated": 1706025600,
+    "dateModified": 1706029200,
+    "dimensions": {
+      "width": 5.0,
+      "height": 10.0,
+      "length": 8.0,
+      "weight": 200
+    },
+    "categories": [
+      {
+        "id": "cat_002",
+        "name": "Home"
+      }
+    ],
+    "brandId": "brand_002",
+    "brandName": "BrandB"
+  },
+  {
+    "id": "item_003",
+    "order_id": "test_order_002",
+    "sku": "SKU003",
+    "name": "Product C",
+    "quantity": 5,
+    "quantity_picked": null,
+    "price": 10.00,
+    "listPrice": 10.00,
+    "imageUrl": null,
+    "dateCreated": 1706025700,
+    "dateModified": null,
+    "dimensions": null,
+    "categories": [],
+    "brandId": null,
+    "brandName": null
+  },
+  {
+    "id": "item_001",
+    "order_id": "test_order_001",
+    "sku": "SKU001",
+    "name": "Product A",
+    "quantity": 2,
+    "quantity_picked": 2,
+    "price": 50.25,
+    "listPrice": 60.00,
+    "imageUrl": "https://example.com/product-a.jpg",
+    "dateCreated": 1706025600,
+    "dateModified": 1706030000,
+    "dimensions": {
+      "width": 10.5,
+      "height": 20.0,
+      "length": 15.0,
+      "weight": 500
+    },
+    "categories": [
+      {
+        "id": "cat_001",
+        "name": "Electronics"
+      }
+    ],
+    "brandId": "brand_001",
+    "brandName": "BrandA"
+  }
+]

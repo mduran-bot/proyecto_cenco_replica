@@ -1,0 +1,1235 @@
+{
+  "_comment": "Mapeo de campos Silver → Gold para todas las tablas",
+  "_description": "Define qué campos de Silver se mapean a qué campos en Gold (Redshift)",
+  
+  "mappings": {
+    "wms_orders": {
+      "source_entity": "orders",
+      "source_tables": ["metro_orders_clean"],
+      "fields": {
+        "order_id": {
+          "silver_field": "id",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "order_group_id": {
+          "silver_field": "orderGroupId",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "commerce_sequential_id": {
+          "silver_field": "commerceSequentialId",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "commerce_date_created": {
+          "silver_field": "commerceDateCreated",
+          "type": "timestamp",
+          "transformation": "direct"
+        },
+        "commerce_sales_channel": {
+          "silver_field": "commerceSalesChannel",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "total_amount": {
+          "silver_field": "totalAmount",
+          "type": "decimal",
+          "transformation": "direct"
+        },
+        "commerce_id": {
+          "silver_field": "commerceId",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "status": {
+          "silver_field": "status",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "original_amount": {
+          "silver_field": "originalAmount",
+          "type": "decimal",
+          "transformation": "direct"
+        },
+        "raw_total_amount": {
+          "silver_field": "rawTotalAmount",
+          "type": "decimal",
+          "transformation": "direct"
+        },
+        "currency": {
+          "silver_field": "currency",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "sales_channel_name": {
+          "silver_field": "salesChannelName",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "account_name": {
+          "silver_field": "account_name",
+          "type": "string",
+          "transformation": "flatten",
+          "source_path": "account.name"
+        },
+        "account_platform": {
+          "silver_field": "account_platform",
+          "type": "string",
+          "transformation": "flatten",
+          "source_path": "account.platform"
+        },
+        "seller_name": {
+          "silver_field": "seller_name",
+          "type": "string",
+          "transformation": "flatten",
+          "source_path": "seller.name"
+        },
+        "date_created": {
+          "silver_field": "dateCreated",
+          "type": "timestamp",
+          "transformation": "direct"
+        },
+        "date_modified": {
+          "silver_field": "dateModified",
+          "type": "timestamp",
+          "transformation": "direct"
+        }
+      }
+    },
+    
+    "products": {
+      "source_entity": "products",
+      "source_tables": ["metro_products_clean"],
+      "fields": {
+        "product_id": {
+          "silver_field": "id",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "product_name": {
+          "silver_field": "name",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "sku": {
+          "silver_field": "sku",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "price": {
+          "silver_field": "price",
+          "type": "decimal",
+          "transformation": "direct"
+        },
+        "category": {
+          "silver_field": "category",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "brand": {
+          "silver_field": "brand",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "status": {
+          "silver_field": "status",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "date_created": {
+          "silver_field": "dateCreated",
+          "type": "timestamp",
+          "transformation": "direct"
+        },
+        "date_modified": {
+          "silver_field": "dateModified",
+          "type": "timestamp",
+          "transformation": "direct"
+        }
+      }
+    },
+    
+    "stock": {
+      "source_entity": "stock",
+      "source_tables": ["metro_stock_clean"],
+      "fields": {
+        "stock_id": {
+          "silver_field": "id",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "product_id": {
+          "silver_field": "productId",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "warehouse_id": {
+          "silver_field": "warehouseId",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "quantity": {
+          "silver_field": "quantity",
+          "type": "integer",
+          "transformation": "direct"
+        },
+        "available_quantity": {
+          "silver_field": "availableQuantity",
+          "type": "integer",
+          "transformation": "direct"
+        },
+        "reserved_quantity": {
+          "silver_field": "reservedQuantity",
+          "type": "integer",
+          "transformation": "direct"
+        },
+        "date_created": {
+          "silver_field": "dateCreated",
+          "type": "timestamp",
+          "transformation": "direct"
+        },
+        "date_modified": {
+          "silver_field": "dateModified",
+          "type": "timestamp",
+          "transformation": "direct"
+        }
+      }
+    },
+    
+    "wms_order_items": {
+      "source_entity": "order-items",
+      "source_tables": ["metro_order_items_clean"],
+      "fields": {
+        "order_item_id": {
+          "silver_field": "id",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "order_id": {
+          "silver_field": "orderId",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "product_id": {
+          "silver_field": "productId",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "sku": {
+          "silver_field": "sku",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "quantity": {
+          "silver_field": "quantity",
+          "type": "integer",
+          "transformation": "direct"
+        },
+        "picked_quantity": {
+          "silver_field": "pickedQuantity",
+          "type": "integer",
+          "transformation": "direct"
+        },
+        "unit_price": {
+          "silver_field": "unitPrice",
+          "type": "decimal",
+          "transformation": "direct"
+        },
+        "total_price": {
+          "silver_field": "totalPrice",
+          "type": "decimal",
+          "transformation": "direct"
+        },
+        "status": {
+          "silver_field": "status",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "date_created": {
+          "silver_field": "dateCreated",
+          "type": "timestamp",
+          "transformation": "direct"
+        },
+        "date_modified": {
+          "silver_field": "dateModified",
+          "type": "timestamp",
+          "transformation": "direct"
+        }
+      }
+    },
+    
+    "skus": {
+      "source_entity": "skus",
+      "source_tables": ["metro_skus_clean"],
+      "fields": {
+        "sku_id": {
+          "silver_field": "id",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "sku": {
+          "silver_field": "sku",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "product_id": {
+          "silver_field": "productId",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "barcode": {
+          "silver_field": "barcode",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "weight": {
+          "silver_field": "weight",
+          "type": "decimal",
+          "transformation": "direct"
+        },
+        "dimensions": {
+          "silver_field": "dimensions",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "status": {
+          "silver_field": "status",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "date_created": {
+          "silver_field": "dateCreated",
+          "type": "timestamp",
+          "transformation": "direct"
+        },
+        "date_modified": {
+          "silver_field": "dateModified",
+          "type": "timestamp",
+          "transformation": "direct"
+        }
+      }
+    },
+    
+    "wms_order_shipping": {
+      "source_entity": "order-shipping",
+      "source_tables": ["metro_order_shipping_clean"],
+      "fields": {
+        "shipping_id": {
+          "silver_field": "id",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "order_id": {
+          "silver_field": "orderId",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "city": {
+          "silver_field": "city",
+          "type": "string",
+          "transformation": "flatten",
+          "source_path": "addresses[0].city"
+        },
+        "neighborhood": {
+          "silver_field": "neighborhood",
+          "type": "string",
+          "transformation": "flatten",
+          "source_path": "addresses[0].neighborhood"
+        },
+        "complement": {
+          "silver_field": "complement",
+          "type": "string",
+          "transformation": "flatten",
+          "source_path": "addresses[0].complement"
+        },
+        "lat": {
+          "silver_field": "lat",
+          "type": "decimal",
+          "transformation": "flatten",
+          "source_path": "addresses[0].lat"
+        },
+        "lng": {
+          "silver_field": "lng",
+          "type": "decimal",
+          "transformation": "flatten",
+          "source_path": "addresses[0].lng"
+        },
+        "shipping_window_start": {
+          "silver_field": "shippingWindowStart",
+          "type": "timestamp",
+          "transformation": "direct"
+        },
+        "shipping_window_end": {
+          "silver_field": "shippingWindowEnd",
+          "type": "timestamp",
+          "transformation": "direct"
+        },
+        "shipped_date_start": {
+          "silver_field": "shippedDateStart",
+          "type": "timestamp",
+          "transformation": "direct"
+        },
+        "shipped_date_end": {
+          "silver_field": "shippedDateEnd",
+          "type": "timestamp",
+          "transformation": "direct"
+        },
+        "date_created": {
+          "silver_field": "dateCreated",
+          "type": "timestamp",
+          "transformation": "direct"
+        },
+        "date_modified": {
+          "silver_field": "dateModified",
+          "type": "timestamp",
+          "transformation": "direct"
+        },
+        "status": {
+          "silver_field": "status",
+          "type": "string",
+          "transformation": "direct"
+        }
+      }
+    },
+    
+    "wms_order_status_changes": {
+      "source_entity": "order-status-changes",
+      "source_tables": ["metro_order_status_changes_clean"],
+      "fields": {
+        "status_change_id": {
+          "silver_field": "id",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "order_id": {
+          "silver_field": "orderId",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "new_status": {
+          "silver_field": "newStatus",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "user_created": {
+          "silver_field": "userCreated",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "extra": {
+          "silver_field": "extra",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "date_created": {
+          "silver_field": "dateCreated",
+          "type": "timestamp",
+          "transformation": "direct"
+        }
+      }
+    },
+    
+    "wms_order_payments": {
+      "source_entity": "order-payments",
+      "source_tables": ["metro_order_payments_clean"],
+      "fields": {
+        "payment_id": {
+          "silver_field": "id",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "order_id": {
+          "silver_field": "orderId",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "payment_method": {
+          "silver_field": "paymentMethod",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "payment_system_name": {
+          "silver_field": "paymentSystemName",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "payment_group": {
+          "silver_field": "paymentGroup",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "acquirer": {
+          "silver_field": "acquirer",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "amount": {
+          "silver_field": "amount",
+          "type": "decimal",
+          "transformation": "direct"
+        },
+        "status": {
+          "silver_field": "status",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "date_created": {
+          "silver_field": "dateCreated",
+          "type": "timestamp",
+          "transformation": "direct"
+        },
+        "date_modified": {
+          "silver_field": "dateModified",
+          "type": "timestamp",
+          "transformation": "direct"
+        }
+      }
+    },
+    
+    "wms_order_payments_connector_responses": {
+      "source_entity": "order-payments",
+      "source_tables": ["metro_order_payments_clean"],
+      "fields": {
+        "payment_id": {
+          "silver_field": "id",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "field": {
+          "silver_field": "field",
+          "type": "string",
+          "transformation": "key_value",
+          "source_path": "connectorResponse"
+        },
+        "value": {
+          "silver_field": "value",
+          "type": "string",
+          "transformation": "key_value",
+          "source_path": "connectorResponse"
+        }
+      }
+    },
+    
+    "wms_order_custom_data_fields": {
+      "source_entity": "orders",
+      "source_tables": ["metro_orders_clean"],
+      "fields": {
+        "order_id": {
+          "silver_field": "id",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "field": {
+          "silver_field": "field",
+          "type": "string",
+          "transformation": "key_value",
+          "source_path": "customData"
+        },
+        "value": {
+          "silver_field": "value",
+          "type": "string",
+          "transformation": "key_value",
+          "source_path": "customData"
+        }
+      }
+    },
+    
+    "wms_order_item_weighables": {
+      "source_entity": "order-items",
+      "source_tables": ["metro_order_items_clean"],
+      "fields": {
+        "order_item_id": {
+          "silver_field": "id",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "order_id": {
+          "silver_field": "orderId",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "weight_picked": {
+          "silver_field": "weightPicked",
+          "type": "decimal",
+          "transformation": "direct"
+        },
+        "quantity": {
+          "silver_field": "quantity",
+          "type": "integer",
+          "transformation": "direct"
+        },
+        "measurement_unit": {
+          "silver_field": "measurementUnit",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "date_created": {
+          "silver_field": "dateCreated",
+          "type": "timestamp",
+          "transformation": "direct"
+        },
+        "date_modified": {
+          "silver_field": "dateModified",
+          "type": "timestamp",
+          "transformation": "direct"
+        }
+      }
+    },
+    
+    "wms_stores": {
+      "source_entity": "stores",
+      "source_tables": ["metro_stores_clean"],
+      "fields": {
+        "store_id": {
+          "silver_field": "id",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "store_name": {
+          "silver_field": "name",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "code": {
+          "silver_field": "code",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "country": {
+          "silver_field": "country",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "city": {
+          "silver_field": "city",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "address": {
+          "silver_field": "address",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "lat": {
+          "silver_field": "lat",
+          "type": "decimal",
+          "transformation": "direct"
+        },
+        "lng": {
+          "silver_field": "lng",
+          "type": "decimal",
+          "transformation": "direct"
+        },
+        "apply_quotation": {
+          "silver_field": "applyQuotation",
+          "type": "boolean",
+          "transformation": "direct"
+        },
+        "status": {
+          "silver_field": "status",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "date_created": {
+          "silver_field": "dateCreated",
+          "type": "timestamp",
+          "transformation": "direct"
+        },
+        "date_modified": {
+          "silver_field": "dateModified",
+          "type": "timestamp",
+          "transformation": "direct"
+        }
+      }
+    },
+    
+    "wms_logistic_carriers": {
+      "source_entity": "carriers",
+      "source_tables": ["metro_carriers_clean"],
+      "fields": {
+        "carrier_id": {
+          "silver_field": "id",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "carrier_name": {
+          "silver_field": "name",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "code": {
+          "silver_field": "code",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "status": {
+          "silver_field": "status",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "date_created": {
+          "silver_field": "dateCreated",
+          "type": "timestamp",
+          "transformation": "direct"
+        },
+        "date_modified": {
+          "silver_field": "dateModified",
+          "type": "timestamp",
+          "transformation": "direct"
+        }
+      }
+    },
+    
+    "wms_logistic_delivery_planning": {
+      "source_entity": "delivery-planning",
+      "source_tables": ["metro_delivery_planning_clean"],
+      "fields": {
+        "planning_id": {
+          "silver_field": "id",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "store_id": {
+          "silver_field": "storeId",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "date_start": {
+          "silver_field": "dateStart",
+          "type": "timestamp",
+          "transformation": "direct"
+        },
+        "date_end": {
+          "silver_field": "dateEnd",
+          "type": "timestamp",
+          "transformation": "direct"
+        },
+        "capacity": {
+          "silver_field": "capacity",
+          "type": "integer",
+          "transformation": "direct"
+        },
+        "available": {
+          "silver_field": "available",
+          "type": "integer",
+          "transformation": "direct"
+        },
+        "reserved": {
+          "silver_field": "reserved",
+          "type": "integer",
+          "transformation": "direct"
+        },
+        "date_created": {
+          "silver_field": "dateCreated",
+          "type": "timestamp",
+          "transformation": "direct"
+        },
+        "date_modified": {
+          "silver_field": "dateModified",
+          "type": "timestamp",
+          "transformation": "direct"
+        }
+      }
+    },
+    
+    "wms_logistic_delivery_ranges": {
+      "source_entity": "delivery-ranges",
+      "source_tables": ["metro_delivery_ranges_clean"],
+      "fields": {
+        "range_id": {
+          "silver_field": "id",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "planning_id": {
+          "silver_field": "planningId",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "time_start": {
+          "silver_field": "timeStart",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "time_end": {
+          "silver_field": "timeEnd",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "date_created": {
+          "silver_field": "dateCreated",
+          "type": "timestamp",
+          "transformation": "direct"
+        },
+        "date_modified": {
+          "silver_field": "dateModified",
+          "type": "timestamp",
+          "transformation": "direct"
+        }
+      }
+    },
+    
+    "categories": {
+      "source_entity": "categories",
+      "source_tables": ["metro_categories_clean"],
+      "fields": {
+        "category_id": {
+          "silver_field": "id",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "category_name": {
+          "silver_field": "name",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "ref_id": {
+          "silver_field": "refId",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "status": {
+          "silver_field": "status",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "date_created": {
+          "silver_field": "dateCreated",
+          "type": "timestamp",
+          "transformation": "direct"
+        }
+      }
+    },
+    
+    "brands": {
+      "source_entity": "brands",
+      "source_tables": ["metro_brands_clean"],
+      "fields": {
+        "brand_id": {
+          "silver_field": "id",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "brand_name": {
+          "silver_field": "name",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "status": {
+          "silver_field": "status",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "date_created": {
+          "silver_field": "dateCreated",
+          "type": "timestamp",
+          "transformation": "direct"
+        }
+      }
+    },
+    
+    "price": {
+      "source_entity": "prices",
+      "source_tables": ["metro_prices_clean"],
+      "fields": {
+        "price_id": {
+          "silver_field": "id",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "sku": {
+          "silver_field": "sku",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "store_id": {
+          "silver_field": "storeId",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "price": {
+          "silver_field": "price",
+          "type": "decimal",
+          "transformation": "direct"
+        },
+        "list_price": {
+          "silver_field": "listPrice",
+          "type": "decimal",
+          "transformation": "direct"
+        },
+        "currency": {
+          "silver_field": "currency",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "date_created": {
+          "silver_field": "dateCreated",
+          "type": "timestamp",
+          "transformation": "direct"
+        },
+        "date_modified": {
+          "silver_field": "dateModified",
+          "type": "timestamp",
+          "transformation": "direct"
+        },
+        "status": {
+          "silver_field": "status",
+          "type": "string",
+          "transformation": "direct"
+        }
+      }
+    },
+    
+    "promotional_prices": {
+      "source_entity": "promotional-prices",
+      "source_tables": ["metro_promotional_prices_clean"],
+      "fields": {
+        "promo_price_id": {
+          "silver_field": "id",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "sku": {
+          "silver_field": "sku",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "store_id": {
+          "silver_field": "storeId",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "promotional_price": {
+          "silver_field": "promotionalPrice",
+          "type": "decimal",
+          "transformation": "direct"
+        },
+        "original_price": {
+          "silver_field": "originalPrice",
+          "type": "decimal",
+          "transformation": "direct"
+        },
+        "discount_percentage": {
+          "silver_field": "discountPercentage",
+          "type": "decimal",
+          "transformation": "direct"
+        },
+        "date_start": {
+          "silver_field": "dateStart",
+          "type": "timestamp",
+          "transformation": "direct"
+        },
+        "date_end": {
+          "silver_field": "dateEnd",
+          "type": "timestamp",
+          "transformation": "direct"
+        },
+        "status": {
+          "silver_field": "status",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "date_created": {
+          "silver_field": "dateCreated",
+          "type": "timestamp",
+          "transformation": "direct"
+        },
+        "date_modified": {
+          "silver_field": "dateModified",
+          "type": "timestamp",
+          "transformation": "direct"
+        }
+      }
+    },
+    
+    "promotions": {
+      "source_entity": "promotions",
+      "source_tables": ["metro_promotions_clean"],
+      "fields": {
+        "promotion_id": {
+          "silver_field": "id",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "promotion_name": {
+          "silver_field": "name",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "description": {
+          "silver_field": "description",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "discount_type": {
+          "silver_field": "discountType",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "discount_value": {
+          "silver_field": "discountValue",
+          "type": "decimal",
+          "transformation": "direct"
+        },
+        "date_start": {
+          "silver_field": "dateStart",
+          "type": "timestamp",
+          "transformation": "direct"
+        },
+        "date_end": {
+          "silver_field": "dateEnd",
+          "type": "timestamp",
+          "transformation": "direct"
+        },
+        "status": {
+          "silver_field": "status",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "date_created": {
+          "silver_field": "dateCreated",
+          "type": "timestamp",
+          "transformation": "direct"
+        },
+        "date_modified": {
+          "silver_field": "dateModified",
+          "type": "timestamp",
+          "transformation": "direct"
+        }
+      }
+    },
+    
+    "admins": {
+      "source_entity": "admins",
+      "source_tables": ["metro_admins_clean"],
+      "fields": {
+        "admin_id": {
+          "silver_field": "id",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "first_name": {
+          "silver_field": "firstName",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "last_name": {
+          "silver_field": "lastName",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "email": {
+          "silver_field": "email",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "document": {
+          "silver_field": "document",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "status": {
+          "silver_field": "status",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "date_created": {
+          "silver_field": "dateCreated",
+          "type": "timestamp",
+          "transformation": "direct"
+        }
+      }
+    },
+    
+    "customers": {
+      "source_entity": "customers",
+      "source_tables": ["metro_customers_clean"],
+      "fields": {
+        "customer_id": {
+          "silver_field": "id",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "first_name": {
+          "silver_field": "firstName",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "last_name": {
+          "silver_field": "lastName",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "email": {
+          "silver_field": "email",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "phone": {
+          "silver_field": "phone",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "document": {
+          "silver_field": "document",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "document_type": {
+          "silver_field": "documentType",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "status": {
+          "silver_field": "status",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "date_created": {
+          "silver_field": "dateCreated",
+          "type": "timestamp",
+          "transformation": "direct"
+        },
+        "date_modified": {
+          "silver_field": "dateModified",
+          "type": "timestamp",
+          "transformation": "direct"
+        }
+      }
+    },
+    
+    "wms_order_picking": {
+      "source_entity": "picking-sessions",
+      "source_tables": ["metro_picking_sessions_clean"],
+      "fields": {
+        "session_id": {
+          "silver_field": "id",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "order_id": {
+          "silver_field": "orderId",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "picker": {
+          "silver_field": "picker",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "pick_start_time": {
+          "silver_field": "startPickingTime",
+          "type": "timestamp",
+          "transformation": "direct"
+        },
+        "pick_end_time": {
+          "silver_field": "endPickingTime",
+          "type": "timestamp",
+          "transformation": "direct"
+        },
+        "status": {
+          "silver_field": "status",
+          "type": "string",
+          "transformation": "direct"
+        }
+      }
+    },
+    
+    "picking_round_orders": {
+      "source_entity": "picking-round-orders",
+      "source_tables": ["metro_picking_round_orders_clean"],
+      "fields": {
+        "session_id": {
+          "silver_field": "sessionId",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "order_id": {
+          "silver_field": "orderId",
+          "type": "string",
+          "transformation": "direct"
+        }
+      }
+    },
+    
+    "invoices": {
+      "source_entity": "invoices",
+      "source_tables": ["metro_invoices_clean"],
+      "fields": {
+        "invoice_id": {
+          "silver_field": "id",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "order_id": {
+          "silver_field": "orderId",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "invoice_number": {
+          "silver_field": "invoiceNumber",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "amount": {
+          "silver_field": "amount",
+          "type": "decimal",
+          "transformation": "direct"
+        },
+        "status": {
+          "silver_field": "status",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "date_created": {
+          "silver_field": "dateCreated",
+          "type": "timestamp",
+          "transformation": "direct"
+        }
+      }
+    },
+    
+    "ff_comments": {
+      "source_entity": "comments",
+      "source_tables": ["metro_comments_clean"],
+      "fields": {
+        "comment_id": {
+          "silver_field": "id",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "order_id": {
+          "silver_field": "orderId",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "user_id": {
+          "silver_field": "userId",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "comment_text": {
+          "silver_field": "text",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "comment_type": {
+          "silver_field": "type",
+          "type": "string",
+          "transformation": "direct"
+        },
+        "date_created": {
+          "silver_field": "dateCreated",
+          "type": "timestamp",
+          "transformation": "direct"
+        },
+        "date_modified": {
+          "silver_field": "dateModified",
+          "type": "timestamp",
+          "transformation": "direct"
+        }
+      }
+    }
+  }
+}

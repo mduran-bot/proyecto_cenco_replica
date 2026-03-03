@@ -1,0 +1,94 @@
+[
+  {
+    "id": "12345",
+    "dateCreated": "1609459200",
+    "status": "  pending  ",
+    "customer": {
+      "email": "  USER@TEST.COM  ",
+      "phone": "(01) 234-5678",
+      "address": {
+        "street": "Av. Principal 123",
+        "city": "Lima",
+        "district": "Miraflores"
+      }
+    },
+    "items": [
+      {
+        "product_id": "P001",
+        "quantity": "10",
+        "quantity_picked": "8",
+        "substitute_type": "original",
+        "price": "15.50"
+      },
+      {
+        "product_id": "P002",
+        "quantity": "5",
+        "quantity_picked": null,
+        "substitute_type": "substitute",
+        "price": "10.00"
+      }
+    ],
+    "amount": "150.50",
+    "originalAmount": "145.00",
+    "store_id": "S001"
+  },
+  {
+    "id": "12345",
+    "dateCreated": "1609459500",
+    "status": "  confirmed  ",
+    "customer": {
+      "email": "user@test.com",
+      "phone": "(01) 234-5678",
+      "address": {
+        "street": "Av. Principal 123",
+        "city": "Lima",
+        "district": "Miraflores"
+      }
+    },
+    "items": [
+      {
+        "product_id": "P001",
+        "quantity": "10",
+        "quantity_picked": "9",
+        "substitute_type": "original",
+        "price": "15.50"
+      },
+      {
+        "product_id": "P002",
+        "quantity": "5",
+        "quantity_picked": "5",
+        "substitute_type": "substitute",
+        "price": "10.00"
+      }
+    ],
+    "amount": "150.50",
+    "originalAmount": "145.00",
+    "store_id": "S001"
+  },
+  {
+    "id": "67890",
+    "dateCreated": "1609459200",
+    "status": "delivered",
+    "customer": {
+      "email": "jane@test.com",
+      "phone": "(01) 987-6543",
+      "address": {
+        "street": "Calle Secundaria 456",
+        "city": "Lima",
+        "district": "San Isidro"
+      }
+    },
+    "items": [
+      {
+        "product_id": "P003",
+        "quantity": "5",
+        "quantity_picked": "5",
+        "substitute_type": "original",
+        "price": "15.05"
+      }
+    ],
+    "amount": "75.25",
+    "originalAmount": "75.25",
+    "store_id": "S002"
+  }
+]
