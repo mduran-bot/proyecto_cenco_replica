@@ -1,0 +1,1 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="0" skipped="0" tests="1" time="2.982" timestamp="2026-03-03T15:49:30.190936" hostname="LAPTOP-HOQLAC9C"><testcase classname="max.polling.tests.test_localstack_with_real_api" name="test_polling_flow_with_real_janis_api" time="2.475" /></testsuite></testsuites>

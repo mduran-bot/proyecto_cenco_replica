@@ -5,31 +5,47 @@
 ### ¿Qué hace este sistema?
 Consulta automáticamente las APIs de Janis cada 5 minutos para obtener datos actualizados de:
 - Órdenes (orders)
-- Catálogo (products, SKUs, categorías, marcas)
+- Productos (products)
 - Inventario (stock)
-- Precios (prices, price sheets, base prices)
-- Tiendas (locations)
+- Precios (prices)
+- Tiendas (stores)
+
+### 🏗️ Arquitectura
+```
+EventBridge (cada 5 min)
+    ↓
+Lambda Orchestrator
+    ↓ [REST API call]
+Airflow Externo de Cencosud
+    ↓ [Orquestación: acquire lock, poll API, write S3, release lock]
+S3 Bronze (datos crudos JSON)
+    ↓
+ETL (Fase 5 - separado)
+```
 
 ### ✅ Compatibilidad con Datos Existentes
 **NO sobrescribe ni elimina la carga inicial de 26 tablas.**
 
 - **Carga inicial:** Archivos en `bronze/wongio/stock/*.parquet` (raíz)
-- **Polling:** Archivos en `bronze/wongio/stock/year=2026/month=03/day=02/*.parquet` (subdirectorios)
+- **Polling:** Archivos en `bronze/wongio/stock/year=2026/month=03/day=02/*.json` (subdirectorios)
 - **Resultado:** Ambos coexisten pacíficamente en diferentes niveles de directorio
 
 ### 🎯 Prerequisitos Críticos
-Antes de empezar, necesitas que el equipo de Cencosud cree:
-1. **2 Roles IAM** (MWAA + EventBridge) con permisos específicos
-2. **1 Secret** en Secrets Manager con credenciales Wongio
-3. **S3 Bronze Bucket** (si no existe): `cencosud-datalake-bronze-prod`
+Antes de empezar, necesitas:
+1. **Acceso al Airflow de Cencosud** (URL + credenciales)
+2. **3 Secrets** en Secrets Manager (airflow-credentials, janis-metro, janis-wongio)
+3. **1 Rol IAM** para Lambda Orchestrator
+4. **1 Rol IAM** para EventBridge
+5. **S3 Bronze Bucket** (si no existe): `cencosud-datalake-bronze-prod`
+6. **DynamoDB Table** para locks
 
 ### 📊 Resultado Final
 Después del deployment:
-- **5 DAGs activos** en MWAA (Airflow)
+- **10 DAGs en Airflow de Cencosud** (5 por cliente: metro, wongio)
 - **10 endpoints** consultados cada 5 minutos
-- **~288 archivos Parquet por día** por tipo de dato
-- **Datos particionados** por año/mes/día para queries eficientes
-- **Multi-tenant** listo para agregar Metro
+- **~288 archivos JSON por día** por tipo de dato
+- **Datos particionados** por año/mes/día
+- **ETL posterior** transforma JSON a Parquet (Fase 5)
 
 ---
 
@@ -37,8 +53,8 @@ Después del deployment:
 1. [Prerequisitos](#prerequisitos)
 2. [Configuración de Roles IAM](#configuración-de-roles-iam)
 3. [Configuración de Secrets Manager](#configuración-de-secrets-manager)
-4. [Deployment con Terraform](#deployment-con-terraform)
-5. [Configuración Post-Deployment](#configuración-post-deployment)
+4. [Deployment de Infraestructura AWS](#deployment-de-infraestructura-aws)
+5. [Entrega de DAGs al Equipo de Cencosud](#entrega-de-dags-al-equipo-de-cencosud)
 6. [Verificación y Monitoreo](#verificación-y-monitoreo)
 7. [Multi-Tenant: Agregar Nuevos Clientes](#multi-tenant-agregar-nuevos-clientes)
 8. [Troubleshooting](#troubleshooting)
@@ -47,36 +63,38 @@ Después del deployment:
 
 ## Prerequisitos
 
-### Permisos Requeridos
+### Información Requerida del Equipo de Cencosud
+- **URL de Airflow:** `https://airflow.cencosud.com` (ejemplo)
+- **Credenciales de Airflow:** Username + Password para API REST
+- **Permisos en Airflow:** Crear y ejecutar DAGs en el ambiente de producción
+
+### Permisos Requeridos en AWS
 - **Usuario con permisos IAM** para crear roles y policies
 - **Usuario con permisos Secrets Manager** para crear secrets
 - **Usuario con permisos para:**
-  - MWAA (crear ambientes)
+  - Lambda (crear funciones)
   - EventBridge (crear rules)
   - DynamoDB (crear tablas)
-  - S3 (crear buckets)
-  - SNS (crear topics)
-  - VPC (usar VPC y subnets existentes)
+  - S3 (crear buckets y escribir objetos)
+  - CloudWatch (crear log groups)
 
 ### Recursos Existentes
-- ✅ VPC: `vpc-0e70f630594378796`
-- ✅ Subnets privadas:
-  - `subnet-0f96d2e7838f2789c` (us-east-1a)
-  - `subnet-0f2a9da0a0eb89bcc` (us-east-1b)
 - ⚠️ S3 Bronze Bucket: `cencosud-datalake-bronze-prod` (crear si no existe)
+- ⚠️ Airflow de Cencosud (externo, gestionado por equipo de Cencosud)
 
 ### Credenciales API Janis
+- API Key de Metro
+- API Secret de Metro
 - API Key de Wongio
 - API Secret de Wongio
-- (Futuro) API Key y Secret de Metro
 
 ---
 
 ## Configuración de Roles IAM
 
-### 1. Rol para MWAA Execution
+### 1. Rol para Lambda Orchestrator
 
-**Nombre:** `janis-polling-mwaa-execution-role`
+**Nombre:** `janis-polling-lambda-orchestrator-role`
 
 **Trust Policy:**
 ```json
@@ -86,10 +104,7 @@ Después del deployment:
     {
       "Effect": "Allow",
       "Principal": {
-        "Service": [
-          "airflow.amazonaws.com",
-          "airflow-env.amazonaws.com"
-        ]
+        "Service": "lambda.amazonaws.com"
       },
       "Action": "sts:AssumeRole"
     }
@@ -99,53 +114,7 @@ Después del deployment:
 
 **Policies necesarias:**
 
-#### Policy 1: DynamoDB Access
-```json
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": [
-        "dynamodb:GetItem",
-        "dynamodb:PutItem",
-        "dynamodb:UpdateItem",
-        "dynamodb:DeleteItem",
-        "dynamodb:Query",
-        "dynamodb:Scan"
-      ],
-      "Resource": "arn:aws:dynamodb:us-east-1:181398079618:table/janis-polling-prod-polling-control"
-    }
-  ]
-}
-```
-
-#### Policy 2: S3 Access
-```json
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": [
-        "s3:GetObject",
-        "s3:PutObject",
-        "s3:ListBucket"
-      ],
-      "Resource": [
-        "arn:aws:s3:::cencosud-datalake-bronze-prod",
-        "arn:aws:s3:::cencosud-datalake-bronze-prod/*",
-        "arn:aws:s3:::janis-polling-prod-mwaa-dags",
-        "arn:aws:s3:::janis-polling-prod-mwaa-dags/*",
-        "arn:aws:s3:::janis-polling-prod-polling-staging",
-        "arn:aws:s3:::janis-polling-prod-polling-staging/*"
-      ]
-    }
-  ]
-}
-```
-
-#### Policy 3: Secrets Manager Access
+#### Policy 1: Secrets Manager Access
 ```json
 {
   "Version": "2012-10-17",
@@ -156,16 +125,13 @@ Después del deployment:
         "secretsmanager:GetSecretValue",
         "secretsmanager:DescribeSecret"
       ],
-      "Resource": [
-        "arn:aws:secretsmanager:us-east-1:181398079618:secret:janis-api-credentials-wongio-*",
-        "arn:aws:secretsmanager:us-east-1:181398079618:secret:janis-api-credentials-metro-*"
-      ]
+      "Resource": "arn:aws:secretsmanager:us-east-1:181398079618:secret:airflow-credentials-*"
     }
   ]
 }
 ```
 
-#### Policy 4: CloudWatch Logs
+#### Policy 2: CloudWatch Logs
 ```json
 {
   "Version": "2012-10-17",
@@ -175,41 +141,9 @@ Después del deployment:
       "Action": [
         "logs:CreateLogStream",
         "logs:CreateLogGroup",
-        "logs:PutLogEvents",
-        "logs:GetLogEvents"
+        "logs:PutLogEvents"
       ],
-      "Resource": [
-        "arn:aws:logs:us-east-1:181398079618:log-group:airflow-janis-polling-prod*",
-        "arn:aws:logs:us-east-1:181398079618:log-group:/aws/api-polling/prod*"
-      ]
-    }
-  ]
-}
-```
-
-#### Policy 5: CloudWatch Metrics
-```json
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": "cloudwatch:PutMetricData",
-      "Resource": "*"
-    }
-  ]
-}
-```
-
-#### Policy 6: SNS Publish
-```json
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": "sns:Publish",
-      "Resource": "arn:aws:sns:us-east-1:181398079618:janis-polling-prod-polling-errors"
+      "Resource": "arn:aws:logs:us-east-1:181398079618:log-group:/aws/lambda/janis-polling-*"
     }
   ]
 }
@@ -218,16 +152,18 @@ Después del deployment:
 **Comando para crear el rol:**
 ```bash
 aws iam create-role \
-  --role-name janis-polling-mwaa-execution-role \
-  --assume-role-policy-document file://mwaa-trust-policy.json
+  --role-name janis-polling-lambda-orchestrator-role \
+  --assume-role-policy-document file://lambda-trust-policy.json
 
-# Adjuntar cada policy
 aws iam put-role-policy \
-  --role-name janis-polling-mwaa-execution-role \
-  --policy-name DynamoDBAccess \
-  --policy-document file://dynamodb-policy.json
+  --role-name janis-polling-lambda-orchestrator-role \
+  --policy-name SecretsManagerAccess \
+  --policy-document file://secrets-policy.json
 
-# Repetir para cada policy...
+aws iam put-role-policy \
+  --role-name janis-polling-lambda-orchestrator-role \
+  --policy-name CloudWatchLogs \
+  --policy-document file://cloudwatch-policy.json
 ```
 
 ### 2. Rol para EventBridge
@@ -257,8 +193,8 @@ aws iam put-role-policy \
   "Statement": [
     {
       "Effect": "Allow",
-      "Action": "airflow:CreateCliToken",
-      "Resource": "arn:aws:airflow:us-east-1:181398079618:environment/janis-polling-prod-mwaa-environment"
+      "Action": "lambda:InvokeFunction",
+      "Resource": "arn:aws:lambda:us-east-1:181398079618:function:janis-polling-orchestrator"
     }
   ]
 }
@@ -272,23 +208,114 @@ aws iam create-role \
 
 aws iam put-role-policy \
   --role-name janis-polling-eventbridge-role \
-  --policy-name MWAATrigger \
+  --policy-name LambdaInvoke \
   --policy-document file://eventbridge-policy.json
+```
+
+### 3. Permisos para Airflow de Cencosud (Gestionado por Cencosud)
+
+**NOTA:** Estos permisos los debe configurar el equipo de Cencosud en su Airflow.
+
+El rol de ejecución de Airflow necesita:
+
+#### DynamoDB Access
+```json
+{
+  "Effect": "Allow",
+  "Action": [
+    "dynamodb:GetItem",
+    "dynamodb:PutItem",
+    "dynamodb:UpdateItem"
+  ],
+  "Resource": "arn:aws:dynamodb:us-east-1:181398079618:table/janis-polling-prod-polling-control"
+}
+```
+
+#### S3 Access (Write to Bronze)
+```json
+{
+  "Effect": "Allow",
+  "Action": [
+    "s3:PutObject",
+    "s3:ListBucket"
+  ],
+  "Resource": [
+    "arn:aws:s3:::cencosud-datalake-bronze-prod",
+    "arn:aws:s3:::cencosud-datalake-bronze-prod/raw/*"
+  ]
+}
+```
+
+#### Secrets Manager Access
+```json
+{
+  "Effect": "Allow",
+  "Action": "secretsmanager:GetSecretValue",
+  "Resource": [
+    "arn:aws:secretsmanager:us-east-1:181398079618:secret:janis-api-credentials-metro-*",
+    "arn:aws:secretsmanager:us-east-1:181398079618:secret:janis-api-credentials-wongio-*"
+  ]
+}
 ```
 
 ---
 
 ## Configuración de Secrets Manager
 
-### Secret para Wongio
+### Secret 1: Credenciales de Airflow
+
+**Nombre:** `airflow-credentials`
+
+**Formato:**
+```json
+{
+  "url": "https://airflow.cencosud.com",
+  "username": "janis-polling-user",
+  "password": "TU_PASSWORD_AIRFLOW"
+}
+```
+
+**Comando:**
+```bash
+aws secretsmanager create-secret \
+  --name airflow-credentials \
+  --description "Credenciales para Airflow externo de Cencosud" \
+  --secret-string '{"url":"https://airflow.cencosud.com","username":"janis-polling-user","password":"xxx"}' \
+  --tags Key=Environment,Value=prod Key=Service,Value=polling
+```
+
+### Secret 2: Credenciales API Janis - Metro
+
+**Nombre:** `janis-api-credentials-metro`
+
+**Formato:**
+```json
+{
+  "janis_client": "metro",
+  "janis_api_key": "TU_API_KEY_METRO",
+  "janis_api_secret": "TU_API_SECRET_METRO"
+}
+```
+
+**Comando:**
+```bash
+aws secretsmanager create-secret \
+  --name janis-api-credentials-metro \
+  --description "Credenciales API Janis para cliente Metro" \
+  --secret-string '{"janis_client":"metro","janis_api_key":"xxx","janis_api_secret":"yyy"}' \
+  --tags Key=Environment,Value=prod Key=Client,Value=metro
+```
+
+### Secret 3: Credenciales API Janis - Wongio
 
 **Nombre:** `janis-api-credentials-wongio`
 
 **Formato:**
 ```json
 {
-  "api_key": "TU_API_KEY_WONGIO",
-  "api_secret": "TU_API_SECRET_WONGIO"
+  "janis_client": "wongio",
+  "janis_api_key": "TU_API_KEY_WONGIO",
+  "janis_api_secret": "TU_API_SECRET_WONGIO"
 }
 ```
 
@@ -297,20 +324,8 @@ aws iam put-role-policy \
 aws secretsmanager create-secret \
   --name janis-api-credentials-wongio \
   --description "Credenciales API Janis para cliente Wongio" \
-  --secret-string '{"api_key":"xxx","api_secret":"yyy"}' \
+  --secret-string '{"janis_client":"wongio","janis_api_key":"xxx","janis_api_secret":"yyy"}' \
   --tags Key=Environment,Value=prod Key=Client,Value=wongio
-```
-
-### Secret para Metro (futuro)
-
-**Nombre:** `janis-api-credentials-metro`
-
-```bash
-aws secretsmanager create-secret \
-  --name janis-api-credentials-metro \
-  --description "Credenciales API Janis para cliente Metro" \
-  --secret-string '{"api_key":"xxx","api_secret":"yyy"}' \
-  --tags Key=Environment,Value=prod Key=Client,Value=metro
 ```
 
 ---

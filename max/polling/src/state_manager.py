@@ -94,7 +94,7 @@ class StateManager:
                 },
                 ExpressionAttributeValues={
                     ':true': True,
-                    'LOCK_ACQUIRED_VAL': False
+                    'LOCK_ACQUIRED_VAL': False,
                     ':now': now,
                     ':exec_id': execution_id,
                     ':running': 'running'
