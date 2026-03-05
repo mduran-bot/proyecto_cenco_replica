@@ -1,72 +1,142 @@
-# Archivos de inventario AWS (contienen información sensible)
-inventario-*.json
-inventario-*.md
-permisos-*.md
-auditoria-*.md
-
-# Terraform
-*.tfstate
-*.tfstate.*
-*.tfplan
-*.tfplan.*
-.terraform/
-.terraform.lock.hcl
-terraform.tfvars
-credentials.tfvars
-
-# Credenciales y secretos
-*.pem
-*.key
-*.env
-.env.*
-secrets/
-credentials/
-
-# AWS
-.aws/
-aws-credentials.json
-
-# Logs
-*.log
-logs/
-
-# Backups
-*.backup
-backups/
-
+# ============================================================================
 # Python
+# ============================================================================
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
-venv/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# ============================================================================
+# Testing
+# ============================================================================
+.pytest_cache/
+.hypothesis/
+htmlcov/
+.coverage
+coverage.xml
+*.cover
+.tox/
+.nox/
+
+# ============================================================================
+# Environments
+# ============================================================================
+.env
+.venv
 env/
+venv/
 ENV/
+env.bak/
+venv.bak/
+*.env
 
-# Node
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+# ============================================================================
+# AWS Credentials (CRÍTICO - NUNCA SUBIR)
+# ============================================================================
+*.pem
+*.key
+*.p12
+*.pfx
+credentials
+credentials.json
+aws_credentials
+.aws/
 
-# IDEs
+# ============================================================================
+# Terraform
+# ============================================================================
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+!example.tfvars
+terraform.tfvars
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+
+# ============================================================================
+# IDE
+# ============================================================================
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
-
-# OS
 .DS_Store
-Thumbs.db
-desktop.ini
 
-# Paquetes generados
-*.zip
-*.tar.gz
-*.rar
+# ============================================================================
+# Logs
+# ============================================================================
+*.log
+logs/
+*.log.*
 
+# ============================================================================
+# Airflow
+# ============================================================================
+airflow.db
+airflow.cfg
+unittests.cfg
+airflow-webserver.pid
+
+# ============================================================================
+# Data Files (NO subir datos reales)
+# ============================================================================
+*.csv
+*.json
+!package.json
+!package-lock.json
+!tsconfig.json
+*.xlsx
+*.xls
+*.parquet
+*.avro
+
+# ============================================================================
+# Backups
+# ============================================================================
+*.backup
+*.bak
+*.old
+backups/
+
+# ============================================================================
+# LocalStack
+# ============================================================================
+.localstack/
+localstack-data/
+
+# ============================================================================
+# SonarQube
+# ============================================================================
+.scannerwork/
+.sonar/
+
+# ============================================================================
 # Documentación temporal
+# ============================================================================
+TODO.md
+NOTES.md
+scratch/
 temp/
 tmp/

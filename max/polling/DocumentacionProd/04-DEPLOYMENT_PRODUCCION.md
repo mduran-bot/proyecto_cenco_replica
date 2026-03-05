@@ -1,63 +1,120 @@
-# Guía de Deployment en Producción - Sistema de Polling
+# Guía de Deployment en Producción - Sistema de Polling (Simplificado)
 
 ## ⚡ Resumen Ejecutivo
 
 ### ¿Qué hace este sistema?
-Consulta automáticamente las APIs de Janis cada 5 minutos para obtener datos actualizados de:
-- Órdenes (orders)
-- Productos (products)
-- Inventario (stock)
-- Precios (prices)
-- Tiendas (stores)
+Consulta automáticamente las APIs de Janis con diferentes frecuencias para obtener datos actualizados:
+- **Cada 5 min:** Orders, Picking Sessions, Order History, Shipping
+- **Cada 10 min:** Stock
+- **Cada 30 min:** Prices, SC-SKU Prices
+- **Cada 1 hora:** Products, SKUs, Categories, Brands
+- **Cada 24 horas:** Stores, Carriers, Delivery Planning, Delivery Ranges
 
-### 🏗️ Arquitectura
+### 🏗️ Arquitectura Simplificada
 ```
-EventBridge (cada 5 min)
+EventBridge (NUESTRO) - Triggers programados
     ↓
-Lambda Orchestrator
+Lambda Orchestrator (NUESTRO)
     ↓ [REST API call]
-Airflow Externo de Cencosud
-    ↓ [Orquestación: acquire lock, poll API, write S3, release lock]
-S3 Bronze (datos crudos JSON)
+Airflow Externo (CENCOSUD)
+    ↓ [Ejecuta DAGs]
+Tu Código Python (max/polling/)
+    ├─ acquire_lock (DynamoDB - NUESTRO)
+    ├─ poll_api_raw (sin filtros, sin deduplicación)
+    ├─ write_json_to_s3 (JSON crudo → S3 NUESTRO)
+    └─ release_lock (DynamoDB - NUESTRO)
     ↓
-ETL (Fase 5 - separado)
+S3 Bronze (JSON crudo particionado - NUESTRO)
 ```
 
-### ✅ Compatibilidad con Datos Existentes
-**NO sobrescribe ni elimina la carga inicial de 26 tablas.**
+### 🎯 Cambios Clave vs Versión Anterior
+- ❌ **NO desplegamos MWAA propio** - Usamos Airflow existente de Cencosud
+- ✅ **SÍ desplegamos EventBridge** - Triggers programados (nuestro)
+- ✅ **SÍ desplegamos Lambda Orchestrator** - Llama a Airflow API (nuestro)
+- ❌ **NO validamos datos** - Escribimos JSON crudo
+- ❌ **NO enriquecemos datos** - Sin llamadas adicionales a APIs
+- ❌ **NO deduplicamos** - Datos tal cual vienen de la API
+- ❌ **NO usamos filtros incrementales** - Fetch completo cada vez
+- ✅ **SÍ escribimos JSON** - Formato crudo, no Parquet
+- ✅ **SÍ particionamos por fecha** - year=/month=/day=
+- ✅ **SÍ usamos locks** - Control de concurrencia con DynamoDB
 
-- **Carga inicial:** Archivos en `bronze/wongio/stock/*.parquet` (raíz)
-- **Polling:** Archivos en `bronze/wongio/stock/year=2026/month=03/day=02/*.json` (subdirectorios)
-- **Resultado:** Ambos coexisten pacíficamente en diferentes niveles de directorio
-
-### 🎯 Prerequisitos Críticos
-Antes de empezar, necesitas:
-1. **Acceso al Airflow de Cencosud** (URL + credenciales)
-2. **3 Secrets** en Secrets Manager (airflow-credentials, janis-metro, janis-wongio)
-3. **1 Rol IAM** para Lambda Orchestrator
-4. **1 Rol IAM** para EventBridge
-5. **S3 Bronze Bucket** (si no existe): `cencosud-datalake-bronze-prod`
-6. **DynamoDB Table** para locks
+### 📦 Componentes a Entregar
+1. **Código Python** (max/polling/) - DAGs y módulos
+2. **Configuración** (api_config.json) - Endpoints y frecuencias
+3. **Requirements** (requirements.txt) - Dependencias Python
+4. **Documentación** - Esta guía
 
 ### 📊 Resultado Final
 Después del deployment:
-- **10 DAGs en Airflow de Cencosud** (5 por cliente: metro, wongio)
-- **10 endpoints** consultados cada 5 minutos
-- **~288 archivos JSON por día** por tipo de dato
-- **Datos particionados** por año/mes/día
-- **ETL posterior** transforma JSON a Parquet (Fase 5)
+- **15 DAGs en Airflow de Cencosud** (uno por endpoint único)
+- **15 endpoints** consultados con diferentes frecuencias
+- **Archivos JSON crudos** en S3 Bronze particionados por fecha
+- **Multi-tenant:** 2 carpetas (wongio/ y metro/) con 26 tablas cada una
+- **ETL posterior** (Fase 5) procesa JSON → Parquet → Silver/Gold
+
+### 📁 Estructura Multi-Tenant en S3 Bronze
+
+```
+s3://cencosud-datalake-bronze-prod/
+├── wongio/                                    ← Cliente 1
+│   ├── orders/                                ← Tabla 1: wms_orders
+│   │   └── year=2026/month=03/day=04/
+│   │       ├── 1709567890.json
+│   │       ├── 1709568190.json
+│   │       └── ...
+│   ├── order_items/                           ← Tabla 2: wms_order_items
+│   ├── order_item_weighables/                ← Tabla 3: wms_order_item_weighables
+│   ├── order_payments/                        ← Tabla 4: wms_order_payments
+│   ├── order_payments_connector_responses/   ← Tabla 5
+│   ├── order_custom_data_fields/             ← Tabla 6
+│   ├── invoices/                              ← Tabla 7
+│   ├── picking_sessions/                      ← Tabla 8: wms_order_picking
+│   ├── order_history/                         ← Tabla 9: wms_order_status_changes
+│   ├── shipping/                              ← Tabla 10: wms_order_shipping
+│   ├── stock/                                 ← Tabla 11: stock
+│   ├── prices/                                ← Tabla 12: price
+│   ├── sc_sku_prices/                         ← Tabla 13: price (store-specific)
+│   ├── products/                              ← Tabla 14: products
+│   ├── skus/                                  ← Tabla 15: skus
+│   ├── categories/                            ← Tabla 16: categories
+│   ├── brands/                                ← Tabla 17: brands
+│   ├── stores/                                ← Tabla 18: wms_stores
+│   ├── carriers/                              ← Tabla 19: wms_logistic_carriers
+│   ├── delivery_planning/                     ← Tabla 20: wms_logistic_delivery_planning
+│   ├── delivery_ranges/                       ← Tabla 21: wms_logistic_delivery_ranges
+│   ├── admins/                                ← Tabla 22: admins (solo carga inicial)
+│   ├── customers/                             ← Tabla 23: customers (solo carga inicial)
+│   ├── order_weighables/                      ← Tabla 24
+│   ├── order_payments_connector/              ← Tabla 25
+│   └── order_custom_data/                     ← Tabla 26
+│
+└── metro/                                     ← Cliente 2 (misma estructura)
+    ├── orders/
+    ├── order_items/
+    ├── ... (26 tablas idénticas)
+    └── order_custom_data/
+
+Total: 2 clientes × 26 tablas = 52 carpetas en S3 Bronze
+```
+
+**Características Multi-Tenant:**
+- ✅ **Separación completa por cliente** - Cada cliente tiene su propia carpeta raíz
+- ✅ **Misma estructura de tablas** - Las 26 tablas se replican para cada cliente
+- ✅ **Particionamiento por fecha** - Dentro de cada tabla: year=/month=/day=/
+- ✅ **Aislamiento de datos** - Los datos de wongio y metro nunca se mezclan
+- ✅ **Escalabilidad** - Fácil agregar nuevos clientes (ej: cliente3/)
 
 ---
 
 ## Índice
 1. [Prerequisitos](#prerequisitos)
-2. [Configuración de Roles IAM](#configuración-de-roles-iam)
+2. [Estructura del Proyecto](#estructura-del-proyecto)
 3. [Configuración de Secrets Manager](#configuración-de-secrets-manager)
 4. [Deployment de Infraestructura AWS](#deployment-de-infraestructura-aws)
 5. [Entrega de DAGs al Equipo de Cencosud](#entrega-de-dags-al-equipo-de-cencosud)
 6. [Verificación y Monitoreo](#verificación-y-monitoreo)
-7. [Multi-Tenant: Agregar Nuevos Clientes](#multi-tenant-agregar-nuevos-clientes)
-8. [Troubleshooting](#troubleshooting)
+7. [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -68,29 +125,112 @@ Después del deployment:
 - **Credenciales de Airflow:** Username + Password para API REST
 - **Permisos en Airflow:** Crear y ejecutar DAGs en el ambiente de producción
 
-### Permisos Requeridos en AWS
-- **Usuario con permisos IAM** para crear roles y policies
-- **Usuario con permisos Secrets Manager** para crear secrets
-- **Usuario con permisos para:**
-  - Lambda (crear funciones)
-  - EventBridge (crear rules)
-  - DynamoDB (crear tablas)
-  - S3 (crear buckets y escribir objetos)
-  - CloudWatch (crear log groups)
+### Permisos Requeridos en AWS (Nuestra Cuenta)
+- **EventBridge:** Crear rules y targets
+- **Lambda:** Crear funciones y roles
+- **S3:** Crear bucket Bronze y escribir objetos
+- **DynamoDB:** Crear tabla de control de locks
+- **Secrets Manager:** Crear y leer secrets
+- **IAM:** Crear roles y policies
+- **CloudWatch:** Crear log groups y escribir logs
 
-### Recursos Existentes
-- ⚠️ S3 Bronze Bucket: `cencosud-datalake-bronze-prod` (crear si no existe)
-- ⚠️ Airflow de Cencosud (externo, gestionado por equipo de Cencosud)
+### Recursos AWS a Desplegar (Nuestra Infraestructura)
+- ✅ **EventBridge Rules:** 5 rules con diferentes frecuencias
+- ✅ **Lambda Orchestrator:** Función que llama a Airflow API
+- ✅ **S3 Bronze Bucket:** `cencosud-datalake-bronze-prod`
+- ✅ **DynamoDB Table:** `polling-control` (para locks)
+- ✅ **Secrets Manager:** 3 secrets (airflow-credentials, janis-metro, janis-wongio)
+- ✅ **IAM Roles:** Para Lambda, EventBridge, y Airflow
 
 ### Credenciales API Janis
 - API Key de Metro
-- API Secret de Metro
 - API Key de Wongio
-- API Secret de Wongio
 
 ---
 
-## Configuración de Roles IAM
+## Estructura del Proyecto
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+---
+
+## Estructura del Proyecto
+
+```
+max/polling/
+├── config/
+│   └── api_config.json              # Configuración de APIs y frecuencias
+├── dags/
+│   ├── base_polling_dag.py          # Factory de DAGs (simplificado)
+│   ├── poll_orders.py               # DAG de orders (5 min)
+│   ├── poll_stock.py                # DAG de stock (10 min)
+│   ├── poll_prices.py               # DAG de prices (30 min)
+│   ├── poll_catalog.py              # DAG de products (1 hora)
+│   └── poll_stores.py               # DAG de stores (24 horas)
+├── src/
+│   ├── airflow_tasks.py             # Tareas simplificadas (4 funciones)
+│   ├── api_client.py                # Cliente HTTP para APIs Janis
+│   ├── pagination_handler.py        # Manejo de paginación
+│   ├── s3_writer.py                 # Escritura de JSON a S3
+│   └── state_manager.py             # Control de locks en DynamoDB
+├── requirements.txt                 # Dependencias Python
+└── DocumentacionProd/
+    └── 04-DEPLOYMENT_PRODUCCION.md  # Esta guía
+```
+
+### Flujo Simplificado por DAG
+
+Cada DAG ejecuta 4 tareas por cliente:
+
+```python
+# Ejemplo: poll_orders para cliente "wongio"
+
+1. acquire_lock_wongio
+   └─ Adquiere lock en DynamoDB (orders-wongio)
+   
+2. poll_api_wongio
+   └─ Consulta https://oms.janis.in/api/order
+   └─ Fetch completo (sin filtros)
+   └─ Paginación automática
+   └─ Retorna JSON crudo
+   
+3. write_to_s3_wongio
+   └─ Escribe a s3://bucket/wongio/orders/year=2026/month=03/day=04/timestamp.json
+   
+4. release_lock_wongio
+   └─ Libera lock en DynamoDB
+   └─ Actualiza timestamp de última ejecución
+```
+
+### APIs y Frecuencias
+
+| DAG | Endpoint | Base URL | Frecuencia | Tablas Cubiertas |
+|-----|----------|----------|------------|------------------|
+| poll_orders | order | https://oms.janis.in/api | 5 min | wms_orders, wms_order_items, wms_order_item_weighables, wms_order_payments, wms_order_payments_connector_responses, wms_order_custom_data_fields, invoices |
+| poll_picking_sessions | session | https://picking.janis.in/api | 5 min | wms_order_picking |
+| poll_order_history | order/{id}/history | https://oms.janis.in/api | 5 min | wms_order_status_changes |
+| poll_shipping | shipping | https://delivery.janis.in/api | 5 min | wms_order_shipping |
+| poll_stock | stock | https://wms.janis.in/api | 10 min | stock |
+| poll_prices | price | https://pricing.janis.in/api | 30 min | price |
+| poll_sc_sku_prices | sc-sku-price | https://pricing.janis.in/api | 30 min | price (store-specific) |
+| poll_products | product | https://catalog.janis.in/api | 1 hora | products |
+| poll_skus | sku | https://catalog.janis.in/api | 1 hora | skus |
+| poll_categories | category | https://catalog.janis.in/api | 1 hora | categories |
+| poll_brands | brand | https://catalog.janis.in/api | 1 hora | brands |
+| poll_stores | stores | https://commerce.janis.in/api | 24 horas | wms_stores |
+| poll_carriers | carrier | https://delivery.janis.in/api | 24 horas | wms_logistic_carriers |
+| poll_delivery_planning | route-planning | https://tms.janis.in/api | 24 horas | wms_logistic_delivery_planning |
+| poll_delivery_ranges | time-slot | https://delivery.janis.in/api | 24 horas | wms_logistic_delivery_ranges |
+
+**Total:** 15 DAGs × 2 clientes = 30 ejecuciones por ciclo completo
+**Cobertura:** 26 tablas de Janis (admins y customers solo en carga inicial)
+
+---
+
+## Configuración de IAM Roles
 
 ### 1. Rol para Lambda Orchestrator
 
@@ -122,10 +262,12 @@ Después del deployment:
     {
       "Effect": "Allow",
       "Action": [
-        "secretsmanager:GetSecretValue",
-        "secretsmanager:DescribeSecret"
+        "secretsmanager:GetSecretValue"
       ],
-      "Resource": "arn:aws:secretsmanager:us-east-1:181398079618:secret:airflow-credentials-*"
+      "Resource": [
+        "arn:aws:secretsmanager:us-east-1:ACCOUNT_ID:secret:airflow-credentials-*",
+        "arn:aws:secretsmanager:us-east-1:ACCOUNT_ID:secret:janis-api-credentials-*"
+      ]
     }
   ]
 }
@@ -143,7 +285,7 @@ Después del deployment:
         "logs:CreateLogGroup",
         "logs:PutLogEvents"
       ],
-      "Resource": "arn:aws:logs:us-east-1:181398079618:log-group:/aws/lambda/janis-polling-*"
+      "Resource": "arn:aws:logs:us-east-1:ACCOUNT_ID:log-group:/aws/lambda/janis-polling-*"
     }
   ]
 }
@@ -151,118 +293,53 @@ Después del deployment:
 
 **Comando para crear el rol:**
 ```bash
-aws iam create-role \
-  --role-name janis-polling-lambda-orchestrator-role \
-  --assume-role-policy-document file://lambda-trust-policy.json
-
-aws iam put-role-policy \
-  --role-name janis-polling-lambda-orchestrator-role \
-  --policy-name SecretsManagerAccess \
-  --policy-document file://secrets-policy.json
-
-aws iam put-role-policy \
-  --role-name janis-polling-lambda-orchestrator-role \
-  --policy-name CloudWatchLogs \
-  --policy-document file://cloudwatch-policy.json
-```
-
-### 2. Rol para EventBridge
-
-**Nombre:** `janis-polling-eventbridge-role`
-
-**Trust Policy:**
-```json
+# Crear archivo de trust policy
+cat > lambda-trust-policy.json << EOF
 {
   "Version": "2012-10-17",
   "Statement": [
     {
       "Effect": "Allow",
       "Principal": {
-        "Service": "events.amazonaws.com"
+        "Service": "lambda.amazonaws.com"
       },
       "Action": "sts:AssumeRole"
     }
   ]
 }
-```
+EOF
 
-**Policy:**
-```json
+# Crear rol
+aws iam create-role \
+  --role-name janis-polling-lambda-orchestrator-role \
+  --assume-role-policy-document file://lambda-trust-policy.json
+
+# Adjuntar policies
+aws iam attach-role-policy \
+  --role-name janis-polling-lambda-orchestrator-role \
+  --policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+# Crear policy custom para Secrets Manager
+cat > secrets-policy.json << EOF
 {
   "Version": "2012-10-17",
   "Statement": [
     {
       "Effect": "Allow",
-      "Action": "lambda:InvokeFunction",
-      "Resource": "arn:aws:lambda:us-east-1:181398079618:function:janis-polling-orchestrator"
+      "Action": "secretsmanager:GetSecretValue",
+      "Resource": "arn:aws:secretsmanager:us-east-1:ACCOUNT_ID:secret:*"
     }
   ]
 }
-```
-
-**Comando para crear:**
-```bash
-aws iam create-role \
-  --role-name janis-polling-eventbridge-role \
-  --assume-role-policy-document file://eventbridge-trust-policy.json
+EOF
 
 aws iam put-role-policy \
-  --role-name janis-polling-eventbridge-role \
-  --policy-name LambdaInvoke \
-  --policy-document file://eventbridge-policy.json
+  --role-name janis-polling-lambda-orchestrator-role \
+  --policy-name SecretsManagerAccess \
+  --policy-document file://secrets-policy.json
 ```
 
-### 3. Permisos para Airflow de Cencosud (Gestionado por Cencosud)
-
-**NOTA:** Estos permisos los debe configurar el equipo de Cencosud en su Airflow.
-
-El rol de ejecución de Airflow necesita:
-
-#### DynamoDB Access
-```json
-{
-  "Effect": "Allow",
-  "Action": [
-    "dynamodb:GetItem",
-    "dynamodb:PutItem",
-    "dynamodb:UpdateItem"
-  ],
-  "Resource": "arn:aws:dynamodb:us-east-1:181398079618:table/janis-polling-prod-polling-control"
-}
-```
-
-#### S3 Access (Write to Bronze)
-```json
-{
-  "Effect": "Allow",
-  "Action": [
-    "s3:PutObject",
-    "s3:ListBucket"
-  ],
-  "Resource": [
-    "arn:aws:s3:::cencosud-datalake-bronze-prod",
-    "arn:aws:s3:::cencosud-datalake-bronze-prod/raw/*"
-  ]
-}
-```
-
-#### Secrets Manager Access
-```json
-{
-  "Effect": "Allow",
-  "Action": "secretsmanager:GetSecretValue",
-  "Resource": [
-    "arn:aws:secretsmanager:us-east-1:181398079618:secret:janis-api-credentials-metro-*",
-    "arn:aws:secretsmanager:us-east-1:181398079618:secret:janis-api-credentials-wongio-*"
-  ]
-}
-```
-
----
-
-## Configuración de Secrets Manager
-
-### Secret 1: Credenciales de Airflow
+### 2. Secret para Credenciales de Airflow
 
 **Nombre:** `airflow-credentials`
 
@@ -284,7 +361,11 @@ aws secretsmanager create-secret \
   --tags Key=Environment,Value=prod Key=Service,Value=polling
 ```
 
-### Secret 2: Credenciales API Janis - Metro
+---
+
+## Configuración de Secrets Manager
+
+### Secret 1: Credenciales API Janis - Metro
 
 **Nombre:** `janis-api-credentials-metro`
 
@@ -292,8 +373,7 @@ aws secretsmanager create-secret \
 ```json
 {
   "janis_client": "metro",
-  "janis_api_key": "TU_API_KEY_METRO",
-  "janis_api_secret": "TU_API_SECRET_METRO"
+  "janis_api_key": "TU_API_KEY_METRO"
 }
 ```
 
@@ -302,9 +382,697 @@ aws secretsmanager create-secret \
 aws secretsmanager create-secret \
   --name janis-api-credentials-metro \
   --description "Credenciales API Janis para cliente Metro" \
-  --secret-string '{"janis_client":"metro","janis_api_key":"xxx","janis_api_secret":"yyy"}' \
+  --secret-string '{"janis_client":"metro","janis_api_key":"xxx"}' \
   --tags Key=Environment,Value=prod Key=Client,Value=metro
 ```
+
+### Secret 2: Credenciales API Janis - Wongio
+
+**Nombre:** `janis-api-credentials-wongio`
+
+**Formato:**
+```json
+{
+  "janis_client": "wongio",
+  "janis_api_key": "TU_API_KEY_WONGIO"
+}
+```
+
+**Comando:**
+```bash
+aws secretsmanager create-secret \
+  --name janis-api-credentials-wongio \
+  --description "Credenciales API Janis para cliente Wongio" \
+  --secret-string '{"janis_client":"wongio","janis_api_key":"yyy"}' \
+  --tags Key=Environment,Value=prod Key=Client,Value=wongio
+```
+
+---
+
+## Deployment de Infraestructura AWS
+
+### Componentes a Desplegar
+
+**NUESTRA INFRAESTRUCTURA:**
+1. EventBridge Rules (5 rules con diferentes frecuencias)
+2. Lambda Orchestrator (llama a Airflow API de Cencosud)
+3. DynamoDB Table (control de locks)
+4. S3 Bronze Bucket (almacenamiento de JSON)
+5. Secrets Manager (credenciales)
+6. IAM Roles y Policies
+
+**INFRAESTRUCTURA DE CENCOSUD (Externo):**
+- Airflow (ejecuta nuestros DAGs)
+
+---
+
+### 1. Crear DynamoDB Table para Locks
+
+```bash
+aws dynamodb create-table \
+  --table-name polling-control \
+  --attribute-definitions \
+    AttributeName=data_type,AttributeType=S \
+  --key-schema \
+    AttributeName=data_type,KeyType=HASH \
+  --billing-mode PAY_PER_REQUEST \
+  --tags Key=Environment,Value=prod Key=Service,Value=polling
+```
+
+### 2. Verificar S3 Bronze Bucket
+
+```bash
+# Verificar si existe
+aws s3 ls s3://cencosud-datalake-bronze-prod/
+
+# Si no existe, crear
+aws s3 mb s3://cencosud-datalake-bronze-prod --region us-east-1
+
+# Habilitar versioning (opcional pero recomendado)
+aws s3api put-bucket-versioning \
+  --bucket cencosud-datalake-bronze-prod \
+  --versioning-configuration Status=Enabled
+```
+
+### 3. Crear Lambda Orchestrator
+
+**Función:** Recibe eventos de EventBridge y llama a Airflow API de Cencosud.
+
+```python
+# lambda_orchestrator.py
+import json
+import boto3
+import requests
+import os
+
+def lambda_handler(event, context):
+    """
+    Orchestrator que recibe eventos de EventBridge y triggerea DAGs en Airflow de Cencosud.
+    """
+    # Obtener credenciales de Airflow desde Secrets Manager
+    secrets_client = boto3.client('secretsmanager')
+    secret = secrets_client.get_secret_value(SecretId='airflow-credentials')
+    airflow_creds = json.loads(secret['SecretString'])
+    
+    # Extraer información del evento
+    dag_id = event['dag_id']  # Ej: 'poll_orders'
+    
+    # Llamar a Airflow API
+    airflow_url = f"{airflow_creds['url']}/api/v1/dags/{dag_id}/dagRuns"
+    
+    response = requests.post(
+        airflow_url,
+        auth=(airflow_creds['username'], airflow_creds['password']),
+        json={"conf": {}},
+        headers={'Content-Type': 'application/json'}
+    )
+    
+    return {
+        'statusCode': response.status_code,
+        'body': json.dumps(f'Triggered DAG: {dag_id}')
+    }
+```
+
+**Deployment:**
+```bash
+# Crear archivo ZIP
+zip lambda_orchestrator.zip lambda_orchestrator.py
+
+# Crear función Lambda
+aws lambda create-function \
+  --function-name janis-polling-orchestrator \
+  --runtime python3.11 \
+  --role arn:aws:iam::ACCOUNT_ID:role/janis-polling-lambda-role \
+  --handler lambda_orchestrator.lambda_handler \
+  --zip-file fileb://lambda_orchestrator.zip \
+  --timeout 30 \
+  --memory-size 256
+```
+
+### 4. Crear EventBridge Rules
+
+**15 Rules con diferentes frecuencias:**
+
+```bash
+# ===== FRECUENCIA: 5 MINUTOS =====
+
+# Rule 1: Orders
+aws events put-rule \
+  --name janis-polling-orders-5min \
+  --schedule-expression "rate(5 minutes)" \
+  --state ENABLED
+
+aws events put-targets \
+  --rule janis-polling-orders-5min \
+  --targets "Id"="1","Arn"="arn:aws:lambda:us-east-1:ACCOUNT_ID:function:janis-polling-orchestrator","Input"='{"dag_id":"poll_orders"}'
+
+# Rule 2: Picking Sessions
+aws events put-rule \
+  --name janis-polling-picking-sessions-5min \
+  --schedule-expression "rate(5 minutes)" \
+  --state ENABLED
+
+aws events put-targets \
+  --rule janis-polling-picking-sessions-5min \
+  --targets "Id"="1","Arn"="arn:aws:lambda:us-east-1:ACCOUNT_ID:function:janis-polling-orchestrator","Input"='{"dag_id":"poll_picking_sessions"}'
+
+# Rule 3: Order History
+aws events put-rule \
+  --name janis-polling-order-history-5min \
+  --schedule-expression "rate(5 minutes)" \
+  --state ENABLED
+
+aws events put-targets \
+  --rule janis-polling-order-history-5min \
+  --targets "Id"="1","Arn"="arn:aws:lambda:us-east-1:ACCOUNT_ID:function:janis-polling-orchestrator","Input"='{"dag_id":"poll_order_history"}'
+
+# Rule 4: Shipping
+aws events put-rule \
+  --name janis-polling-shipping-5min \
+  --schedule-expression "rate(5 minutes)" \
+  --state ENABLED
+
+aws events put-targets \
+  --rule janis-polling-shipping-5min \
+  --targets "Id"="1","Arn"="arn:aws:lambda:us-east-1:ACCOUNT_ID:function:janis-polling-orchestrator","Input"='{"dag_id":"poll_shipping"}'
+
+# ===== FRECUENCIA: 10 MINUTOS =====
+
+# Rule 5: Stock
+aws events put-rule \
+  --name janis-polling-stock-10min \
+  --schedule-expression "rate(10 minutes)" \
+  --state ENABLED
+
+aws events put-targets \
+  --rule janis-polling-stock-10min \
+  --targets "Id"="1","Arn"="arn:aws:lambda:us-east-1:ACCOUNT_ID:function:janis-polling-orchestrator","Input"='{"dag_id":"poll_stock"}'
+
+# ===== FRECUENCIA: 30 MINUTOS =====
+
+# Rule 6: Prices
+aws events put-rule \
+  --name janis-polling-prices-30min \
+  --schedule-expression "rate(30 minutes)" \
+  --state ENABLED
+
+aws events put-targets \
+  --rule janis-polling-prices-30min \
+  --targets "Id"="1","Arn"="arn:aws:lambda:us-east-1:ACCOUNT_ID:function:janis-polling-orchestrator","Input"='{"dag_id":"poll_prices"}'
+
+# Rule 7: SC-SKU Prices
+aws events put-rule \
+  --name janis-polling-sc-sku-prices-30min \
+  --schedule-expression "rate(30 minutes)" \
+  --state ENABLED
+
+aws events put-targets \
+  --rule janis-polling-sc-sku-prices-30min \
+  --targets "Id"="1","Arn"="arn:aws:lambda:us-east-1:ACCOUNT_ID:function:janis-polling-orchestrator","Input"='{"dag_id":"poll_sc_sku_prices"}'
+
+# ===== FRECUENCIA: 1 HORA =====
+
+# Rule 8: Products
+aws events put-rule \
+  --name janis-polling-products-1hour \
+  --schedule-expression "rate(1 hour)" \
+  --state ENABLED
+
+aws events put-targets \
+  --rule janis-polling-products-1hour \
+  --targets "Id"="1","Arn"="arn:aws:lambda:us-east-1:ACCOUNT_ID:function:janis-polling-orchestrator","Input"='{"dag_id":"poll_products"}'
+
+# Rule 9: SKUs
+aws events put-rule \
+  --name janis-polling-skus-1hour \
+  --schedule-expression "rate(1 hour)" \
+  --state ENABLED
+
+aws events put-targets \
+  --rule janis-polling-skus-1hour \
+  --targets "Id"="1","Arn"="arn:aws:lambda:us-east-1:ACCOUNT_ID:function:janis-polling-orchestrator","Input"='{"dag_id":"poll_skus"}'
+
+# Rule 10: Categories
+aws events put-rule \
+  --name janis-polling-categories-1hour \
+  --schedule-expression "rate(1 hour)" \
+  --state ENABLED
+
+aws events put-targets \
+  --rule janis-polling-categories-1hour \
+  --targets "Id"="1","Arn"="arn:aws:lambda:us-east-1:ACCOUNT_ID:function:janis-polling-orchestrator","Input"='{"dag_id":"poll_categories"}'
+
+# Rule 11: Brands
+aws events put-rule \
+  --name janis-polling-brands-1hour \
+  --schedule-expression "rate(1 hour)" \
+  --state ENABLED
+
+aws events put-targets \
+  --rule janis-polling-brands-1hour \
+  --targets "Id"="1","Arn"="arn:aws:lambda:us-east-1:ACCOUNT_ID:function:janis-polling-orchestrator","Input"='{"dag_id":"poll_brands"}'
+
+# ===== FRECUENCIA: 24 HORAS =====
+
+# Rule 12: Stores
+aws events put-rule \
+  --name janis-polling-stores-24hours \
+  --schedule-expression "rate(24 hours)" \
+  --state ENABLED
+
+aws events put-targets \
+  --rule janis-polling-stores-24hours \
+  --targets "Id"="1","Arn"="arn:aws:lambda:us-east-1:ACCOUNT_ID:function:janis-polling-orchestrator","Input"='{"dag_id":"poll_stores"}'
+
+# Rule 13: Carriers
+aws events put-rule \
+  --name janis-polling-carriers-24hours \
+  --schedule-expression "rate(24 hours)" \
+  --state ENABLED
+
+aws events put-targets \
+  --rule janis-polling-carriers-24hours \
+  --targets "Id"="1","Arn"="arn:aws:lambda:us-east-1:ACCOUNT_ID:function:janis-polling-orchestrator","Input"='{"dag_id":"poll_carriers"}'
+
+# Rule 14: Delivery Planning
+aws events put-rule \
+  --name janis-polling-delivery-planning-24hours \
+  --schedule-expression "rate(24 hours)" \
+  --state ENABLED
+
+aws events put-targets \
+  --rule janis-polling-delivery-planning-24hours \
+  --targets "Id"="1","Arn"="arn:aws:lambda:us-east-1:ACCOUNT_ID:function:janis-polling-orchestrator","Input"='{"dag_id":"poll_delivery_planning"}'
+
+# Rule 15: Delivery Ranges
+aws events put-rule \
+  --name janis-polling-delivery-ranges-24hours \
+  --schedule-expression "rate(24 hours)" \
+  --state ENABLED
+
+aws events put-targets \
+  --rule janis-polling-delivery-ranges-24hours \
+  --targets "Id"="1","Arn"="arn:aws:lambda:us-east-1:ACCOUNT_ID:function:janis-polling-orchestrator","Input"='{"dag_id":"poll_delivery_ranges"}'
+```
+
+### 5. Dar Permisos a EventBridge para Invocar Lambda
+
+```bash
+aws lambda add-permission \
+  --function-name janis-polling-orchestrator \
+  --statement-id AllowEventBridgeInvoke \
+  --action lambda:InvokeFunction \
+  --principal events.amazonaws.com
+```
+
+### 6. Configurar IAM Role para Airflow (Cencosud)
+
+**NOTA:** Este rol lo debe configurar el equipo de Cencosud en su Airflow.
+
+El rol de ejecución de Airflow necesita permisos para acceder a NUESTROS recursos:
+
+#### DynamoDB Access
+```json
+{
+  "Effect": "Allow",
+  "Action": [
+    "dynamodb:GetItem",
+    "dynamodb:PutItem",
+    "dynamodb:UpdateItem"
+  ],
+  "Resource": "arn:aws:dynamodb:us-east-1:ACCOUNT_ID:table/polling-control"
+}
+```
+
+#### S3 Access (Write to Bronze)
+```json
+{
+  "Effect": "Allow",
+  "Action": [
+    "s3:PutObject",
+    "s3:ListBucket"
+  ],
+  "Resource": [
+    "arn:aws:s3:::cencosud-datalake-bronze-prod",
+    "arn:aws:s3:::cencosud-datalake-bronze-prod/*"
+  ]
+}
+```
+
+#### Secrets Manager Access
+```json
+{
+  "Effect": "Allow",
+  "Action": "secretsmanager:GetSecretValue",
+  "Resource": [
+    "arn:aws:secretsmanager:us-east-1:ACCOUNT_ID:secret:janis-api-credentials-metro-*",
+    "arn:aws:secretsmanager:us-east-1:ACCOUNT_ID:secret:janis-api-credentials-wongio-*"
+  ]
+}
+```
+
+---
+
+## Entrega de DAGs al Equipo de Cencosud
+
+### 1. Preparar Paquete de Entrega
+
+```bash
+cd max/polling
+
+# Crear directorio de entrega
+mkdir -p entrega-cencosud
+
+# Copiar archivos necesarios
+cp -r dags/ entrega-cencosud/
+cp -r src/ entrega-cencosud/
+cp -r config/ entrega-cencosud/
+cp requirements.txt entrega-cencosud/
+cp DocumentacionProd/04-DEPLOYMENT_PRODUCCION.md entrega-cencosud/README.md
+
+# Crear archivo ZIP
+cd entrega-cencosud
+zip -r ../janis-polling-dags.zip .
+cd ..
+```
+
+### 2. Contenido del Paquete
+
+```
+janis-polling-dags.zip
+├── dags/
+│   ├── base_polling_dag.py
+│   ├── poll_orders.py
+│   ├── poll_picking_sessions.py
+│   ├── poll_order_history.py
+│   ├── poll_shipping.py
+│   ├── poll_stock.py
+│   ├── poll_prices.py
+│   ├── poll_sc_sku_prices.py
+│   ├── poll_products.py
+│   ├── poll_skus.py
+│   ├── poll_categories.py
+│   ├── poll_brands.py
+│   ├── poll_stores.py
+│   ├── poll_carriers.py
+│   ├── poll_delivery_planning.py
+│   └── poll_delivery_ranges.py
+├── src/
+│   ├── airflow_tasks.py
+│   ├── api_client.py
+│   ├── pagination_handler.py
+│   ├── s3_writer.py
+│   └── state_manager.py
+├── config/
+│   └── api_config.json
+├── requirements.txt
+└── README.md
+```
+
+### 3. Instrucciones para el Equipo de Cencosud
+
+**Enviar al equipo de Cencosud:**
+
+```
+Asunto: Entrega de DAGs - Sistema de Polling Janis
+
+Hola equipo,
+
+Adjunto el paquete con los DAGs del sistema de polling de APIs Janis.
+
+ARCHIVOS ADJUNTOS:
+- janis-polling-dags.zip
+
+INSTRUCCIONES DE INSTALACIÓN:
+
+1. Descomprimir el ZIP en el directorio de DAGs de Airflow:
+   unzip janis-polling-dags.zip -d /opt/airflow/dags/janis-polling/
+
+2. Instalar dependencias Python:
+   pip install -r /opt/airflow/dags/janis-polling/requirements.txt
+
+3. Configurar variables de entorno en Airflow:
+   - DYNAMODB_TABLE_NAME=polling-control
+   - S3_BRONZE_BUCKET=cencosud-datalake-bronze-prod
+   - AWS_REGION=us-east-1
+
+4. Verificar que los secrets existan en Secrets Manager:
+   - janis-api-credentials-metro
+   - janis-api-credentials-wongio
+
+5. Activar los DAGs en la UI de Airflow (15 DAGs):
+   - poll_orders (5 min)
+   - poll_picking_sessions (5 min)
+   - poll_order_history (5 min)
+   - poll_shipping (5 min)
+   - poll_stock (10 min)
+   - poll_prices (30 min)
+   - poll_sc_sku_prices (30 min)
+   - poll_products (1 hora)
+   - poll_skus (1 hora)
+   - poll_categories (1 hora)
+   - poll_brands (1 hora)
+   - poll_stores (24 horas)
+   - poll_carriers (24 horas)
+   - poll_delivery_planning (24 horas)
+   - poll_delivery_ranges (24 horas)
+
+6. Los DAGs serán triggereados automáticamente por nuestro EventBridge según sus frecuencias configuradas
+
+CONTACTO:
+Para cualquier duda, contactar a [TU_EMAIL]
+
+Saludos,
+[TU_NOMBRE]
+```
+
+---
+
+## Verificación y Monitoreo
+
+### 1. Verificar DAGs en Airflow
+
+```bash
+# Listar DAGs (desde Airflow CLI)
+airflow dags list | grep poll_
+
+# Debería mostrar 15 DAGs:
+# poll_orders
+# poll_picking_sessions
+# poll_order_history
+# poll_shipping
+# poll_stock
+# poll_prices
+# poll_sc_sku_prices
+# poll_products
+# poll_skus
+# poll_categories
+# poll_brands
+# poll_stores
+# poll_carriers
+# poll_delivery_planning
+# poll_delivery_ranges
+```
+
+### 2. Trigger Manual de Prueba
+
+```bash
+# Trigger manual de un DAG
+airflow dags trigger poll_orders
+
+# Ver logs
+airflow tasks logs poll_orders acquire_lock_wongio 2026-03-04
+```
+
+### 3. Verificar Datos en S3 (Multi-Tenant)
+
+```bash
+# Listar estructura de clientes
+aws s3 ls s3://cencosud-datalake-bronze-prod/
+
+# Debería mostrar:
+# PRE wongio/
+# PRE metro/
+
+# Listar tablas de wongio
+aws s3 ls s3://cencosud-datalake-bronze-prod/wongio/
+
+# Debería mostrar 26 carpetas:
+# PRE orders/
+# PRE order_items/
+# PRE picking_sessions/
+# PRE stock/
+# PRE prices/
+# ... (26 tablas total)
+
+# Ver archivos de una tabla específica
+aws s3 ls s3://cencosud-datalake-bronze-prod/wongio/orders/ --recursive
+
+# Debería mostrar:
+# wongio/orders/year=2026/month=03/day=04/1709567890.json
+# wongio/orders/year=2026/month=03/day=04/1709568190.json
+
+# Verificar que metro tiene la misma estructura
+aws s3 ls s3://cencosud-datalake-bronze-prod/metro/orders/ --recursive
+
+# Debería mostrar:
+# metro/orders/year=2026/month=03/day=04/1709567890.json
+# metro/orders/year=2026/month=03/day=04/1709568190.json
+```
+
+### 4. Verificar Locks en DynamoDB
+
+```bash
+# Ver items en tabla de control
+aws dynamodb scan --table-name polling-control
+
+# Debería mostrar locks activos o timestamps de última ejecución
+```
+
+### 5. Monitoreo con CloudWatch
+
+```bash
+# Ver logs de Airflow
+aws logs tail /aws/airflow/janis-polling --follow
+
+# Buscar errores
+aws logs filter-pattern "ERROR" --log-group-name /aws/airflow/janis-polling
+```
+
+---
+
+## Troubleshooting
+
+### Problema 1: DAG no aparece en Airflow
+
+**Síntomas:**
+- DAG no visible en UI de Airflow
+- Error "DAG not found"
+
+**Solución:**
+```bash
+# Verificar que el archivo esté en el directorio correcto
+ls -la /opt/airflow/dags/janis-polling/dags/
+
+# Verificar sintaxis Python
+python -m py_compile /opt/airflow/dags/janis-polling/dags/poll_orders.py
+
+# Refrescar DAGs en Airflow
+airflow dags list-import-errors
+```
+
+### Problema 2: Error de credenciales API Janis
+
+**Síntomas:**
+- Error 401 Unauthorized
+- "JANIS_API_KEY must be set"
+
+**Solución:**
+```bash
+# Verificar que el secret exista
+aws secretsmanager get-secret-value --secret-id janis-api-credentials-wongio
+
+# Verificar permisos del rol de Airflow
+aws iam get-role-policy --role-name airflow-execution-role --policy-name SecretsManagerAccess
+```
+
+### Problema 3: No se escriben datos a S3
+
+**Síntomas:**
+- DAG completa exitosamente
+- No hay archivos en S3
+
+**Solución:**
+```bash
+# Verificar permisos S3
+aws s3api get-bucket-policy --bucket cencosud-datalake-bronze-prod
+
+# Verificar logs de la tarea write_to_s3
+airflow tasks logs poll_orders write_to_s3_wongio 2026-03-04
+
+# Verificar variable de entorno
+echo $S3_BRONZE_BUCKET
+```
+
+### Problema 4: Lock no se libera
+
+**Síntomas:**
+- DAG se salta (skip) en ejecuciones siguientes
+- "Lock already exists"
+
+**Solución:**
+```bash
+# Ver locks activos
+aws dynamodb get-item \
+  --table-name polling-control \
+  --key '{"data_type":{"S":"orders-wongio"}}'
+
+# Liberar lock manualmente (CUIDADO: solo si estás seguro)
+aws dynamodb delete-item \
+  --table-name polling-control \
+  --key '{"data_type":{"S":"orders-wongio"}}'
+```
+
+### Problema 5: Paginación incompleta
+
+**Síntomas:**
+- Solo se obtienen 100 registros
+- Faltan datos
+
+**Solución:**
+```python
+# Verificar configuración de paginación en api_config.json
+{
+  "pagination": {
+    "page_size": 100,
+    "max_pages": 1000  # Aumentar si es necesario
+  }
+}
+```
+
+---
+
+## Resumen de Comandos Útiles
+
+```bash
+# Verificar estado de DAGs
+airflow dags list-runs -d poll_orders
+
+# Ver última ejecución
+airflow dags list-runs -d poll_orders --state success --limit 1
+
+# Pausar DAG
+airflow dags pause poll_orders
+
+# Reanudar DAG
+airflow dags unpause poll_orders
+
+# Ver configuración
+airflow config get-value core dags_folder
+
+# Limpiar metadata de DAG
+airflow dags delete poll_orders
+
+# Verificar conexiones
+airflow connections list
+
+# Ver variables
+airflow variables list
+```
+
+---
+
+## Contacto y Soporte
+
+Para soporte técnico o consultas:
+- **Email:** [TU_EMAIL]
+- **Slack:** #janis-cencosud-integration
+- **Documentación:** Ver carpeta `DocumentacionProd/`
+
+---
+
+**Última actualización:** 2026-03-04  
+**Versión:** 2.0 (Simplificada - JSON crudo)
 
 ### Secret 3: Credenciales API Janis - Wongio
 
@@ -536,60 +1304,101 @@ Crear dashboard en CloudWatch con métricas:
 
 ---
 
-## Multi-Tenant: Agregar Nuevos Clientes
+## Multi-Tenant: Configuración y Escalabilidad
 
-### Agregar Metro
+### ✅ Multi-Tenant YA Implementado
 
-#### 1. Crear Secret
+El sistema está diseñado para soportar múltiples clientes desde el inicio:
+
+**Clientes Actuales:**
+1. **wongio** - Cliente 1
+2. **metro** - Cliente 2
+
+**Cómo Funciona:**
+
+```python
+# Cada DAG procesa AMBOS clientes automáticamente
+# Ejemplo: poll_orders.py
+
+dag = create_polling_dag(
+    dag_id='poll_orders',
+    data_type='orders',
+    clients=['metro', 'wongio'],  # ← Lista de clientes
+    endpoint='order',
+    base_url='https://oms.janis.in/api',
+)
+
+# Esto crea automáticamente tareas para cada cliente:
+# - acquire_lock_wongio → poll_wongio → write_wongio → release_lock_wongio
+# - acquire_lock_metro → poll_metro → write_metro → release_lock_metro
+```
+
+**Resultado en S3:**
+```
+s3://cencosud-datalake-bronze-prod/
+├── wongio/
+│   ├── orders/year=2026/month=03/day=04/1709567890.json
+│   ├── stock/year=2026/month=03/day=04/1709567890.json
+│   └── ... (26 tablas)
+└── metro/
+    ├── orders/year=2026/month=03/day=04/1709567890.json
+    ├── stock/year=2026/month=03/day=04/1709567890.json
+    └── ... (26 tablas)
+```
+
+### Agregar Nuevo Cliente (Ejemplo: cliente3)
+
+#### 1. Crear Secret para el nuevo cliente
 
 ```bash
 aws secretsmanager create-secret \
-  --name janis-api-credentials-metro \
-  --secret-string '{"api_key":"xxx","api_secret":"yyy"}'
+  --name janis-api-credentials-cliente3 \
+  --secret-string '{"janis_client":"cliente3","janis_api_key":"xxx"}'
 ```
 
-#### 2. Actualizar prod.tfvars
+#### 2. Actualizar DAGs
 
-```hcl
-# Agregar metro a la lista
-clients = ["wongio", "metro"]
+Editar cada DAG para incluir el nuevo cliente:
 
-# Agregar ARN del secret
-secrets_manager_arns = [
-  "arn:aws:secretsmanager:us-east-1:181398079618:secret:janis-api-credentials-wongio-*",
-  "arn:aws:secretsmanager:us-east-1:181398079618:secret:janis-api-credentials-metro-*"
-]
+```python
+# En cada archivo poll_*.py
+dag = create_polling_dag(
+    dag_id='poll_orders',
+    data_type='orders',
+    clients=['metro', 'wongio', 'cliente3'],  # ← Agregar cliente3
+    endpoint='order',
+    base_url='https://oms.janis.in/api',
+)
 ```
 
-#### 3. Aplicar Terraform
+#### 3. Subir DAGs actualizados a Airflow
 
 ```bash
-terraform plan -var-file="prod.tfvars"
-terraform apply -var-file="prod.tfvars"
+aws s3 sync dags/ s3://MWAA_BUCKET/dags/
 ```
 
-Esto creará automáticamente:
-- 5 nuevas EventBridge rules para Metro
-- Los DAGs detectarán el nuevo cliente automáticamente
-
-#### 4. Verificar Nuevos DAGs
-
-En Airflow UI deberías ver 5 DAGs adicionales:
-- `poll_orders_metro`
-- `poll_products_metro`
-- `poll_stock_metro`
-- `poll_prices_metro`
-- `poll_stores_metro`
-
-#### 5. Activar DAGs de Metro
-
-Toggle ON los nuevos DAGs.
-
-#### 6. Verificar Datos
+#### 4. Verificar nueva estructura en S3
 
 ```bash
-aws s3 ls s3://cencosud-datalake-bronze-prod/bronze/metro/ --recursive
+aws s3 ls s3://cencosud-datalake-bronze-prod/
+
+# Debería mostrar:
+# PRE wongio/
+# PRE metro/
+# PRE cliente3/  ← Nueva carpeta automáticamente creada
+
+# Verificar que tiene las 26 tablas
+aws s3 ls s3://cencosud-datalake-bronze-prod/cliente3/
 ```
+
+### Ventajas del Diseño Multi-Tenant
+
+✅ **Un solo DAG por endpoint** - No necesitas crear DAGs separados por cliente
+✅ **Escalabilidad horizontal** - Agregar clientes es solo actualizar la lista
+✅ **Aislamiento de datos** - Cada cliente tiene su carpeta raíz en S3
+✅ **Procesamiento paralelo** - Tareas de diferentes clientes corren en paralelo
+✅ **Mantenimiento simple** - Un cambio en el DAG aplica a todos los clientes
+✅ **Cost tracking** - Fácil medir costos por cliente usando S3 tags
 
 ---
 
@@ -898,42 +1707,75 @@ El sistema consulta **5 DAGs principales** que hacen polling a diferentes APIs d
 - **Método:** GET con filtros incrementales
 - **Datos:** Información de tiendas y ubicaciones
 
-### Total de DAGs Creados
+### Total de DAGs y Ejecuciones
 
-Con la configuración actual (`clients = ["wongio"]`):
-- **5 DAGs** (uno por tipo de dato)
+**DAGs únicos:** 15 (uno por endpoint)
 
-Cuando agregues Metro (`clients = ["wongio", "metro"]`):
-- **10 DAGs** (5 por cliente)
+**Ejecuciones por cliente:**
+- Cada DAG procesa AMBOS clientes (wongio y metro) en la misma ejecución
+- Dentro del DAG, se crean tareas separadas por cliente:
+  - `acquire_lock_wongio` + `poll_wongio` + `write_wongio` + `release_lock_wongio`
+  - `acquire_lock_metro` + `poll_metro` + `write_metro` + `release_lock_metro`
 
-### Estructura de Datos en S3
+**Resultado en S3:**
+- Cada ejecución de DAG escribe en 2 carpetas:
+  - `s3://bucket/wongio/{tabla}/year=/month=/day=/timestamp.json`
+  - `s3://bucket/metro/{tabla}/year=/month=/day=/timestamp.json`
 
-Los datos se escriben en:
+**Total de carpetas en S3:** 2 clientes × 26 tablas = 52 carpetas
+
+### Estructura Multi-Tenant de Datos en S3
+
+Los datos se escriben con separación completa por cliente:
+
 ```
 s3://cencosud-datalake-bronze-prod/
-└── bronze/
-    └── wongio/
-        ├── orders/
-        │   └── year=2026/month=03/day=02/data_HHMM.parquet
-        ├── catalog_product/
-        │   └── year=2026/month=03/day=02/data_HHMM.parquet
-        ├── catalog_sku/
-        │   └── year=2026/month=03/day=02/data_HHMM.parquet
-        ├── catalog_category/
-        │   └── year=2026/month=03/day=02/data_HHMM.parquet
-        ├── catalog_brand/
-        │   └── year=2026/month=03/day=02/data_HHMM.parquet
-        ├── stock/
-        │   └── year=2026/month=03/day=02/data_HHMM.parquet
-        ├── prices_price/
-        │   └── year=2026/month=03/day=02/data_HHMM.parquet
-        ├── prices_price_sheet/
-        │   └── year=2026/month=03/day=02/data_HHMM.parquet
-        ├── prices_base_price/
-        │   └── year=2026/month=03/day=02/data_HHMM.parquet
-        └── stores/
-            └── year=2026/month=03/day=02/data_HHMM.parquet
+├── wongio/                                    ← CLIENTE 1
+│   ├── orders/                                ← 7 tablas relacionadas
+│   │   └── year=2026/month=03/day=04/
+│   │       ├── 1709567890.json
+│   │       └── 1709568190.json
+│   ├── order_items/
+│   ├── order_item_weighables/
+│   ├── order_payments/
+│   ├── order_payments_connector_responses/
+│   ├── order_custom_data_fields/
+│   ├── invoices/
+│   ├── picking_sessions/                      ← 1 tabla
+│   ├── order_history/                         ← 1 tabla
+│   ├── shipping/                              ← 1 tabla
+│   ├── stock/                                 ← 1 tabla
+│   ├── prices/                                ← 2 tablas de precios
+│   ├── sc_sku_prices/
+│   ├── products/                              ← 4 tablas de catálogo
+│   ├── skus/
+│   ├── categories/
+│   ├── brands/
+│   ├── stores/                                ← 4 tablas de logística
+│   ├── carriers/
+│   ├── delivery_planning/
+│   ├── delivery_ranges/
+│   ├── admins/                                ← Solo carga inicial
+│   └── customers/                             ← Solo carga inicial
+│
+└── metro/                                     ← CLIENTE 2 (misma estructura)
+    ├── orders/
+    │   └── year=2026/month=03/day=04/
+    │       ├── 1709567890.json
+    │       └── 1709568190.json
+    ├── order_items/
+    ├── ... (26 tablas idénticas a wongio)
+    └── customers/
+
+TOTAL: 2 clientes × 26 tablas = 52 carpetas
 ```
+
+**Ventajas del Multi-Tenant:**
+- ✅ Aislamiento completo de datos por cliente
+- ✅ Fácil agregar nuevos clientes (solo crear nueva carpeta raíz)
+- ✅ Permisos IAM granulares por cliente
+- ✅ Billing y cost tracking por cliente
+- ✅ Procesamiento independiente por cliente en ETL
 
 ### Autenticación
 

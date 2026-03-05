@@ -1,36 +1,109 @@
 {
   "apis": {
     "orders": {
-      "endpoint": "orders",
+      "endpoint": "order",
+      "base_url": "https://oms.janis.in/api",
       "schedule": "rate(5 minutes)",
-      "requires_enrichment": true,
-      "enrichment_endpoint": "orders/{id}/items",
-      "priority": "high"
+      "priority": "high",
+      "tables": ["wms_orders", "wms_order_items", "wms_order_item_weighables", "wms_order_payments", "wms_order_payments_connector_responses", "wms_order_custom_data_fields", "invoices"]
     },
-    "products": {
-      "endpoint": "products",
-      "schedule": "rate(1 hour)",
-      "requires_enrichment": true,
-      "enrichment_endpoint": "products/{id}/skus",
-      "priority": "medium"
+    "picking_sessions": {
+      "endpoint": "session",
+      "base_url": "https://picking.janis.in/api",
+      "schedule": "rate(5 minutes)",
+      "priority": "high",
+      "tables": ["wms_order_picking"]
+    },
+    "order_history": {
+      "endpoint": "order/{id}/history",
+      "base_url": "https://oms.janis.in/api",
+      "schedule": "rate(5 minutes)",
+      "priority": "high",
+      "tables": ["wms_order_status_changes"]
+    },
+    "shipping": {
+      "endpoint": "shipping",
+      "base_url": "https://delivery.janis.in/api",
+      "schedule": "rate(5 minutes)",
+      "priority": "high",
+      "tables": ["wms_order_shipping"]
     },
     "stock": {
       "endpoint": "stock",
+      "base_url": "https://wms.janis.in/api",
       "schedule": "rate(10 minutes)",
-      "requires_enrichment": false,
-      "priority": "high"
+      "priority": "high",
+      "tables": ["stock"]
     },
     "prices": {
-      "endpoint": "prices",
+      "endpoint": "price",
+      "base_url": "https://pricing.janis.in/api",
       "schedule": "rate(30 minutes)",
-      "requires_enrichment": false,
-      "priority": "medium"
+      "priority": "medium",
+      "tables": ["price"]
+    },
+    "sc_sku_prices": {
+      "endpoint": "sc-sku-price",
+      "base_url": "https://pricing.janis.in/api",
+      "schedule": "rate(30 minutes)",
+      "priority": "medium",
+      "tables": ["price"]
+    },
+    "products": {
+      "endpoint": "product",
+      "base_url": "https://catalog.janis.in/api",
+      "schedule": "rate(1 hour)",
+      "priority": "medium",
+      "tables": ["products"]
+    },
+    "skus": {
+      "endpoint": "sku",
+      "base_url": "https://catalog.janis.in/api",
+      "schedule": "rate(1 hour)",
+      "priority": "medium",
+      "tables": ["skus"]
+    },
+    "categories": {
+      "endpoint": "category",
+      "base_url": "https://catalog.janis.in/api",
+      "schedule": "rate(1 hour)",
+      "priority": "low",
+      "tables": ["categories"]
+    },
+    "brands": {
+      "endpoint": "brand",
+      "base_url": "https://catalog.janis.in/api",
+      "schedule": "rate(1 hour)",
+      "priority": "low",
+      "tables": ["brands"]
     },
     "stores": {
       "endpoint": "stores",
-      "schedule": "rate(1 day)",
-      "requires_enrichment": false,
-      "priority": "low"
+      "base_url": "https://commerce.janis.in/api",
+      "schedule": "rate(24 hours)",
+      "priority": "low",
+      "tables": ["wms_stores"]
+    },
+    "carriers": {
+      "endpoint": "carrier",
+      "base_url": "https://delivery.janis.in/api",
+      "schedule": "rate(24 hours)",
+      "priority": "low",
+      "tables": ["wms_logistic_carriers"]
+    },
+    "delivery_planning": {
+      "endpoint": "route-planning",
+      "base_url": "https://tms.janis.in/api",
+      "schedule": "rate(24 hours)",
+      "priority": "low",
+      "tables": ["wms_logistic_delivery_planning"]
+    },
+    "delivery_ranges": {
+      "endpoint": "time-slot",
+      "base_url": "https://delivery.janis.in/api",
+      "schedule": "rate(24 hours)",
+      "priority": "low",
+      "tables": ["wms_logistic_delivery_ranges"]
     }
   },
   "rate_limiting": {
@@ -41,9 +114,5 @@
   "pagination": {
     "page_size": 100,
     "max_pages": 1000
-  },
-  "incremental": {
-    "overlap_minutes": 1,
-    "date_field": "dateModified"
   }
 }

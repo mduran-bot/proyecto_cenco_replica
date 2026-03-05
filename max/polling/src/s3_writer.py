@@ -10,6 +10,7 @@ Este módulo maneja la escritura de datos al bucket S3 Bronze con:
 import json
 import os
 import boto3
+from botocore.exceptions import ClientError
 from datetime import datetime
 from typing import List, Dict, Optional, Any
 import logging

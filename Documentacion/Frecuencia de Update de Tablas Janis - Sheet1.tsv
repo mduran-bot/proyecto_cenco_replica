@@ -1,0 +1,273 @@
+Tabla	Campo	Var Type	Utilizado	Campo en Json	Mapeo api endpoint	frecuencia
+wms_orders	vtex_id	varchar(50)	SI	commerceId	https://oms.janis.in/api/order	5 min
+wms_orders	id	bigint	SI	id	https://oms.janis.in/api/order	5 min
+wms_orders	seq_id	varchar(50)	SI	commerceSequentialId	https://oms.janis.in/api/order	5 min
+wms_orders	ecommerce_account	bigint	SI	account.id	https://oms.janis.in/api/order	5 min
+wms_orders	seller_id	bigint	SI	seller.id	https://oms.janis.in/api/order	5 min
+wms_orders	seller_ecom_id	varchar(50)	SI	seller.commerceId	https://oms.janis.in/api/order	5 min
+wms_orders	website_name	varchar(100)	SI	salesChannelName	https://oms.janis.in/api/order	5 min
+wms_orders	customer	bigint	SI	customer.id	https://oms.janis.in/api/order	5 min
+wms_orders	customer_address	bigint	SI	addresses[].id	https://oms.janis.in/api/order	5 min
+wms_orders	store	bigint	SI	statusPerLocation[].locationId	https://oms.janis.in/api/order	5 min
+wms_orders	sales_channel	smallint	SI	salesChannelId	https://oms.janis.in/api/order	5 min
+wms_orders	invoice_date	bigint	SI	invoices[].dateCreated	https://oms.janis.in/api/order	5 min
+wms_orders	invoice_number	varchar(80)	SI	invoices[].number	https://oms.janis.in/api/order	5 min
+wms_orders	invoice_ammount	float(12,2)	SI	invoices[].amount	https://oms.janis.in/api/order	5 min
+wms_orders	product_qty	smallint	SI	productsQuantity	https://oms.janis.in/api/order	5 min
+wms_orders	items_qty	smallint	SI	itemsQuantity	https://oms.janis.in/api/order	5 min
+wms_orders	product_qty_picked	smallint	SI	pickingSessions.totalProductsPicked	https://picking.janis.in/api/session/{id}	5 min
+wms_orders	items_qty_picked	smallint	SI	pickingSessions.totalItemsPicked	https://picking.janis.in/api/session/{id}	5 min
+wms_orders	product_substitute_qty	smallint	SI	pickingSessions.totalProductsSubstitutes	https://picking.janis.in/api/session/{id}	5 min
+wms_orders	items_substitute_qty	smallint	SI	pickingSessions.totalItemsSubstitutes	https://picking.janis.in/api/session/{id}	5 min
+wms_orders	product_substituted_qty	smallint	SI	pickingSessions.totalProductsSubstitutes	https://picking.janis.in/api/session/{id}	5 min
+wms_orders	product_qty_missing	smallint	SI	pickingSessions.totalProductsMissing	https://picking.janis.in/api/session/{id}	5 min
+wms_orders	total	decimal(15,5)	SI	totalAmount	https://oms.janis.in/api/order	5 min
+wms_orders	total_items	decimal(15,5)	SI	totals.items.amount	https://oms.janis.in/api/order	5 min
+wms_orders	total_discount	decimal(15,5)	SI	totals.discounts.amount	https://oms.janis.in/api/order	5 min
+wms_orders	total_shipping	decimal(15,5)	SI	totals.shipping.amount	https://oms.janis.in/api/order	5 min
+wms_orders	total_changes	decimal(15,5)	SI	totals.items.amount - totals.items.originalAmount	https://oms.janis.in/api/order	5 min
+wms_orders	total_original	decimal(15,5)	SI	originalAmount	https://oms.janis.in/api/order	5 min
+wms_orders	total_items_original	decimal(15,5)	SI	totals.items.originalAmount	https://oms.janis.in/api/order	5 min
+wms_orders	amount_to_capture	decimal(15,5)	SI	totalAmount	https://oms.janis.in/api/order	5 min
+wms_orders	items_qty_original	smallint	SI	pickingSessions.totalItems	https://oms.janis.in/api/order	5 min
+wms_orders	total_shipping_original	decimal(15,5)	SI	totals.shipping.originalAmount	https://oms.janis.in/api/order	5 min
+wms_orders	total_discount_original	decimal(15,5)	SI	totals.discounts.originalAmount	https://oms.janis.in/api/order	5 min
+wms_orders	status	smallint	SI	status	https://oms.janis.in/api/order	5 min
+wms_orders	user_created	bigint	SI	userCreated	https://oms.janis.in/api/order	5 min
+wms_orders	user_modified	bigint	SI	userModified	https://oms.janis.in/api/order	5 min
+wms_orders	date_created	bigint	SI	dateCreated	https://oms.janis.in/api/order	5 min
+wms_orders	date_picked	bigint	SI	N/A	https://oms.janis.in/api/order	5 min
+admins	id	bigint unsigned	SI	id (alfanumerico)	https://id.janis.in/api/user/{id}	sin update
+admins	employee_id	varchar(50)	SI	employeeId	https://id.janis.in/api/user/{id}	sin update
+admins	firstname	varchar(255)	SI	firstname	https://id.janis.in/api/user	sin update
+admins	lastname	varchar(255)	SI	lastname	https://id.janis.in/api/user	sin update
+admins	email	varchar(255)	SI	email	https://id.janis.in/api/user	sin update
+admins	username	varchar(255)	SI	N/A	https://id.janis.in/api/user/{id}	sin update
+admins	document	varchar(50)	SI	documentNumber	https://id.janis.in/api/user	sin update
+wms_order_shipping	id	bigint unsigned	SI	id	https://oms.janis.in/api/order	5 min
+wms_order_shipping	order_id	bigint unsigned	SI	(en shippings array)	https://oms.janis.in/api/order	5 min
+wms_order_shipping	city	varchar(255)	SI	addresses[].city	https://oms.janis.in/api/order	5 min
+wms_order_shipping	neighborhood	varchar(255)	SI	addresses[].neighborhood	https://oms.janis.in/api/order	5 min
+wms_order_shipping	complement	varchar(255)	SI	addresses[].complement	https://oms.janis.in/api/order	5 min
+wms_order_shipping	lat	decimal(12,9)	SI	addresses[].lat	https://oms.janis.in/api/order	5 min
+wms_order_shipping	lng	decimal(12,9)	SI	addresses[].lng	https://oms.janis.in/api/order	5 min
+wms_order_shipping	carrier_id	varchar(50)	SI	carrierId	https://oms.janis.in/api/order	5 min
+wms_order_shipping	shipping_window_start	bigint unsigned	SI	deliveryWindow.initialDate	https://oms.janis.in/api/order	5 min
+wms_order_shipping	shipping_window_end	bigint unsigned	SI	deliveryWindow.finalDate	https://oms.janis.in/api/order	5 min
+wms_order_shipping	shipped_date_start	bigint	SI	dateModified	https://oms.janis.in/api/order	5 min
+wms_order_shipping	shipped_date_end	bigint	SI	dateModified	https://oms.janis.in/api/order	5 min
+wms_order_shipping	flags	smallint unsigned	SI	Status o tracking.statuses	https://delivery.janis.in/api/shipping/{id}	5 min
+wms_order_shipping	linear_distance	decimal(6,1)	SI	expectedDistance	https://delivery.janis.in/api/shipping/{id}	5 min
+wms_logistic_carriers	id	bigint unsigned	SI	[].id	https://delivery.janis.in/api/carrier	24 horas
+wms_logistic_carriers	ref_id	varchar(50)	SI	[].refId	https://delivery.janis.in/api/carrier	24 horas
+wms_logistic_carriers	name	varchar(255)	SI	[].name	https://delivery.janis.in/api/carrier	24 horas
+wms_logistic_carriers	type	varchar(255)	SI	[].shippingType	https://delivery.janis.in/api/carrier	24 horas
+wms_logistic_carriers	quota	smallint unsigned	SI	[].defaultShippingQuantity	https://delivery.janis.in/api/carrier	24 horas
+wms_logistic_carriers	status	smallint	SI	[].status	https://delivery.janis.in/api/carrier	24 horas
+wms_order_items	id	bigint unsigned	SI	items[].id	GET https://oms.janis.in/api/order/{id}	5 min
+wms_order_items	order_id	bigint	SI	id (orden padre)	GET https://oms.janis.in/api/order/{id}	5 min
+wms_order_items	substitute_of	bigint unsigned	SI	items[].pickingResult[].substituteOf	GET https://oms.janis.in/api/order/{id}	5 min
+wms_order_items	sku	bigint unsigned	SI	items[].skuId	GET https://oms.janis.in/api/order/{id}	5 min
+wms_order_items	product	bigint unsigned	SI	items[].commerceProductId	GET https://oms.janis.in/api/order/{id}	5 min
+wms_order_items	ref_id	varchar(50)	SI	items[].refId	GET https://oms.janis.in/api/order/{id}	5 min
+wms_order_items	name	varchar(100)	SI	items[].name	GET https://oms.janis.in/api/order/{id}	5 min
+wms_order_items	list_price	float(12,2) unsigned	SI	items[].purchasedListPrice	GET https://oms.janis.in/api/order/{id}	5 min
+wms_order_items	price	float(12,2) unsigned	SI	items[].purchasedPrice	GET https://oms.janis.in/api/order/{id}	5 min
+wms_order_items	selling_price	decimal(15,5) unsigned	SI	pickingResult[].price	https://oms.janis.in/api/order/	5 min
+wms_order_items	selling_price_original	decimal(15,5) unsigned	SI	items[].purchasedPrice	https://oms.janis.in/api/order/	5 min
+wms_order_items	quantity	smallint unsigned	SI	items[].purchasedQuantity	GET https://oms.janis.in/api/order/{id}	5 min
+wms_order_items	quantity_picked	smallint unsigned	SI	items[].pickingResult[].quantity	GET https://oms.janis.in/api/order/{id}	5 min
+wms_order_items	quantity_invoiced	smallint unsigned	SI	items[].invoicedQuantity	GET https://oms.janis.in/api/order/{id}	5 min
+wms_order_items	quantity_returned	smallint unsigned	SI	items[].returnedQuantity	GET https://oms.janis.in/api/order/{id}	5 min
+wms_order_items	substitute_type	tinyint unsigned	SI	items[].pickingResult[].type	GET https://oms.janis.in/api/order/{id}	5 min
+wms_order_items	measurement_unit	varchar(5)	SI	items[].sellingMeasurementUnit	GET https://oms.janis.in/api/order/{id}	5 min
+wms_order_items	unit_multiplier	float(7,5) unsigned	SI	items[].sellingUnitMultiplier	GET https://oms.janis.in/api/order/{id}	5 min
+wms_order_item_weighables	id	bigint unsigned	SI	items.measurementUnit: kg // ProductGroup name:weightables	https://oms.janis.in/api/order/{id}	5 min
+wms_order_item_weighables	order_id	bigint unsigned	SI	id (orden padre)	https://oms.janis.in/api/order/{id}	5 min
+wms_order_item_weighables	order_item	bigint unsigned	SI	items[].id	https://oms.janis.in/api/order/{id}	5 min
+wms_order_item_weighables	weight	int unsigned	SI	items[].dimensions.weight	https://oms.janis.in/api/order/{id}	5 min
+wms_order_item_weighables	weight_picked	decimal(15,3)	SI	items[].pickingResult.weight	https://oms.janis.in/api/order/{id}	5 min
+wms_order_item_weighables	price	decimal(15,5) unsigned	SI	items[].purchasedPrice	https://oms.janis.in/api/order/{id}	5 min
+wms_order_item_weighables	quantity	smallint	SI	items[].pickingResult.quantity	https://oms.janis.in/api/order/{id}	5 min
+wms_order_status_changes	order_id	bigint unsigned	SI	id	https://oms.janis.in/api/order/{id}	5 min
+wms_order_status_changes	extra	text	SI	customData	https://oms.janis.in/api/order/{id}/history	5 min
+wms_order_status_changes	old_status	int	SI	notifyOrderChangeStatus	https://oms.janis.in/api/order/{id}/	5 min
+wms_order_status_changes	new_status	int	SI	name	https://oms.janis.in/api/order/{id}/history	5 min
+wms_order_status_changes	user_created	bigint	SI	userCreated	https://oms.janis.in/api/order/{id}/history	5 min
+wms_order_status_changes	date_created	bigint	SI	dateCreated	https://oms.janis.in/api/order/{id}/history	5 min
+wms_stores	id	bigint	SI	id	https://commerce.janis.in/api/stores	24 horas
+wms_stores	title	varchar(255)	SI	title	https://commerce.janis.in/api/stores	24 horas
+wms_stores	name	varchar(255)	SI	name	https://commerce.janis.in/api/stores	24 horas
+wms_stores	ref_id	varchar(10)	SI	refId	https://commerce.janis.in/api/stores	24 horas
+wms_stores	erp_id	varchar(50)	SI	erpId	https://commerce.janis.in/api/stores	24 horas
+wms_stores	code	varchar(50)	SI	code	https://commerce.janis.in/api/stores	24 horas
+wms_stores	sales_channel	int unsigned	SI	salesChannel	https://commerce.janis.in/api/stores	24 horas
+wms_stores	ecommerce_account_id	bigint	SI	ecommerceAccountId	https://commerce.janis.in/api/stores	24 horas
+wms_stores	country	bigint unsigned	SI	country	https://commerce.janis.in/api/stores	24 horas
+wms_stores	street_name	varchar(255)	SI	streetName	https://commerce.janis.in/api/stores	24 horas
+wms_stores	street_number	varchar(50)	SI	streetNumber	https://commerce.janis.in/api/stores	24 horas
+wms_stores	postal_code	varchar(10)	SI	postalCode	https://commerce.janis.in/api/stores	24 horas
+wms_stores	city	varchar(255)	SI	city	https://commerce.janis.in/api/stores	24 horas
+wms_stores	state	varchar(255)	SI	state	https://commerce.janis.in/api/stores	24 horas
+wms_stores	neighborhood	varchar(255)	SI	neighborhood	https://commerce.janis.in/api/stores	24 horas
+wms_stores	lat	decimal(12,9)	SI	lat	https://commerce.janis.in/api/stores	24 horas
+wms_stores	lng	decimal(12,9)	SI	lng	https://commerce.janis.in/api/stores	24 horas
+wms_stores	phone	varchar(50)	SI	phone	https://commerce.janis.in/api/stores	24 horas
+wms_stores	apply_quotation	tinyint(1)	SI	applyQuotation	https://commerce.janis.in/api/stores	24 horas
+wms_stores	status	tinyint	SI	status	https://commerce.janis.in/api/stores	24 horas
+wms_stores	complement	varchar(255)	SI	complement	https://commerce.janis.in/api/stores	24 horas
+wms_stores	date_modified	bigint	SI	dateModified	https://commerce.janis.in/api/stores	24 horas
+wms_stores	date_created	bigint	SI	dateCreated	https://commerce.janis.in/api/stores	24 horas
+wms_logistic_delivery_planning	id	bigint unsigned	SI	[].id	https://tms.janis.in/api/route-planning	24 horas
+wms_logistic_delivery_planning	store	bigint unsigned	SI	[].warehouseIds[]	https://tms.janis.in/api/route-planning	24 horas
+wms_logistic_delivery_planning	delivery_range	bigint unsigned	SI	[].schedule	https://tms.janis.in/api/route-planning	24 horas
+wms_logistic_delivery_planning	quantity	smallint unsigned	SI	[].totals.shippingCount	https://tms.janis.in/api/route-planning	24 horas
+wms_logistic_delivery_planning	dynamic_quota	smallint	SI	N/A	N/A	24 horas
+wms_logistic_delivery_planning	quantity_new	int unsigned	SI	totals.new.count	https://delivery.janis.in/api/time-slot-order	24 horas
+wms_logistic_delivery_planning	quantity_picking	int unsigned	SI	totals.picking.count	https://delivery.janis.in/api/time-slot-order	24 horas
+wms_logistic_delivery_planning	quantity_picked	int unsigned	SI	totals.picked.count	https://delivery.janis.in/api/time-slot-order	24 horas
+wms_logistic_delivery_planning	quantity_invoiced	int unsigned	SI	totals.invoiced.count	https://delivery.janis.in/api/time-slot-order	24 horas
+wms_logistic_delivery_planning	quantity_shipped	int unsigned	SI	totals.inDeñivery.count	https://delivery.janis.in/api/time-slot-order	24 horas
+wms_logistic_delivery_planning	quantity_delivered	int unsigned	SI	totals.delivered.count	https://delivery.janis.in/api/time-slot-order	24 horas
+wms_logistic_delivery_planning	offset	float(12,2) unsigned	SI	closingTime	https://delivery.janis.in/api/time-slot-order	24 horas
+wms_logistic_delivery_planning	offset_start	float(12,2) unsigned	SI	dateStart		24 horas
+wms_logistic_delivery_planning	date_start	bigint unsigned	SI	[].schedule.from	https://tms.janis.in/api/route-planning	24 horas
+wms_logistic_delivery_planning	date_end	bigint unsigned	SI	[].schedule.to	https://tms.janis.in/api/route-planning	24 horas
+wms_logistic_delivery_planning	edited	tinyint unsigned	SI	N/A		24 horas
+wms_logistic_delivery_planning	is_blocked	tinyint(1)	SI	locked.isLocked	https://delivery.janis.in/api/carrier-group-time-slot	24 horas
+wms_logistic_delivery_planning	block_origin	smallint unsigned	SI	lock.reason	https://delivery.janis.in/api/time-slot	24 horas
+wms_logistic_delivery_planning	block_date	bigint unsigned	SI	lock.date	https://delivery.janis.in/api/time-slot	24 horas
+wms_logistic_delivery_planning	block_quota	smallint unsigned	SI	capacity.used	https://delivery.janis.in/api/time-slot	24 horas
+wms_logistic_delivery_planning	block_offset	smallint unsigned	SI	capacity	https://delivery.janis.in/api/time-slot	24 horas
+wms_logistic_delivery_planning	status	tinyint unsigned	SI	[].status	https://tms.janis.in/api/route-planning	24 horas
+wms_logistic_delivery_planning	date_created	bigint	SI	[].dateCreated	https://tms.janis.in/api/route-planning	24 horas
+wms_logistic_delivery_planning	date_modified	bigint	SI	[].dateModified	https://tms.janis.in/api/route-planning	24 horas
+wms_logistic_delivery_ranges	id	bigint unsigned	SI	id	https://delivery.janis.in/api/time-slot	24 horas
+wms_logistic_delivery_ranges	ref_id	varchar(100)	SI	referenceId	https://delivery.janis.in/api/time-slot	24 horas
+wms_logistic_delivery_ranges	carrier	bigint unsigned	SI	carrierId	https://delivery.janis.in/api/time-slot	24 horas
+wms_logistic_delivery_ranges	time_start	char(5)	SI	initialTime	https://delivery.janis.in/api/time-slot	24 horas
+wms_logistic_delivery_ranges	time_end	char(5)	SI	finalTime	https://delivery.janis.in/api/time-slot	24 horas
+wms_logistic_delivery_ranges	status	smallint	SI	status	https://delivery.janis.in/api/time-slot	24 horas
+wms_order_payments	id	bigint unsigned	SI	payments[].id	GET https://oms.janis.in/api/order/{id}	5 min
+wms_order_payments	order_id	bigint unsigned	SI	id (orden padre)	GET https://oms.janis.in/api/order/{id}	5 min
+wms_order_payments	tid	varchar(100)	SI	payments[].tid	GET https://oms.janis.in/api/order/{id}	5 min
+wms_order_payments	payment_system	varchar(50)	SI	payments[].paymentSystemCommerceId	GET https://oms.janis.in/api/order/{id}	5 min
+wms_order_payments	payment_system_name	varchar(100)	SI	payments[].paymentSystemName	GET https://oms.janis.in/api/order/{id}	5 min
+wms_order_payments	payment_group	varchar(100)	SI	payments[].paymentGroup	GET https://oms.janis.in/api/order/{id}	5 min
+wms_order_payments	cc_bank	varchar(50)	SI	payments[].acquirer	GET https://oms.janis.in/api/order/{id}	5 min
+wms_order_payments	cc_brand	varchar(50)	SI	payments[].paymentSystemName	GET https://oms.janis.in/api/order/{id}	5 min
+wms_order_payments	cc_type	varchar(50)	SI	payments[].paymentGroup	GET https://oms.janis.in/api/order/{id}	5 min
+wms_order_payments	auth_id	varchar(255)	SI	payments[].authorizationId	GET https://oms.janis.in/api/order/{id}	5 min
+wms_order_payments	authorization_code	varchar(100)	SI	N/A	N/A	
+wms_order_payments_connector_responses	payment_id	bigint unsigned	SI	payments[].id	https://oms.janis.in/api/order	5 min
+wms_order_payments_connector_responses	field	varchar(255)	SI	payments[].connectorResponses.{key}	https://oms.janis.in/api/order	5 min
+wms_order_payments_connector_responses	value	text	SI	payments[].connectorResponses.{value}	https://oms.janis.in/api/order	5 min
+wms_order_custom_data_fields	order_id	bigint unsigned	SI	id	https://oms.janis.in/api/order	5 min
+wms_order_custom_data_fields	app_id	varchar(100)	SI	customData.{appId}	https://oms.janis.in/api/order	5 min
+wms_order_custom_data_fields	field	varchar(100)	SI	customData.{appId}.{field}	https://oms.janis.in/api/order	5 min
+wms_order_custom_data_fields	value	text	SI	customData.{appId}.{field}.value	https://oms.janis.in/api/order	5 min
+products	id	bigint unsigned	SI	id	https://catalog.janis.in/api/product	1 hora
+products	ref_id	varchar(100)	SI	referenceId	https://catalog.janis.in/api/product	1 hora
+products	vtex_id	bigint unsigned	SI	commerceId	https://catalog.janis.in/api/product	1 hora
+products	ref_code	varchar(100)	SI	code	https://catalog.janis.in/api/product	1 hora
+products	name	varchar(150)	SI	name	https://catalog.janis.in/api/product	1 hora
+products	alt_name	varchar(150)	SI	title	https://catalog.janis.in/api/product	1 hora
+products	erp_category	bigint unsigned	SI	N/A	https://catalog.janis.in/api/product	1 hora
+products	category	bigint unsigned	SI	categoryId	https://catalog.janis.in/api/product	1 hora
+products	erp_brand	bigint unsigned	SI	N/A	https://catalog.janis.in/api/product	1 hora
+products	brand	bigint unsigned	SI	brandId	https://catalog.janis.in/api/product	1 hora
+products	supplier	bigint unsigned	SI	N/A	https://catalog.janis.in/api/product	1 hora
+products	description	text	SI	description	https://catalog.janis.in/api/product	1 hora
+products	description_short	varchar(255)	SI	shortDescription	https://catalog.janis.in/api/product	1 hora
+products	infinite_stock	tinyint(1)	SI	hasInfiniteStock	https://catalog.janis.in/api/product	1 hora
+products	sales_channels	varchar(255)	SI	salesChannels	https://catalog.janis.in/api/product	1 hora
+products	cart_limit	int unsigned	SI	N/A	https://catalog.janis.in/api/product	1 hora
+products	min_stock	int	SI	N/A	https://catalog.janis.in/api/product	1 hora
+products	status	bigint	SI	status	https://catalog.janis.in/api/product	1 hora
+products	date_modified	bigint	SI	dateModified	https://catalog.janis.in/api/product	1 hora
+products	user_modified	bigint unsigned	SI	userModified	https://catalog.janis.in/api/product	1 hora
+skus	id	bigint unsigned	SI	id	GET https://catalog.janis.in/api/sku	1 hora
+skus	ref_id	varchar(100)	SI	referenceId	GET https://catalog.janis.in/api/sku	1 hora
+skus	vtex_id	int unsigned	SI	commerceId	GET https://catalog.janis.in/api/sku	1 hora
+skus	stock_erp_id	varchar(50)	SI	attributes[?]	GET https://catalog.janis.in/api/sku/{id}/attribute	1 hora
+skus	ean	varchar(65)	SI	eans[0]	GET https://catalog.janis.in/api/sku	1 hora
+skus	product	bigint unsigned	SI	product	GET https://catalog.janis.in/api/sku	1 hora
+skus	name	varchar(150)	SI	name	GET https://catalog.janis.in/api/sku	1 hora
+skus	alt_name	varchar(150)	SI	attributes[?]	GET https://catalog.janis.in/api/sku/{id}/attribute	1 hora
+skus	height	float(8,2) unsigned	SI	measures.height	GET https://catalog.janis.in/api/sku	1 hora
+skus	length	float(8,2) unsigned	SI	measures.depth	GET https://catalog.janis.in/api/sku	1 hora
+skus	width	float(8,2) unsigned	SI	measures.width	GET https://catalog.janis.in/api/sku	1 hora
+skus	weight	float(8,2) unsigned	SI	measures.weight	GET https://catalog.janis.in/api/sku	1 hora
+skus	shipment_packages	bigint	SI	packageMeasures	GET https://catalog.janis.in/api/sku	1 hora
+skus	measurement_unit	bigint unsigned	SI	measurementUnit	GET https://catalog.janis.in/api/sku	1 hora
+skus	measurement_unit_un	bigint unsigned	SI	sellingMeasurementUnit	GET https://catalog.janis.in/api/sku	1 hora
+skus	unit_multiplier	float(7,5) unsigned	SI	unitMultiplier	GET https://catalog.janis.in/api/sku	1 hora
+skus	unit_multiplier_un	float(12,5) unsigned	SI	sellingUnitMultiplier	GET https://catalog.janis.in/api/sku	1 hora
+skus	eta	varchar(10)	SI	expirationDays	GET https://catalog.janis.in/api/sku	1 hora
+skus	picking_unit	smallint unsigned	SI	measurementUnit (derivado)	GET https://catalog.janis.in/api/sku	1 hora
+skus	stock_base_measurement_unit	bigint unsigned	SI	measurementUnit	GET https://catalog.janis.in/api/sku	1 hora
+skus	pack_units	smallint unsigned	SI	attributes[?]	GET https://catalog.janis.in/api/sku/{id}/attribute	1 hora
+skus	legal_measurement_unit	varchar(5)	SI	measurementUnit	GET https://catalog.janis.in/api/sku	1 hora
+skus	legal_unit_multiplier	float(8,3)	SI	N/A	GET https://catalog.janis.in/api/sku	1 hora
+skus	min_stock	int unsigned	SI	N/A	GET https://catalog.janis.in/api/sku	1 hora
+skus	modal	bigint unsigned	SI	modalType	GET https://catalog.janis.in/api/sku	1 hora
+skus	base_price	float(12,2) unsigned	SI	price	https://pricing.janis.in/api/base-price/{id}	1 hora
+skus	status	bigint	SI	status	GET https://catalog.janis.in/api/sku	1 hora
+skus	flags_client	int unsigned	SI	N/A	GET https://catalog.janis.in/api/sku	1 hora
+skus	manufacturer_code	varchar(100)	SI	manufacturerCode	GET https://catalog.janis.in/api/sku	1 hora
+skus	date_created	bigint	SI	dateCreated	GET https://catalog.janis.in/api/sku	1 hora
+categories	id	bigint	SI	id	https://catalog.janis.in/api/category	1 hora
+categories	ref_id	int	SI	referenceId	https://catalog.janis.in/api/category	1 hora
+categories	name	varchar(100)	SI	name	https://catalog.janis.in/api/category	1 hora
+categories	ref_parent	int unsigned	SI	parentId	https://catalog.janis.in/api/category	1 hora
+categories	status	int	SI	status	https://catalog.janis.in/api/category	1 hora
+price	id	bigint	SI	id	https://pricing.janis.in/api/price	30 minutos
+price	item_id	bigint unsigned	SI	sku	https://pricing.janis.in/api/price	30 minutos
+price	store_id	bigint unsigned	SI	salesChannelId	https://pricing.janis.in/api/sc-sku-price	30 minutos
+price	price	float(12,2) unsigned	SI	price	https://pricing.janis.in/api/price	30 minutos
+price	list_price	float(12,2) unsigned	SI	listPrice	https://pricing.janis.in/api/price	30 minutos
+price	cost_price	float(12,2) unsigned	SI	costPrice	https://pricing.janis.in/api/price	30 minutos
+price	store_price	float(12,2) unsigned	SI	price	https://pricing.janis.in/api/sc-sku-price	30 minutos
+price	status	tinyint	SI	status	https://pricing.janis.in/api/price	30 minutos
+price	date_modified	bigint	SI	dateModified	https://pricing.janis.in/api/price	30 minutos
+price	date_created	bigint	SI	dateCreated	https://pricing.janis.in/api/price	30 minutos
+brands	id	bigint unsigned	SI	id	https://catalog.janis.in/api/brand	1 hora
+brands	ref_id	bigint	SI	referenceId	https://catalog.janis.in/api/brand	1 hora
+brands	name	varchar(100)	SI	name	https://catalog.janis.in/api/brand	1 hora
+brands	status	smallint	SI	status	https://catalog.janis.in/api/brand	1 hora
+customers	id	bigint unsigned	SI	id (alfanumerico)	https://crm.janis.in/api/customer	sin update
+customers	vtex_id	varchar(50)	SI	N/A	https://crm.janis.in/api/customer	sin update
+customers	user_id	varchar(50)	SI	commerceId	https://crm.janis.in/api/customer	sin update
+customers	doc_type	varchar(30)	SI	documentType	https://crm.janis.in/api/customer	sin update
+customers	doc	varchar(50)	SI	documentNumber	https://crm.janis.in/api/customer	sin update
+customers	email	varchar(100)	SI	email	https://crm.janis.in/api/customer	sin update
+customers	firstname	varchar(100)	SI	firstname	https://crm.janis.in/api/customer	sin update
+customers	lastname	varchar(100)	SI	lastname	https://crm.janis.in/api/customer	sin update
+customers	phone	varchar(50)	SI	phone	https://crm.janis.in/api/customer	sin update
+customers	points_card	varchar(100)	SI	pointsCard	https://crm.janis.in/api/customer	sin update
+customers	user_modified	bigint unsigned	SI	userModified	https://crm.janis.in/api/customer	sin update
+customers	date_modified	bigint	SI	dateModified	https://crm.janis.in/api/customer	sin update
+wms_order_picking	order_id	bigint	SI	orderIds[] (primer elemento)	https://picking.janis.in/api/session	5 min
+wms_order_picking	picker	bigint unsigned	SI	pickerId	https://picking.janis.in/api/session	5 min
+wms_order_picking	pick_start_time	bigint	SI	startPickingTime	https://picking.janis.in/api/session	5 min
+wms_order_picking	pick_end_time	bigint unsigned	SI	endPickingTime	https://picking.janis.in/api/session	5 min
+wms_order_picking	total_time	smallint unsigned	SI	Derivado (endPickingTime - startPickingTime)	https://picking.janis.in/api/session	5 min
+wms_order_picking	status	smallint unsigned	SI	status	https://picking.janis.in/api/session	5 min
+stock	id	bigint	SI	[].id	https://wms.janis.in/api/stock	10 min
+stock	item_id	bigint unsigned	SI	[].sku	https://wms.janis.in/api/stock	10 min
+stock	store_id	bigint unsigned	SI	warehouseName	https://wms.janis.in/api/stock	10 min
+stock	warehouse_id	bigint unsigned	SI	[].warehouse	https://wms.janis.in/api/stock	10 min
+stock	stock	int unsigned	SI	[].stock	https://wms.janis.in/api/stock	10 min
+stock	store_stock	int	SI	availableStock	https://wms.janis.in/api/stock	10 min
+stock	min_stock	int unsigned	SI	[].securityStock	https://wms.janis.in/api/stock	10 min
+stock	reserve_stock	int unsigned	SI	[].reservedStock	https://wms.janis.in/api/stock	10 min
+stock	infinite_stock	tinyint(1)	SI	[].infiniteStock	https://wms.janis.in/api/stock	10 min
+stock	status	tinyint	SI	[].status	https://wms.janis.in/api/stock	10 min
+stock	date_modified	bigint	SI	[].dateModified	https://wms.janis.in/api/stock	10 min
+stock	date_created	bigint	SI	[].dateCreated	https://wms.janis.in/api/stock	10 min
+invoices	id	bigint	SI	invoices[].id	https://oms.janis.in/api/order	5 min
+invoices	order_id	bigint unsigned	SI	id	https://oms.janis.in/api/order	5 min
+invoices	number	varchar(80)	SI	invoices[].number	https://oms.janis.in/api/order	5 min
+invoices	amount	float(12,2) unsigned	SI	invoices[].amount	https://oms.janis.in/api/order	5 min
+invoices	date_invoiced	bigint	SI	invoices[].dateCreated	https://oms.janis.in/api/order	5 min
+invoices	type	bigint unsigned	SI	invoices[].type	https://oms.janis.in/api/order	5 min

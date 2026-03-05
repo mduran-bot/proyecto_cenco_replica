@@ -17,7 +17,7 @@ Requirements:
 
 import os
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional, Dict, Any
 import boto3
 from botocore.exceptions import ClientError
@@ -47,6 +47,9 @@ class StateManager:
         client_config = {'region_name': os.environ.get('AWS_DEFAULT_REGION', 'us-east-1')}
         if endpoint_url:
             client_config['endpoint_url'] = endpoint_url
+            # Usar credenciales de test para LocalStack
+            client_config['aws_access_key_id'] = os.environ.get('AWS_ACCESS_KEY_ID', 'test')
+            client_config['aws_secret_access_key'] = os.environ.get('AWS_SECRET_ACCESS_KEY', 'test')
         
         self.dynamodb = boto3.resource('dynamodb', **client_config)
         self.table = self.dynamodb.Table(table_name)

@@ -296,22 +296,6 @@ headers = {
 
 **⚠️ Nota de Seguridad:** En producción, estas credenciales deben estar en AWS Secrets Manager.
 
-### Credenciales AWS para S3
-
-El módulo `S3Writer` ahora utiliza variables de entorno para credenciales AWS en lugar de valores hardcodeados:
-
-```bash
-# Configurar credenciales AWS antes de ejecutar
-export AWS_ACCESS_KEY_ID="tu-access-key"
-export AWS_SECRET_ACCESS_KEY="tu-secret-key"
-
-# O en PowerShell
-$env:AWS_ACCESS_KEY_ID = "tu-access-key"
-$env:AWS_SECRET_ACCESS_KEY = "tu-secret-key"
-```
-
-**Valores por defecto para LocalStack:** Si no se configuran las variables de entorno, el sistema usa `'test'` como valores por defecto para testing local con LocalStack.
-
 ### Endpoint de API
 
 El script usa el endpoint de historial de órdenes:
